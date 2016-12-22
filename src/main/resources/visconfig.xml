@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+
+<information>
+
+	<connector>
+	    <width>2</width>
+	    <color>blue</color>
+  	</connector>
+  
+  	<dashedConnector>
+  		<width>1.0</width>
+	    <color>green</color>
+  	</dashedConnector>
+  
+	<font>
+     	<type>sans_serif</type>
+	    <size>10</size>
+	    <width>19</width>
+	</font>
+
+</information>
