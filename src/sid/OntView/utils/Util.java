@@ -148,7 +148,8 @@ public class Util {
 					freshClassPrefix + nextFreshId, 
 					new DefaultPrefixManager(onto.getOntologyID().getOntologyIRI().toString())
 				);
-		OWLDeclarationAxiom declAxiom = new OWLDeclarationAxiomImpl(dataFactory, cls, new HashSet<OWLAnnotation>());
+		
+		OWLDeclarationAxiom declAxiom = dataFactory.getOWLDeclarationAxiom(cls, new HashSet<OWLAnnotation>()); 
 		manager.applyChange(manager.addAxiom(onto, declAxiom).get(0));
 		
 		++nextFreshId;

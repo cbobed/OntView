@@ -83,8 +83,8 @@ public class VisConnectorEquiv extends VisConnector {
 		return false;
 	}
 	
-	
-	   public static VisConnectorEquiv getConnector(ArrayList<VisConnectorEquiv>list, Shape s1,Shape s2){
+		// from Java 1.7 and on they don't allow to override static methods 
+	   public static VisConnectorEquiv getConnectorEquiv(ArrayList<VisConnectorEquiv>list, Shape s1,Shape s2){
 		   for (VisConnectorEquiv c : list){
 			   if ((c.from == s1)&&(c.to==s2)){
 			      return c;
