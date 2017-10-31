@@ -1,4 +1,4 @@
-package sid.OntView.Applet;
+package sid.OntView.main;
 
 import java.awt.Color;
 import java.awt.Component;

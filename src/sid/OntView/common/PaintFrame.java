@@ -201,7 +201,6 @@ public class PaintFrame extends JPanel implements MouseListener,Runnable,MouseMo
 //	   graphObserver.start();
 	   visGraph.addObserver(graphObserver);
 	   
-       
 //	   
 	   stable       = true;
 	   stateChanged = true;

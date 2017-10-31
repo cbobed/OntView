@@ -1605,9 +1605,19 @@ public class VisGraph extends Observable implements Runnable{
 	public void run() {
 		// TODO Auto-generated method stub
 		try {
+			
+			HashSet<OWLClassExpression> topSet = new HashSet<>(); 
+			topSet.add(getActiveOntology().getOWLOntologyManager().getOWLDataFactory().getOWLThing()); 
+			
+//			this.buildReasonedGraph(getActiveOntology(), 
+//					getReasoner(), 
+//					getOWLClassExpressionSet(), 
+//					isExpanded());
+			
+
 			this.buildReasonedGraph(getActiveOntology(), 
 					getReasoner(), 
-					getOWLClassExpressionSet(), 
+					topSet, 
 					isExpanded());
 		} catch (XPathExpressionException e) {
 			e.printStackTrace();

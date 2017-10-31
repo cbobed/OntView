@@ -1,4 +1,4 @@
-package sid.OntView.Applet;
+package sid.OntView.main;
 
 import java.applet.Applet;
 import java.awt.Color;
@@ -55,7 +55,7 @@ import uk.ac.manchester.cs.jfact.JFactFactory;
 
 import java.security.*;
 
-public class Mine extends Applet implements Embedable{
+public class Mine extends JPanel implements Embedable{
 	
 	private static final long serialVersionUID = 1L;
     boolean DEBUG=false;
