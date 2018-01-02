@@ -204,7 +204,7 @@ public class PaintFrame extends JPanel implements MouseListener,Runnable,MouseMo
 //	   
 	   stable       = true;
 	   stateChanged = true;
-	   relax();
+//	   relax();
 	   factor = 1.0;
 	   removeMouseListener(this);
 	   removeMouseMotionListener(this);
@@ -641,7 +641,7 @@ public class PaintFrame extends JPanel implements MouseListener,Runnable,MouseMo
 							upperShapeHeight +=  upperShape.asVisClass().getTotalHeight();
 						if (repellingShape.getPosY()< (upperShape.getPosY()+upperShapeHeight+MIN_Y_SEP)) {
 							upperShape.setPosY(upperShape.getPosY()-upperShape.getHeight()/2);
-							repaint();
+//							repaint();
 						}
 						shapeRepulsion(upperShape, direction);
 					}
@@ -659,7 +659,7 @@ public class PaintFrame extends JPanel implements MouseListener,Runnable,MouseMo
 							z = repellingShape.asVisClass().getTotalHeight();
 						if (repellingShape.getPosY()+z > lowerShape.getPosY()-lowerShape.getHeight()-MIN_Y_SEP) {
 							lowerShape.setPosY(lowerShape.getPosY()+lowerShape.getHeight()/2);
-							repaint();
+//							repaint();
 						}
 						shapeRepulsion(lowerShape, direction);
 					}
