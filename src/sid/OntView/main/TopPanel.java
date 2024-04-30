@@ -56,8 +56,7 @@ public class TopPanel extends JPanel implements ControlPanelInterface {
 
 	private static final long serialVersionUID = 1L;
 	private JButton loadOntologyButton;
-	private JComboBox loadOntologyCombo;
-	private JComboBox loadReasonerCombo;
+	private JComboBox loadOntologyCombo, loadReasonerCombo;
 	private JButton loadReasonerButton;
 	private JPanel jPanelLoad;
 	private JCheckBox expandCheckBox;
