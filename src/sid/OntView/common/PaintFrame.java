@@ -100,7 +100,7 @@ public class PaintFrame extends JPanel implements MouseListener,Runnable,MouseMo
     
     /**
      * sets scaling/zoom factor
-     * @param double d
+     * @param d d
      */
     public void setFactor(double d){factor = d;}
     public void setOriginalSize(Dimension in){ oSize = in;}

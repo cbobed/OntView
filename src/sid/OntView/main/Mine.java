@@ -1,6 +1,5 @@
 package sid.OntView.main;
 
-import java.applet.Applet;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
@@ -11,7 +10,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
 import java.io.File;
 import java.io.IOException;
-import java.security.AccessController;
+//import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -77,7 +76,7 @@ public class Mine extends JPanel implements Embedable{
     /* Code for standalone app initialization */ 
     
     public static void main(String[] args) {
-		
+
     	SwingUtilities.invokeLater(new Runnable(){
     		public void run() {
     			// TODO Auto-generated method stub
@@ -86,18 +85,7 @@ public class Mine extends JPanel implements Embedable{
     	});
 
 	}
-    
-    /* Code for applet initialization */ 
-    
-    public void init(){
-    	
-    	SwingUtilities.invokeLater(new Runnable() {
-    		public void run() {
-    			createAndShowGUIApplet();
-    		}
-    	});
-    
-    }
+
 
 	public static void createAndShowGUI() {
     	
@@ -115,8 +103,8 @@ public class Mine extends JPanel implements Embedable{
         frame.setSize(800,600);
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         frame.setVisible(true);
-    	viewer.self = viewer; 
-    	
+    	viewer.self = viewer;
+
     	viewer.entityNameSet = new HashSet<String>();
 		viewer.setLayout(new BoxLayout(viewer, BoxLayout.Y_AXIS));
         viewer.artPanel = new PaintFrame();
@@ -126,7 +114,7 @@ public class Mine extends JPanel implements Embedable{
         viewer.nTopPanel = new TopPanel(viewer);
         viewer.nTopPanel.setAlignmentX(RIGHT_ALIGNMENT);
         viewer.add(viewer.nTopPanel);
-       // JScrollPane scroll      = new JScrollPane(artPanel);   
+       // JScrollPane scroll      = new JScrollPane(artPanel);
         viewer.scroll = new JScrollPane(viewer.artPanel);
         viewer.add(viewer.scroll);
         viewer.setVisible(true);
@@ -298,12 +286,12 @@ public class Mine extends JPanel implements Embedable{
 		renamer.applyNaming(true); 
     }
     
-    public void refreshOntology (String ontologyString, String reasonerString) {
+    /*public void refreshOntology (String ontologyString, String reasonerString) {
     	
     	 AccessController.doPrivileged(new RefreshingAction(ontologyString, reasonerString));
     	
-    }
-    
+    }*/
+
     class RefreshingAction implements PrivilegedAction {
     	String ontologyString; 
     	String reasonerString; 
@@ -334,10 +322,10 @@ public class Mine extends JPanel implements Embedable{
     		return null;
     	}
     }
-    
+    /*
     public void refreshOntologyFromString(String ontologyString, String reasonerString) {
     	 AccessController.doPrivileged(new RefreshingFromStringAction(ontologyString, reasonerString));
-    }
+    }*/
     
     class RefreshingFromStringAction implements PrivilegedAction {
     	String ontologyString; 

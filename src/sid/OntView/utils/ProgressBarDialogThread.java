@@ -28,12 +28,16 @@ public class ProgressBarDialogThread extends VisGraphObserver{
 		super(ppaintframe.getVisGraph());
 		paintframe = ppaintframe;
 		progressDialog = new JDialog();
+
 		progressBar = new JProgressBar(0, 100);
 		progressBar.setStringPainted(true);
+
 		progressDialog.add(progressBar);
+
 		progressBar.setPreferredSize(new Dimension(BARWIDTH,BARHEIGHT));
 		progressBar.setString(Integer.toString(getProgress()));
 		progressBar.setVisible(true);
+
 		progressDialog.setSize(new Dimension(BARWIDTH,BARHEIGHT));
 		progressDialog.pack();
 		progressDialog.setLocation((int)paintframe.getVisibleRect().getWidth()/ 2-BARWIDTH, 
