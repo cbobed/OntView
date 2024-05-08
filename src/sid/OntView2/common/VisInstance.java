@@ -1,133 +1,55 @@
 package sid.OntView2.common;
 
-import javax.swing.*;
-import java.awt.*;
-import java.util.ArrayList;
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.Cursor;
+import javafx.scene.control.*;
+
+import java.io.Serial;
+import java.io.Serializable;
+
+import javax.swing.UIManager;
 
 //VS4E -- DO NOT REMOVE THIS LINE!
-public class VisInstance extends JDialog {
+public class VisInstance extends Dialog<Void> implements Serializable {
 
+	@Serial
 	private static final long serialVersionUID = 1L;
-	private JList jList0;
-	private JScrollPane jScrollPane0;
-	private static final String PREFERRED_LOOK_AND_FEEL = "com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel";
+	private ListView<String> list0;
+	//private static final String PREFERRED_LOOK_AND_FEEL = "com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel";
 	public VisInstance() {
 		initComponents();
 	}
 
-	public VisInstance(Frame parent) {
-		super(parent);
-		initComponents();
-	}
-
-	public VisInstance(Frame parent, boolean modal) {
-		super(parent, modal);
-		initComponents();
-	}
-
-	public VisInstance(Frame parent, String title) {
-		super(parent, title);
-		initComponents();
-	}
-
-	public VisInstance(Frame parent, String title, boolean modal) {
-		super(parent, title, modal);
-		initComponents();
-	}
-
-	public VisInstance(Frame parent, String title, boolean modal,
-			GraphicsConfiguration arg) {
-		super(parent, title, modal, arg);
-		initComponents();
-	}
-
-	public VisInstance(Dialog parent) {
-		super(parent);
-		initComponents();
-	}
-
-	public VisInstance(Dialog parent, boolean modal) {
-		super(parent, modal);
-		initComponents();
-	}
-
-	public VisInstance(Dialog parent, String title) {
-		super(parent, title);
-		initComponents();
-	}
-
-	public VisInstance(Dialog parent, String title, boolean modal) {
-		super(parent, title, modal);
-		initComponents();
-	}
-
-	public VisInstance(Dialog parent, String title, boolean modal,
-			GraphicsConfiguration arg) {
-		super(parent, title, modal, arg);
-		initComponents();
-	}
-
-	public VisInstance(Window parent) {
-		super(parent);
-		initComponents();
-	}
-
-	public VisInstance(Window parent, ModalityType modalityType) {
-		super(parent, modalityType);
-		initComponents();
-	}
-
-	public VisInstance(Window parent, String title) {
-		super(parent, title);
-		initComponents();
-	}
-
-	public VisInstance(Window parent, String title, ModalityType modalityType) {
-		super(parent, title, modalityType);
-		initComponents();
-	}
-
-	public VisInstance(Window parent, String title, ModalityType modalityType,
-			GraphicsConfiguration arg) {
-		super(parent, title, modalityType, arg);
-		initComponents();
-	}
-
 	private void initComponents() {
-		setFont(new Font("Dialog", Font.PLAIN, 12));
-		setBackground(new Color(223, 223, 223));
-		setForeground(Color.black);
-		add(getJScrollPane0(), BorderLayout.CENTER);
-		setSize(221, 451);
+		setResizable(false);
+		getDialogPane().setStyle("-fx-background-color: rgb(233, 233, 233); -fx-text-fill: black; -fx-font-size: 12px;");
+		list0 = getList0();
+
+		ScrollPane scrollPane0 = new ScrollPane(list0);
+		getDialogPane().setContent(scrollPane0);
+		scrollPane0.setFitToWidth(true);
+		getDialogPane().setPrefSize(221, 451);
 	}
 
-	private JScrollPane getJScrollPane0() {
-		if (jScrollPane0 == null) {
-			jScrollPane0 = new JScrollPane();
-			jScrollPane0.setViewportView(getJList0());
+	// REVISAR
+	private ListView<String> getList0() {
+		if (list0 == null) {
+			list0 = new ListView<>();
+			ObservableList<String> items = FXCollections.observableArrayList();
+			list0.setItems(items);
+			list0.setStyle("-fx-selection-bar: rgb(100, 154, 191);");
+			if ( items.isEmpty() ){
+				list0.setCursor(javafx.scene.Cursor.DEFAULT);
+			} else {
+				list0.setCursor(Cursor.HAND);
+			}
 		}
-		return jScrollPane0;
+		return list0;
 	}
 
-	public void setModel(ArrayList<String> model){
-		DefaultListModel listModel = new DefaultListModel();
-		for (String s : model){
-			listModel.addElement(s);
-		}
-		jList0.setModel(listModel);
-	}
-	
-	private JList getJList0() {
-		if (jList0 == null) {
-			jList0 = new JList();
-			DefaultListModel listModel = new DefaultListModel();
-			jList0.setModel(listModel);
-			jList0.setSelectionBackground(new Color(100, 154, 191));
-		}
-		return jList0;
-	}
-
-	private static void installLnF() {
+	/*private static void installLnF() {
 		try {
 			String lnfClassname = PREFERRED_LOOK_AND_FEEL;
 			if (lnfClassname == null)
@@ -137,7 +59,7 @@ public class VisInstance extends JDialog {
 			System.err.println("Cannot install " + PREFERRED_LOOK_AND_FEEL
 					+ " on this platform:" + e.getMessage());
 		}
-	}
+	}*/
 
 	/**
 	 * Main entry of the class.
@@ -146,18 +68,14 @@ public class VisInstance extends JDialog {
 	 * You can modify it as you like.
 	 */
 	public static void main(String[] args) {
-		installLnF();
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				VisInstance dialog = new VisInstance();
-				dialog.setDefaultCloseOperation(VisInstance.DISPOSE_ON_CLOSE);
-				dialog.setTitle("VisInstance");
-				dialog.setLocationRelativeTo(null);
-				dialog.getContentPane().setPreferredSize(dialog.getSize());
-				dialog.pack();
-				dialog.setVisible(true);
-			}
+		//installLnF();
+		Platform.runLater(() -> {
+			VisInstance dialog = new VisInstance();
+			ButtonType cancelButtonType = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+			dialog.getDialogPane().getButtonTypes().add(cancelButtonType);
+			dialog.getDialogPane().lookupButton(cancelButtonType).setVisible(false);
+			dialog.setTitle("VisInstance");
+			dialog.showAndWait();
 		});
 	}
 

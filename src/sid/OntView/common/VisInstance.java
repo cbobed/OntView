@@ -122,7 +122,7 @@ public class VisInstance extends JDialog {
 	}
 
 	public void setModel(ArrayList<String> model){
-		DefaultListModel listModel = new DefaultListModel();
+		DefaultListModel<String> listModel = new DefaultListModel<>();
 		for (String s : model){
 			listModel.addElement(s);
 		}
@@ -131,8 +131,8 @@ public class VisInstance extends JDialog {
 	
 	private JList getJList0() {
 		if (jList0 == null) {
-			jList0 = new JList();
-			DefaultListModel listModel = new DefaultListModel();
+			jList0 = new JList<>();
+			DefaultListModel<String> listModel = new DefaultListModel<>();
 			jList0.setModel(listModel);
 			jList0.setSelectionBackground(new Color(100, 154, 191));
 		}

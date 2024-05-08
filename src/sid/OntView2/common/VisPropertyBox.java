@@ -1,12 +1,16 @@
 package sid.OntView2.common;
 
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.text.Text;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
-import java.awt.*;
+import java.awt.Font;
+import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -65,15 +69,19 @@ public class VisPropertyBox {
 		propRangeConnectorList = new ArrayList<VisConnectorPropertyRange>();
 	}
 
+	// REVISAR
 	public void calculateHeight(){
-		Graphics context = vclass.graph.paintframe.getGraphics();
-		FontMetrics f = context.getFontMetrics();
-		height = (f.getAscent()+3) * (propertyList.size()+dPropertyList.size());
-		objectPropHeight =  (f.getAscent()+3) * (propertyList.size());
+		Canvas canvas = new Canvas();
+		GraphicsContext context = canvas.getGraphicsContext2D();
+		Text f = new Text();
+		f.setFont(context.getFont());
+		int ascent = (int)f.getLayoutBounds().getHeight();
+		height = (ascent + 3) * (propertyList.size()+dPropertyList.size());
+		objectPropHeight =  (ascent + 3) * (propertyList.size());
 		
 	}
 	
-	public void draw(Graphics g,FontMetrics fm){
+	public void draw(Graphics g){
 
 	    g.setFont(new Font(Font.DIALOG,Font.PLAIN,9));
 	    for (VisObjectProperty p: propertyList){
@@ -121,21 +129,7 @@ public class VisPropertyBox {
 	    }	
 		
 	}
-	
-	
-	public void calculateWidth() {
-		Graphics context = vclass.graph.paintframe.getGraphics();
-		FontMetrics f = context.getFontMetrics();
-		for (String s : rep){
-			int stringWidth =(int) f.getStringBounds(s, context).getX(); 
-			if (maxWidth == 0) {
-				maxWidth = stringWidth;
-			}
-			else {
-				maxWidth = (maxWidth < stringWidth ? stringWidth : maxWidth);
-			}
-		}
-	}
+
 	public VisObjectProperty add(OWLObjectProperty objProp, Shape range, OWLOntology ontology){
 		VisObjectProperty v =null;
 		if (!VisObjectProperty.contains(propertyList, objProp)){
