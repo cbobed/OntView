@@ -23,6 +23,9 @@ import javax.swing.ToolTipManager;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 
+import javafx.geometry.Point2D;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
@@ -32,8 +35,7 @@ import reducer.StructuralReducer;
 import sid.OntView2.utils.ProgressBarDialogThread;
 
 
-public class PaintFrame extends JPanel implements MouseListener,Runnable,MouseMotionListener{
-
+public class PaintFrame extends Canvas implements MouseListener,Runnable,MouseMotionListener{
 
 	private static final long serialVersionUID = 1L;
 	public JScrollPane scroll;
@@ -434,7 +436,7 @@ public class PaintFrame extends JPanel implements MouseListener,Runnable,MouseMo
 
 	private VisObjectProperty movedOnVisPropertyDescription(int x, int y){
 		for ( Entry<String, VisObjectProperty> entry : visGraph.propertyMap.entrySet()){
-			if (entry.getValue().onProperty(new Point(x,y)))
+			if (entry.getValue().onProperty(new Point2D(x,y)))
 				return entry.getValue();
 		}
 		return null;

@@ -2,11 +2,12 @@ package sid.OntView2.common;
 
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.input.MouseEvent;
+import javafx.stage.Stage;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 public class VisShapeContext extends ContextMenu {
@@ -15,13 +16,13 @@ public class VisShapeContext extends ContextMenu {
 	PaintFrame parent;
 	OWLClassExpression expression;
 	
-	int posx,posy;
+	double posx,posy;
 	public VisShapeContext (Shape s, PaintFrame parentFrame, MouseEvent e){
 		
 		super();
 		shape =s;
-		posx =e.getXOnScreen();
-		posy =e.getYOnScreen();
+		posx =e.getScreenX();
+		posy =e.getScreenY();
 		parent= parentFrame;
 		boolean visc = shape instanceof VisClass;
 		expression = shape.asVisClass().getLinkedClassExpression();
@@ -75,10 +76,13 @@ public class VisShapeContext extends ContextMenu {
 				
 			}
 			VisInstance c = new VisInstance();
-			c.setTitle("instances of "+shape.asVisClass().label);
+			c.setTitle("instances of " + shape.asVisClass().label);
 			c.setModel(instanceArray);
-			c.setLocation(posx,posy);
-			c.setVisible(true);
+			c.showAndWait();
+
+			Stage stage = (Stage) c.getDialogPane().getScene().getWindow();
+			stage.setX(posx);
+			stage.setY(posy);
 		
 		}
 	}

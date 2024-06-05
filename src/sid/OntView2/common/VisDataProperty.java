@@ -1,10 +1,15 @@
 package sid.OntView2.common;
 
+import javafx.geometry.Point2D;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.text.FontWeight;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import sid.OntView.utils.ExpressionManager;
+import javafx.scene.text.Font;
+
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -72,14 +77,16 @@ public class VisDataProperty extends VisProperty {
 	
 	public int getLabelHeight() {
 		if (height ==0) {
-			height = VisProperty.stringHeight(new Font(Font.DIALOG,Font.PLAIN,9), getDomain().graph.paintframe.getGraphics())+8;
-		}	
+			Font font = Font.font("Dialog", FontWeight.NORMAL, 9);
+			height = VisProperty.stringHeight(font, getDomain().graph.paintframe.getGraphicsContext2D()) + 8;
+		}
 		return height;
 	}
 	
 	public int getLabelWidth(){
 		if (width ==0){
-			width = VisProperty.stringWidth(label+": "+range,new Font(Font.DIALOG,Font.PLAIN,9),getDomain().graph.paintframe.getGraphics());
+			Font font = Font.font("Dialog", FontWeight.NORMAL, 9);
+			width = VisProperty.stringWidth(label+": "+range, font, getDomain().graph.paintframe.getGraphicsContext2D());
 		}
 		return width;
 	}
@@ -105,7 +112,7 @@ public class VisDataProperty extends VisProperty {
 		return pbox.vclass;
 	}
 
-	public void draw(Graphics g){
+	public void draw(GraphicsContext g){
 		if ((pbox.visible)&&(visible)&&(pbox.vclass.visible)){
 			g.setFont(textFont);
 			if ((parents!=null)&&(parents.size() > 0)) {
@@ -152,7 +159,7 @@ public class VisDataProperty extends VisProperty {
 	public void drawConnectors(Graphics g) {
 	}
 	
-	public boolean onProperty(Point p){
+	public boolean onProperty(Point2D p){
 		return ((p.x >= getPosX()-20)&&(p.x <= getPosX())&& (p.y >= getPosY()-10)&&(p.y <= getPosY()));
 	}
 	

@@ -1,16 +1,15 @@
 package sid.OntView2.common;
 
-import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import javafx.scene.text.Font;
 
-import java.awt.Font;
-import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,11 +20,8 @@ public class VisPropertyBox {
 	int height = 0;
 	int posy;
 	boolean visible = false;
-	String val="";
-	boolean flag = false;
 	
 	VisClass vclass;
-
 	HashSet<VisClass> visClassSet;
 	HashMap<OWLObjectProperty, Shape> objectPropertyMap;
 	HashMap<OWLDataProperty, String> dataPropertyMap;
@@ -71,8 +67,7 @@ public class VisPropertyBox {
 
 	// REVISAR
 	public void calculateHeight(){
-		Canvas canvas = new Canvas();
-		GraphicsContext context = canvas.getGraphicsContext2D();
+		GraphicsContext context = vclass.graph.paintframe.getGraphicsContext2D();
 		Text f = new Text();
 		f.setFont(context.getFont());
 		int ascent = (int)f.getLayoutBounds().getHeight();
@@ -81,9 +76,10 @@ public class VisPropertyBox {
 		
 	}
 	
-	public void draw(Graphics g){
+	public void draw(GraphicsContext g){
 
-	    g.setFont(new Font(Font.DIALOG,Font.PLAIN,9));
+		Font font = Font.font("Dialog", FontWeight.NORMAL, 9);
+		g.setFont(font);
 	    for (VisObjectProperty p: propertyList){
 	    	if (p.visible){
 	    	p.draw(g);

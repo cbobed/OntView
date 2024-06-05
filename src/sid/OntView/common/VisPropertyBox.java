@@ -133,21 +133,7 @@ public class VisPropertyBox {
 	    }	
 		
 	}
-	
-	
-	public void calculateWidth() {
-		Graphics context = vclass.graph.paintframe.getGraphics();
-		FontMetrics f = context.getFontMetrics();
-		for (String s : rep){
-			int stringWidth =(int) f.getStringBounds(s, context).getX(); 
-			if (maxWidth == 0) {
-				maxWidth = stringWidth;
-			}
-			else {
-				maxWidth = (maxWidth < stringWidth ? stringWidth : maxWidth);
-			}
-		}
-	}
+
 	public VisObjectProperty add(OWLObjectProperty objProp,Shape range,OWLOntology ontology){
 		VisObjectProperty v =null;
 		if (!VisObjectProperty.contains(propertyList, objProp)){

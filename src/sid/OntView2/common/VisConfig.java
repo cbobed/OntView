@@ -1,5 +1,6 @@
 package sid.OntView2.common;
 
+import javafx.scene.paint.Color;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -7,7 +8,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.*;
-import java.awt.*;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -50,16 +50,16 @@ public class VisConfig {
 	}
 	
 	private void mapColor (){
-		map.put("blue",Color.blue);
-		map.put("red",Color.red);
-		map.put("black",Color.black);
-		map.put("cyan",Color.cyan);
-		map.put("darkGray",Color.darkGray);
-		map.put("orange",Color.orange);
-		map.put("lightGray",Color.lightGray);
-		map.put("magenta", Color.magenta);
-		map.put("yellow", Color.yellow);
-		map.put("green", Color.green);
+		map.put("blue",Color.BLUE);
+		map.put("red",Color.RED);
+		map.put("black",Color.BLACK);
+		map.put("cyan",Color.CYAN);
+		map.put("darkGray",Color.DARKGRAY);
+		map.put("orange",Color.ORANGE);
+		map.put("lightGray",Color.LIGHTGRAY);
+		map.put("magenta", Color.MAGENTA);
+		map.put("yellow", Color.YELLOW);
+		map.put("green", Color.GREEN);
 	}
 	public static VisConfig getInstance() throws ParserConfigurationException, SAXException, IOException{
 		if (instance == null) 
@@ -70,7 +70,7 @@ public class VisConfig {
 	public void connectorWidth() throws XPathExpressionException{
 		XPathExpression expr = xpath.compile("//connector/width/text()");
         Object result = expr.evaluate(doc, XPathConstants.STRING);
-        VisConnector.width =  Float.valueOf((String) result);
+        VisConnector.width =  Float.parseFloat((String) result);
 	}
 	
 	public void connectorColor() throws XPathExpressionException{

@@ -8,8 +8,9 @@ import javafx.scene.control.*;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.ArrayList;
 
-import javax.swing.UIManager;
+import javax.swing.*;
 
 //VS4E -- DO NOT REMOVE THIS LINE!
 public class VisInstance extends Dialog<Void> implements Serializable {
@@ -32,6 +33,13 @@ public class VisInstance extends Dialog<Void> implements Serializable {
 		scrollPane0.setFitToWidth(true);
 		getDialogPane().setPrefSize(221, 451);
 	}
+
+	// REVISAR
+	public void setModel(ArrayList<String> model){
+		ObservableList<String> items = FXCollections.observableArrayList(model);
+		list0.setItems(items);
+	}
+
 
 	// REVISAR
 	private ListView<String> getList0() {

@@ -1,5 +1,10 @@
 package sid.OntView2.common;
 
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Font;
+import javafx.scene.canvas.GraphicsContext;
+
+
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.Node;
@@ -977,7 +982,7 @@ public class VisClass extends Shape {
 		return numTabs*tabSize; 
 	}
 
-	public void drawFormattedString (Graphics g, String toDraw, int x, int y, int ascent) {
+	public void drawFormattedString (GraphicsContext g, String toDraw, int x, int y, int ascent) {
 		StringTokenizer sTokenizer = new StringTokenizer(toDraw,"\n"); 
 		int currentX = x; 
 		int currentY = y;
@@ -985,8 +990,10 @@ public class VisClass extends Shape {
 		while (sTokenizer.hasMoreTokens()) {
 			token = sTokenizer.nextToken();
 			currentX = x+tabsSize(token); 
-			g.drawString(removeFormatInformation(token), currentX, currentY); 
-			currentY += VisProperty.stringHeight(new Font(Font.DIALOG,Font.PLAIN,9), g)+6;
+			g.drawString(removeFormatInformation(token), currentX, currentY);
+			Font font = Font.font("Dialog", FontWeight.NORMAL, 9);
+
+			currentY += VisProperty.stringHeight(font, g)+6;
 		}
 	}
 	

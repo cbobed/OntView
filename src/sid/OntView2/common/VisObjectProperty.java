@@ -1,5 +1,8 @@
 package sid.OntView2.common;
 
+import javafx.geometry.Point2D;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.text.FontWeight;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.NodeSet;
@@ -51,7 +54,7 @@ public class VisObjectProperty extends VisProperty {
 	public int getPosY(){return 10+getDomain().getPosY()+(getDomain().getHeight())+getLabelHeight()*voffset;}
 	private OWLReasoner getReasoner(){return pbox.vclass.graph.paintframe.getReasoner();}
 	
-	public boolean onProperty(Point p){
+	public boolean onProperty(Point2D p){
 		return ((p.x >= getPosX()-20)&&(p.x <= getPosX())&& (p.y >= getPosY()-10)&&(p.y <= getPosY()));
 	}
 	
@@ -153,15 +156,17 @@ public class VisObjectProperty extends VisProperty {
 	}
 	
 	public int getLabelHeight() {
-		if (height == 0) {
-			height = VisProperty.stringHeight(new Font(Font.DIALOG,Font.PLAIN,9), getDomain().graph.paintframe.getGraphics())+8;
+		if (height ==0) {
+			javafx.scene.text.Font font = javafx.scene.text.Font.font("Dialog", FontWeight.NORMAL, 9);
+			height = VisProperty.stringHeight(font, getDomain().graph.paintframe.getGraphicsContext2D()) + 8;
 		}	
 		return height;
 	}
 	
 	public int getLabelWidth(){
-		if (width == 0){
-			width = VisProperty.stringWidth(label,new Font(Font.DIALOG,Font.PLAIN,9),getDomain().graph.paintframe.getGraphics());
+		if (width ==0){
+			javafx.scene.text.Font font = javafx.scene.text.Font.font("Dialog", FontWeight.NORMAL, 9);
+			width = VisProperty.stringWidth(label+": "+range, font, getDomain().graph.paintframe.getGraphicsContext2D());
 		}
 		return width;
 	}
@@ -187,7 +192,7 @@ public class VisObjectProperty extends VisProperty {
 		return pbox.vclass;
 	}
 
-	public void draw(Graphics g){
+	public void draw(GraphicsContext g){
 		Point p = getClosePoint();
 		if ((pbox.visible)&&(visible)&&(pbox.vclass.visible)){
 			g.setFont(textFont);
@@ -235,7 +240,7 @@ public class VisObjectProperty extends VisProperty {
 		list.add(new Point(getPosX()+getLabelWidth()/2,getPosY()+getLabelHeight()));
 	}
 
-	public void drawConnectors(Graphics g) {
+	public void drawConnectors(GraphicsContext g) {
 		if (visible) {
 			if (rangeConnector != null)
 				rangeConnector.draw(g);
