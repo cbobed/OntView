@@ -1,5 +1,7 @@
 package sid.OntView2.common;
 
+import javafx.scene.canvas.GraphicsContext;
+
 import java.awt.*;
 
 public class VisConnectorHeritance extends VisConnectorPropProp {
@@ -10,7 +12,7 @@ public class VisConnectorHeritance extends VisConnectorPropProp {
 	}
 
 	@Override
-	public void draw(Graphics g){
+	public void draw(GraphicsContext g){
 		Graphics2D g2d= (Graphics2D) g;
 		if ((visible)&&(from.asVisClass().getPropertyBox().visible)){
 			if ((from != null) && (to!= null)){

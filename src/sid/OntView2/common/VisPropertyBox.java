@@ -3,12 +3,13 @@ package sid.OntView2.common;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import javafx.scene.text.Font;
+
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
-import javafx.scene.text.Font;
 
 import java.util.ArrayList;
 import java.util.HashMap;

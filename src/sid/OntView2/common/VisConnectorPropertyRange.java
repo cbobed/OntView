@@ -1,5 +1,7 @@
 package sid.OntView2.common;
 
+import javafx.scene.canvas.GraphicsContext;
+
 import java.awt.*;
 import java.awt.geom.CubicCurve2D;
 import java.awt.geom.GeneralPath;
@@ -21,7 +23,7 @@ public class VisConnectorPropertyRange extends VisConnectorIsA {
 	}
 
 	@Override
-	public void draw(Graphics g){
+	public void draw(GraphicsContext g){
 		Graphics2D g2d= (Graphics2D) g;
 		boolean globalHide  = parentBox.vclass.graph.paintframe.hideRange;
 		if ((visible)&&(parentBox.visible)&&(!globalHide)){

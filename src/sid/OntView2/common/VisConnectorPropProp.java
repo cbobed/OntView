@@ -1,5 +1,7 @@
 package sid.OntView2.common;
 
+import javafx.scene.canvas.GraphicsContext;
+
 import java.awt.*;
 import java.awt.geom.GeneralPath;
 
@@ -53,7 +55,7 @@ public class VisConnectorPropProp extends VisConnector {
 	}
 	
 	@Override
-	public void draw(Graphics g){
+	public void draw(GraphicsContext g){
 		Graphics2D g2d= (Graphics2D) g;
 		if (drawable()){
 			Color prevColor = g2d.getColor();					

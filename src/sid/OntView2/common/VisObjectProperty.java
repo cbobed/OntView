@@ -2,12 +2,17 @@ package sid.OntView2.common;
 
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import sid.OntView.utils.ExpressionManager;
+
+import javafx.scene.text.Font;
+import javafx.scene.paint.Color;
+import javafx.geometry.Point2D;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -27,9 +32,9 @@ public class VisObjectProperty extends VisProperty {
 	VisConnectorPropertyRange rangeConnector;
 	ArrayList<VisConnectorHeritance> parentConnectors;
 	ArrayList<VisObjectProperty> parents;
-	HashSet<Point> pointSet;
+	HashSet<Point2D> pointSet;
 	VisConnectorPropProp onlyParentConnector;
-	ArrayList<Point> connectionPoints;
+	ArrayList<Point2D> connectionPoints;
 	Font textFont;
 	Font circleFont;
 	
@@ -55,7 +60,7 @@ public class VisObjectProperty extends VisProperty {
 	private OWLReasoner getReasoner(){return pbox.vclass.graph.paintframe.getReasoner();}
 	
 	public boolean onProperty(Point2D p){
-		return ((p.x >= getPosX()-20)&&(p.x <= getPosX())&& (p.y >= getPosY()-10)&&(p.y <= getPosY()));
+		return ((p.getX() >= getPosX()-20)&&(p.getX() <= getPosX())&& (p.getY() >= getPosY()-10)&&(p.getY() <= getPosY()));
 	}
 	
 	public String getTooltipText(){
@@ -126,9 +131,11 @@ public class VisObjectProperty extends VisProperty {
 		oPropExp = po;
 		range    = prange;
 		voffset  = pvoffset;
-		textFont    = new Font(Font.DIALOG,Font.PLAIN,10);
-		circleFont  = new Font(Font.DIALOG,Font.BOLD, 10);
-		connectionPoints = new ArrayList<Point>();
+
+		textFont    = Font.font("Dialog", FontWeight.NORMAL, FontPosture.REGULAR, 12);
+		circleFont  = Font.font("Dialog", FontWeight.BOLD, 10);
+
+		connectionPoints = new ArrayList<Point2D>();
 		if (getDomain() != range) {
 			rangeConnector = new VisConnectorPropertyRange(ppbox, pbox.vclass , range, this);
 		}	
@@ -157,7 +164,7 @@ public class VisObjectProperty extends VisProperty {
 	
 	public int getLabelHeight() {
 		if (height ==0) {
-			javafx.scene.text.Font font = javafx.scene.text.Font.font("Dialog", FontWeight.NORMAL, 9);
+			Font font = Font.font("Dialog", FontWeight.NORMAL, 9);
 			height = VisProperty.stringHeight(font, getDomain().graph.paintframe.getGraphicsContext2D()) + 8;
 		}	
 		return height;
@@ -165,8 +172,8 @@ public class VisObjectProperty extends VisProperty {
 	
 	public int getLabelWidth(){
 		if (width ==0){
-			javafx.scene.text.Font font = javafx.scene.text.Font.font("Dialog", FontWeight.NORMAL, 9);
-			width = VisProperty.stringWidth(label+": "+range, font, getDomain().graph.paintframe.getGraphicsContext2D());
+			Font font = Font.font("Dialog", FontWeight.NORMAL, 9);
+			width = VisProperty.stringWidth(label, font, getDomain().graph.paintframe.getGraphicsContext2D());
 		}
 		return width;
 	}
@@ -193,51 +200,51 @@ public class VisObjectProperty extends VisProperty {
 	}
 
 	public void draw(GraphicsContext g){
-		Point p = getClosePoint();
+		Point2D p = getClosePoint();
 		if ((pbox.visible)&&(visible)&&(pbox.vclass.visible)){
 			g.setFont(textFont);
 			if ((parents!=null)&&(parents.size() > 0)) {
-				g.drawString(visibleLabel, getPosX(), getPosY());
+				g.fillText(visibleLabel, getPosX(), getPosY());
 			}	
 			else {
-				g.drawString(visibleLabel, getPosX(), getPosY());
+				g.fillText(visibleLabel, getPosX(), getPosY());
 			}
-			Point circlePos = new Point(getPosX()-17, getPosY()-11);
+			Point2D circlePos = new Point2D(getPosX()-17, getPosY()-11);
 			if (isTransitive|| isFunctional || isSymmetric || hasInverse || isReflexive || propertyChainAxiom!=null){
-				Color c = g.getColor();
-				g.drawOval(circlePos.x,circlePos.y+2, 9,9);
-				g.setColor(Color.lightGray);
-				g.fillOval(circlePos.x,circlePos.y+2, 9,9);
-				g.setColor(c);
+				Color c = (Color) g.getFill();
+				g.strokeOval(circlePos.getX(),circlePos.getY()+2, 9,9);
+				g.setFill(Color.LIGHTGRAY);
+				g.fillOval(circlePos.getX(),circlePos.getY()+2, 9,9);
+				g.setFill(c);
 			}
 		}
 	}
 	
-	public Point getClosePoint(){
-		return new Point(getPosX()+pbox.getMaxWidth()+15,getPosY()-5);
+	public Point2D getClosePoint(){
+		return new Point2D(getPosX()+pbox.getMaxWidth()+15,getPosY()-5);
 	}
-	public Point getOvalCoord(){
-		return new Point(getPosX()+pbox.getMaxWidth()+25,getPosY()-5);
+	public Point2D getOvalCoord(){
+		return new Point2D(getPosX()+pbox.getMaxWidth()+25,getPosY()-5);
 	}
 
-	public Point getConnectionPoint(int index) {
+	public Point2D getConnectionPoint(int index) {
 		if (connectionPoints ==null)
 			getConnectionPoints();
 		return connectionPoints.get(index);
 	}
 	
-	public ArrayList<Point> getConnectionPoints(){
+	public ArrayList<Point2D> getConnectionPoints(){
 		if (connectionPoints.size()==0) {
 			addPoints(connectionPoints);
 		}
 		return connectionPoints;
 	}
 
-	private void addPoints(ArrayList<Point> list ) {
-		list.add(new Point(getPosX(),getPosY()));
-		list.add(new Point(getPosX()+getLabelWidth()+2,getPosY()));
-		list.add(new Point(getPosX()+getLabelWidth()/2,getPosY()-getLabelHeight()));
-		list.add(new Point(getPosX()+getLabelWidth()/2,getPosY()+getLabelHeight()));
+	private void addPoints(ArrayList<Point2D> list ) {
+		list.add(new Point2D(getPosX(),getPosY()));
+		list.add(new Point2D(getPosX()+getLabelWidth()+2,getPosY()));
+		list.add(new Point2D(getPosX()+ (double) getLabelWidth() /2,getPosY()-getLabelHeight()));
+		list.add(new Point2D(getPosX()+ (double) getLabelWidth() /2,getPosY()+getLabelHeight()));
 	}
 
 	public void drawConnectors(GraphicsContext g) {
@@ -247,8 +254,8 @@ public class VisObjectProperty extends VisProperty {
 			if (parents.size()>1){
 				g.setFont(circleFont);
 				if (pbox.vclass.visible){
-					g.drawOval(getPosX()-17, getPosY()-14, 14,14);
-					g.drawString(OntViewConstants.AND, getPosX()-14, getPosY()-2);
+					g.strokeOval(getPosX()-17, getPosY()-14, 14,14);
+					g.fillText(OntViewConstants.AND, getPosX()-14, getPosY()-2);
 				}
 				for (VisConnectorHeritance con : parentConnectors) {
 					con.draw(g);
