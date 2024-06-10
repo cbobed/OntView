@@ -1,5 +1,6 @@
 package sid.OntView2.common;
 
+import javafx.geometry.Point2D;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.Node;
@@ -12,16 +13,21 @@ import sid.OntView.utils.ProgressBarDialogThread;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
-import java.awt.*;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.*;
+import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.Set;
 import java.util.Map.Entry;
 
 public class VisGraph extends Observable implements Runnable{
-    
 
-	
 	private int progress = 0;
     
     
@@ -114,8 +120,8 @@ public class VisGraph extends Observable implements Runnable{
     public void adjustPanelSize(float factor){
     	int x = (int) (getWidth()*factor);
     	int y = (int) (getHeight()*factor);
-    	paintframe.setPreferredSize(new Dimension(x,y));
-    	paintframe.revalidate();
+		paintframe.setWidth(x);
+		paintframe.setHeight(y);
     }
 
 	private OWLClassExpression getTopClass(OWLOntology activeOntology) {
@@ -241,9 +247,8 @@ public class VisGraph extends Observable implements Runnable{
 	/**
 	 * adds both object properties and data properties to the graph
 	 * looks for domains (creates if not found), ranges.
-	 * @param activeOntology
-	 * @param reasoner
-	 * @param set
+	 * @param in
+	 * @param delimiter
 	 */
 	
 	
@@ -667,7 +672,7 @@ public class VisGraph extends Observable implements Runnable{
 	 *  If there's a visible shape in that point this will return a reference to it and null otherwise
 	 *  @return shape or null if not found
 	 */
-	public Shape findShape(Point p) {
+	public Shape findShape(Point2D p) {
 		for(Iterator<Entry<String,Shape>> it = shapeMap.entrySet().iterator(); it.hasNext();) {
             Entry<String,Shape> e = (Entry<String, Shape>)it.next();
 	        int x = e.getValue().getPosX();
@@ -682,9 +687,9 @@ public class VisGraph extends Observable implements Runnable{
 	    return null;
 	 }
 
-	private boolean isInShape(int x,int y,int w, int h,Point p) {
-		return ((p.x >= x-w/2)  && (p.x <= x+w/2+h/2) 
-        		&& (p.y >=y -h/2)  && (p.y <= y+h/2)); 
+	private boolean isInShape(int x,int y,int w, int h,Point2D p) {
+		return ((p.getX() >= x- (double) w /2)  && (p.getX() <= x+ (double) w /2+ (double) h /2)
+        		&& (p.getY() >=y - (double) h /2)  && (p.getY() <= y+ (double) h /2));
 	}
 	
 	/**
@@ -1500,7 +1505,7 @@ public class VisGraph extends Observable implements Runnable{
 	 
 	 /**
 	 * looks up for the shape or creates if not found
-	 * @param owlclassexpression
+	 * @param e
 	 * @return
 	 */
 	 public Shape lookUpOrCreate(OWLClassExpression e){

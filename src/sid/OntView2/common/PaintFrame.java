@@ -309,7 +309,7 @@ public class PaintFrame extends Canvas implements MouseListener,Runnable,MouseMo
 	@Override
 	public void mousePressed(MouseEvent e) {
 
-		Point p = translatePoint(e.getPoint());
+		Point2D p = translatePoint(e.getPoint());
 		pressedShape= visGraph.findShape(p);
 
 		if (pressedShape!=null) {
@@ -386,7 +386,7 @@ public class PaintFrame extends Canvas implements MouseListener,Runnable,MouseMo
 	public void mouseMoved(MouseEvent e) {
 
 
-		Point p = translatePoint(e.getPoint());
+		Point2D p = translatePoint(e.getPoint());
 		int x = (int) p.getX();
 		int y = (int) p.getY();
 		VisObjectProperty prop = null;
@@ -488,7 +488,7 @@ public class PaintFrame extends Canvas implements MouseListener,Runnable,MouseMo
 
 
 	private boolean clickedOnShape(int x, int y,MouseEvent e){
-		Shape shape = visGraph.findShape(new Point(x, y));
+		Shape shape = visGraph.findShape(new Point2D(x, y));
 		if (shape!=null) {
 			if (e.getClickCount() == 2 && !e.isConsumed() && e.getButton()==MouseEvent.BUTTON1) {
 				//double click

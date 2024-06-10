@@ -1,5 +1,6 @@
 package sid.OntView2.main;
 
+import javafx.scene.control.ComboBox;
 import org.dyno.visual.swing.layouts.Bilateral;
 import org.dyno.visual.swing.layouts.Constraints;
 import org.dyno.visual.swing.layouts.GroupLayout;
@@ -41,8 +42,8 @@ public class TopPanel extends JPanel implements ControlPanelInterface {
 	private JButton saveImageButton;
 	private JButton saveImagePartialButton;
 	private JLabel jLabel0;
-	private JComboBox jComboBox0;
-	private JComboBox kceComboBox;
+	private ComboBox jComboBox0;
+	private ComboBox kceComboBox;
 	private JPanel jPanel0;
 	private Mine parent;
     static String  RESOURCE_BASE ;
@@ -200,13 +201,13 @@ public class TopPanel extends JPanel implements ControlPanelInterface {
 			jPanel0.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, null, null));
 			jPanel0.setLayout(new GroupLayout());
 			jPanel0.add(getJLabel0(), new Constraints(new Leading(8, 22, 10, 10), new Leading(1, 24, 12, 12)));
-			jPanel0.add(getJComboBox0(), new Constraints(new Bilateral(39, 12, 126), new Leading(4, 21, 12, 12)));
+			jPanel0.add(getComboBox0(), new Constraints(new Bilateral(39, 12, 126), new Leading(4, 21, 12, 12)));
 		}
 		return jPanel0;
 	}
-	private JComboBox getJComboBox0() {
+	private ComboBox getComboBox0() {
 		if (jComboBox0 == null) {
-			jComboBox0 = new JComboBox();
+			jComboBox0 = new ComboBox();
 			AutoCompletion.enable(jComboBox0);
 			jComboBox0.setEditable(true);
 			jComboBox0.setFont(new Font("Dialog", Font.BOLD, 10));
@@ -238,9 +239,9 @@ public class TopPanel extends JPanel implements ControlPanelInterface {
 	}
 	
 	
-	private JComboBox getKceComboBox() {
+	private ComboBox getKceComboBox() {
 		if (kceComboBox == null) {
-			kceComboBox = new JComboBox();
+			kceComboBox = new ComboBox<String>();
 			AutoCompletion.enable(kceComboBox);
 			kceComboBox.setEditable(true);
 			kceComboBox.setFont(new Font("Dialog", Font.BOLD, 10));

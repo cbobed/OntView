@@ -1,52 +1,51 @@
 package sid.OntView2.utils;
 
-import java.awt.Dimension;
-import java.awt.Window;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowListener;
-import java.util.Observable;
-import java.util.Observer;
-
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JProgressBar;
-import javax.swing.RepaintManager;
-
+import javafx.application.Platform;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import sid.OntView2.common.PaintFrame;
 import sid.OntView2.common.VisGraphObserver;
 
 public class ProgressBarDialogThread extends VisGraphObserver{
 
-	JDialog progressDialog;
-	JProgressBar progressBar;
+	Stage progressDialog;
+	ProgressBar progressBar;
 	PaintFrame paintframe;
+	Label progressLabel;
 	//	int mock = 0;
 	final static int BARWIDTH  = 100;
 	final static int BARHEIGHT = 20 ;
 
+	final static int DIALOGWIDTH  = 200;
+	final static int DIALOGHEIGHT = 100;
+
 	public ProgressBarDialogThread(PaintFrame ppaintframe){
 		super(ppaintframe.getVisGraph());
 		paintframe = ppaintframe;
-		progressDialog = new JDialog();
-
-		progressBar = new JProgressBar(0, 100);
-		progressBar.setStringPainted(true);
-
-		progressDialog.add(progressBar);
-
-		progressBar.setPreferredSize(new Dimension(BARWIDTH,BARHEIGHT));
-		progressBar.setString(Integer.toString(getProgress()));
-		progressBar.setVisible(true);
-
-		progressDialog.setSize(new Dimension(BARWIDTH,BARHEIGHT));
-		progressDialog.pack();
-		progressDialog.setLocation((int)paintframe.getVisibleRect().getWidth()/ 2-BARWIDTH,
-				(int)paintframe.getVisibleRect().getHeight()/2+BARHEIGHT);
-		progressDialog.setVisible(true);
-		progressDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		progressDialog.setAlwaysOnTop(true);
+		progressDialog = new Stage();
 		progressDialog.setTitle("Progress");
+		progressDialog.setResizable(false);
+		progressDialog.setAlwaysOnTop(true);
+		progressDialog.initModality(Modality.APPLICATION_MODAL);
 
+		progressBar = new ProgressBar(0);
+		progressBar.setPrefSize(BARWIDTH, BARHEIGHT);
+		progressBar.setProgress(0);
+
+		progressLabel = new Label("0%");
+		progressLabel.setAlignment(Pos.CENTER);
+
+		VBox vbox = new VBox(10, progressLabel, progressBar);
+		vbox.setAlignment(Pos.CENTER);
+
+		Scene scene = new Scene(vbox, DIALOGWIDTH, DIALOGHEIGHT);
+		progressDialog.setScene(scene);
+		progressDialog.show();
 	}
 
 	private int getProgress() {
@@ -55,13 +54,13 @@ public class ProgressBarDialogThread extends VisGraphObserver{
 
 	@Override
 	public void update() {
-		int progress;
-		progress = getProgress();
-		progressBar.setValue(progress);
-		progressBar.setString(Integer.toString(progress));
-		if (progress == 100) {
-			progressDialog.dispose();
-		}
+		int progress = getProgress();
+		Platform.runLater(() -> {
+			progressBar.setProgress(progress / 100.0);
+			if (progress == 100) {
+				progressDialog.close();
+			}
+		});
 
 	}
 }

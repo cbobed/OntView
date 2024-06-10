@@ -1,33 +1,35 @@
 package sid.OntView2.common;
 
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
+
 import java.util.Map.Entry;
 import java.util.Set;
 
 
-public class VisGeneralContext extends JPopupMenu {
+public class VisGeneralContext extends ContextMenu {
 
 	
-	JMenuItem item1;
-	JMenuItem item2;
-	JMenuItem item3;
-	private JMenuItem getJMenuItem1(){
+	MenuItem item1;
+	MenuItem item2;
+	MenuItem item3;
+	private MenuItem getMenuItem1(){
 		if (item1==null)
-			item1 = new JMenuItem("Show/Hide Properties");
+			item1 = new MenuItem("Show/Hide Properties");
 		return item1;
 	}
 	
-	private JMenuItem getJMenuItem2(){
+	private MenuItem getMenuItem2(){
 		if (item2==null)
-			item2 = new JMenuItem("Show/hide Disjoint");
+			item2 = new MenuItem("Show/hide Disjoint");
 		return item2;
 	}
 	
-	private JMenuItem getJMenuItem3(){
+	private MenuItem getMenuItem3(){
 		if (item3==null)
-			item3 = new JMenuItem("Show/Hide Ranges");
+			item3 = new MenuItem("Show/Hide Ranges");
 		return item3;
 	}
 	PaintFrame parent;
@@ -35,23 +37,26 @@ public class VisGeneralContext extends JPopupMenu {
 	public VisGeneralContext (PaintFrame pparent){
 		super();	
 		parent = pparent;
-		add(getJMenuItem1());
-		item1.addActionListener(new ActionListener() {
+		getItems().add(getMenuItem1());
+		item1.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void handle(ActionEvent e) {
 				propertiesItemClicked();
-			}});
-		add(getJMenuItem2());
-		item2.addActionListener(new ActionListener() {
+			}
+		});
+
+		getItems().add(getMenuItem2());
+		item2.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void handle(ActionEvent e) {
 				disjointItemClicked();
 			}
 		});
-		add(getJMenuItem3());
-		item3.addActionListener(new ActionListener() {
+
+		getItems().add(getMenuItem3());
+		getMenuItem3().setOnAction(new EventHandler<ActionEvent>(){
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void handle(ActionEvent actionEvent) {
 				rangeItemClicked();
 			}
 		});
