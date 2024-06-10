@@ -1,10 +1,9 @@
 package sid.OntView2.common;
 
+import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
-
-import java.awt.*;
-import java.awt.geom.CubicCurve2D;
-import java.awt.geom.GeneralPath;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Path;
 
 
 public class VisConnectorPropertyRange extends VisConnectorIsA {
@@ -12,39 +11,38 @@ public class VisConnectorPropertyRange extends VisConnectorIsA {
 	VisPropertyBox parentBox;
 	VisObjectProperty vprop;
 	
-	GeneralPath path;
+	Path path;
 	
 	public VisConnectorPropertyRange(VisPropertyBox box, Shape par_from, Shape par_to, VisObjectProperty pvprop) {
 		super(par_from, par_to);
 		vprop = pvprop;
 		parentBox = box;
-		path = new GeneralPath();
+		path = new Path();
 		
 	}
 
 	@Override
 	public void draw(GraphicsContext g){
-		Graphics2D g2d= (Graphics2D) g;
+		GraphicsContext g2d= (GraphicsContext) g;
 		boolean globalHide  = parentBox.vclass.graph.paintframe.hideRange;
 		if ((visible)&&(parentBox.visible)&&(!globalHide)){
 			if ((from != null) && (to!= null)){
 				if ((from.visible) && (to.visible)){
-					fromPoint = new Point(vprop.getPosX(),vprop.getPosY());
-					toPoint = new Point(to.getPosX(),to.getPosY());
-			    	fromPoint.x += vprop.getLabelWidth()+15;
-					Color prevColor = g2d.getColor();
-				  	g2d.setColor(Color.GRAY);
-			  		g2d.fillOval(fromPoint.x, fromPoint.y-3, 4, 4);
+					fromPoint = new Point2D(vprop.getPosX() + vprop.getLabelWidth()+15,vprop.getPosY());
+					toPoint = new Point2D(to.getPosX(),to.getPosY());
+					Color prevColor = (Color) g2d.getStroke();
+				  	g2d.setStroke(Color.GRAY);
+			  		g2d.fillOval(fromPoint.getX(), fromPoint.getY()-3, 4, 4);
 //				  	g2d.drawLine(fromPoint.x+2, fromPoint.y-2, toPoint.x, toPoint.y);
 			  		drawCurve(g2d, VisConstants.NURB);
 //			  		setPath(path,fromPoint.x+2, fromPoint.y-2, toPoint.x, toPoint.y);
 //			  		g2d.draw(path);
-				  	g2d.setColor(prevColor);
+				  	g2d.setStroke(prevColor);
 				} 	
 			}
 		}	
 	}
-	protected void drawCurve(Graphics2D g2d,int method){
+	protected void drawCurve(GraphicsContext g2d,int method){
 		switch (method){
 			case VisConstants.BEZIER:
 				drawBezier(g2d);
@@ -56,20 +54,17 @@ public class VisConnectorPropertyRange extends VisConnectorIsA {
 		
 	}
 	
-	protected void drawNurbs(Graphics2D g2d, Point pfrom, Point pto){
-		CubicCurve2D curve2 = null; 
+	protected void drawNurbs(GraphicsContext g2d, Point2D pfrom, Point2D pto){
 
 		calculateNurbPoints(pfrom.getX(), pfrom.getY(), toPoint.getX(), toPoint.getY());
-		curve2 = new CubicCurve2D.Float(); 
-		curve2.setCurve(pfrom.getX(),pfrom.getY(), 
-						controlx1,pfrom.getY(),
-						controlx2,pfrom.getY(), 
-						pto.getX(),pto.getY()); 
-		g2d.draw(curve2); 
+		g2d.beginPath();
+		g2d.moveTo(pfrom.getX(), pfrom.getY());
+		g2d.bezierCurveTo(controlx1, pfrom.getY(), controlx2, pfrom.getY(), pto.getX(), pto.getY());
+		g2d.stroke();
 	}
 	
-	protected void drawBezier(Graphics2D g2d){
+	protected void drawBezier(GraphicsContext g2d){
 	    setPath(path,fromPoint.getX(), fromPoint.getY(), toPoint.getX(),toPoint.getY());
-	    g2d.draw(path);
+	    drawPath(g2d, path);
 	}
 }	

@@ -1,8 +1,9 @@
 package sid.OntView2.common;
 
-import java.awt.*;
-import java.awt.geom.CubicCurve2D;
-import java.awt.geom.GeneralPath;
+import javafx.geometry.Point2D;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.*;
 
 public class VisConnectorIsA extends VisConnector {
 	
@@ -10,60 +11,70 @@ public class VisConnectorIsA extends VisConnector {
 	
 	private static double PATH_OFFSET = 5.0;
 	
-	GeneralPath path;
+	Path path;
 	
 
 	public VisConnectorIsA(Shape par_from, Shape par_to) {
 		super(par_from, par_to);
 		isaColor = VisConnector.color;
-		path = new GeneralPath();
+		path = new Path();
 	}
 
 	@Override
-	public void draw(Graphics g){
-		Graphics2D g2d= (Graphics2D) g;
-		Stroke prevStroke = g2d.getStroke();
+	public void draw(GraphicsContext g){
+		GraphicsContext g2d = g;
+        Color prevColor = (Color) g2d.getStroke();
+		double prevLineWidth = g2d.getLineWidth();
+		StrokeLineCap prevCap = g2d.getLineCap();
+		StrokeLineJoin prevJoin = g2d.getLineJoin();
+
 		if (visible){
 			if ((from != null) && (to!= null)){
-				fromPoint = from.getConnectionPoint(new Point(from.getPosX(),from.getPosY()),false);
-				toPoint   = to.getConnectionPoint(new Point(from.getPosX(),from.getPosY()),true);
+				fromPoint = from.getConnectionPoint(new Point2D(from.getPosX(),from.getPosY()),false);
+				toPoint   = to.getConnectionPoint(new Point2D(from.getPosX(),from.getPosY()),true);
 
 			    Shape selected = from.graph.paintframe.getPressedShape();
 
-			    Color prevColor = g2d.getColor();
 			    if (selected !=null) {
-			    		g2d.setStroke(stroke);
-			    		if ((from==selected)||(to==selected)){
-						   	g2d.setColor(Color.orange);
-						}
-					    else  {
-					    	g2d.setColor(isaColor);
-					    	g2d.setStroke(minStroke);
-					    }
+					g2d.setLineWidth(width);
+					g2d.setLineCap(StrokeLineCap.SQUARE);
+					g2d.setLineJoin(StrokeLineJoin.MITER);
+
+					if ((from==selected)||(to==selected)){
+						g2d.setStroke(Color.ORANGE);
+						g2d.setFill(Color.ORANGE);
+					}
+					else  {
+						g.setStroke(isaColor);
+						g.setFill(isaColor);
+						g.setLineWidth(minWidth);
+					}
 			    }	
 			    else {
-			        Stroke str = (redundant ? minStroke : stroke);
-			        Color col  = (redundant ? altColor : isaColor);
-			    	g2d.setColor(col);
-		    		g2d.setStroke(str);
+					double lineWidth = (redundant ? minWidth : width);
+					Color col = (redundant ? altColor : isaColor);
+					g.setStroke(col);
+					g.setLineWidth(lineWidth);
+					g.setLineCap(StrokeLineCap.SQUARE);
+					g.setLineJoin(StrokeLineJoin.MITER);
 			    }
 
 			    //drawing a curve path
-			    drawCurve(g2d, VisConstants.NURB);
+			    drawCurve(g, VisConstants.NURB);
 			   
-			    this.drawArrow(g2d, 5, PATH_OFFSET, fromPoint.getX(), fromPoint.getY());
-			    
-			    g2d.setColor(prevColor);
-			 	g2d.setStroke(prevStroke);
+			    this.drawArrow(g, 5, PATH_OFFSET, fromPoint.getX(), fromPoint.getY());
+
+				g.setStroke(prevColor);
+				g.setFill(prevColor);
+				g.setLineWidth(prevLineWidth);
+				g.setLineCap(prevCap);
+				g.setLineJoin(prevJoin);
 			}
 		}	
 	}
 	
-	
-	
-	
 	@Override
-	protected void drawCurve(Graphics2D g2d,int method){
+	protected void drawCurve(GraphicsContext g2d,int method){
 		switch (method){
 			case VisConstants.BEZIER:
 				drawBezier(g2d);
@@ -76,22 +87,25 @@ public class VisConnectorIsA extends VisConnector {
 		
 	}
 	
-	protected void drawBezier(Graphics2D g2d){
+	protected void drawBezier(GraphicsContext g2d){
 	    setPath(path,fromPoint.getX(), fromPoint.getY(), toPoint.getX(),toPoint.getY());
-	    g2d.draw(path);
+		drawPath(g2d, path);
 	}
-	
-	protected void drawNurbs(Graphics2D g2d, Point pfrom, Point pto){
-		CubicCurve2D curve2 = null; 
+
+	//REVISAR
+	protected void drawNurbs(GraphicsContext g2d, Point2D pfrom, Point2D pto){
 		double auxX1 = 0.2* (pto.getX()-pfrom.getX()) + pfrom.getX();
         double auxX2 = 0.4* (pto.getX()-pfrom.getX()) + pfrom.getX();
-		
-		curve2 = new CubicCurve2D.Float(); 
-		curve2.setCurve(pfrom.getX(),pfrom.getY(), 
-						auxX1,pfrom.getY(),
-						auxX2,pto.getY(), 
-						pto.getX(),pto.getY()); 
-		g2d.draw(curve2); 
+
+		g2d.beginPath();
+		g2d.moveTo(pfrom.getX(), pfrom.getY());
+
+		g2d.bezierCurveTo(
+				auxX1, pfrom.getY(),
+				auxX2, pto.getY(),
+				pto.getX(), pto.getY()
+		);
+		g2d.stroke();
 	}
 	
 	
@@ -100,43 +114,39 @@ public class VisConnectorIsA extends VisConnector {
 	 * calculates intermediate points (x1,y1) (x2,y2) for a Bezier curve
 	 */
 		double heightDiff = Math.abs(toPointY -fromPointY);
-	    if (toPoint.y -fromPoint.y > 0){
+	    if (toPoint.getY() -fromPoint.getY() > 0){
 	    	controlx1 = fromPointX + 0.2*(toPointX-fromPointX);
 	    	controly1 = fromPointY + 0.8*(heightDiff);
 	    	controlx2 = fromPointX + 0.8*(toPointX-fromPointX);
 	    	controly2 = fromPointY + 0.9*(heightDiff);
         }
 	    else {
-	    	controlx1 = fromPoint.x + 0.2*(toPointX-fromPointX);
-	    	controly1 = fromPoint.y + (-0.8)*(heightDiff);
-	    	controlx2 = fromPoint.x + 0.8*(toPointX-fromPointX);
-	    	controly2 = fromPoint.y + (-0.9)*(heightDiff);	
+	    	controlx1 = fromPoint.getX() + 0.2*(toPointX-fromPointX);
+	    	controly1 = fromPoint.getY() + (-0.8)*(heightDiff);
+	    	controlx2 = fromPoint.getX() + 0.8*(toPointX-fromPointX);
+	    	controly2 = fromPoint.getY() + (-0.9)*(heightDiff);
 	    }
 	}
 	
 	@Override
-	protected void setPath(GeneralPath path,double fromPointX, double fromPointY, double toPointX,double toPointY){
+	protected void setPath(Path path,double fromPointX, double fromPointY, double toPointX,double toPointY){
 	/*
 	 *  adds Points to a path to be drawn
 	 */
-		path.reset();
+		path.getElements().clear();
 		calculateBezierPoints(fromPointX, fromPointY, toPointX, toPointY);
-		path.moveTo(fromPointX, fromPointY);
-		path.lineTo(fromPointX+PATH_OFFSET, fromPointY);
-		path.curveTo(controlx1, 
-		   		     controly1,
-		   		     controlx2,
-		   		     controly2,
-                      toPointX-PATH_OFFSET, 
-                      toPointY
-		    		     );
-	   path.lineTo(toPointX, toPointY);
+		path.getElements().add(new MoveTo(fromPointX, fromPointY));
+		path.getElements().add(new LineTo(fromPointX + PATH_OFFSET, fromPointY));
+		path.getElements().add(new CubicCurveTo(
+				controlx1, controly1, controlx2, controly2, toPointX - PATH_OFFSET, toPointY
+		));
+		path.getElements().add(new LineTo(toPointX, toPointY));
 		
 	}
 	
-	private void drawArrow(Graphics2D g,int height,double pATH_OFFSET2,double d,double e){
-	    int[] xPoints = { (int) (d+pATH_OFFSET2),  (int) (d+pATH_OFFSET2),  (int) d};
-	    int[] yPoints = { (int) (e-height), (int) (e+height), (int) e}; 
+	private void drawArrow(GraphicsContext g,int height,double pATH_OFFSET2,double d,double e){
+	    double[] xPoints = { (d+pATH_OFFSET2), (d+pATH_OFFSET2),  (int) d};
+	    double[] yPoints = { (e-height), (e+height), (int) e};
 	    g.fillPolygon(xPoints, yPoints, 3);
 		
 	}

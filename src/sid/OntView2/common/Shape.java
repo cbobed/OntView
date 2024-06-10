@@ -1,6 +1,8 @@
 
 package sid.OntView2.common;
 
+import javafx.geometry.Point2D;
+import javafx.scene.canvas.GraphicsContext;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 
@@ -19,8 +21,8 @@ public abstract class Shape{
 	int depthlevel;
 	VisLevel vdepthlevel;
 	VisGraph graph;
-	Point connectionPointsL;
-	Point connectionPointsR;	
+	Point2D connectionPointsL;
+	Point2D connectionPointsR;
 	ArrayList<VisConnector> inConnectors,
 							outConnectors,
 	                        inDashedConnectors,
@@ -55,8 +57,8 @@ public abstract class Shape{
 	public abstract OWLClassExpression getLinkedClassExpression();
 	public abstract String getToolTipInfo();
 	public abstract int getLevelRelativePos();
-	public abstract void drawShape(Graphics g);
-	public abstract Point getConnectionPoint(Point point, boolean b);
+	public abstract void drawShape(GraphicsContext g);
+	public abstract Point2D getConnectionPoint(Point2D point, boolean b);
     PaintFrame frame;
 
     /**************************************************************/

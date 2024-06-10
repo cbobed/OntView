@@ -1,10 +1,16 @@
 package sid.OntView2.common;
 
+import com.sun.javafx.tk.FontMetrics;
+import com.sun.javafx.tk.Toolkit;
+import javafx.geometry.Point2D;
+import javafx.scene.paint.Color;
+import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Font;
 import javafx.scene.canvas.GraphicsContext;
 
 
+import javafx.scene.text.Text;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.Node;
@@ -12,7 +18,6 @@ import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import sid.OntView.utils.ExpressionManager;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -27,9 +32,7 @@ public class VisClass extends Shape {
 	public static final int NODES_X_SEPARATION = 200;
 	public static final int NODES_Y_SEPARATION = 40;
 	public static final int RELATIVE_POS = 0;
-	public static Color  color;
-	public static Stroke stroke;
-	
+	public static Color color;
 	
 	String   label;
 //	String   mapKey;
@@ -102,8 +105,8 @@ public class VisClass extends Shape {
 		linkedClassExpression = o;
 		this.label= plabel;
 		this.visibleLabel = plabel; 
-		connectionPointsL = new Point(posx,posy+5);
-		connectionPointsR = new Point(posx+getWidth(),posy+5);
+		connectionPointsL = new Point2D(posx,posy+5);
+		connectionPointsR = new Point2D(posx+getWidth(),posy+5);
 		children    = new ArrayList<Shape>();
         parents     = new ArrayList<Shape>();
         properties  = new ArrayList<String>();
@@ -220,17 +223,17 @@ public class VisClass extends Shape {
 	private Font boldFont;
 	private Font getDefinedClassFont(){
 		if (defFont==null)
-			defFont= new Font(Font.DIALOG,Font.ITALIC,12);
+			defFont = Font.font("Dialog", FontPosture.ITALIC, 12);
 		return defFont;
 	}
 	
 	private Font getBoldFont(){
 		if (boldFont==null)
-			boldFont= new Font(Font.DIALOG,Font.BOLD,10);
+			boldFont= Font.font("Dialog", FontWeight.BOLD, 10);
 		return boldFont;
 	}
 	
-	public void drawShape(Graphics g) {
+	public void drawShape(GraphicsContext g) {
 	    int x = posx+1;
 	    int y = posy;
 	    	    
@@ -241,8 +244,11 @@ public class VisClass extends Shape {
 	    else {
 	    	g.setFont(getBoldFont());
 	    }
-	    FontMetrics fm = g.getFontMetrics(); 
-	    int fontHeight = fm.getHeight();
+
+		Text textNode = new Text();
+		textNode.setFont(g.getFont());
+		double fontHeight = textNode.getBoundsInLocal().getHeight();
+		double ascent = textNode.getBaselineOffset();
 	    
 	    if (currentHeight == 0) {
 	    	
@@ -255,40 +261,39 @@ public class VisClass extends Shape {
 	    }
 	    
 	    if (visible){
+			Color mini = Color.rgb(224, 224, 224);
 
-	    	Color mini = new Color(224,224,224);
-	    	
 	    	if (!isDefined) {
 	    		// CBL if it is not defined, we use the previous representation
 		    	if (!isAnonymous) 
-		    		g.setColor(mini);
+		    		g.setFill(mini);
 		    	else
-		    		g.setColor(Color.white);	
+		    		g.setFill(Color.WHITE);
 		    	
-			    g.fillRect(x - getWidth()/2, y - currentHeight/2, getWidth(), currentHeight);
-			    g.setColor(Color.black);
+			    g.fillRect(x - (double) getWidth() /2, y - (double) currentHeight /2, getWidth(), currentHeight);
+			    g.setStroke(Color.BLACK);
 			    if (isBottom) {
-			    	g.setColor(Color.red);
+			    	g.setStroke(Color.RED);
 			    }	
 		 
 			    //rectangle
-			    g.drawRect(x -  getWidth()/2, y - currentHeight/2,  getWidth()-1, currentHeight-1);
-			    g.setColor(Color.lightGray);
+			    g.strokeRect(x -  (double) getWidth() /2, y - (double) currentHeight /2,  getWidth()-1, currentHeight-1);
+			    g.setFill(Color.LIGHTGRAY);
 			    if (propertyBox!=null){
-			    	g.fillRect(x -  getWidth()/2, y + currentHeight/2, getWidth()-1, 6);
-			    	g.setColor(Color.black);
-			    	g.drawRect(x -  getWidth()/2, y + currentHeight/2,getWidth()-1, 6);
+			    	g.fillRect(x -  (double) getWidth() /2, y + (double) currentHeight /2, getWidth()-1, 6);
+			    	g.setStroke(Color.BLACK);
+			    	g.strokeRect(x -  (double) getWidth() /2, y + (double) currentHeight /2,getWidth()-1, 6);
 	
 			    }	
-			    g.setColor(Color.black);
+			    g.setStroke(Color.BLACK);
 	
 	//    		g.drawString(label, x -(getWidth()-10)/2, (y - (oldHeight-4)/2) + fm.getAscent());
 			    if (!isAnonymous) { 
-			    	g.drawString(visibleLabel, x -(getWidth()-10)/2, (y - (currentHeight-4)/2) + fm.getAscent());
+					g.fillText(visibleLabel, x - (double) (getWidth() - 10) / 2, (y -(double) (currentHeight - 4) / 2) + ascent);
 			    }
 			    else {
-			    	drawFormattedString(g, visibleLabel, x -(getWidth()-10)/2, (y - (currentHeight-4)/2) + fm.getAscent(), fm.getMaxAscent()); 
-	//		    	g.drawString(removeFormatInformation(visibleLabel), x -(getWidth()-10)/2, (y - (currentHeight-4)/2) + fm.getAscent());
+					drawFormattedString(g, visibleLabel, x - (getWidth() - 10) / 2,  (int) ((y - (currentHeight - 4) / 2) + ascent), (int) fontHeight);
+					//		    	g.drawString(removeFormatInformation(visibleLabel), x -(getWidth()-10)/2, (y - (currentHeight-4)/2) + fm.getAscent());
 			    }
 	    	}
 	    	else {
@@ -297,34 +302,34 @@ public class VisClass extends Shape {
 		    		// CBL: the new definitions representation 
 		    		// a Background white rectangle for the definition
 		    		// a grey for the 
-		    		g.setColor(Color.white); 
-		    		g.fillRect(x - getWidth()/2, y-currentHeight/2+5, getWidth(), currentHeight); 
+		    		g.setFill(Color.WHITE);
+		    		g.fillRect(x - (double) getWidth() /2, y- (double) currentHeight /2+5, getWidth(), currentHeight);
 		    		if (isBottom) 
-		    			g.setColor(Color.red); 
+		    			g.setStroke(Color.RED);
 		    		else 
-		    			g.setColor(Color.black);
-		    		g.drawRect(x -  getWidth()/2, y - currentHeight/2+5,  getWidth()-1, currentHeight-1);
+		    			g.setStroke(Color.BLACK);
+		    		g.strokeRect(x -  (double) getWidth() /2, y - (double) currentHeight /2+5,  getWidth()-1, currentHeight-1);
 		    		
 		    		// now => the rectangle for the name of the concept
 		    			
-		    		g.setColor(mini); 
-		    		g.fillRect(x - getWidth()/2 + 5, y-currentHeight/2, getWidth()-10, fontHeight+5); 
+		    		g.setFill(mini);
+		    		g.fillRect(x - (double) getWidth() /2 + 5, y- (double) currentHeight /2, getWidth()-10, fontHeight+5);
 		    		if (isBottom) 
-		    			g.setColor(Color.red); 
+		    			g.setStroke(Color.RED);
 		    		else 
-		    			g.setColor(Color.black);
-		    		g.drawRect(x -  getWidth()/2+5, y - currentHeight/2,  getWidth()-10, fontHeight+4);
+		    			g.setStroke(Color.BLACK);
+		    		g.strokeRect(x -  (double) getWidth() /2+5, y - (double) currentHeight /2,  getWidth()-10, fontHeight+4);
 		    		
 		    		// this is the name of the concept
 		    		g.setFont(getDefinedClassFont()); 
-		    		g.drawString(visibleLabel, x -(getWidth()-16) /2, (y - (currentHeight-4)/2) + fm.getAscent()); 
+		    		g.fillText(visibleLabel, x - (double) (getWidth() - 16) /2, (y - (double) (currentHeight - 4) /2) + ascent);
 		    		
 		    		g.setFont(getBoldFont()); 
-		    		int auxY = y - (currentHeight/2) + (fontHeight +5) + 2; 
+		    		double auxY = y - ((double) currentHeight /2) + (fontHeight +5) + 2;
 		    		if (visibleDefinitionLabels != null) {
 		    			for (String auxDefString: visibleDefinitionLabels) {
-		    				drawFormattedString(g, auxDefString, x -(getWidth()-12)/2, auxY + fm.getAscent(), fm.getMaxAscent()); 
-		    				auxY += (countLines(auxDefString)*fontHeight) + 5; 
+							drawFormattedString(g, auxDefString, x - (getWidth() - 12) / 2, (int) (auxY + ascent), (int) fontHeight);
+							auxY += (countLines(auxDefString)*fontHeight) + 5;
 		    			}
 		    		}
 	    		}
@@ -332,30 +337,30 @@ public class VisClass extends Shape {
 	    			// CBL: it is an auxiliar definition 
 	    			// CBL if it is not defined, we use the previous representation
 			    	
-			    	g.setColor(Color.white);	
+			    	g.setFill(Color.WHITE);
 			    	
-				    g.fillRect(x - getWidth()/2, y - currentHeight/2, getWidth(), currentHeight);
-				    g.setColor(Color.black);
+				    g.fillRect(x - (double) getWidth() /2, y - (double) currentHeight /2, getWidth(), currentHeight);
+				    g.setStroke(Color.BLACK);
 				    if (isBottom) {
-				    	g.setColor(Color.red);
+				    	g.setStroke(Color.RED);
 				    }	
 			 
 				    //rectangle
-				    g.drawRect(x -  getWidth()/2, y - currentHeight/2,  getWidth()-1, currentHeight-1);
-				    g.setColor(Color.lightGray);
+				    g.strokeRect(x -  (double) getWidth() /2, y - (double) currentHeight /2,  getWidth()-1, currentHeight-1);
+				    g.setFill(Color.LIGHTGRAY);
 				    if (propertyBox!=null){
-				    	g.fillRect(x -  getWidth()/2, y + currentHeight/2, getWidth()-1, 6);
-				    	g.setColor(Color.black);
-				    	g.drawRect(x -  getWidth()/2, y + currentHeight/2,getWidth()-1, 6);
+				    	g.fillRect(x -  (double) getWidth() /2, y + (double) currentHeight /2, getWidth()-1, 6);
+				    	g.setStroke(Color.BLACK);
+				    	g.strokeRect(x -  (double) getWidth() /2, y + (double) currentHeight /2,getWidth()-1, 6);
 		
 				    }	
-				    g.setColor(Color.black);
+				    g.setStroke(Color.BLACK);
 				    g.setFont(getBoldFont()); 
-		    		int auxY = (y - (currentHeight-4)/2); 
+		    		double auxY = (y - (double) (currentHeight - 4) /2);
 		    		if (visibleDefinitionLabels != null) {
 		    			for (String auxDefString: visibleDefinitionLabels) {
-		    				drawFormattedString(g, auxDefString, x -(getWidth()-10)/2, auxY + fm.getAscent(), fm.getMaxAscent()); 
-		    				auxY += (countLines(auxDefString)*fontHeight) + 5; 
+							drawFormattedString(g, auxDefString, x - (getWidth() - 10) / 2, (int) (auxY + ascent), (int) fontHeight);
+							auxY += (countLines(auxDefString)*fontHeight) + 5;
 		    			}
 		    		}
 //		//    		g.drawString(label, x -(getWidth()-10)/2, (y - (oldHeight-4)/2) + fm.getAscent());
@@ -376,35 +381,35 @@ public class VisClass extends Shape {
 		    	switch (this.getState()) {
 		    	
 		    	   case Shape.PARTIALLY_CLOSED :
-		    		   g.setColor(mini);
-		   	           g.fillRect(x + getWidth()/2, y - 10, 10, 10);
-		   	           g.setColor(Color.black);
-		   	           g.drawRect(x + getWidth()/2, y - 10, 10, 10);
-		   	           g.drawLine(x + getWidth()/2 + 2, y - 5, x + getWidth()/2 + 8, y - 5);
-		   	           g.drawLine(x + getWidth()/2 + 5, y - 8, x + getWidth()/2 + 5, y - 3);
+		    		   g.setFill(mini);
+		   	           g.fillRect(x + (double) getWidth() /2, y - 10, 10, 10);
+		   	           g.setStroke(Color.BLACK);
+		   	           g.strokeRect(x + (double) getWidth() /2, y - 10, 10, 10);
+		   	           g.strokeLine(x + (double) getWidth() /2 + 2, y - 5, x + (double) getWidth() /2 + 8, y - 5);
+		   	           g.strokeLine(x + (double) getWidth() /2 + 5, y - 8, x + (double) getWidth() /2 + 5, y - 3);
 		   	           // open
-		   	           g.setColor(mini);
-		   	           g.fillRect(x + getWidth()/2, y, 10, 10);
-		   	           g.setColor(Color.black);
-		   	           g.drawRect(x + getWidth()/2, y, 10, 10);
-		   	           g.drawLine(x + getWidth()/2 + 2, y + 5, x + getWidth()/2 + 8, y + 5);
+		   	           g.setFill(mini);
+		   	           g.fillRect(x + (double) getWidth() /2, y, 10, 10);
+		   	           g.setStroke(Color.BLACK);
+		   	           g.strokeRect(x + (double) getWidth() /2, y, 10, 10);
+		   	           g.strokeLine(x + (double) getWidth() /2 + 2, y + 5, x + (double) getWidth() /2 + 8, y + 5);
 		    		   break;
 		    		   
 		    	   case CLOSED : 
-		    		   g.setColor(mini);
-		 	           g.fillRect(x + getWidth()/2, y - 10, 10, 10);
-		 	           g.setColor(Color.black);
-		 	           g.drawRect(x + getWidth()/2, y - 10, 10, 10);
-		 	           g.drawLine(x + getWidth()/2 + 2, y - 5, x + getWidth()/2 + 8, y - 5);
-		 	           g.drawLine(x + getWidth()/2 + 5, y - 8, x + getWidth()/2 + 5, y - 3);
+		    		   g.setFill(mini);
+		 	           g.fillRect(x + (double) getWidth() /2, y - 10, 10, 10);
+		 	           g.setStroke(Color.BLACK);
+		 	           g.strokeRect(x + (double) getWidth() /2, y - 10, 10, 10);
+		 	           g.strokeLine(x + (double) getWidth() /2 + 2, y - 5, x + (double) getWidth() /2 + 8, y - 5);
+		 	           g.strokeLine(x + (double) getWidth() /2 + 5, y - 8, x + (double) getWidth() /2 + 5, y - 3);
 		    		   break;
 	
 		    	   case  Shape.OPEN :
-		    		   g.setColor(mini);
-		 	           g.fillRect(x + getWidth()/2, y, 10, 10);
-		 	           g.setColor(Color.black);
-		 	           g.drawRect(x + getWidth()/2, y, 10, 10);
-		 	           g.drawLine(x + getWidth()/2 + 2, y + 5, x + getWidth()/2 + 8, y + 5);
+		    		   g.setFill(mini);
+		 	           g.fillRect(x + (double) getWidth() /2, y, 10, 10);
+		 	           g.setStroke(Color.BLACK);
+		 	           g.strokeRect(x + (double) getWidth() /2, y, 10, 10);
+		 	           g.strokeLine(x + (double) getWidth() /2 + 2, y + 5, x + (double) getWidth() /2 + 8, y + 5);
 		    		   break;
 		    		   
 		    	   default :
@@ -512,16 +517,14 @@ public class VisClass extends Shape {
 		}	
 	 }
 		
-	public Point getConnectionPoint(Point p,boolean left) {
+	public Point2D getConnectionPoint(Point2D p,boolean left) {
 	//return Closest conection point	
 		if (left){
-			connectionPointsL.x = getPosX()-getWidth()/2;
-			connectionPointsL.y = getPosY();
+			connectionPointsL = new Point2D(getPosX() - (double) getWidth() /2, getPosY());
 			return connectionPointsL;
 		}
      	else {
-			connectionPointsR.x = getPosX()+getWidth()/2;
-			connectionPointsR.y = getPosY();
+			connectionPointsR = new Point2D(getPosX() + (double) getWidth() /2, getPosY());
 		    return connectionPointsR;
 		}
 	}
@@ -815,19 +818,22 @@ public class VisClass extends Shape {
 	}
 	
 	public int calculateWidth () {
-		Graphics g = graph.paintframe.getGraphics();
-	    int max;
-	    max = getWidth();
+		GraphicsContext g = graph.paintframe.getGraphicsContext2D();
+	    int max = getWidth();
 	    Font prevFont = g.getFont();
-	    g.setFont(new Font(Font.DIALOG,Font.BOLD,10));
-	    FontMetrics f = g.getFontMetrics(g.getFont());
+		g.setFont(Font.font("Dialog", FontWeight.BOLD, 10));
+
+		// Way to measure text width
+		Text textNode = new Text();
+		textNode.setFont(Font.font("Dialog", FontWeight.BOLD, 10));
 	    
 	    StringTokenizer sTokenizer = null; 
     	String token; 
     	int candidate = 0;	
 	    if (!isAnonymous) {
 	    	if (!label.startsWith(sid.OntView.expressionNaming.SIDClassExpressionNamer.className)) {
-	    		max = (int) (f.getStringBounds(visibleLabel,g).getWidth()+40);
+				textNode.setText(visibleLabel);
+				max = (int) textNode.getLayoutBounds().getWidth() + 40;
 	    	}
 	    	else {
 	    		// there is no label as it is supposed to be anonymous
@@ -842,8 +848,9 @@ public class VisClass extends Shape {
 	    			sTokenizer = new StringTokenizer(auxLabel, "\n");
 	    			while (sTokenizer.hasMoreElements()) {
 	    	    		token = sTokenizer.nextToken();
-	    	    		candidate = (int)f.getStringBounds(removeFormatInformation(token),g).getWidth()+25;
-	    	    		candidate += tabsSize(token); 	    
+						textNode.setText(removeFormatInformation(token));
+						candidate = (int) textNode.getLayoutBounds().getWidth() + 25;
+						candidate += tabsSize(token);
 	    	    		if (candidate > max) {
 	    	    			max = candidate; 
 	    	    		}
@@ -857,7 +864,8 @@ public class VisClass extends Shape {
 	    	max = 0;	    	    	
 	    	while (sTokenizer.hasMoreElements()) {
 	    		token = sTokenizer.nextToken();
-	    		candidate = (int)f.getStringBounds(removeFormatInformation(token),g).getWidth()+25;
+				textNode.setText(removeFormatInformation(token));
+				candidate = (int) textNode.getLayoutBounds().getWidth() + 25;
 	    		candidate += tabsSize(token); 
 	    		
 	    		if (candidate > max) {
@@ -867,7 +875,7 @@ public class VisClass extends Shape {
 	    }
 
 	    g.setFont(prevFont);
-	    f=g.getFontMetrics(new Font(Font.DIALOG,Font.ITALIC,9));
+		textNode.setFont(Font.font("Dialog", FontPosture.ITALIC, 9));
 	    return max;
 		
 	}
@@ -888,9 +896,11 @@ public class VisClass extends Shape {
 	}
 
 	public int calculateHeight(){
-		Graphics g = graph.paintframe.getGraphics();
-	    FontMetrics f = g.getFontMetrics(g.getFont());
-	    int fontHeight = f.getHeight();
+		GraphicsContext g = graph.paintframe.getGraphicsContext2D();
+		Text textNode = new Text();
+		textNode.setFont(g.getFont());
+
+		int fontHeight = (int) textNode.getFont().getSize();
 	    
 	    int result = 0;
 	    if (isAnonymous) {
@@ -990,7 +1000,7 @@ public class VisClass extends Shape {
 		while (sTokenizer.hasMoreTokens()) {
 			token = sTokenizer.nextToken();
 			currentX = x+tabsSize(token); 
-			g.drawString(removeFormatInformation(token), currentX, currentY);
+			g.fillText(removeFormatInformation(token), currentX, currentY);
 			Font font = Font.font("Dialog", FontWeight.NORMAL, 9);
 
 			currentY += VisProperty.stringHeight(font, g)+6;

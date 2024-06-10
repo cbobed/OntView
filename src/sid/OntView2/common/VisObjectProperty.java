@@ -12,9 +12,7 @@ import sid.OntView.utils.ExpressionManager;
 
 import javafx.scene.text.Font;
 import javafx.scene.paint.Color;
-import javafx.geometry.Point2D;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -214,8 +212,10 @@ public class VisObjectProperty extends VisProperty {
 				Color c = (Color) g.getFill();
 				g.strokeOval(circlePos.getX(),circlePos.getY()+2, 9,9);
 				g.setFill(Color.LIGHTGRAY);
+				g.setStroke(Color.LIGHTGRAY);
 				g.fillOval(circlePos.getX(),circlePos.getY()+2, 9,9);
 				g.setFill(c);
+				g.setStroke(c);
 			}
 		}
 	}

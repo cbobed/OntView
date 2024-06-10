@@ -1,54 +1,56 @@
 package sid.OntView2.common;
 
-import java.awt.*;
+import javafx.geometry.Point2D;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 
 public class VisConnectorEquiv extends VisConnector {
 
-	Color color= Color.cyan;
+	Color color= Color.CYAN;
 	
 	public VisConnectorEquiv(Shape par_from, Shape par_to) {
 		super(par_from, par_to);
-		fromPoint = new Point();
-		toPoint =  new Point();
+		fromPoint = new Point2D(0,0);
+		toPoint =  new Point2D(0,0);
 		
 	}
 
 	@Override
-	public void draw(Graphics g){
+	public void draw(GraphicsContext g){
 		int posy1,posy2;
 		Color col = color;
-		Graphics2D g2d= (Graphics2D) g;
+		GraphicsContext g2d= (GraphicsContext) g;
 		
 		if ((from.visible) &&(to.visible)){
 			if (color==null)
 				col = VisConnector.color;
 			posy1 = from.getPosY();
 			posy2 = to.getPosY();
-			fromPoint.x = from.posx;
-			toPoint.x = to.posx;
+
 			if (posy1 < posy2) {
-				fromPoint.y = posy1+from.getHeight()/2;
-				toPoint.y = posy2-to.getHeight()/2;
+				fromPoint = new Point2D(from.posx, posy1 + (double) from.getHeight() / 2);
+				toPoint = new Point2D(to.posx, posy2 - (double) to.getHeight() / 2);
 			}
 			else  {
-				fromPoint.y = posy1-from.getHeight()/2;
-				toPoint.y = posy2+to.getHeight()/2;
+				fromPoint = new Point2D(from.posx, posy1 - (double) from.getHeight() / 2);
+				toPoint = new Point2D(to.posx, posy2 + (double) to.getHeight() / 2);
 
 			}
-		    Color prevColor = g2d.getColor();
-		  	g2d.setColor(col);
-		  	g2d.drawLine(fromPoint.x, fromPoint.y, toPoint.x, toPoint.y);
-		  	g2d.drawLine(fromPoint.x-5, fromPoint.y, toPoint.x-5, toPoint.y);
-		  	g2d.drawLine(fromPoint.x+5, fromPoint.y, toPoint.x+5, toPoint.y);
-		 	g2d.setColor(prevColor);
+		    Color prevColor = (Color) g2d.getStroke();
+		  	g2d.setStroke(col);
+		  	g2d.strokeLine(fromPoint.getX(), fromPoint.getY(), toPoint.getX(), toPoint.getY());
+		  	g2d.strokeLine(fromPoint.getX()-5, fromPoint.getY(), toPoint.getX()-5, toPoint.getY());
+		  	g2d.strokeLine(fromPoint.getX()+5, fromPoint.getY(), toPoint.getX()+5, toPoint.getY());
+		 	g2d.setStroke(prevColor);
 		}	
 	}
 
 	/**
 	 * Returns if dst is accesible from origin
-	 * @param list
+	 * @param discarded
 	 * @param or
 	 * @param dst
 	 * @return boolean

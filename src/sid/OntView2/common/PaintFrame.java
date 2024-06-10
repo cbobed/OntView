@@ -113,7 +113,7 @@ public class PaintFrame extends Canvas implements MouseListener,Runnable,MouseMo
 	 */
 	public void scale(double factor,Dimension size){
 
-		Graphics2D g2d = (Graphics2D) this.getGraphics();
+		GraphicsContext g2d = (GraphicsContext) this.getGraphicsContext2D();
 		g2d.scale(factor, factor);
 		if (factor>1.0)
 			setPreferredSize(new Dimension( (int)(size.getWidth()*factor),
@@ -123,9 +123,9 @@ public class PaintFrame extends Canvas implements MouseListener,Runnable,MouseMo
 	/*-*************************************************************/
 
 	@Override
-	public  void  paintComponent(Graphics g) {
+	public  void  paintComponent(GraphicsContext g) {
 		super.paintComponent(g);
-		Graphics2D  g2d = (Graphics2D) g;
+		GraphicsContext  g2d = (GraphicsContext) g;
 		if ((factor !=1.0)&&(stable)){
 			g2d.scale(factor, factor);
 		}

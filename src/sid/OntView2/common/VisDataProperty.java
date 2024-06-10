@@ -3,15 +3,14 @@ package sid.OntView2.common;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.text.FontWeight;
+import javafx.scene.text.Font;
+
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
-import sid.OntView.utils.ExpressionManager;
-import javafx.scene.text.Font;
+import sid.OntView2.utils.ExpressionManager;
 
-
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -26,9 +25,9 @@ public class VisDataProperty extends VisProperty {
 	String visibleLabel = ""; 
 	String range;
 	VisConnectorPropertyRange rangeConnector;
-	HashSet<Point> pointSet;
+	HashSet<Point2D> pointSet;
 	VisConnectorPropProp parent;
-	ArrayList<Point> connectionPoints;
+	ArrayList<Point2D> connectionPoints;
 	
 	boolean visible = true;
 	ArrayList<VisConnectorHeritance> parentConnectors;
@@ -62,11 +61,11 @@ public class VisDataProperty extends VisProperty {
 		dPropExp = dexp;
 		range = prange;
 		voffset = pvoffset;
-		connectionPoints = new ArrayList<Point>();
-		
-		textFont    = new Font(Font.DIALOG,Font.PLAIN,10);
-		circleFont  = new Font(Font.DIALOG,Font.BOLD, 10);
-		connectionPoints = new ArrayList<Point>();
+		connectionPoints = new ArrayList<Point2D>();
+
+		textFont = Font.font("Dialog", FontWeight.NORMAL, 10);
+		circleFont  = Font.font("Dialog", FontWeight.BOLD, 10);
+		connectionPoints = new ArrayList<Point2D>();
 		if (dPropExp.isFunctional(ontology)) isFunctional = true;
 	
 	}
@@ -116,16 +115,16 @@ public class VisDataProperty extends VisProperty {
 		if ((pbox.visible)&&(visible)&&(pbox.vclass.visible)){
 			g.setFont(textFont);
 			if ((parents!=null)&&(parents.size() > 0)) {
-				g.drawString(label, getPosX(), getPosY());
+				g.fillText(label, getPosX(), getPosY());
 			}	
 			else {
-				g.drawString(label+ " : " + range, getPosX(), getPosY());
+				g.fillText(label+ " : " + range, getPosX(), getPosY());
 			}
-			Point circlePos = new Point(getPosX()-16, getPosY()-10);
+			Point2D circlePos = new Point2D(getPosX()-16, getPosY()-10);
 			if (isFunctional){
 				g.setFont(circleFont);
-				g.drawOval(circlePos.x,circlePos.y, 10,10);			
-				g.drawString("+", circlePos.x+1, getPosY()-1);
+				g.fillOval(circlePos.getX(),circlePos.getY(), 10,10);
+				g.fillText("+", circlePos.getX()+1, getPosY()-1);
 				g.setFont(textFont);
 			}
 		}
@@ -133,34 +132,34 @@ public class VisDataProperty extends VisProperty {
 		
 	}
 	
-	public Point getClosePoint(){
-		return new Point(getPosX()+pbox.getMaxWidth()+15,getPosY()-5);
+	public Point2D getClosePoint(){
+		return new Point2D(getPosX()+pbox.getMaxWidth()+15,getPosY()-5);
 	}
 	
-	public Point getConnectionPoint(int index) {
+	public Point2D getConnectionPoint(int index) {
 		if (connectionPoints ==null)
 			getConnectionPoints();
 		return connectionPoints.get(index);
 	}
 	
-	public ArrayList<Point> getConnectionPoints(){
+	public ArrayList<Point2D> getConnectionPoints(){
 		if (connectionPoints.size()==0) {
 			addPoints(connectionPoints);
 		}
 		return connectionPoints;
 	}
 
-	private void addPoints(ArrayList<Point> list ) {
-		list.add(new Point(getPosX(),getPosY()));
-		list.add(new Point(getPosX()+getLabelWidth()+2,getPosY()));
-		list.add(new Point(getPosX()+getLabelWidth()/2,getPosY()-getLabelHeight()));
-		list.add(new Point(getPosX()+getLabelWidth()/2,getPosY()+getLabelHeight()));
+	private void addPoints(ArrayList<Point2D> list ) {
+		list.add(new Point2D(getPosX(),getPosY()));
+		list.add(new Point2D(getPosX()+getLabelWidth()+2,getPosY()));
+		list.add(new Point2D(getPosX()+getLabelWidth()/2,getPosY()-getLabelHeight()));
+		list.add(new Point2D(getPosX()+getLabelWidth()/2,getPosY()+getLabelHeight()));
 	}
-	public void drawConnectors(Graphics g) {
+	public void drawConnectors(GraphicsContext g) {
 	}
 	
 	public boolean onProperty(Point2D p){
-		return ((p.x >= getPosX()-20)&&(p.x <= getPosX())&& (p.y >= getPosY()-10)&&(p.y <= getPosY()));
+		return ((p.getX() >= getPosX()-20)&&(p.getX() <= getPosX())&& (p.getY() >= getPosY()-10)&&(p.getY() <= getPosY()));
 	}
 	
 	

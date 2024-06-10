@@ -1,13 +1,17 @@
 package sid.OntView2.common;
 
-import java.awt.*;
-import java.awt.geom.GeneralPath;
+
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.shape.*;
+import javafx.scene.paint.Color;
+import javafx.geometry.Point2D;
+
 import java.util.ArrayList;
 
 public abstract class VisConnector {
     Shape from,to;
-    Point fromPoint,toPoint;
-    public static Color altColor = Color.lightGray;
+    Point2D fromPoint,toPoint;
+    public static Color altColor = Color.LIGHTGRAY;
     public static Color color = Color.BLACK;
     boolean visible = true;
     boolean redundant = false;
@@ -15,19 +19,18 @@ public abstract class VisConnector {
 	protected double controly1;
 	protected double controlx2;
 	protected double controly2;
-    static BasicStroke stroke;
-    static BasicStroke minStroke;
     static float  width  = 1.0f;
+	static float minWidth = 1.0f;
     
     public VisConnector(){}
     
     public VisConnector(Shape par_from, Shape par_to){
     	from = par_from;
     	to = par_to;
-    	stroke = new BasicStroke(width);
-    	minStroke = new BasicStroke((float) 1.0);
     }
-    
+
+	public static double getLineWidth() { return width;	}
+
     public void setRedundant(){
     	redundant = true;
     }
@@ -36,21 +39,21 @@ public abstract class VisConnector {
     /**
      * graphics.drawLine with an arrow
      */
-    public static void drawArrow(Graphics g,int x0,int y0,int x1,int y1){
+    public static void drawArrow(GraphicsContext g, int x0, int y0, int x1, int y1){
 		double alfa=Math.atan2(y1-y0,x1-x0);
-		g.drawLine(x0,y0,x1,y1);
+		g.strokeLine(x0,y0,x1,y1);
 		int k=3;
-		int xa=(int)(x1-k*Math.cos(alfa+1));
-		int ya=(int)(y1-k*Math.sin(alfa+1));
+		int xa=(int)(x1 - k * Math.cos(alfa+1));
+		int ya=(int)(y1 - k * Math.sin(alfa+1));
 		// Se dibuja un extremo de la dirección de la flecha.
-		g.drawLine(xa,ya,x1,y1); 
-		xa=(int)(x1-k*Math.cos(alfa-1));
-		ya=(int)(y1-k*Math.sin(alfa-1));
+		g.strokeLine(xa,ya,x1,y1);
+		xa=(int)(x1 - k * Math.cos(alfa-1));
+		ya=(int)(y1 - k * Math.sin(alfa-1));
 		// Se dibuja el otro extremo de la dirección de la flecha.
-		g.drawLine(xa,ya,x1,y1); 
+		g.strokeLine(xa,ya,x1,y1);
 		}
     
-    public abstract void draw (Graphics g);
+    public abstract void draw (GraphicsContext g);
 
     public static void removeConnector(ArrayList<VisConnector> list , Shape origin, Shape dst){
 	   VisConnector c = null;
@@ -90,8 +93,8 @@ public abstract class VisConnector {
    }
   
 
-	public static double distance(Point p1,Point p2) {
-		return  Math.sqrt(Math.pow((p1.x-p2.x),2) + Math.pow((p1.y-p2.y),2));	
+	public static double distance(Point2D p1,Point2D p2) {
+		return  Math.sqrt(Math.pow((p1.getX()-p2.getX()),2) + Math.pow((p1.getY()-p2.getY()),2));
 	}
    
    
@@ -200,31 +203,50 @@ public abstract class VisConnector {
 	    
 	
 	}
-	
-	
-	
-	protected void setPath(GeneralPath path,double fromPointX, double fromPointY, double toPointX,double toPointY){
+
+	protected void setPath(Path path, double fromPointX, double fromPointY, double toPointX, double toPointY){
 	/*
 	 *  adds Points to a path to be drawn
 	 */
-		path.reset();
+		path.getElements().clear();
 		calculateBezierPoints(fromPointX, fromPointY, toPointX, toPointY);
-		path.moveTo(fromPointX, fromPointY);
-		path.lineTo(fromPointX, fromPointY);
-		path.curveTo(controlx1, 
-		   		     controly1,
-		   		     controlx2,
-		   		     controly2,
-                      toPointX, 
-                      toPointY
-		    		     );
-	   path.lineTo(toPointX, toPointY);
+		path.getElements().add(new MoveTo(fromPointX, fromPointY));
+		path.getElements().add(new LineTo(fromPointX, fromPointY));
+		path.getElements().add(new CubicCurveTo(
+				controlx1, controly1, controlx2, controly2, toPointX, toPointY
+		));
+		path.getElements().add(new LineTo(toPointX, toPointY));
 		
 	}
 	
 
-	protected void drawCurve(Graphics2D g2d, int method) {};
-   
-   
+	protected void drawCurve(GraphicsContext g2d, int method) {};
+
+	// REVISAR
+	protected void drawPath(GraphicsContext gc, Path path) {
+		gc.beginPath();
+		for (PathElement element : path.getElements()) {
+			if (element instanceof MoveTo moveTo) {
+				gc.moveTo(moveTo.getX(), moveTo.getY());
+			} else if (element instanceof LineTo lineTo) {
+				gc.lineTo(lineTo.getX(), lineTo.getY());
+			} else if (element instanceof CubicCurveTo cubicCurveTo) {
+				gc.bezierCurveTo(
+						cubicCurveTo.getControlX1(), cubicCurveTo.getControlY1(),
+						cubicCurveTo.getControlX2(), cubicCurveTo.getControlY2(),
+						cubicCurveTo.getX(), cubicCurveTo.getY()
+				);
+			} else if (element instanceof QuadCurveTo) {
+				QuadCurveTo quadCurveTo = (QuadCurveTo) element;
+				gc.quadraticCurveTo(
+						quadCurveTo.getControlX(), quadCurveTo.getControlY(),
+						quadCurveTo.getX(), quadCurveTo.getY()
+				);
+			} else if (element instanceof ClosePath) {
+				gc.closePath();
+			}
+		}
+		gc.stroke();
+	}
    
 }

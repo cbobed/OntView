@@ -1,32 +1,61 @@
 package sid.OntView2.common;
 
-import java.awt.*;
+import javafx.geometry.Point2D;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
+import javafx.scene.shape.StrokeLineCap;
+import javafx.scene.shape.StrokeLineJoin;
 
 public class VisConnectorDashed extends VisConnectorIsA {
 
-	float dash[] = { 4.0f };
-    public static Color color = Color.BLACK;
-    static double frac = 0.01;
+	double[] dash = { 4.0f };
+	public static Color color = Color.BLACK;
+	static double frac = 0.01;
 
 	public VisConnectorDashed(Shape par_from, Shape par_to) {
 		super(par_from, par_to);
 	}
-	
-	public void draw(Graphics g){
-		Graphics2D g2d= (Graphics2D) g;
+
+	public void draw(GraphicsContext g){
+		GraphicsContext g2d= (GraphicsContext) g;
 		if (visible){
-			BasicStroke prevStroke = (BasicStroke) g2d.getStroke();
-			fromPoint = from.getConnectionPoint(new Point(from.getPosX(),from.getPosY()),false);
-			toPoint   = to.getConnectionPoint(new Point(from.getPosX(),from.getPosY()),true);
-		    g2d.setStroke(new BasicStroke(width, BasicStroke.CAP_BUTT,BasicStroke.JOIN_MITER, 5.0f, dash, 0.0f));
-		    Color prevColor = g2d.getColor();
-		  	g2d.setColor(color);
-		  	drawCurve(g2d, VisConstants.NURB);
-		  	g2d.setStroke(prevStroke);
-		 	g2d.setColor(prevColor);
-		}	
+			// Save the previous stroke and fill settings
+			Paint prevColor = g2d.getFill();
+			Paint prevStroke = g2d.getStroke();
+			double prevLineWidth = g2d.getLineWidth();
+			StrokeLineCap prevLineCap = g2d.getLineCap();
+			double[] prevDashes = g2d.getLineDashes();
+			double prevDashOffset = g2d.getLineDashOffset();
+			double prevMiterLimit = g2d.getMiterLimit();
+
+			fromPoint = from.getConnectionPoint(new Point2D(from.getPosX(),from.getPosY()),false);
+			toPoint   = to.getConnectionPoint(new Point2D(from.getPosX(),from.getPosY()),true);
+
+			// Set the new stroke properties
+			g2d.setStroke(color);
+			g2d.setFill(color);
+			g2d.setLineWidth(width);
+			g2d.setLineCap(StrokeLineCap.BUTT);
+			g2d.setLineJoin(StrokeLineJoin.MITER);
+			g2d.setMiterLimit(5.0f);
+			g2d.setLineDashes(dash);
+			g2d.setLineDashOffset(0.0);
+
+			drawCurve(g2d, VisConstants.NURB);
+
+			// Restore previous settings
+			g2d.setFill(prevColor);
+			g2d.setStroke(prevStroke);
+			g2d.setLineWidth(prevLineWidth);
+			g2d.setLineCap(prevLineCap);
+			g2d.setLineJoin(StrokeLineJoin.MITER);
+			g2d.setMiterLimit(prevMiterLimit);
+			g2d.setLineDashes(prevDashes);
+			g2d.setLineDashOffset(prevDashOffset);
+		}
 	}
-	
+
 //	protected void setPath(GeneralPath path,double fromPointX, double fromPointY, double toPointX,double toPointY){
 //	/*
 //	 *  adds Points to a path to be drawn
@@ -71,5 +100,5 @@ public class VisConnectorDashed extends VisConnectorIsA {
 //	    	controly2 = fromPoint.y + (-0.9)*(heightDiff);	
 //	    }
 //	}
-	
+
 }

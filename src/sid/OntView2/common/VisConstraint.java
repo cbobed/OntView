@@ -1,9 +1,29 @@
 package sid.OntView2.common;
 
-import org.semanticweb.owlapi.model.*;
-import sid.OntView.utils.ExpressionManager;
+import javafx.geometry.Point2D;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import org.semanticweb.owlapi.model.ClassExpressionType;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLDataAllValuesFrom;
+import org.semanticweb.owlapi.model.OWLDataExactCardinality;
+import org.semanticweb.owlapi.model.OWLDataHasValue;
+import org.semanticweb.owlapi.model.OWLDataMaxCardinality;
+import org.semanticweb.owlapi.model.OWLDataMinCardinality;
+import org.semanticweb.owlapi.model.OWLDataSomeValuesFrom;
+import org.semanticweb.owlapi.model.OWLObjectAllValuesFrom;
+import org.semanticweb.owlapi.model.OWLObjectExactCardinality;
+import org.semanticweb.owlapi.model.OWLObjectHasSelf;
+import org.semanticweb.owlapi.model.OWLObjectHasValue;
+import org.semanticweb.owlapi.model.OWLObjectMaxCardinality;
+import org.semanticweb.owlapi.model.OWLObjectMinCardinality;
+import org.semanticweb.owlapi.model.OWLObjectOneOf;
+import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
 
-import java.awt.*;
+import sid.OntView.utils.ExpressionManager;
 
 public class VisConstraint extends Shape {
 	public static final int RELATIVE_POS =0;
@@ -30,8 +50,8 @@ public class VisConstraint extends Shape {
 		
 		System.err.println("Constraint Label: "+this.label);
 		
-		connectionPointsL = new Point(posx-getWidth()/2,posy+getHeight()/2);
-		connectionPointsR = new Point(posx-getWidth()/2,posy+getHeight()/2);
+		connectionPointsL = new Point2D(posx- (double) getWidth() /2,posy+ (double) getHeight() /2);
+		connectionPointsR = new Point2D(posx- (double) getWidth() /2,posy+ (double) getHeight() /2);
 		setVisLevel(level);
 	    ClassExpressionType type = o.getClassExpressionType();
 		switch (type){
@@ -128,7 +148,7 @@ public class VisConstraint extends Shape {
 	
 	
 	@Override
-	public void drawShape(Graphics g) {
+	public void drawShape(GraphicsContext g) {
 		int x = posx+1;
 		int y = posy;
 		String draw;
@@ -145,30 +165,33 @@ public class VisConstraint extends Shape {
 				draw+=")";
 			}	
 		}
-		
-		Graphics2D g2d = (Graphics2D)g;
-		if (visible) {				
-			FontMetrics f = g2d.getFontMetrics();
-			Font prev = g2d.getFont();
-			g2d.setFont(new Font(Font.DIALOG, Font.PLAIN,9));
-			Color c = g2d.getColor();
-			g2d.setColor(Color.lightGray);
-			
-			g2d.fillOval(x-getWidth()/2, y, getWidth(), getHeight());
-			g2d.setColor(c);
+
+		GraphicsContext g2d = (GraphicsContext)g;
+		if (visible) {
+			Font prevFont = g.getFont();
+			Color prevColor = (Color) g.getFill();  // Type cast assuming the fill is set to a Color
+
+			// Set font and fill color for background oval
+			g.setFont(Font.font("Dialog", FontWeight.NORMAL, 9));
+			g.setFill(Color.LIGHTGRAY);
+			g.fillOval(x - (double) getWidth() / 2, y, getWidth(), getHeight());
+
+			// Set color for text
+			g.setFill(prevColor);
+
 			String auxStr;
 			switch (type) {
 
 				case OBJECT_INTERSECTION_OF:
 				case OBJECT_UNION_OF:
-					g2d.setFont(new Font(Font.DIALOG, Font.BOLD,14));
-					g2d.drawString(draw,getPosX()-getWidth()/4, getPosY()+getHeight()/2+2);
-					g2d.setFont(new Font(Font.DIALOG, Font.BOLD,9));
-					break;	
+					g2d.setFont(Font.font("Dialog", FontWeight.BOLD, 14));
+					g2d.fillText(draw,getPosX() - (double) getWidth() /4, getPosY() + (double) getHeight() /2+2);
+					g.setFont(Font.font("Dialog", FontWeight.BOLD, 9));
+					break;
 				case OBJECT_HAS_VALUE :	
-					g2d.drawString(property+" {"+filler+"}",getPosX()-getWidth()/2, getPosY());
+					g2d.fillText(property+" {"+filler+"}",getPosX() - (double) getWidth() /2, getPosY());
 				case DATA_HAS_VALUE :
-					g2d.drawString(property+"="+filler,getPosX()-getWidth()/2, getPosY());
+					g2d.fillText(property+"="+filler,getPosX() - (double) getWidth() /2, getPosY());
 					break;
 				case OBJECT_EXACT_CARDINALITY:
 				case OBJECT_MAX_CARDINALITY:
@@ -179,29 +202,26 @@ public class VisConstraint extends Shape {
 				case DATA_ALL_VALUES_FROM:	
 				case DATA_EXACT_CARDINALITY:	
 					auxStr = "/ "+property+"/ "+label;
-					g2d.drawString(auxStr,getPosX()-getWidth()/2, getPosY());
+					g2d.fillText(auxStr,getPosX() - (double) getWidth() /2, getPosY());
 					break;
 				default:
-					f.getHeight();
-					g2d.drawString(draw,getPosX()-getWidth()/2, getPosY());
+					g2d.fillText(draw,getPosX() - (double) getWidth() /2, getPosY());
 			}
-			g2d.drawOval(x-getWidth()/2, y, getWidth(), getHeight());
-			g2d.setColor(c);
-			g2d.setFont(prev);
+			g2d.strokeOval(x-getWidth()/2, y, getWidth(), getHeight());
+			g2d.setStroke(prevColor);
+			g2d.setFont(prevFont);
 		}	
 	}
 
 	@Override
-	public Point getConnectionPoint(Point p,boolean left) {
+	public Point2D getConnectionPoint(Point2D p,boolean left) {
 	//return Closest conection point	
 		if (left){
-			connectionPointsL.x = getPosX()-getWidth()/2;
-			connectionPointsL.y = getPosY()+getHeight()/2;
+			connectionPointsL = new Point2D(getPosX() - (double) getWidth() /2, getPosY() + (double) getHeight() /2);
 			return connectionPointsL;
 		}
      	else {
-			connectionPointsR.x = getPosX()+getWidth()/2;
-			connectionPointsR.y = getPosY()+getHeight()/2;
+			connectionPointsR = new Point2D(getPosX() + (double) getWidth() /2, getPosY() + (double) getHeight() /2);
 		    return connectionPointsR;
 		}
 	}
