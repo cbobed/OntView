@@ -26,6 +26,8 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 
+import javafx.scene.canvas.Canvas;
+import javafx.scene.control.ScrollPane;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.StringDocumentSource;
 import org.semanticweb.owlapi.model.IRI;
@@ -55,7 +57,7 @@ import uk.ac.manchester.cs.jfact.JFactFactory;
 
 import java.security.*;
 
-public class Mine extends JPanel implements Embedable{
+public class Mine extends Canvas implements Embedable{
 
 	private static final long serialVersionUID = 1L;
 	boolean DEBUG=false;
@@ -67,7 +69,7 @@ public class Mine extends JPanel implements Embedable{
 
 	PaintFrame   artPanel;
 	TopPanel     nTopPanel;
-	JScrollPane  scroll;
+	ScrollPane  scroll;
 	boolean      firstItemStateChanged = false;
 	Mine         self= this;
 	boolean      check = true;
@@ -115,7 +117,7 @@ public class Mine extends JPanel implements Embedable{
 		viewer.nTopPanel.setAlignmentX(RIGHT_ALIGNMENT);
 		viewer.add(viewer.nTopPanel);
 		// JScrollPane scroll      = new JScrollPane(artPanel);
-		viewer.scroll = new JScrollPane(viewer.artPanel);
+		viewer.scroll = new ScrollPane(viewer.artPanel);
 		viewer.add(viewer.scroll);
 		viewer.setVisible(true);
 		viewer.artPanel.scroll = viewer.scroll;

@@ -1,31 +1,28 @@
 package sid.OntView2.common;
 
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Map.Entry;
 
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ToolTipManager;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 
+import javafx.geometry.Bounds;
+import javafx.geometry.Dimension2D;
 import javafx.geometry.Point2D;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Tooltip;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.paint.Color;
+import javafx.scene.Cursor;
+
+import javafx.scene.text.Font;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
@@ -35,10 +32,10 @@ import reducer.StructuralReducer;
 import sid.OntView2.utils.ProgressBarDialogThread;
 
 
-public class PaintFrame extends Canvas implements MouseListener,Runnable,MouseMotionListener{
+public class PaintFrame extends Canvas implements Runnable{
 
 	private static final long serialVersionUID = 1L;
-	public JScrollPane scroll;
+	public ScrollPane scroll;
 	static final int BORDER_PANEL = 50;
 	static final int MIN_Y_SEP = 3;
 	static final int SEP = 200;
@@ -55,7 +52,7 @@ public class PaintFrame extends Canvas implements MouseListener,Runnable,MouseMo
 	private String kceOption      = VisConstants.KCECOMBOOPTION1;
 
 	Thread         relaxer;
-	Dimension	   prevSize;
+	Dimension2D	   prevSize;
 	PaintFrame     paintFrame = this;
 	OWLOntology    activeOntology;
 	private String activeOntologySource;
@@ -82,14 +79,26 @@ public class PaintFrame extends Canvas implements MouseListener,Runnable,MouseMo
 	public PaintFrame(){
 		super();
 		try {
-			this.setDoubleBuffered(true);
-			setSize(new Dimension (800,600));
-			prevSize = getSize();
+			this.setWidth(800);
+			this.setHeight(600);
+			prevSize = new Dimension2D(getWidth(), getHeight());
 			VisConfig.getInstance().setConstants();
+			addEventHandlers();
+
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	private void addEventHandlers() {
+		this.addEventHandler(MouseEvent.MOUSE_PRESSED, this::handleMousePressed);
+		this.addEventHandler(MouseEvent.MOUSE_RELEASED, this::handleMouseReleased);
+		this.addEventHandler(MouseEvent.MOUSE_DRAGGED, this::handleMouseDragged);
+		this.addEventHandler(MouseEvent.MOUSE_MOVED, this::handleMouseMoved);
+		this.addEventHandler(MouseEvent.MOUSE_CLICKED, this::handleMouseClicked);
+		this.addEventHandler(MouseEvent.MOUSE_ENTERED, this::handleMouseEntered);
+		this.addEventHandler(MouseEvent.MOUSE_EXITED, this::handleMouseExited);
 	}
 
 	/*-*************************************************************
@@ -98,44 +107,42 @@ public class PaintFrame extends Canvas implements MouseListener,Runnable,MouseMo
 
 	double 		factor = 1.0;
 	double 		prevFactor = 1.0;
-	Dimension 	oSize;
+	Dimension2D 	oSize;
 
 	/**
 	 * sets scaling/zoom factor
 	 * @param d d
 	 */
 	public void setFactor(double d){factor = d;}
-	public void setOriginalSize(Dimension in){ oSize = in;}
+	public void setOriginalSize(Dimension2D in){ oSize = in;}
 	/**
 	 * scales by factor and adjusts panel size
 	 * @param factor
 	 * @param size
 	 */
-	public void scale(double factor,Dimension size){
+	public void scale(double factor,Dimension2D size){
 
 		GraphicsContext g2d = (GraphicsContext) this.getGraphicsContext2D();
 		g2d.scale(factor, factor);
-		if (factor>1.0)
-			setPreferredSize(new Dimension( (int)(size.getWidth()*factor),
-					(int)(size.getHeight()*factor)));
+		if (factor>1.0) {
+			setWidth(size.getWidth() * factor);
+			setHeight(size.getHeight() * factor);
+		}
 	}
 
 	/*-*************************************************************/
 
-	@Override
-	public  void  paintComponent(GraphicsContext g) {
-		super.paintComponent(g);
-		GraphicsContext  g2d = (GraphicsContext) g;
-		if ((factor !=1.0)&&(stable)){
-			g2d.scale(factor, factor);
+	public void draw() {
+		GraphicsContext g = this.getGraphicsContext2D();
+        if ((factor !=1.0)&&(stable)){
+			(g).scale(factor, factor);
 		}
 		if (prevFactor!=factor){
 			prevFactor = factor;
-			if ((factor >=1.0) && (getSize() != prevSize)){
-				prevSize = getSize();
-				setSize(new Dimension( (int)(oSize.getWidth()*factor),
-						(int)(oSize.getHeight()*factor)));
-				revalidate();
+			if ((factor >=1.0) && (getWidth() != prevSize.getWidth() || getHeight() != prevSize.getHeight())) {
+				prevSize = new Dimension2D(getWidth(), getHeight());
+				setWidth(oSize.getWidth() * factor);
+				setHeight(oSize.getHeight() * factor);
 
 			}
 		}
@@ -146,17 +153,17 @@ public class PaintFrame extends Canvas implements MouseListener,Runnable,MouseMo
 			for (VisConnector c : visGraph.dashedConnectorList){
 				c.draw(g);
 			}
-			g.setColor(Color.LIGHT_GRAY);
+			g.setStroke(Color.LIGHTGRAY);
 			for (VisLevel lvl : visGraph.levelSet){
-				g2d.drawLine(lvl.getXpos(), 0, lvl.getXpos(), (int) (getHeight()/factor));
+				(g).strokeLine(lvl.getXpos(), 0, lvl.getXpos(), (int) (getHeight()/factor));
 				//Uncomment this to get a vertical line in every level
-				g.setColor(Color.LIGHT_GRAY);
+				g.setStroke(Color.LIGHTGRAY);
 
 			}
-			g.setColor(Color.BLACK);
-			drawPropertyBoxes(g2d);
+			g.setStroke(Color.BLACK);
+			drawPropertyBoxes(g);
 			for (Entry<String,Shape> entry : visGraph.shapeMap.entrySet()){
-				entry.getValue().drawShape(g2d);
+				entry.getValue().drawShape(g);
 			}
 
 		}
@@ -164,14 +171,13 @@ public class PaintFrame extends Canvas implements MouseListener,Runnable,MouseMo
 
 
 
-	private void drawPropertyBoxes(Graphics2D g2d){
+	private void drawPropertyBoxes(GraphicsContext g2d){
 		for (Entry<String,Shape> entry : visGraph.shapeMap.entrySet()){
 			if (entry.getValue() instanceof VisClass){
-				FontMetrics fm = g2d.getFontMetrics();
 				VisClass v = entry.getValue().asVisClass();
 				if ((v.getPropertyBox()!=null) && (v.getPropertyBox().visible==true)) {
 					Font c = g2d.getFont();
-					g2d.setColor(Color.BLACK);
+					g2d.setStroke(Color.BLACK);
 					v.getPropertyBox().draw(g2d);
 					g2d.setFont(c);
 				}
@@ -184,7 +190,6 @@ public class PaintFrame extends Canvas implements MouseListener,Runnable,MouseMo
 		rVisGraph = new VisGraph(this);
 
 		visGraph = rVisGraph;
-		paintFrame.revalidate();
 		stable = false;
 		visGraph.setActiveOntology(activeOntology);
 //	   applyStructuralReduction();
@@ -193,7 +198,7 @@ public class PaintFrame extends Canvas implements MouseListener,Runnable,MouseMo
 		visGraph.setReasoner(reasoner);
 
 		new Thread(visGraph).start();
-		paintFrame.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+		paintFrame.setCursor(Cursor.WAIT); //DUDA
 
 		visGraph.addObserver(new ProgressBarDialogThread(this));
 
@@ -208,12 +213,7 @@ public class PaintFrame extends Canvas implements MouseListener,Runnable,MouseMo
 		stateChanged = true;
 //	   relax();
 		factor = 1.0;
-		removeMouseListener(this);
-		removeMouseMotionListener(this);
-		addMouseListener(this);
-		addMouseMotionListener(this);
-		setAutoscrolls(true);
-		paintFrame.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+		paintFrame.setCursor(Cursor.DEFAULT);
 		// scroll.getVerticalScrollBar().setUnitIncrement(15);
 
 
@@ -268,13 +268,10 @@ public class PaintFrame extends Canvas implements MouseListener,Runnable,MouseMo
 						shapeRepulsion(s_i, DOWN);
 					}
 					visGraph.adjustPanelSize((float) factor);
-
 				}
 			}
-			repaint();
+			draw();
 		}
-
-
 	}
 
 
@@ -290,26 +287,23 @@ public class PaintFrame extends Canvas implements MouseListener,Runnable,MouseMo
 	int mouseLastY = 0;
 	int mouseLastX = 0;
 	Shape pressedShape =null;
-	int cursorState = Cursor.DEFAULT_CURSOR;
+	Cursor cursorState = Cursor.DEFAULT;
 	public boolean hideRange = false;
 	private Embedable parentframe;
+	private Tooltip tooltip = new Tooltip();
 
 
-	//    @Override
-//  	public void mouseClicked(MouseEvent e) {}
-	@Override
-	public void mouseEntered(MouseEvent e) {
-		setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+	public void handleMouseEntered(MouseEvent e) {
+		setCursor(Cursor.DEFAULT);
 	}
-	@Override
-	public void mouseExited(MouseEvent e) {
-		setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+	public void handleMouseExited(MouseEvent e) {
+		setCursor(Cursor.DEFAULT);
 	}
 
-	@Override
-	public void mousePressed(MouseEvent e) {
 
-		Point2D p = translatePoint(e.getPoint());
+	private void handleMousePressed(MouseEvent e) {
+
+		Point2D p = translatePoint(new Point2D(e.getX(), e.getY()));
 		pressedShape= visGraph.findShape(p);
 
 		if (pressedShape!=null) {
@@ -318,19 +312,18 @@ public class PaintFrame extends Canvas implements MouseListener,Runnable,MouseMo
 		else {
 			mouseLastX = (int) p.getX();
 			mouseLastY = (int) p.getY();
-			setCursor(new Cursor(Cursor.MOVE_CURSOR));
+			setCursor(Cursor.MOVE);
 		}
-		repaint();
+		draw();
 	}
 
-	@Override
-	public void mouseReleased(MouseEvent e) {
+	public void handleMouseReleased(MouseEvent e) {
 
 		pressedShape=null;
 		repulsion = true;
 		mouseLastY=0;
 		mouseLastX=0;
-		setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+		setCursor(Cursor.DEFAULT);
 
 	}
 
@@ -338,12 +331,11 @@ public class PaintFrame extends Canvas implements MouseListener,Runnable,MouseMo
 	 * MOUSEMOTIONLISTENER
 	 */
 
-	@Override
-	public void mouseDragged(MouseEvent e) {
+	public void handleMouseDragged(MouseEvent e) {
 		int draggedY,draggedX;
 		int direction;
-		repulsion = !((e.getModifiers() & MouseEvent.BUTTON3_MASK) == MouseEvent.BUTTON3_MASK);
-		Point p = translatePoint(e.getPoint());
+		repulsion = (e.getButton() != MouseButton.SECONDARY);
+		Point2D p = translatePoint(new Point2D(e.getX(), e.getY()));
 		if ((mouseLastX == 0) && (mouseLastY==0)){
 			draggedX = 0;
 			draggedY = 0;
@@ -360,33 +352,34 @@ public class PaintFrame extends Canvas implements MouseListener,Runnable,MouseMo
 			shapeRepulsion (pressedShape,direction);
 			mouseLastX = (int)p.getX();
 			mouseLastY = (int)p.getY();
-			repaint();
+			draw();
 		}
 		else {
-			int scrollx,scrolly;
-			if (draggedX < 0) {
-				scrollx = (int) (getVisibleRect().x + getVisibleRect().getWidth()  - draggedX*2);
-			}
-			else {
-				scrollx = getVisibleRect().x - draggedX;
-			}
-			if (draggedY < 0){
-				scrolly = (int) (getVisibleRect().y + getVisibleRect().getHeight() - draggedY*2);
-			}
-			else {
-				scrolly = (int) (getVisibleRect().y - draggedY);
-			}
-			Rectangle r = new Rectangle(scrollx, scrolly, 1, 1);
-			scrollRectToVisible(r);
+			double scrollX,scrollY;
+			Bounds visibleBounds = scroll.getViewportBounds();
 
+			if (draggedX < 0) {
+				scrollX = scroll.getHvalue() * (getWidth() - visibleBounds.getWidth()) - draggedX * 2;
+			} else {
+				scrollX = scroll.getHvalue() * (getWidth() - visibleBounds.getWidth()) - draggedX;
+			}
+
+			if (draggedY < 0) {
+				scrollY = scroll.getVvalue() * (getHeight() - visibleBounds.getHeight()) - draggedY * 2;
+			} else {
+				scrollY = scroll.getVvalue() * (getHeight() - visibleBounds.getHeight()) - draggedY;
+			}
+
+			scrollX = Math.max(0, Math.min(scrollX / (getWidth() - visibleBounds.getWidth()), 1));
+			scrollY = Math.max(0, Math.min(scrollY / (getHeight() - visibleBounds.getHeight()), 1));
+
+			scroll.setHvalue(scrollX);
+			scroll.setVvalue(scrollY);
 		}
 	}
 
-	@Override
-	public void mouseMoved(MouseEvent e) {
-
-
-		Point2D p = translatePoint(e.getPoint());
+	public void handleMouseMoved(MouseEvent e) {
+		Point2D p = translatePoint(new Point2D(e.getX(), e.getY()));
 		int x = (int) p.getX();
 		int y = (int) p.getY();
 		VisObjectProperty prop = null;
@@ -395,24 +388,27 @@ public class PaintFrame extends Canvas implements MouseListener,Runnable,MouseMo
 
 		if (shape !=null) {
 			tip = shape.getToolTipInfo();
-			ToolTipManager.sharedInstance().setDismissDelay(15000);
-			this.setToolTipText(tip);
+			tooltip.setText(tip);
+			tooltip.setShowDelay(javafx.util.Duration.seconds(15));
+			Tooltip.install(this, tooltip);
+
 		}
 		else  {
 			prop = movedOnVisPropertyDescription(x, y);
 			if (prop != null){
 				tip = prop.getTooltipText();
-				ToolTipManager.sharedInstance().setDismissDelay(15000);
-				this.setToolTipText(tip);
+				tooltip.setText(tip);
+				tooltip.setShowDelay(javafx.util.Duration.seconds(15));
+				Tooltip.install(this, tooltip);
 			}
 		}
 		if ((shape !=null )||(prop != null)){
-			setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-			cursorState=Cursor.HAND_CURSOR;
+			setCursor(Cursor.HAND);
+			cursorState=Cursor.HAND;
 		}
 		else{
-			cursorState= Cursor.DEFAULT_CURSOR;
-			setCursor(Cursor.getDefaultCursor());
+			cursorState= Cursor.DEFAULT;
+			setCursor(Cursor.DEFAULT);
 		}
 
 
@@ -424,15 +420,21 @@ public class PaintFrame extends Canvas implements MouseListener,Runnable,MouseMo
 	 * @return Point
 	 */
 
-	private Point translatePoint(Point p){
+	private Point2D translatePoint(Point2D p){
 		/*
 		 *  when scaling positions get messed up
 		 *  so to keep actions as in a 1,1 ratio
 		 *  i need to scale down event points
 		 */
-		return  new Point ((int) (p.x/factor), (int) (p.y/factor));
+		return  new Point2D ((int) (p.getX()/factor), (int) (p.getY()/factor));
 
 	}
+
+	private Rectangle2D getVisibleRect() {
+		// Implement this method to return the visible rectangle
+		return new Rectangle2D(0, 0, getWidth(), getHeight());
+	}
+
 
 	private VisObjectProperty movedOnVisPropertyDescription(int x, int y){
 		for ( Entry<String, VisObjectProperty> entry : visGraph.propertyMap.entrySet()){
@@ -472,25 +474,24 @@ public class PaintFrame extends Canvas implements MouseListener,Runnable,MouseMo
 		relaxer = null;
 	}
 
-	@Override
-	public void mouseClicked(MouseEvent e) {
+	public void handleMouseClicked(MouseEvent e) {
 
-		Point p = translatePoint(e.getPoint());
+		Point2D p = translatePoint(new Point2D(e.getX(), e.getY()));
 		int x = (int) p.getX();
 		int y = (int) p.getY();
 		if (clickedOnShape(x, y,e))          return;
 		if (clickedOnClosePropertyBox(x, y)) return;
-		if (e.getButton()==MouseEvent.BUTTON3){
-			showContextMenu(e.getX(),e.getY());
+		if (e.getButton()==MouseButton.SECONDARY){
+			showContextMenu((int) e.getX(), (int) e.getY());
 		}
-		repaint();
+		draw();
 	}
 
 
 	private boolean clickedOnShape(int x, int y,MouseEvent e){
 		Shape shape = visGraph.findShape(new Point2D(x, y));
 		if (shape!=null) {
-			if (e.getClickCount() == 2 && !e.isConsumed() && e.getButton()==MouseEvent.BUTTON1) {
+			if (e.getClickCount() == 2 && !e.isConsumed() && e.getButton() == MouseButton.PRIMARY) {
 				//double click
 				e.consume();
 				if (shape.allSubHidden()){
@@ -502,10 +503,10 @@ public class PaintFrame extends Canvas implements MouseListener,Runnable,MouseMo
 				switch (e.getButton()) {
 
 					//if right click on the figure
-					case MouseEvent.BUTTON3 :
+					case SECONDARY :
 						showContextMenu(shape,e);
 						break;
-					case MouseEvent.BUTTON1 :
+					case PRIMARY :
 						//Click on the open symbol
 						if (pressedOpen(shape, x, y,e)){
 							if(shape.getState()== Shape.CLOSED || shape.getState()== Shape.PARTIALLY_CLOSED){
@@ -523,8 +524,6 @@ public class PaintFrame extends Canvas implements MouseListener,Runnable,MouseMo
 							}
 						}
 						else { // pressed elsewhere on the shape
-							Rectangle visiblePart = new Rectangle();
-							paintFrame.computeVisibleRect(visiblePart);
 							paintFrame.focusOnShape(null,shape);
 							break;
 						}
@@ -559,19 +558,21 @@ public class PaintFrame extends Canvas implements MouseListener,Runnable,MouseMo
 		 * focus the frame on the shape pos
 		 * If shapeKey is  null, it will look for it
 		 */
-		Shape shape;
-		shape = pshape;
+		Shape shape = pshape;
 		if (shape == null)
 			shape = visGraph.getShape(shapeKey);
 		if (shape!= null) {
-			Rectangle visible = paintFrame.getVisibleRect();
 			int x  = (int) (shape.getPosX()*factor);
 			int y  = (int) (shape.getPosY()*factor);
 			int w  = (int) (shape.getWidth()/2*factor);
 			int h  = (int) (shape.getHeight()/2*factor);
-			int vw = (int) (visible.getWidth());
-			int vh = (int) (visible.getHeight());
-			paintFrame.scrollRectToVisible(new Rectangle(x-w-vw/2, y-h-vh/2,vw,vh));
+
+			double scrollX = x - w - scroll.getViewportBounds().getWidth() / 2;
+			double scrollY = y - h - scroll.getViewportBounds().getHeight() / 2;
+
+			scroll.setHvalue(scrollX / (getWidth() - scroll.getViewportBounds().getWidth()));
+			scroll.setVvalue(scrollY / (getHeight() - scroll.getViewportBounds().getHeight()));
+
 		}
 
 	}
@@ -593,7 +594,7 @@ public class PaintFrame extends Canvas implements MouseListener,Runnable,MouseMo
 	}
 
 	private void showContextMenu(Shape s,MouseEvent e) {
-		int x,y;
+		double x,y;
 		x = e.getX();
 		y = e.getY();
 

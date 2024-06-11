@@ -1,6 +1,15 @@
 package sid.OntView2.main;
 
-import javafx.scene.control.ComboBox;
+import javafx.event.ActionEvent;
+import javafx.geometry.Dimension2D;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.control.*;
+
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
+import javafx.stage.FileChooser;
 import org.dyno.visual.swing.layouts.Bilateral;
 import org.dyno.visual.swing.layouts.Constraints;
 import org.dyno.visual.swing.layouts.GroupLayout;
@@ -9,17 +18,6 @@ import org.semanticweb.owlapi.model.IRI;
 import sid.OntView2.common.Shape;
 import sid.OntView2.common.*;
 
-import javax.swing.*;
-import javax.swing.border.EtchedBorder;
-import javax.swing.border.TitledBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.filechooser.FileFilter;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,31 +25,31 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 //VS4E -- DO NOT REMOVE THIS LINE!
-public class TopPanel extends JPanel implements ControlPanelInterface {
+public class TopPanel extends Canvas implements ControlPanelInterface {
 
 	private static final long serialVersionUID = 1L;
-	private JButton loadOntologyButton;
-	private JComboBox loadOntologyCombo, loadReasonerCombo;
-	private JButton loadReasonerButton;
-	private JPanel jPanelLoad;
-	private JCheckBox expandCheckBox;
-	private JPanel jPanel1;
-	private JButton saveViewButton;
-	private JButton restoreViewButton;
-	private JPanel ViewPanel;
-	private JButton saveImageButton;
-	private JButton saveImagePartialButton;
-	private JLabel jLabel0;
+	private Button loadOntologyButton;
+	private ComboBox loadOntologyCombo, loadReasonerCombo;
+	private Button loadReasonerButton;
+	private Canvas jPanelLoad;
+	private CheckBox expandCheckBox;
+	private Canvas jPanel1;
+	private Button saveViewButton;
+	private Button restoreViewButton;
+	private Canvas ViewPanel;
+	private Button saveImageButton;
+	private Button saveImagePartialButton;
+	private Label jLabel0;
 	private ComboBox jComboBox0;
 	private ComboBox kceComboBox;
-	private JPanel jPanel0;
+	private Canvas jPanel0;
 	private Mine parent;
     static String  RESOURCE_BASE ;
-	private JCheckBox Properties;
-	private JButton fileSystemButton;
-	private JSlider zoomSlider;
-	private JCheckBox reduceCheckBox;
-	private JLabel reduceLabel;
+	private CheckBox Properties;
+	private Button fileSystemButton;
+	private Slider zoomSlider;
+	private CheckBox reduceCheckBox;
+	private Label reduceLabel;
 	public TopPanel(Mine pparent){
 		parent = pparent;
 		initComponents();
@@ -74,9 +72,9 @@ public class TopPanel extends JPanel implements ControlPanelInterface {
 		setSize(1040, 108);
 	}
 	
-	private JPanel getSnapshotPanel() {
+	private Canvas getSnapshotPanel() {
 		if (snapshotPanel == null) {
-			snapshotPanel = new JPanel();
+			snapshotPanel = new Canvas();
 			snapshotPanel.setBorder(BorderFactory.createTitledBorder(null, "Snapshot", TitledBorder.LEADING, TitledBorder.DEFAULT_POSITION, new Font("Dialog",
 					Font.ITALIC, 10), Color.blue));
 			snapshotPanel.setLayout(new GroupLayout());
@@ -320,9 +318,9 @@ public class TopPanel extends JPanel implements ControlPanelInterface {
 	}
 	
 	
-	public JLabel getReduceLabel() {
+	public Canvas getReduceLabel() {
 		if (reduceLabel == null) {
-			reduceLabel = new JLabel("reduce");
+			reduceLabel = new Canvas("reduce");
 			reduceLabel.setText("reduce");
 			reduceLabel.setFont(new Font("Dialog", Font.PLAIN, 9));
 		}
@@ -330,9 +328,9 @@ public class TopPanel extends JPanel implements ControlPanelInterface {
 	}
 	
 	
-	private JPanel getJPanelLoad() {
+	private Canvas getJPanelLoad() {
 		if (jPanelLoad == null) {
-			jPanelLoad = new JPanel();
+			jPanelLoad = new Canvas();
 			jPanelLoad.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, null, null));
 			jPanelLoad.setLayout(new GroupLayout());
 			jPanelLoad.add(getfileSystemButton(), new Constraints(new Leading(404, 24, 10, 10), new Leading(12, 23, 12, 12)));
@@ -349,10 +347,10 @@ public class TopPanel extends JPanel implements ControlPanelInterface {
 		}
 		return jPanelLoad;
 	}
-	private JCheckBox getReduceCheckBox() {
+	private CheckBox getReduceCheckBox() {
 		if (reduceCheckBox == null) {
-			reduceCheckBox = new JCheckBox();
-			reduceCheckBox.setFont(new Font("Dialog", Font.PLAIN, 10));
+			reduceCheckBox = new CheckBox();
+			reduceCheckBox.setFont(Font.font("Dialog", FontWeight.NORMAL,10));
 			reduceCheckBox.addActionListener(new ActionListener() {
 	
 				public void actionPerformed(ActionEvent event) {
@@ -363,9 +361,9 @@ public class TopPanel extends JPanel implements ControlPanelInterface {
 		return reduceCheckBox;
 	}
 	
-	private JButton getSaveImageButton() {
+	private Button getSaveImageButton() {
 		if (saveImageButton == null) {
-			saveImageButton = new JButton();
+			saveImageButton = new Button();
 			ClassLoader c = Thread.currentThread().getContextClassLoader();
 			saveImageButton.setIcon(new ImageIcon(c.getResource("saveImage.JPG")));
 			saveImageButton.addActionListener(new ActionListener() {
@@ -377,23 +375,23 @@ public class TopPanel extends JPanel implements ControlPanelInterface {
 		return saveImageButton;
 	}
 
-	private JPanel getViewPanel() {
+	private Canvas getViewPanel() {
 		if (ViewPanel == null) {
 			ViewPanel = new JPanel();
 			ViewPanel.setBorder(BorderFactory.createTitledBorder(null, "View", TitledBorder.LEADING, TitledBorder.DEFAULT_POSITION, new Font("Dialog", Font.BOLD
 					| Font.ITALIC, 10), Color.blue));
-			ViewPanel.setFont(new Font("Dialog", Font.BOLD | Font.ITALIC, 10));
+			ViewPanel.setFont(Font.font("Dialog", FontWeight.NORMAL, FontPosture.ITALIC, 10));
 			ViewPanel.setLayout(new GroupLayout());
 			ViewPanel.add(getSaveViewButton(), new Constraints(new Leading(6, 76, 12, 12), new Leading(-4, 28, 10, 10)));
 			ViewPanel.add(getRestoreViewButton(), new Constraints(new Leading(88, 76, 12, 12), new Leading(-4, 28, 12, 12)));
 		}
 		return ViewPanel;
 	}
-	private JButton getRestoreViewButton() {
+	private Button getRestoreViewButton() {
 		if (restoreViewButton == null) {
-			restoreViewButton = new JButton();
-			restoreViewButton.setFont(new Font("Dialog", Font.PLAIN, 10));
-			restoreViewButton.setForeground(Color.blue);
+			restoreViewButton = new Button();
+			restoreViewButton.setFont(Font.font("Dialog", FontWeight.NORMAL, 10));
+			restoreViewButton.setForeground(Color.BLUE);
 			restoreViewButton.setText("Restore");
 			restoreViewButton.addActionListener(new ActionListener() {
 	
@@ -404,11 +402,11 @@ public class TopPanel extends JPanel implements ControlPanelInterface {
 		}
 		return restoreViewButton;
 	}
-	private JButton getSaveViewButton() {
+	private Button getSaveViewButton() {
 		if (saveViewButton == null) {
-			saveViewButton = new JButton();
-			saveViewButton.setFont(new Font("Dialog", Font.PLAIN, 10));
-			saveViewButton.setForeground(Color.blue);
+			saveViewButton = new Button();
+			saveViewButton.setFont(Font.font("Dialog", FontWeight.NORMAL, 10));
+			saveViewButton.setForeground(Color.BLUE);
 			saveViewButton.setText("Save");
 			saveViewButton.addActionListener(new ActionListener() {
 	
@@ -419,7 +417,7 @@ public class TopPanel extends JPanel implements ControlPanelInterface {
 		}
 		return saveViewButton;
 	}
-	private JPanel getJPanel1() {
+	private Canvas getJPanel1() {
 		if (jPanel1 == null) {
 			jPanel1 = new JPanel();
 			jPanel1.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, null, null));
@@ -431,10 +429,10 @@ public class TopPanel extends JPanel implements ControlPanelInterface {
 		}
 		return jPanel1;
 	}
-	private JButton getLoadOntologyButton() {
+	private Button getLoadOntologyButton() {
 		if (loadOntologyButton == null) {
-			loadOntologyButton = new JButton();
-			loadOntologyButton.setFont(new Font("Dialog", Font.PLAIN, 10));
+			loadOntologyButton = new Button();
+			loadOntologyButton.setFont(Font.font("Dialog", FontWeight.NORMAL, 10));
 			loadOntologyButton.setForeground(Color.blue);
 			loadOntologyButton.setText("Load Ont");
 			loadOntologyButton.addActionListener(new ActionListener() {
@@ -446,10 +444,10 @@ public class TopPanel extends JPanel implements ControlPanelInterface {
 		}
 		return loadOntologyButton;
 	}
-	public JComboBox getReasonerCombo() {
+	public ComboBox getReasonerCombo() {
 		if (loadReasonerCombo == null) {
-			loadReasonerCombo = new JComboBox();
-			loadReasonerCombo.setFont(new Font("Dialog", Font.PLAIN, 10));
+			loadReasonerCombo = new ComboBox();
+			loadReasonerCombo.setFont(Font.font("Dialog", FontWeight.NORMAL, 10));
 			loadReasonerCombo.setModel(new DefaultComboBoxModel(new Object[] { "Pellet", "JFact", "Elk", "Jcel" }));
 			loadReasonerCombo.setDoubleBuffered(false);
 			loadReasonerCombo.setBorder(null);
@@ -457,11 +455,11 @@ public class TopPanel extends JPanel implements ControlPanelInterface {
 		}
 		return loadReasonerCombo;
 	}
-	public JComboBox getOntologyCombo() {
+	public ComboBox getOntologyCombo() {
 		if (loadOntologyCombo == null) {
 			loadOntologyCombo = new JComboBox();
 			loadOntologyCombo.setEditable(true);
-			loadOntologyCombo.setFont(new Font("Dialog", Font.PLAIN, 10));
+			loadOntologyCombo.setFont(Font.font("Dialog", FontWeight.NORMAL, 10));
 			loadRecent();
 
 			loadOntologyCombo.setDoubleBuffered(false);
@@ -638,8 +636,8 @@ public class TopPanel extends JPanel implements ControlPanelInterface {
 		int answer;
 		if (getReduceCheckBox().isSelected()) {
 			if (parent.artPanel.getOntology() != null){
-		           answer =  JOptionPane.showConfirmDialog(parent,"Warning! this could modify source ontology","proceed", JOptionPane.OK_CANCEL_OPTION);
-		           if (answer == JOptionPane.OK_OPTION){
+		           answer =  OptionPane.showConfirmDialog(parent,"Warning! this could modify source ontology","proceed", JOptionPane.OK_CANCEL_OPTION);
+		           if (answer == OptionPane.OK_OPTION){
 //		        	   parent.artPanel.applyStructuralReduction();
 		           }	  
 		           else{
@@ -647,14 +645,14 @@ public class TopPanel extends JPanel implements ControlPanelInterface {
 		           }
 			}
 			else {
-				JOptionPane.showMessageDialog(parent, "Load ontology first");
+				OptionPane.showMessageDialog(parent, "Load ontology first");
 			}
 		}
 
 	}
 	
 	private void fileSystemButtonActionActionPerformed(ActionEvent event) {
-		JFileChooser selector = new JFileChooser();
+		FileChooser selector = new FileChooser();
 		selector.addChoosableFileFilter(new owlFileFilter("owl"));
 		selector.showOpenDialog(this);
 		String x = null;
@@ -687,10 +685,10 @@ public class TopPanel extends JPanel implements ControlPanelInterface {
 	}
 
 
-	Dimension size = null;
-	private JCheckBox renderLabel;
-	private JCheckBox qualifiedNames;
-	private JPanel snapshotPanel;
+	Dimension2D size = null;
+	private CheckBox renderLabel;
+	private CheckBox qualifiedNames;
+	private Canvas snapshotPanel;
 
 	private void zoomSliderChangeStateChanged(ChangeEvent event) {
 		if (parent.artPanel!=null) {
