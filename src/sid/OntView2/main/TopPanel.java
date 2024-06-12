@@ -15,12 +15,10 @@ import javafx.scene.control.*;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import org.dyno.visual.swing.layouts.Bilateral;
 import org.dyno.visual.swing.layouts.Constraints;
@@ -63,6 +61,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private Slider zoomSlider;
 	private CheckBox reduceCheckBox;
 	private Label reduceLabel;
+	private Pane mainPane;
+
 	public TopPanel(Mine pparent){
 		parent = pparent;
 		initComponents();
@@ -72,20 +72,47 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		
 	}
 
+
 	// REVISAR
 	private void initComponents() {
-		minWidth(2147483647);
-		minHeight(90);
+		mainPane = new Pane();
+		mainPane.maxWidth(2147483647);
+		mainPane.maxHeight(90);
+		mainPane.setStyle("-fx-border-color: black; -fx-border-width: 1; -fx-border-style: solid;");
 
-		BorderPane topPanel = new BorderPane();
-		//topPanel.setPadding(new Insets(10));
+		addComponent(mainPane, getPanelLoad(), 12, 10, 523, 78);
+		addComponent(mainPane, getZoomSlider(), 750, 2, 24, 94);
+		addComponent(mainPane, getPanel1(), 541, 10, 197, 78);
+		addComponent(mainPane, getSnapshotPanel(), 968, 2, 120, 51);
+		addComponent(mainPane, getPanel0(), 786, 54, 300, 34);
+		addComponent(mainPane, getViewPanel(), 786, 2, 179, 51);
 
-		HBox topBox = new HBox(10);
-		topBox.getChildren().addAll(getPanelLoad(), getZoomSlider(), getPanel1(), getSnapshotPanel(), getPanel0(), getViewPanel());
-
-		topPanel.setCenter(topBox);
 		setWidth(1040);
 		setHeight(108);
+
+		/*
+			// Define column constraints for responsive design
+            ColumnConstraints col1 = new ColumnConstraints();
+            col1.setPercentWidth(20); // Set percentage width for first column
+            ColumnConstraints col2 = new ColumnConstraints();
+            col2.setPercentWidth(80); // Set percentage width for second column
+            panel1.getColumnConstraints().addAll(col1, col2);
+
+            // Define row constraints for responsive design
+            RowConstraints row1 = new RowConstraints();
+            row1.setVgrow(Priority.ALWAYS); // Allow row to grow vertically
+            RowConstraints row2 = new RowConstraints();
+            row2.setVgrow(Priority.ALWAYS);
+            RowConstraints row3 = new RowConstraints();
+            row3.setVgrow(Priority.ALWAYS);
+            panel1.getRowConstraints().addAll(row1, row2, row3);
+
+            // Add components to GridPane with specified positions
+            panel1.add(getPropertiesCheckBox(), 0, 0); // Columna 0, Fila 0
+            panel1.add(getExpandCheckBox(), 0, 1); // Columna 0, Fila 1
+            panel1.add(getRenderLabel(), 0, 2); // Columna 0, Fila 2
+            panel1.add(getQualifiedNames(), 1, 2); // Columna 1, Fila 2
+		 */
 	}
 	
 	private VBox getSnapshotPanel() {
@@ -327,13 +354,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private CheckBox getReduceCheckBox() {
 		if (reduceCheckBox == null) {
 			reduceCheckBox = new CheckBox();
-			reduceCheckBox.setFont(new Font("Dialog", Font.PLAIN, 10));
-			reduceCheckBox.addActionListener(new ActionListener() {
-	
-				public void actionPerformed(ActionEvent event) {
-					reduceActionActionPerformed(event);
-				}
-			});
+			reduceCheckBox.setFont(Font.font("Dialog", FontWeight.NORMAL, 10));
+			reduceCheckBox.setOnAction(this::reduceActionActionPerformed);
 		}
 		return reduceCheckBox;
 	}
@@ -342,12 +364,9 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		if (saveImageButton == null) {
 			saveImageButton = new Button();
 			ClassLoader c = Thread.currentThread().getContextClassLoader();
-			saveImageButton.setIcon(new ImageIcon(c.getResource("saveImage.JPG")));
-			saveImageButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent event) {
-					saveImageButtonActionActionPerformed(event);
-				}
-			});
+			Image image = new Image(Objects.requireNonNull(c.getResourceAsStream("saveImage.JPG")));
+			saveImageButton.setGraphic(new ImageView(image));
+			saveImageButton.setOnAction(this::saveImageButtonActionActionPerformed);
 		}
 		return saveImageButton;
 	}
@@ -355,56 +374,58 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private VBox getViewPanel() {
 		if (ViewPanel == null) {
 			ViewPanel = new VBox();
-			ViewPanel.setBorder(BorderFactory.createTitledBorder(null, "View", TitledBorder.LEADING, TitledBorder.DEFAULT_POSITION, new Font("Dialog", Font.BOLD
-					| Font.ITALIC, 10), Color.blue));
-			ViewPanel.setFont(new Font("Dialog", Font.BOLD | Font.ITALIC, 10));
-			ViewPanel.setLayout(new GroupLayout());
-			ViewPanel.add(getSaveViewButton(), new Constraints(new Leading(6, 76, 12, 12), new Leading(-4, 28, 10, 10)));
-			ViewPanel.add(getRestoreViewButton(), new Constraints(new Leading(88, 76, 12, 12), new Leading(-4, 28, 12, 12)));
+
+			TitledPane titledPane = new TitledPane();
+			titledPane.setText("View");
+			titledPane.setFont(Font.font("Dialog", FontWeight.BOLD, FontPosture.ITALIC, 10));
+			titledPane.setCollapsible(false);
+
+			BorderStroke borderStroke = new BorderStroke(Color.BLUE, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT);
+			titledPane.setBorder(new Border(borderStroke));
+
+			HBox buttonBox = new HBox(10);
+			buttonBox.getChildren().addAll(getSaveViewButton(), getRestoreViewButton());
+
+			titledPane.setContent(buttonBox);
+			ViewPanel.getChildren().add(titledPane);
 		}
 		return ViewPanel;
 	}
 	private Button getRestoreViewButton() {
 		if (restoreViewButton == null) {
 			restoreViewButton = new Button();
-			restoreViewButton.setFont(new Font("Dialog", Font.PLAIN, 10));
-			restoreViewButton.setForeground(Color.blue);
+			restoreViewButton.setFont(Font.font("Dialog", FontWeight.NORMAL, 10));
+			restoreViewButton.setStyle("-fx-text-fill: blue;");
 			restoreViewButton.setText("Restore");
-			restoreViewButton.addActionListener(new ActionListener() {
-	
-				public void actionPerformed(ActionEvent event) {
-					restoreViewButtonActionActionPerformed(event);
-				}
-			});
+			restoreViewButton.setOnAction(this::restoreViewButtonActionActionPerformed);
 		}
 		return restoreViewButton;
 	}
 	private Button getSaveViewButton() {
 		if (saveViewButton == null) {
 			saveViewButton = new Button();
-			saveViewButton.setFont(new Font("Dialog", Font.PLAIN, 10));
-			saveViewButton.setForeground(Color.blue);
+			saveViewButton.setFont(Font.font("Dialog", FontWeight.NORMAL, 10));
+			saveViewButton.setStyle("-fx-text-fill: blue;");
 			saveViewButton.setText("Save");
-			saveViewButton.addActionListener(new ActionListener() {
-	
-				public void actionPerformed(ActionEvent event) {
-					saveViewButtonActionActionPerformed(event);
-				}
-			});
+			saveViewButton.setOnAction(this::saveViewButtonActionActionPerformed);
 		}
 		return saveViewButton;
 	}
-	private VBox getPanel1() {
+	private AnchorPane getPanel1() {
 		if (panel1 == null) {
 			panel1 = new VBox();
-			panel1.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, null, null));
-			panel1.setLayout(new GroupLayout());
-			panel1.add(getPropertiesCheckBox(), new Constraints(new Leading(8, 8, 8), new Leading(6, 10, 10)));
-			panel1.add(getExpandCheckBox(), new Constraints(new Leading(8, 8, 8), new Leading(27, 18, 8, 8)));
-			panel1.add(getRenderLabel(), new Constraints(new Leading(8, 8, 8), new Leading(45, 8, 8)));
-			panel1.add(getQualifiedNames(), new Constraints(new Leading(86, 10, 10), new Leading(45, 8, 8)));
+			panel1.setStyle("-fx-border-color: black; -fx-border-width: 1; -fx-border-style: solid;");
+
+			addComponent(panel1, getPropertiesCheckBox(), 8.0, 6.0);
+			addComponent(panel1, getExpandCheckBox(), 8.0, 27.0);
+			addComponent(panel1, getRenderLabel(), 8.0, 45.0);
+			addComponent(panel1, getQualifiedNames(), 86.0, 45.0);
 		}
 		return panel1;
+	}
+	private void addComponent(VBox pane, javafx.scene.Node node, double x, double y) {
+		node.relocate(x, y);
+		pane.getChildren().add(node);
 	}
 	private Button getLoadOntologyButton() {
 		if (loadOntologyButton == null) {
@@ -678,12 +699,12 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		}
 	}
 
-	private Pane createPositionedNode(Node node, double x, double y) {
-		Pane pane = new Pane();
+
+
+	private void addComponent(Pane pane, Node node, double x, double y, double width, double height) {
+		node.relocate(x, y);
 		pane.getChildren().add(node);
-		pane.setLayoutX(x);
-		pane.setLayoutY(y);
-		return pane;
+		pane.setMinSize(width, height);
 	}
 	
 }
