@@ -592,7 +592,7 @@ public class TopPanel extends JPanel implements ControlPanelInterface {
 	}
 	
 	private void jComboBox0ItemItemStateChanged(ItemEvent event) {
-		if (event.getID()==ItemEvent.ITEM_STATE_CHANGED) {
+	if (event.getID()==ItemEvent.ITEM_STATE_CHANGED) {
 			if (parent.firstItemStateChanged) {
 				String selItem = (String)getJComboBox0().getSelectedItem();
 				String key = parent.artPanel.getVisGraph().getQualifiedLabelMap().get(selItem);

@@ -1,15 +1,27 @@
 package sid.OntView2.main;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Dimension2D;
+import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
+import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
-import javafx.stage.FileChooser;
 import org.dyno.visual.swing.layouts.Bilateral;
 import org.dyno.visual.swing.layouts.Constraints;
 import org.dyno.visual.swing.layouts.GroupLayout;
@@ -22,6 +34,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 
 //VS4E -- DO NOT REMOVE THIS LINE!
@@ -29,20 +42,20 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 	private static final long serialVersionUID = 1L;
 	private Button loadOntologyButton;
-	private ComboBox loadOntologyCombo, loadReasonerCombo;
+	private ComboBox<String> loadOntologyCombo, loadReasonerCombo;
 	private Button loadReasonerButton;
-	private Canvas jPanelLoad;
+	private VBox panelLoad;
 	private CheckBox expandCheckBox;
-	private Canvas jPanel1;
+	private VBox panel1;
 	private Button saveViewButton;
 	private Button restoreViewButton;
-	private Canvas ViewPanel;
+	private VBox ViewPanel;
 	private Button saveImageButton;
 	private Button saveImagePartialButton;
-	private Label jLabel0;
-	private ComboBox jComboBox0;
-	private ComboBox kceComboBox;
-	private Canvas jPanel0;
+	private Label label0;
+	private ComboBox<String> comboBox;
+	private ComboBox<String> kceComboBox;
+	private VBox panel0;
 	private Mine parent;
     static String  RESOURCE_BASE ;
 	private CheckBox Properties;
@@ -59,57 +72,55 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		
 	}
 
+	// REVISAR
 	private void initComponents() {
-		setBorder(BorderFactory.createCompoundBorder(null, null));
-		setMaximumSize(new Dimension(2147483647, 90));
-		setLayout(new GroupLayout());
-		add(getJPanelLoad(), new Constraints(new Leading(12, 523, 12, 12), new Leading(10, 78, 12, 12)));
-		add(getZoomSlider(), new Constraints(new Leading(750, 24, 12, 12), new Leading(2, 94, 12, 12)));
-		add(getJPanel1(), new Constraints(new Leading(541, 197, 10, 10), new Leading(10, 78, 12, 12)));
-     	add(getSnapshotPanel(), new Constraints(new Leading(968, 120, 10, 10), new Leading(2, 51, 12, 12)));
-		add(getJPanel0(), new Constraints(new Leading(786, 300, 12, 12), new Leading(54, 34, 12, 12)));
-		add(getViewPanel(), new Constraints(new Leading(786, 179, 10, 10), new Leading(2, 51, 12, 12)));
-		setSize(1040, 108);
+		minWidth(2147483647);
+		minHeight(90);
+
+		BorderPane topPanel = new BorderPane();
+		//topPanel.setPadding(new Insets(10));
+
+		HBox topBox = new HBox(10);
+		topBox.getChildren().addAll(getPanelLoad(), getZoomSlider(), getPanel1(), getSnapshotPanel(), getPanel0(), getViewPanel());
+
+		topPanel.setCenter(topBox);
+		setWidth(1040);
+		setHeight(108);
 	}
 	
-	private Canvas getSnapshotPanel() {
+	private VBox getSnapshotPanel() {
 		if (snapshotPanel == null) {
-			snapshotPanel = new Canvas();
-			snapshotPanel.setBorder(BorderFactory.createTitledBorder(null, "Snapshot", TitledBorder.LEADING, TitledBorder.DEFAULT_POSITION, new Font("Dialog",
-					Font.ITALIC, 10), Color.blue));
-			snapshotPanel.setLayout(new GroupLayout());
-			snapshotPanel.add(getSaveImageButton(), new Constraints(new Leading(8, 30, 10, 10), new Leading(0, 26, 11, 12)));
-			snapshotPanel.add(getSaveImagePartialButton(), new Constraints(new Leading(45, 30, 10, 10), new Leading(0, 26, 12, 12)));
-			
+			snapshotPanel = new VBox();
+			snapshotPanel.setSpacing(10);
+			snapshotPanel.setStyle("-fx-border-color: blue; -fx-border-width: 1; -fx-border-radius: 5; -fx-border-style: solid;");
+
+			//HBox buttonBox = new HBox(10);
+			//buttonBox.
+			snapshotPanel.getChildren().addAll(getSaveImageButton(), getSaveImagePartialButton());
+
 		}
 		return snapshotPanel;
 	}
 	
-	private Component getSaveImagePartialButton() {
+	private Button getSaveImagePartialButton() {
 		if (saveImagePartialButton == null) {
-			saveImagePartialButton = new JButton();
+			saveImagePartialButton = new Button();
 			ClassLoader c = Thread.currentThread().getContextClassLoader();
-			saveImagePartialButton.setIcon(new ImageIcon(c.getResource("saveImageParcial.JPG")));
-			saveImagePartialButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent event) {
-					saveImageButtonPartialActionActionPerformed(event);
-				}
-			});
+			Image image = new Image(Objects.requireNonNull(c.getResourceAsStream("saveImageParcial.JPG")));
+			saveImagePartialButton.setGraphic(new ImageView(image));
+
+			saveImagePartialButton.setOnAction(this::saveImageButtonPartialActionActionPerformed);
 		}
 		return saveImagePartialButton;
 	}
 	
-	private JCheckBox getQualifiedNames() {
+	private CheckBox getQualifiedNames() {
 		if (qualifiedNames == null) {
-			qualifiedNames = new JCheckBox();
-			qualifiedNames.setFont(new Font("Dialog", Font.PLAIN, 10));
+			qualifiedNames = new CheckBox();
+			qualifiedNames.setFont(Font.font("Dialog", FontWeight.NORMAL, 10));
 			qualifiedNames.setText("qualified names");
-			qualifiedNames.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent event) {
-					// TODO Auto-generated method stub
-					qualifiedNamesActionActionPerformed(event);
-				}
-			}); 
+			// TODO Auto-generated method stub
+			qualifiedNames.setOnAction(this::qualifiedNamesActionActionPerformed);
 		}
 		return qualifiedNames;
 	}
@@ -121,17 +132,12 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		}
 	}
 	
-	private JCheckBox getRenderLabel() {
+	private CheckBox getRenderLabel() {
 		if (renderLabel == null) {
-			renderLabel = new JCheckBox();
-			renderLabel.setFont(new Font("Dialog", Font.PLAIN, 10));
+			renderLabel = new CheckBox();
+			renderLabel.setFont(Font.font("Dialog", FontWeight.NORMAL, 10));
 			renderLabel.setText("label");
-			renderLabel.addActionListener(new ActionListener() {
-	
-				public void actionPerformed(ActionEvent event) {
-					renderLabelActionActionPerformed(event);
-				}
-			});
+			renderLabel.setOnAction(this::renderLabelActionActionPerformed);
 		}
 		return renderLabel;
 	}
@@ -142,119 +148,89 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		}
 	}
 
-	private JSlider getZoomSlider() {
+	private Slider getZoomSlider() {
 		if (zoomSlider == null) {
-			zoomSlider = new JSlider();
-			zoomSlider.setMaximum(25);
-			zoomSlider.setMinorTickSpacing(3);
-			zoomSlider.setOrientation(SwingConstants.VERTICAL);
-			zoomSlider.setValue(5);
-			zoomSlider.setFocusCycleRoot(true);
-			zoomSlider.addChangeListener(new ChangeListener() {
-	
-				public void stateChanged(ChangeEvent event) {
-					zoomSliderChangeStateChanged(event);
-				}
-			});
+			zoomSlider = new Slider(0, 25, 5);
+			zoomSlider.setBlockIncrement(3);
+			zoomSlider.setOrientation(Orientation.VERTICAL);
+			zoomSlider.setFocusTraversable(true);
+			zoomSlider.valueProperty().addListener((obs, oldVal, newVal) -> zoomSliderChangeStateChanged(newVal));
 		}
 		return zoomSlider;
 	}
-	private JButton getfileSystemButton() {
+	private Button getfileSystemButton() {
 		if (fileSystemButton == null) {
-			fileSystemButton = new JButton();
+			fileSystemButton = new Button();
 
 			ClassLoader c = Thread.currentThread().getContextClassLoader();
-			ImageIcon icono = new ImageIcon(c.getResource("folder.png"));		
-			Image img = icono.getImage();
-			Image newimg = img.getScaledInstance(17,17, Image.SCALE_SMOOTH);  
-			icono = new ImageIcon(newimg); 
-			fileSystemButton.setIcon(icono);
-
-			fileSystemButton.addActionListener(new ActionListener() {
-	
-				public void actionPerformed(ActionEvent event) {
-					fileSystemButtonActionActionPerformed(event);
-				}
-			});
+			Image icon = new Image(Objects.requireNonNull(c.getResourceAsStream("folder.png")));
+			ImageView imageView = new ImageView(icon);
+			imageView.setFitWidth(17);
+			imageView.setFitHeight(17);
+			imageView.setPreserveRatio(true);
+			fileSystemButton.setGraphic(imageView);
+			fileSystemButton.setOnAction(this::fileSystemButtonActionActionPerformed);
 		}
 		return fileSystemButton;
 	}
-	private JCheckBox getPropertiesCheckBox() {
+	private CheckBox getPropertiesCheckBox() {
 		if (Properties == null) {
-			Properties = new JCheckBox();
-			Properties.setFont(new Font("Dialog", Font.PLAIN, 10));
+			Properties = new CheckBox();
+			Properties.setFont(Font.font("Dialog", FontWeight.NORMAL, 10));
 			Properties.setText("properties");
-			Properties.addActionListener(new ActionListener() {
-	
-				public void actionPerformed(ActionEvent event) {
-					PropertiesActionActionPerformed(event);
-				}
-			});
+			Properties.setOnAction(this::PropertiesActionActionPerformed);
 		}
 		return Properties;
 	}
-	private JPanel getJPanel0() {
-		if (jPanel0 == null) {
-			jPanel0 = new JPanel();
-			jPanel0.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, null, null));
-			jPanel0.setLayout(new GroupLayout());
-			jPanel0.add(getJLabel0(), new Constraints(new Leading(8, 22, 10, 10), new Leading(1, 24, 12, 12)));
-			jPanel0.add(getComboBox0(), new Constraints(new Bilateral(39, 12, 126), new Leading(4, 21, 12, 12)));
+	private VBox getPanel0() {
+		if (panel0 == null) {
+			panel0 = new VBox();
+			panel0.setStyle("-fx-border-color: #a9a9a9; -fx-border-width: 1; -fx-border-style: solid;");
+			panel0.getChildren().addAll(getJLabel0(), getComboBox0());
 		}
-		return jPanel0;
+		return panel0;
 	}
-	private ComboBox getComboBox0() {
-		if (jComboBox0 == null) {
-			jComboBox0 = new ComboBox();
-			AutoCompletion.enable(jComboBox0);
-			jComboBox0.setEditable(true);
-			jComboBox0.setFont(new Font("Dialog", Font.BOLD, 10));
-			jComboBox0.setForeground(Color.blue);
-			jComboBox0.setModel(new DefaultComboBoxModel(new Object[] {}));
-			jComboBox0.setDoubleBuffered(false);
-			jComboBox0.setBorder(null);
-//			jComboBox0.setRequestFocusEnabled(FALSE);
-		
-//			jComboBox0.addActionListener(new ActionListener() {
-//				
-//				@Override
-//				public void actionPerformed(ActionEvent arg0) {
-//					if (parent.artPanel.getVisGraph() != null){
-//						System.out.println("action");
-//						loadSearchCombo();
-//					}
-//					
-//				}
-//			});
-			jComboBox0.addItemListener(new ItemListener() {
-	
-				public void itemStateChanged(ItemEvent event) {
-					jComboBox0ItemItemStateChanged(event);
-				}
+	private ComboBox<String> getComboBox0() {
+		if (comboBox == null) {
+			comboBox = new ComboBox<>();
+			AutoCompletion.enable(comboBox);
+			comboBox.setEditable(true);
+			comboBox.setStyle("-fx-font-family: 'Dialog';" + "-fx-font-size: 10px;" +
+							"-fx-font-weight: bold;" + "-fx-text-fill: blue;");
+
+			ObservableList<String> items = FXCollections.observableArrayList();
+			comboBox.setItems(items);
+			comboBox.setBorder(null);
+
+			comboBox.valueProperty().addListener((options, oldValue, newValue) -> {
+				comboBox0ItemItemStateChanged(newValue);
 			});
+
 		}
-		return jComboBox0;
+		return comboBox;
 	}
 	
 	
-	private ComboBox getKceComboBox() {
+	private ComboBox<String> getKceComboBox() {
 		if (kceComboBox == null) {
-			kceComboBox = new ComboBox<String>();
+			kceComboBox = new ComboBox<>();
 			AutoCompletion.enable(kceComboBox);
 			kceComboBox.setEditable(true);
-			kceComboBox.setFont(new Font("Dialog", Font.BOLD, 10));
-			kceComboBox.setForeground(Color.blue);
-			kceComboBox.setModel(new DefaultComboBoxModel(new Object[] {}));
-			kceComboBox.setDoubleBuffered(false);
+			kceComboBox.setStyle("-fx-font-family: 'Dialog';" + "-fx-font-size: 10px;" +
+					"-fx-font-weight: bold;" + "-fx-text-fill: blue;");
+
+			ObservableList<String> items = FXCollections.observableArrayList();
+			kceComboBox.setItems(items);
 			kceComboBox.setBorder(null);
-			kceComboBox.setRequestFocusEnabled(false);
-			fillKceComboBox();
+
+			fillKceComboBox(items);
 			if (parent.artPanel!=null) {
-				parent.artPanel.setKceOption((String)getKceComboBox().getItemAt(0));
+				parent.artPanel.setKceOption((String)getKceComboBox().getItems().get(0));
 			}
-			
-			kceComboBox.addItemListener(new ItemListener() {
-	        	public void itemStateChanged(ItemEvent event) {
+
+			kceComboBox.setOnAction(new EventHandler<ActionEvent>() {
+				@Override
+				public void handle(ActionEvent event) {
 					kceItemItemStateChanged(event);
 				}
 			});
@@ -262,95 +238,96 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		return kceComboBox;
 	}
 	
-	private void fillKceComboBox(){
-		getKceComboBox().addItem(VisConstants.KCECOMBOOPTION1);
-		getKceComboBox().addItem(VisConstants.KCECOMBOOPTION2);
-		getKceComboBox().addItem(VisConstants.KCECOMBOOPTION3);
+	private void fillKceComboBox(ObservableList<String> items){
+		items.addAll(VisConstants.KCECOMBOOPTION1, VisConstants.KCECOMBOOPTION2, VisConstants.KCECOMBOOPTION3);
 
 	}
 	
-	protected void kceItemItemStateChanged(ItemEvent event) {
+	protected void kceItemItemStateChanged(ActionEvent event) {
 		// TODO Auto-generated method stub
 		if (parent.artPanel!=null) {
-			parent.artPanel.setKceOption((String)getKceComboBox().getSelectedItem());
+			parent.artPanel.setKceOption(kceComboBox.getSelectionModel().getSelectedItem());
 			parent.artPanel.doKceOptionAction();
 		}
-		
-	}
-	private JLabel getJLabel0(){
-	if(jLabel0==null){
-		jLabel0 = new JLabel();
-		ClassLoader c = Thread.currentThread().getContextClassLoader();
-		jLabel0.setIcon(new ImageIcon(c.getResource("search.JPG")));
-
-	}
-	return jLabel0;
 	}
 
-	private JCheckBox getExpandCheckBox() {
+	private Label getJLabel0(){
+		if(label0==null){
+			label0 = new Label();
+			ClassLoader c = Thread.currentThread().getContextClassLoader();
+			Image image = new Image(Objects.requireNonNull(c.getResourceAsStream("search.JPG")));
+			ImageView imageView = new ImageView(image);
+			label0.setGraphic(imageView);
+		}
+		return label0;
+	}
+
+	private CheckBox getExpandCheckBox() {
 		if (expandCheckBox == null) {
-			expandCheckBox = new JCheckBox();
-			expandCheckBox.setFont(new Font("Dialog", Font.PLAIN, 10));
+			expandCheckBox = new CheckBox();
+			expandCheckBox.setFont(Font.font("Dialog", FontWeight.NORMAL, 10));
 			expandCheckBox.setText("expand");
-			expandCheckBox.addActionListener(new ActionListener() {
-	
-				public void actionPerformed(ActionEvent event) {
-					expandCheckBoxActionActionPerformed(event);
-				}
-			});
+			expandCheckBox.setOnAction(this::expandCheckBoxActionActionPerformed);
 		}
 		return expandCheckBox;
 	}
-	public JButton getLoadReasonerButton() {
+
+	public Button getLoadReasonerButton() {
 		if (loadReasonerButton == null) {
-			loadReasonerButton = new JButton();
-			loadReasonerButton.setFont(new Font("Dialog", Font.PLAIN, 10));
-			loadReasonerButton.setForeground(Color.blue);
+			loadReasonerButton = new Button();
+			loadReasonerButton.setFont(Font.font("Dialog", FontWeight.NORMAL, 10));
+			loadReasonerButton.setStyle("-fx-text-fill: blue;");
 			loadReasonerButton.setText("Sync");
-			loadReasonerButton.addActionListener(new ActionListener() {
-	
-				public void actionPerformed(ActionEvent event) {
-					loadReasonerButtonActionActionPerformed(event);
-				}
-			});
+			loadReasonerButton.setOnAction(this::loadReasonerButtonActionActionPerformed);
 		}
 		return loadReasonerButton;
 	}
 	
 	
-	public Canvas getReduceLabel() {
+	public Label getReduceLabel() {
 		if (reduceLabel == null) {
-			reduceLabel = new Canvas("reduce");
+			reduceLabel = new Label("reduce");
 			reduceLabel.setText("reduce");
-			reduceLabel.setFont(new Font("Dialog", Font.PLAIN, 9));
+			reduceLabel.setFont(Font.font("Dialog", FontWeight.NORMAL, 9));
 		}
 		return reduceLabel;
 	}
-	
-	
-	private Canvas getJPanelLoad() {
-		if (jPanelLoad == null) {
-			jPanelLoad = new Canvas();
-			jPanelLoad.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, null, null));
-			jPanelLoad.setLayout(new GroupLayout());
-			jPanelLoad.add(getfileSystemButton(), new Constraints(new Leading(404, 24, 10, 10), new Leading(12, 23, 12, 12)));
-			jPanelLoad.add(getOntologyCombo(), new Constraints(new Leading(10, 388, 12, 12), new Leading(12, 12, 12)));
-			jPanelLoad.add(getLoadOntologyButton(), new Constraints(new Leading(434, 10, 10), new Leading(12, 23, 12, 12)));
-			jPanelLoad.add(getLoadReasonerButton(), new Constraints(new Leading(440, 71, 10, 10), new Leading(45, 23, 12, 12)));
-			jPanelLoad.add(getReasonerCombo(), new Constraints(new Leading(10, 358, 12, 12), new Leading(45, 12, 12)));
-//			jPanelLoad.add(getReduceCheckBox(), new Constraints(new Leading(407, 24, 10, 10), new Leading(44, 15, 12, 12)));
-//			jPanelLoad.add(getReduceLabel(), new Constraints(new Leading(403, 40, 10, 10), new Leading(52, 23, 12, 12)));
-			jPanelLoad.add(getKceComboBox(),new Constraints(new Leading(373, 60, 10, 10), new Leading(45, 23, 12, 12)) );
 
+	private VBox getPanelLoad() {
+		if (panelLoad == null) {
+			panelLoad = new VBox();
+			panelLoad.setStyle("-fx-border-color: #a9a9a9; -fx-border-width: 1; -fx-border-style: solid;");
+
+			panelLoad.getChildren().addAll(
+					getfileSystemButton(),
+					getOntologyCombo(),
+					getLoadOntologyButton(),
+					getLoadReasonerButton(),
+					getReasonerCombo(),
+					getKceComboBox()
+			);
+			/*
+			Pane layoutPane = new Pane();
+			layoutPane.getChildren().addAll(
+					createPositionedNode(getfileSystemButton(), 404, 12),
+					createPositionedNode(getOntologyCombo(), 10, 12),
+					createPositionedNode(getLoadOntologyButton(), 434, 12),
+					createPositionedNode(getLoadReasonerButton(), 440, 45),
+					createPositionedNode(getReasonerCombo(), 10, 45),
+					createPositionedNode(getKceComboBox(), 373, 45)
+			);
+
+			panelLoad.getChildren().add(layoutPane);*/
 
 		
 		}
-		return jPanelLoad;
+		return panelLoad;
 	}
+
 	private CheckBox getReduceCheckBox() {
 		if (reduceCheckBox == null) {
 			reduceCheckBox = new CheckBox();
-			reduceCheckBox.setFont(Font.font("Dialog", FontWeight.NORMAL,10));
+			reduceCheckBox.setFont(new Font("Dialog", Font.PLAIN, 10));
 			reduceCheckBox.addActionListener(new ActionListener() {
 	
 				public void actionPerformed(ActionEvent event) {
@@ -375,12 +352,12 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		return saveImageButton;
 	}
 
-	private Canvas getViewPanel() {
+	private VBox getViewPanel() {
 		if (ViewPanel == null) {
-			ViewPanel = new JPanel();
+			ViewPanel = new VBox();
 			ViewPanel.setBorder(BorderFactory.createTitledBorder(null, "View", TitledBorder.LEADING, TitledBorder.DEFAULT_POSITION, new Font("Dialog", Font.BOLD
 					| Font.ITALIC, 10), Color.blue));
-			ViewPanel.setFont(Font.font("Dialog", FontWeight.NORMAL, FontPosture.ITALIC, 10));
+			ViewPanel.setFont(new Font("Dialog", Font.BOLD | Font.ITALIC, 10));
 			ViewPanel.setLayout(new GroupLayout());
 			ViewPanel.add(getSaveViewButton(), new Constraints(new Leading(6, 76, 12, 12), new Leading(-4, 28, 10, 10)));
 			ViewPanel.add(getRestoreViewButton(), new Constraints(new Leading(88, 76, 12, 12), new Leading(-4, 28, 12, 12)));
@@ -390,8 +367,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private Button getRestoreViewButton() {
 		if (restoreViewButton == null) {
 			restoreViewButton = new Button();
-			restoreViewButton.setFont(Font.font("Dialog", FontWeight.NORMAL, 10));
-			restoreViewButton.setForeground(Color.BLUE);
+			restoreViewButton.setFont(new Font("Dialog", Font.PLAIN, 10));
+			restoreViewButton.setForeground(Color.blue);
 			restoreViewButton.setText("Restore");
 			restoreViewButton.addActionListener(new ActionListener() {
 	
@@ -405,8 +382,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private Button getSaveViewButton() {
 		if (saveViewButton == null) {
 			saveViewButton = new Button();
-			saveViewButton.setFont(Font.font("Dialog", FontWeight.NORMAL, 10));
-			saveViewButton.setForeground(Color.BLUE);
+			saveViewButton.setFont(new Font("Dialog", Font.PLAIN, 10));
+			saveViewButton.setForeground(Color.blue);
 			saveViewButton.setText("Save");
 			saveViewButton.addActionListener(new ActionListener() {
 	
@@ -417,22 +394,22 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		}
 		return saveViewButton;
 	}
-	private Canvas getJPanel1() {
-		if (jPanel1 == null) {
-			jPanel1 = new JPanel();
-			jPanel1.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, null, null));
-			jPanel1.setLayout(new GroupLayout());
-			jPanel1.add(getPropertiesCheckBox(), new Constraints(new Leading(8, 8, 8), new Leading(6, 10, 10)));
-			jPanel1.add(getExpandCheckBox(), new Constraints(new Leading(8, 8, 8), new Leading(27, 18, 8, 8)));
-			jPanel1.add(getRenderLabel(), new Constraints(new Leading(8, 8, 8), new Leading(45, 8, 8)));
-			jPanel1.add(getQualifiedNames(), new Constraints(new Leading(86, 10, 10), new Leading(45, 8, 8)));
+	private VBox getPanel1() {
+		if (panel1 == null) {
+			panel1 = new VBox();
+			panel1.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, null, null));
+			panel1.setLayout(new GroupLayout());
+			panel1.add(getPropertiesCheckBox(), new Constraints(new Leading(8, 8, 8), new Leading(6, 10, 10)));
+			panel1.add(getExpandCheckBox(), new Constraints(new Leading(8, 8, 8), new Leading(27, 18, 8, 8)));
+			panel1.add(getRenderLabel(), new Constraints(new Leading(8, 8, 8), new Leading(45, 8, 8)));
+			panel1.add(getQualifiedNames(), new Constraints(new Leading(86, 10, 10), new Leading(45, 8, 8)));
 		}
-		return jPanel1;
+		return panel1;
 	}
 	private Button getLoadOntologyButton() {
 		if (loadOntologyButton == null) {
 			loadOntologyButton = new Button();
-			loadOntologyButton.setFont(Font.font("Dialog", FontWeight.NORMAL, 10));
+			loadOntologyButton.setFont(new Font("Dialog", Font.PLAIN, 10));
 			loadOntologyButton.setForeground(Color.blue);
 			loadOntologyButton.setText("Load Ont");
 			loadOntologyButton.addActionListener(new ActionListener() {
@@ -447,7 +424,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	public ComboBox getReasonerCombo() {
 		if (loadReasonerCombo == null) {
 			loadReasonerCombo = new ComboBox();
-			loadReasonerCombo.setFont(Font.font("Dialog", FontWeight.NORMAL, 10));
+			loadReasonerCombo.setFont(new Font("Dialog", Font.PLAIN, 10));
 			loadReasonerCombo.setModel(new DefaultComboBoxModel(new Object[] { "Pellet", "JFact", "Elk", "Jcel" }));
 			loadReasonerCombo.setDoubleBuffered(false);
 			loadReasonerCombo.setBorder(null);
@@ -457,9 +434,9 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	}
 	public ComboBox getOntologyCombo() {
 		if (loadOntologyCombo == null) {
-			loadOntologyCombo = new JComboBox();
+			loadOntologyCombo = new ComboBox();
 			loadOntologyCombo.setEditable(true);
-			loadOntologyCombo.setFont(Font.font("Dialog", FontWeight.NORMAL, 10));
+			loadOntologyCombo.setFont(new Font("Dialog", Font.PLAIN, 10));
 			loadRecent();
 
 			loadOntologyCombo.setDoubleBuffered(false);
@@ -564,16 +541,14 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		parent.restoreViewButtonAction(event);
 	}
 	
-	private void jComboBox0ItemItemStateChanged(ItemEvent event) {
-		if (event.getID()==ItemEvent.ITEM_STATE_CHANGED) {
-			if (parent.firstItemStateChanged) {
-				String selItem = (String)getJComboBox0().getSelectedItem();
-				String key = parent.artPanel.getVisGraph().getQualifiedLabelMap().get(selItem);
-			    parent.artPanel.focusOnShape(key,null); }
-			else {
-				parent.firstItemStateChanged = true; }
-		}
+	private void comboBox0ItemItemStateChanged(String selectedItem) {
+		if (parent.firstItemStateChanged) {
+			String key = parent.artPanel.getVisGraph().getQualifiedLabelMap().get(selectedItem);
+			parent.artPanel.focusOnShape(key,null); }
+		else {
+			parent.firstItemStateChanged = true; }
 	}
+
 	private void saveViewButtonActionActionPerformed(ActionEvent event) {
 		parent.saveViewButtonAction(event);
 	}
@@ -586,8 +561,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		    ArrayList<String> temp;
 		    Set<Entry<String,Shape>> classesInGraph = parent.artPanel.getVisGraph().getClassesInGraph();
 
-		    if (getJComboBox0().getModel().getSize()!=0){
-		    	getJComboBox0().removeAllItems();
+		    if (getComboBox0().getModel().getSize()!=0){
+		    	getComboBox0().removeAllItems();
 		    }
 		    temp = new ArrayList<String>();
 		    
@@ -609,7 +584,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		    
 			Collections.sort(temp);
 			for (Object item : temp) {
-				getJComboBox0().addItem(item);
+				getComboBox0().addItem(item);
 			}
      }
 	 
@@ -636,8 +611,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		int answer;
 		if (getReduceCheckBox().isSelected()) {
 			if (parent.artPanel.getOntology() != null){
-		           answer =  OptionPane.showConfirmDialog(parent,"Warning! this could modify source ontology","proceed", JOptionPane.OK_CANCEL_OPTION);
-		           if (answer == OptionPane.OK_OPTION){
+		           answer =  JOptionPane.showConfirmDialog(parent,"Warning! this could modify source ontology","proceed", JOptionPane.OK_CANCEL_OPTION);
+		           if (answer == JOptionPane.OK_OPTION){
 //		        	   parent.artPanel.applyStructuralReduction();
 		           }	  
 		           else{
@@ -645,14 +620,14 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		           }
 			}
 			else {
-				OptionPane.showMessageDialog(parent, "Load ontology first");
+				JOptionPane.showMessageDialog(parent, "Load ontology first");
 			}
 		}
 
 	}
 	
 	private void fileSystemButtonActionActionPerformed(ActionEvent event) {
-		FileChooser selector = new FileChooser();
+		JFileChooser selector = new JFileChooser();
 		selector.addChoosableFileFilter(new owlFileFilter("owl"));
 		selector.showOpenDialog(this);
 		String x = null;
@@ -688,22 +663,28 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	Dimension2D size = null;
 	private CheckBox renderLabel;
 	private CheckBox qualifiedNames;
-	private Canvas snapshotPanel;
+	private VBox snapshotPanel;
 
-	private void zoomSliderChangeStateChanged(ChangeEvent event) {
+	private void zoomSliderChangeStateChanged(Number newValue) {
 		if (parent.artPanel!=null) {
 			double factor = (0.5+getZoomSlider().getValue()/10.0);
 			if (size == null) {
 				size= parent.artPanel.getSize();
 				parent.artPanel.setOriginalSize(size);
 			}
-			parent.artPanel.getVisGraph().setZoomLevel(getZoomSlider().getValue());
+			parent.artPanel.getVisGraph().setZoomLevel(newValue.intValue());
 			parent.artPanel.setFactor(factor);	
 			parent.artPanel.scale(factor, size);
 		}
 	}
-	
-	
+
+	private Pane createPositionedNode(Node node, double x, double y) {
+		Pane pane = new Pane();
+		pane.getChildren().add(node);
+		pane.setLayoutX(x);
+		pane.setLayoutY(y);
+		return pane;
+	}
 	
 }
 	
