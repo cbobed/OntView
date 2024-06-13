@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
@@ -26,8 +25,10 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 
+import javafx.event.ActionEvent;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.ScrollPane;
+import javafx.stage.Stage;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.StringDocumentSource;
 import org.semanticweb.owlapi.model.IRI;
@@ -59,6 +60,7 @@ import java.security.*;
 
 public class Mine extends Canvas implements Embedable{
 
+	private Stage primaryStage;
 	private static final long serialVersionUID = 1L;
 	boolean DEBUG=false;
 
@@ -86,6 +88,10 @@ public class Mine extends Canvas implements Embedable{
 			}
 		});
 
+	}
+
+	public Stage getPrimaryStage() {
+		return primaryStage;
 	}
 
 
@@ -307,9 +313,9 @@ public class Mine extends Canvas implements Embedable{
 
 			loadActiveOntology(IRI.create(ontologyString));
 			if (activeOntology != null) {
-				nTopPanel.getOntologyCombo().setSelectedItem(ontologyString);
-				nTopPanel.getLoadReasonerButton().setEnabled(true);
-				nTopPanel.getReasonerCombo().setEnabled(true);
+				nTopPanel.getOntologyCombo().setValue(ontologyString);
+				nTopPanel.getLoadReasonerButton().setDisable(false);
+				nTopPanel.getReasonerCombo().setDisable(false);
 				if (artPanel != null){
 					artPanel.setActiveOntolgySource(ontologyString);
 				}
@@ -342,9 +348,9 @@ public class Mine extends Canvas implements Embedable{
 
 			loadActiveOntologyFromString(ontologyString);
 			if (activeOntology != null) {
-				nTopPanel.getOntologyCombo().setSelectedItem(activeOntology.getOntologyID().getOntologyIRI());
-				nTopPanel.getLoadReasonerButton().setEnabled(true);
-				nTopPanel.getReasonerCombo().setEnabled(true);
+				nTopPanel.getOntologyCombo().setValue(activeOntology.getOntologyID().getOntologyIRI());
+				nTopPanel.getLoadReasonerButton().setDisable(false);
+				nTopPanel.getReasonerCombo().setDisable(false);
 				if (artPanel != null){
 					artPanel.setActiveOntolgySource(ontologyString);
 				}
@@ -416,14 +422,14 @@ public class Mine extends Canvas implements Embedable{
 		createImage(artPanel);
 	}
 
-	public void createImage(JPanel panel) {
+	public void createImage(Canvas panel) {
 		int w = panel.getWidth();
 		int h = panel.getHeight();
 		imageDialog(panel, w, h);
 
 	}
 
-	public void createImageFromVisibleRect(JPanel panel){
+	public void createImageFromVisibleRect(Canvas panel){
 		int w = (int) panel.getVisibleRect().getWidth();
 		int h = (int) panel.getVisibleRect().getHeight();
 
