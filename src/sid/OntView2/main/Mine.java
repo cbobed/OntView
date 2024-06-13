@@ -1,34 +1,28 @@
 package sid.OntView2.main;
 
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Graphics;
-import java.awt.Rectangle;
-import java.awt.event.WindowEvent;
-import java.awt.image.BufferedImage;
-import java.awt.image.Raster;
 import java.io.File;
 import java.io.IOException;
-//import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.HashSet;
-
 import javax.imageio.ImageIO;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
-import javax.swing.filechooser.FileFilter;
 
+import javafx.application.Application;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.Cursor;
+import javafx.scene.Scene;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.image.WritableImage;
+import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.StringDocumentSource;
 import org.semanticweb.owlapi.model.IRI;
@@ -53,12 +47,12 @@ import sid.OntView2.common.VisGraph;
 import sid.OntView2.common.VisPositionConfig;
 import sid.OntView2.expressionNaming.SIDClassExpressionNamer;
 import sid.OntView2.utils.ExpressionManager;
-import sid.OntView2.main.JavaFXApp;
 import uk.ac.manchester.cs.jfact.JFactFactory;
 
 import java.security.*;
+import java.util.Optional;
 
-public class Mine extends Canvas implements Embedable{
+public class Mine extends Application implements Embedable{
 
 	private Stage primaryStage;
 	private static final long serialVersionUID = 1L;
@@ -79,15 +73,13 @@ public class Mine extends Canvas implements Embedable{
 	/* Code for standalone app initialization */
 
 	public static void main(String[] args) {
-		JavaFXApp.launch(JavaFXApp.class, args);
+		launch(args);
+	}
 
-		SwingUtilities.invokeLater(new Runnable(){
-			public void run() {
-				// TODO Auto-generated method stub
-				createAndShowGUI();
-			}
-		});
-
+	@Override
+	public void start(Stage primaryStage) {
+		this.primaryStage = primaryStage;
+		createAndShowGUI(primaryStage);
 	}
 
 	public Stage getPrimaryStage() {
@@ -95,83 +87,39 @@ public class Mine extends Canvas implements Embedable{
 	}
 
 
-	public static void createAndShowGUI() {
-
-		JFrame frame = new JFrame("Viewer");
-
-		frame.addWindowListener(new java.awt.event.WindowAdapter(){
-									public void windowClosing(WindowEvent e){
-										System.exit(0);
-									}
-								}
-		);
+	public static void createAndShowGUI(Stage primaryStage) {
+		primaryStage.setTitle("Viewer");
+		primaryStage.setOnCloseRequest(event -> System.exit(0));
 
 		Mine viewer = new Mine();
-		frame.add(viewer);
-		frame.setSize(800,600);
-		frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-		frame.setVisible(true);
 		viewer.self = viewer;
 
-		viewer.entityNameSet = new HashSet<String>();
-		viewer.setLayout(new BoxLayout(viewer, BoxLayout.Y_AXIS));
+		viewer.entityNameSet = new HashSet<>();
 		viewer.artPanel = new PaintFrame();
 		viewer.artPanel.setParentFrame(viewer);
-		viewer.artPanel.setBorder(BorderFactory.createTitledBorder("Visor"));
-		viewer.artPanel.setBackground(new Color(255,255,255));
+
 		viewer.nTopPanel = new TopPanel(viewer);
-		viewer.nTopPanel.setAlignmentX(RIGHT_ALIGNMENT);
-		viewer.add(viewer.nTopPanel);
-		// JScrollPane scroll      = new JScrollPane(artPanel);
+
 		viewer.scroll = new ScrollPane(viewer.artPanel);
-		viewer.add(viewer.scroll);
-		viewer.setVisible(true);
-		viewer.artPanel.scroll = viewer.scroll;
-		viewer.validate();
+
+		VBox root = new VBox();
+		root.getChildren().add(viewer.nTopPanel);
+		root.getChildren().add(viewer.scroll);
+
+		viewer.artPanel.setStyle("-fx-background-color: white;");
+		viewer.nTopPanel.setStyle("-fx-border-color: black; -fx-border-width: 1;");
+
+		Scene scene = new Scene(root, 800, 600);
+		primaryStage.setScene(scene);
+		primaryStage.setMaximized(true);
+		primaryStage.show();
 	}
-
-	public void createAndShowGUIApplet () {
-		System.out.println("Created GUI on EDT? "+SwingUtilities.isEventDispatchThread());
-
-		JFrame frame = new JFrame("Viewer");
-
-		frame.addWindowListener(new java.awt.event.WindowAdapter(){
-									public void windowClosing(WindowEvent e){
-										System.exit(0);
-									}
-								}
-		);
-
-		frame.add(this);
-		frame.setSize(800,600);
-		frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-		frame.setVisible(true);
-
-		this.self = this;
-
-		this.entityNameSet = new HashSet<String>();
-		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-		this.artPanel = new PaintFrame();
-		this.artPanel.setParentFrame(this);
-		this.artPanel.setBorder(BorderFactory.createTitledBorder("Visor"));
-		this.artPanel.setBackground(new Color(255,255,255));
-		this.nTopPanel = new TopPanel(this);
-		this.nTopPanel.setAlignmentX(RIGHT_ALIGNMENT);
-		this.add(this.nTopPanel);
-		// JScrollPane scroll      = new JScrollPane(artPanel);
-		this.scroll = new JScrollPane(this.artPanel);
-		this.add(this.scroll);
-		this.setVisible(true);
-		this.artPanel.scroll = this.scroll;
-		this.validate();
-	}
-
 
 	/* Rest of methods */
 
 	public void createButtonAction(){
 		if (reasoner!= null) {
-			artPanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+			artPanel.setCursor(Cursor.WAIT);
 			//cant cast to set<OWLClassExpression> from set<OWLClass>
 			HashSet<OWLClassExpression> set = new HashSet<OWLClassExpression>();
 			for (OWLClass d : reasoner.getTopClassNode().getEntities())
@@ -179,12 +127,12 @@ public class Mine extends Canvas implements Embedable{
 			try {
 				//set reasoner and ontology before creating
 				artPanel.createReasonedGraph(set,check);
-				artPanel.setCursor(Cursor.getDefaultCursor());
+				artPanel.setCursor(Cursor.DEFAULT);
 
 			}
 			catch (Exception e1) {
 				e1.printStackTrace();
-				artPanel.setCursor(Cursor.getDefaultCursor());
+				artPanel.setCursor(Cursor.DEFAULT);
 			}
 
 			while (!artPanel.isStable()){
@@ -208,17 +156,17 @@ public class Mine extends Canvas implements Embedable{
 
 	protected void loadActiveOntology(IRI source){
 		manager = OWLManager.createOWLOntologyManager();
-		artPanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+		artPanel.setCursor(Cursor.WAIT);
 		try {
 			activeOntology = manager.loadOntologyFromOntologyDocument(source);
 		} catch (OWLOntologyCreationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			artPanel.setCursor(Cursor.getDefaultCursor());
+			artPanel.setCursor(Cursor.DEFAULT);
 			activeOntology = null;
 			manager = null;
 		}
-		artPanel.setCursor(Cursor.getDefaultCursor());
+		artPanel.setCursor(Cursor.DEFAULT);
 		artPanel.setOntology(activeOntology);
 
 		artPanel.setActiveOntolgySource(source.toString()); //this might FAIL
@@ -239,34 +187,34 @@ public class Mine extends Canvas implements Embedable{
 	protected void loadActiveOntologyFromString(String ontology) {
 
 		manager = OWLManager.createOWLOntologyManager();
-		artPanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+		artPanel.setCursor(Cursor.WAIT);
 		try {
 			activeOntology = manager.loadOntologyFromOntologyDocument(new StringDocumentSource(ontology));
 		} catch (OWLOntologyCreationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			artPanel.setCursor(Cursor.getDefaultCursor());
+			artPanel.setCursor(Cursor.DEFAULT);
 			activeOntology = null;
 			manager = null;
 		}
-		artPanel.setCursor(Cursor.getDefaultCursor());
+		artPanel.setCursor(Cursor.DEFAULT);
 		artPanel.setOntology(activeOntology);
 		artPanel.setActiveOntolgySource(ontology);
 	}
 
 	protected void loadActiveOntology(String source){
 		manager = OWLManager.createOWLOntologyManager();
-		artPanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+		artPanel.setCursor(Cursor.WAIT);
 		try {
 			activeOntology = manager.loadOntologyFromOntologyDocument(IRI.create(source));
 		} catch (OWLOntologyCreationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			artPanel.setCursor(Cursor.getDefaultCursor());
+			artPanel.setCursor(Cursor.DEFAULT);
 			activeOntology = null;
 			manager = null;
 		}
-		artPanel.setCursor(Cursor.getDefaultCursor());
+		artPanel.setCursor(Cursor.DEFAULT);
 		artPanel.setOntology(activeOntology);
 	}
 
@@ -293,7 +241,6 @@ public class Mine extends Canvas implements Embedable{
 		SIDClassExpressionNamer renamer = new SIDClassExpressionNamer(activeOntology, reasoner);
 		renamer.applyNaming(true);
 	}
-
     /*public void refreshOntology (String ontologyString, String reasonerString) {
 
     	 AccessController.doPrivileged(new RefreshingAction(ontologyString, reasonerString));
@@ -390,11 +337,13 @@ public class Mine extends Canvas implements Embedable{
 		// TODO Auto-generated method stub
 		VisGraph graph = artPanel.getVisGraph();
 		if (graph!= null){
-			JFileChooser selector = new JFileChooser() ;
-			if ((selector.showSaveDialog(self))==JFileChooser.APPROVE_OPTION) {
+			FileChooser selector = new FileChooser() ;
+			File file = selector.showSaveDialog(primaryStage);
+
+			if (file != null) {
 				String path = null;
 				try {
-					path = selector.getSelectedFile().getCanonicalFile().toString();
+					path = file.getCanonicalFile().toString();
 					VisPositionConfig.saveState(path, graph);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -406,11 +355,12 @@ public class Mine extends Canvas implements Embedable{
 	public void restoreViewButtonAction(ActionEvent arg0) {
 		// TODO Auto-generated method stub
 		if (artPanel.getVisGraph()!= null){
-			JFileChooser selector = new JFileChooser();
-			if ((selector.showOpenDialog(self))==JFileChooser.APPROVE_OPTION) {
+			FileChooser selector = new FileChooser();
+			File file = selector.showOpenDialog(primaryStage);
+			if (file != null) {
 				String path = null;
 				try {
-					path = selector.getSelectedFile().getCanonicalFile().toString();
+					path = file.getCanonicalFile().toString();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -423,21 +373,21 @@ public class Mine extends Canvas implements Embedable{
 	}
 
 	public void createImage(Canvas panel) {
-		int w = panel.getWidth();
-		int h = panel.getHeight();
+		int w = (int) panel.getWidth();
+		int h = (int) panel.getHeight();
 		imageDialog(panel, w, h);
 
 	}
 
 	public void createImageFromVisibleRect(Canvas panel){
-		int w = (int) panel.getVisibleRect().getWidth();
-		int h = (int) panel.getVisibleRect().getHeight();
+		int w = (int) panel.getBoundsInLocal().getWidth();
+		int h = (int) panel.getBoundsInLocal().getHeight();
 
 		// <CBL 25/9/13>
 		// we have to check the position of the scroll bars
 
-		int xIni = scroll.getHorizontalScrollBar().getValue();
-		int yIni = scroll.getVerticalScrollBar().getValue();
+		int xIni = (int) (scroll.getHvalue() * (panel.getWidth() - scroll.getViewportBounds().getWidth()));
+		int yIni = (int) (scroll.getVvalue() * (panel.getHeight() - scroll.getViewportBounds().getHeight()));
 
 		System.out.println(w + " "+h+" "+xIni+" "+yIni);
 
@@ -446,57 +396,62 @@ public class Mine extends Canvas implements Embedable{
 
 	// <CBL 25/9/13>
 	// wrapper for the method
-	private void imageDialog(JPanel panel,int w, int h){
+	private void imageDialog(Canvas panel,int w, int h){
 		imageDialog(panel, w, h, 0, 0);
 	}
 
 	// <CBL 25/9/13>
 	// modified to take an offset as argument
 
-	private void imageDialog(JPanel panel,int w, int h, int xIni, int yIni){
+	private void imageDialog(Canvas panel,int w, int h, int xIni, int yIni){
 		File fl = null;
 		boolean done = false;
 		int answer;
-		BufferedImage bi = new BufferedImage(w+xIni,h+yIni, BufferedImage.TYPE_INT_RGB);
+		//BufferedImage bi = new BufferedImage(w+xIni,h+yIni, BufferedImage.TYPE_INT_RGB);
 		ArrayList<String> valid = new ArrayList<String>();
 		valid.add("jpg");
 		valid.add("png");
-		Graphics g = bi.createGraphics();
-		panel.paint(g);
-		bi = bi.getSubimage(xIni, yIni, w, h);
 
-		JFileChooser selector = new JFileChooser();
+		WritableImage writableImage = new WritableImage(w + xIni, h + yIni);
+		SnapshotParameters params = new SnapshotParameters();
+		params.setViewport(new Rectangle2D(xIni, yIni, w, h));
+		panel.snapshot(params, writableImage);
+
+		FileChooser selector = new FileChooser();
 		boolean hasSuffix= true;
-		selector.addChoosableFileFilter(new ImageFileFilter("jpg"));
-		selector.addChoosableFileFilter(new ImageFileFilter("png"));
+		FileChooser.ExtensionFilter jpgFilter = new FileChooser.ExtensionFilter("JPG files (*.jpg)", "*.jpg");
+		FileChooser.ExtensionFilter pngFilter = new FileChooser.ExtensionFilter("PNG files (*.png)", "*.png");
+		selector.getExtensionFilters().addAll(jpgFilter, pngFilter);
 		while (!done) {
-			if ((selector.showSaveDialog(self))==JFileChooser.APPROVE_OPTION) {
-				fl = selector.getSelectedFile();
+			File file = selector.showSaveDialog(primaryStage);
+
+			if (file != null) {
+				fl = file;
 
 				if (fl.exists()){
-					answer =  JOptionPane.showConfirmDialog(self,"Overwrite?","confirm", JOptionPane.OK_CANCEL_OPTION);
-					if (answer == JOptionPane.CANCEL_OPTION){
+					Alert alert = new Alert(AlertType.CONFIRMATION, "Overwrite?", ButtonType.OK, ButtonType.CANCEL);
+					Optional<ButtonType> result = alert.showAndWait();
+					if (result.isPresent() && result.get() == ButtonType.CANCEL) {
 						continue;
 					}
 				}
 				try {
-					String description =  (valid.contains(selector.getFileFilter().getDescription()) ?
-							selector.getFileFilter().getDescription() : "jpg");
+					String extension = getExtension(selector.getSelectedExtensionFilter().getDescription());
 					hasSuffix = hasValidSuffix(fl.getName().toLowerCase());
 					if (!hasSuffix){
-						String newName = fl.getPath()+"."+description;
+						String newName = fl.getPath() + "." + extension;
 						boolean exists = (new File(newName).exists());
 						File fl2 = new File(newName);
 						if (exists){
-							answer = JOptionPane.showConfirmDialog(self,"Overwrite?","confirm", JOptionPane.OK_CANCEL_OPTION);
-							if (answer == JOptionPane.CANCEL_OPTION){
+							Alert alert = new Alert(AlertType.CONFIRMATION, "Overwrite?", ButtonType.OK, ButtonType.CANCEL);
+							Optional<ButtonType> result = alert.showAndWait();
+							if (result.isPresent() && result.get() == ButtonType.CANCEL) {
 								continue;
 							}
 						}
-						ImageIO.write(bi, description, fl2);
-					}
+						ImageIO.write(SwingFXUtils.fromFXImage(writableImage, null), extension, fl2);					}
 					else {
-						ImageIO.write(bi,description,fl);
+						ImageIO.write(SwingFXUtils.fromFXImage(writableImage, null), extension, fl);
 					}
 					done = true;
 				} catch (IOException e1) {
@@ -514,17 +469,14 @@ public class Mine extends Canvas implements Embedable{
 		if (in.endsWith("png")) return true;
 		return false;
 	}
-	public class ImageFileFilter extends FileFilter
-	{
-		String fileType;
-		public ImageFileFilter(String pextension){fileType = pextension;}
-		public boolean accept(File file){
-			if (file.getName().toLowerCase().endsWith("."+fileType) || (file.isDirectory()))
-				return true;
-			return false;
+
+	private String getExtension(String description) {
+		if (description.contains("jpg")) {
+			return "jpg";
+		} else if (description.contains("png")) {
+			return "png";
 		}
-		@Override
-		public String getDescription() {return fileType;}
+		return "jpg";
 	}
 
 	@Override
