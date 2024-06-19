@@ -4,12 +4,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.geometry.Dimension2D;
-import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
-
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
@@ -19,7 +17,6 @@ import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.stage.FileChooser;
 import org.semanticweb.owlapi.model.IRI;
-import sid.OntView2.common.Shape;
 import sid.OntView2.common.*;
 
 import java.io.*;
@@ -34,18 +31,18 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private ComboBox<Object> loadOntologyCombo;
 	private ComboBox<String> loadReasonerCombo;
 	private Button loadReasonerButton;
-	private VBox panelLoad;
+	private Pane panelLoad;
 	private CheckBox expandCheckBox;
-	private VBox panel1;
+	private Pane panel1;
 	private Button saveViewButton;
 	private Button restoreViewButton;
-	private HBox viewPanel;
+	private Pane viewPanel;
 	private Button saveImageButton;
 	private Button saveImagePartialButton;
 	private Label label0;
 	private ComboBox<String> comboBox;
 	private ComboBox<String> kceComboBox;
-	private HBox panel0;
+	private Pane panel0;
 	private Mine parent;
     static String  RESOURCE_BASE ;
 	private CheckBox Properties;
@@ -53,7 +50,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private Slider zoomSlider;
 	private CheckBox reduceCheckBox;
 	private Label reduceLabel;
-	private VBox mainPane;
+	private Pane mainPane;
 
 	public TopPanel(Mine pparent){
 		parent = pparent;
@@ -70,35 +67,17 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 	// REVISAR
 	private void initComponents() {
-		mainPane = new VBox();
-		mainPane.setPadding(new Insets(10));
-		mainPane.setMinSize(1040, 108);
-		mainPane.setPrefSize(1040, 108);
-		//mainPane.maxWidth(2147483647);
-		//mainPane.maxHeight(90);
-		mainPane.setStyle("-fx-border-color: black; -fx-border-width: 1; -fx-border-style: solid; -fx-background-color: #f0f8ff;");
+		mainPane = new Pane();
+		mainPane.maxWidth(Double.MAX_VALUE);
+		mainPane.maxHeight(90);
+		mainPane.setStyle("-fx-border-color: black; -fx-background-color: #e5e4e0; -fx-border-width: 1; -fx-border-style: solid;");
 
-		/*addComponent(mainPane, getPanelLoad(), 12, 10, 523, 78);
+		addComponent(mainPane, getPanelLoad(), 12, 10, 523, 78);
 		addComponent(mainPane, getZoomSlider(), 750, 2, 24, 94);
 		addComponent(mainPane, getPanel1(), 541, 10, 197, 78);
 		addComponent(mainPane, getSnapshotPanel(), 968, 2, 120, 51);
 		addComponent(mainPane, getPanel0(), 786, 54, 300, 34);
-		addComponent(mainPane, getViewPanel(), 786, 2, 179, 51);*/
-		getPanelLoad().setPrefSize(523, 78);
-		getZoomSlider().setPrefSize(24, 94);
-		getPanel1().setPrefSize(197, 78);
-		getSnapshotPanel().setPrefSize(120, 51);
-		getPanel0().setPrefSize(300, 34);
-		getViewPanel().setPrefSize(179, 51);
-
-		mainPane.getChildren().addAll(getPanelLoad(), getPanel1(), getViewPanel(), getPanel0(), getSnapshotPanel(), getZoomSlider());
-
-		getPanelLoad().relocate(12, 10);
-		getZoomSlider().relocate(750, 2);
-		getPanel1().relocate(541, 10);
-		getSnapshotPanel().relocate(968, 2);
-		getPanel0().relocate(786, 54);
-		getViewPanel().relocate(786, 2);
+		addComponent(mainPane, getViewPanel(), 786, 2, 179, 51);
 
 		setWidth(1040);
 		setHeight(108);
@@ -128,14 +107,12 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		 */
 	}
 
-	private HBox getSnapshotPanel() {
+	private Pane getSnapshotPanel() {
 		if (snapshotPanel == null) {
-			snapshotPanel = new HBox(10);
+			snapshotPanel = new Pane();
 			snapshotPanel.setStyle("-fx-border-color: blue; -fx-border-width: 1; -fx-border-radius: 5; -fx-border-style: solid;");
-			/*addComponent(snapshotPanel, getSaveImageButton(), 8, 0, 30, 26);
-			addComponent(snapshotPanel, getSaveImagePartialButton(), 45, 0, 30, 26);*/
-
-			snapshotPanel.getChildren().addAll(getSaveImageButton(), getSaveImagePartialButton());
+			addComponent(snapshotPanel, getSaveImageButton(), 8, 0, 30, 26);
+			addComponent(snapshotPanel, getSaveImagePartialButton(), 45, 0, 30, 26);
 
 		}
 		return snapshotPanel;
@@ -201,6 +178,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private Button getfileSystemButton() {
 		if (fileSystemButton == null) {
 			fileSystemButton = new Button();
+
 			ClassLoader c = Thread.currentThread().getContextClassLoader();
 			Image icon = new Image(Objects.requireNonNull(c.getResourceAsStream("folder.png")));
 			ImageView imageView = new ImageView(icon);
@@ -221,14 +199,12 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		}
 		return Properties;
 	}
-	private HBox getPanel0() {
+	private Pane getPanel0() {
 		if (panel0 == null) {
-			panel0 = new HBox(10);
+			panel0 = new Pane();
 			panel0.setStyle("-fx-border-color: #a9a9a9; -fx-border-width: 1; -fx-border-style: solid;");
-			/*addComponent(panel0, getLabel0(), 8, 1, 22, 24);
-			addBilateralComponent(panel0, getComboBox0(), 39, 12, 4, 21);*/
-			panel0.getChildren().addAll(getLabel0(), getComboBox0());
-
+			addComponent(panel0, getLabel0(), 8, 1, 22, 24);
+			addBilateralComponent(panel0, getComboBox0(), 39, 12, 4, 21);
 		}
 		return panel0;
 	}
@@ -329,21 +305,19 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		return reduceLabel;
 	}
 
-	private VBox getPanelLoad() {
+	private Pane getPanelLoad() {
 		if (panelLoad == null) {
-			panelLoad = new VBox(10);
+			panelLoad = new Pane();
 			panelLoad.setStyle("-fx-border-color: #a9a9a9; -fx-border-width: 1; -fx-border-style: solid;");
 
-			/*addComponent(panelLoad, getfileSystemButton(), 404, 12, 24, 23);
+			addComponent(panelLoad, getfileSystemButton(), 404, 12, 24, 23);
 			addComponent(panelLoad, getOntologyCombo(), 10, 12, 388, 23);
 			addComponent(panelLoad, getLoadOntologyButton(), 434, 12, 24, 23);
 			addComponent(panelLoad, getLoadReasonerButton(), 440, 45, 71, 23);
 			addComponent(panelLoad, getReasonerCombo(), 10, 45, 358, 23);
 			// addComponent(pane, getReduceCheckBox(), 407, 44, 24, 15);
 			// addComponent(pane, getReduceLabel(), 403, 52, 40, 23);
-			addComponent(panelLoad, getKceComboBox(), 373, 45, 60, 23);*/
-
-			panelLoad.getChildren().addAll(getfileSystemButton(), getOntologyCombo(), getLoadOntologyButton(), getLoadReasonerButton(), getReasonerCombo(), getKceComboBox());
+			addComponent(panelLoad, getKceComboBox(), 373, 45, 60, 23);
 
 		}
 		return panelLoad;
@@ -368,7 +342,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		}
 		return saveImageButton;
 	}
-	private HBox getViewPanel() {
+
+	private Pane getViewPanel() {
 		if (viewPanel == null) {
 			viewPanel = new HBox(10);
 
@@ -381,19 +356,23 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			titledPane.setBorder(new Border(borderStroke));
 
 			// Crear un nuevo HBox que contenga los botones
-			HBox contentBox = new HBox(10);
-			contentBox.getChildren().addAll(getSaveViewButton(), getRestoreViewButton());
+			Pane contentBox = new Pane();
+			addComponent(contentBox, getSaveViewButton(), 6, -4, 76, 28);
+			addComponent(contentBox, getRestoreViewButton(), 88, -4, 76, 28);
+
+			//contentBox.getChildren().addAll(getSaveViewButton(), getRestoreViewButton());
 
 			// Establecer el nuevo HBox como el contenido del TitledPane
 			titledPane.setContent(contentBox);
 
 			// Agregar el TitledPane al viewPanel
 			viewPanel.getChildren().add(titledPane);
+
+
+
 		}
 		return viewPanel;
 	}
-
-
 	private Button getRestoreViewButton() {
 		if (restoreViewButton == null) {
 			restoreViewButton = new Button();
@@ -414,17 +393,15 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		}
 		return saveViewButton;
 	}
-	private VBox getPanel1() {
+	private Pane getPanel1() {
 		if (panel1 == null) {
-			panel1 = new VBox(10);
+			panel1 = new Pane();
 			panel1.setStyle("-fx-border-color: black; -fx-border-width: 1; -fx-border-style: solid;");
 
-			/*addComponent(panel1, getPropertiesCheckBox(), 8.0, 6.0, 8, 10);
+			addComponent(panel1, getPropertiesCheckBox(), 8.0, 6.0, 8, 10);
 			addComponent(panel1, getExpandCheckBox(), 8.0, 27.0, 8, 8);
 			addComponent(panel1, getRenderLabel(), 8.0, 45.0, 8, 8);
-			addComponent(panel1, getQualifiedNames(), 86.0, 45.0, 10, 8);*/
-
-			panel1.getChildren().addAll(getPropertiesCheckBox(), getExpandCheckBox(), getRenderLabel(), getQualifiedNames());
+			addComponent(panel1, getQualifiedNames(), 86.0, 45.0, 10, 8);
 		}
 		return panel1;
 	}
@@ -656,7 +633,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	Dimension2D size = null;
 	private CheckBox renderLabel;
 	private CheckBox qualifiedNames;
-	private HBox snapshotPanel;
+	private Pane snapshotPanel;
 
 	private void zoomSliderChangeStateChanged(Number newValue) {
 		if (parent.artPanel!=null) {
