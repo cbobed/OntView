@@ -18,6 +18,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.WritableImage;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -104,7 +105,8 @@ public class Mine extends Application implements Embedable{
 		viewer.scroll = new ScrollPane(viewer.artPanel);
 
 		VBox root = new VBox();
-		root.getChildren().add(viewer.nTopPanel);
+		VBox.setVgrow(viewer.scroll, Priority.ALWAYS);
+		root.getChildren().add(viewer.nTopPanel.getMainPane());
 		root.getChildren().add(viewer.scroll);
 
 		viewer.artPanel.setStyle("-fx-background-color: white;");
