@@ -83,6 +83,7 @@ public class PaintFrame extends Canvas implements Runnable{
 			this.setHeight(600);
 			prevSize = new Dimension2D(getWidth(), getHeight());
 			VisConfig.getInstance().setConstants();
+			//visGraph = new VisGraph(this);
 			addEventHandlers();
 
 		}
@@ -302,7 +303,9 @@ public class PaintFrame extends Canvas implements Runnable{
 
 
 	private void handleMousePressed(MouseEvent e) {
-
+		if (visGraph == null) {
+			return;
+		}
 		Point2D p = translatePoint(new Point2D(e.getX(), e.getY()));
 		pressedShape= visGraph.findShape(p);
 
@@ -379,6 +382,9 @@ public class PaintFrame extends Canvas implements Runnable{
 	}
 
 	public void handleMouseMoved(MouseEvent e) {
+		if (visGraph == null) {
+			return;
+		}
 		Point2D p = translatePoint(new Point2D(e.getX(), e.getY()));
 		int x = (int) p.getX();
 		int y = (int) p.getY();
@@ -489,6 +495,9 @@ public class PaintFrame extends Canvas implements Runnable{
 
 
 	private boolean clickedOnShape(int x, int y,MouseEvent e){
+		if (visGraph == null) {
+			return false;
+		}
 		Shape shape = visGraph.findShape(new Point2D(x, y));
 		if (shape!=null) {
 			if (e.getClickCount() == 2 && !e.isConsumed() && e.getButton() == MouseButton.PRIMARY) {
@@ -540,6 +549,9 @@ public class PaintFrame extends Canvas implements Runnable{
 	}
 
 	private  boolean clickedOnClosePropertyBox(int x, int y){
+		if (visGraph == null) {
+			return false;
+		}
 		for (Entry<String,Shape> entry : visGraph.shapeMap.entrySet()){
 			Shape shape = entry.getValue();
 			if ((shape instanceof VisClass) &&(shape.asVisClass().propertyBox!=null)){
