@@ -42,7 +42,7 @@ public class AutoCompletion {
             }
         });
 
-        editor.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
+        /*editor.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
             if (comboBox.isShowing()) comboBox.show();
             hitBackspace = false;
             if (e.getCode() == KeyCode.BACK_SPACE) {
@@ -52,17 +52,39 @@ public class AutoCompletion {
                 e.consume();
                 playBeepSound();
             }
-        });
+        });*/
+
+        editorKeyListener = e -> {
+            if (comboBox.isShowing()) comboBox.show();
+            hitBackspace = false;
+            if (e.getCode() == KeyCode.BACK_SPACE) {
+                hitBackspace = true;
+                hitBackspaceOnSelection = editor.getSelection().getStart() != editor.getSelection().getEnd();
+            } else if (e.getCode() == KeyCode.DELETE) {
+                e.consume();
+                playBeepSound();
+            }
+        };
 
         hidePopupOnFocusLoss = System.getProperty("java.version").startsWith("1.5");
 
-        editor.focusedProperty().addListener((obs, wasFocused, isFocused) -> {
+        /*editor.focusedProperty().addListener((obs, wasFocused, isFocused) -> {
             if (isFocused) {
                 highlightCompletedText(0);
             } else if (hidePopupOnFocusLoss) {
                 comboBox.hide();
             }
-        });
+        });*/
+
+        editorFocusListener = (obs, wasFocused, isFocused) -> {
+            if (isFocused) {
+                highlightCompletedText(0);
+            } else if (hidePopupOnFocusLoss) {
+                comboBox.hide();
+            }
+        };
+
+        editor.focusedProperty().addListener(editorFocusListener);
 
         configureEditor(comboBox.getEditor());
 
@@ -91,7 +113,7 @@ public class AutoCompletion {
             editor.focusedProperty().removeListener(editorFocusListener);        }
         
         if (newEditor != null) {
-            editor = comboBox.getEditor();
+            editor = newEditor;
             editor.addEventHandler(KeyEvent.KEY_PRESSED, editorKeyListener);
             editor.focusedProperty().addListener(editorFocusListener);
         }

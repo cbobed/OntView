@@ -225,7 +225,7 @@ public abstract class VisConnector {
 	// REVISAR
 	protected void drawPath(GraphicsContext gc, Path path) {
 		gc.beginPath();
-		for (PathElement element : path.getElements()) {
+		/*for (PathElement element : path.getElements()) {
 			if (element instanceof MoveTo moveTo) {
 				gc.moveTo(moveTo.getX(), moveTo.getY());
 			} else if (element instanceof LineTo lineTo) {
@@ -245,7 +245,7 @@ public abstract class VisConnector {
 			} else if (element instanceof ClosePath) {
 				gc.closePath();
 			}
-		}
+		}*/
 		gc.stroke();
 	}
    

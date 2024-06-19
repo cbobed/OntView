@@ -430,7 +430,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		if (loadOntologyCombo == null) {
 			loadOntologyCombo = new ComboBox<>();
 			loadOntologyCombo.setEditable(true);
-			loadReasonerCombo.setStyle("-fx-font-family: 'Dialog';" + "-fx-font-size: 10px;" +
+			loadOntologyCombo.setStyle("-fx-font-family: 'Dialog';" + "-fx-font-size: 10px;" +
 					"-fx-font-weight: normal;");
 			loadRecent();
 			loadOntologyCombo.setBorder(null);

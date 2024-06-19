@@ -6,7 +6,6 @@ import javafx.collections.ObservableList;
 import javafx.scene.Cursor;
 import javafx.scene.control.*;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -15,8 +14,6 @@ import javax.swing.*;
 //VS4E -- DO NOT REMOVE THIS LINE!
 public class VisInstance extends Dialog<Void> implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
 	private ListView<String> list0;
 	//private static final String PREFERRED_LOOK_AND_FEEL = "com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel";
 	public VisInstance() {
