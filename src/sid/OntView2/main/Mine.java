@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import javax.imageio.ImageIO;
+import java.net.URL;
 
 
 import javafx.application.Application;
@@ -17,6 +18,7 @@ import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -52,6 +54,7 @@ import sid.OntView2.utils.ExpressionManager;
 import uk.ac.manchester.cs.jfact.JFactFactory;
 
 import java.security.*;
+import java.util.Objects;
 import java.util.Optional;
 
 public class Mine extends Application implements Embedable{
@@ -113,6 +116,9 @@ public class Mine extends Application implements Embedable{
 		viewer.nTopPanel.setStyle("-fx-border-color: black; -fx-border-width: 1;");
 
 		Scene scene = new Scene(root, 800, 600);
+		
+		ClassLoader c = Thread.currentThread().getContextClassLoader();		
+		scene.getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
 		primaryStage.setScene(scene);
 		primaryStage.setMaximized(true);
 		primaryStage.show();

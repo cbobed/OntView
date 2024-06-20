@@ -7,7 +7,8 @@ public class VisConstants {
 	public static final String KCECOMBOOPTION3 = "KCE 20";
 	
 	public static final int CONNECTOROFFSET = 7;
-	
+
+	public static final int CONTAINER_SIZE = 100;
 	
 	final static int WIDTH_MARGIN        = 300;
     final static int HEIGHT_MARGIN       = 300;

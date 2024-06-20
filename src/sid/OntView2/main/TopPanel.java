@@ -4,7 +4,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.geometry.Dimension2D;
+import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
@@ -15,6 +18,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import org.semanticweb.owlapi.model.IRI;
 import sid.OntView2.common.*;
@@ -31,18 +35,18 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private ComboBox<Object> loadOntologyCombo;
 	private ComboBox<String> loadReasonerCombo;
 	private Button loadReasonerButton;
-	private Pane panelLoad;
+	private VBox panelLoad;
 	private CheckBox expandCheckBox;
-	private Pane panel1;
+	private VBox panelCheckBox;
 	private Button saveViewButton;
 	private Button restoreViewButton;
-	private Pane viewPanel;
+	private VBox viewPanel;
 	private Button saveImageButton;
 	private Button saveImagePartialButton;
 	private Label label0;
 	private ComboBox<String> comboBox;
 	private ComboBox<String> kceComboBox;
-	private Pane panel0;
+	private HBox panel0;
 	private Mine parent;
     static String  RESOURCE_BASE ;
 	private CheckBox Properties;
@@ -50,7 +54,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private Slider zoomSlider;
 	private CheckBox reduceCheckBox;
 	private Label reduceLabel;
-	private Pane mainPane;
+	private HBox mainPane;
 
 	public TopPanel(Mine pparent){
 		parent = pparent;
@@ -67,52 +71,45 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 	// REVISAR
 	private void initComponents() {
-		mainPane = new Pane();
-		mainPane.maxWidth(Double.MAX_VALUE);
-		mainPane.maxHeight(90);
+		mainPane = new HBox(10);
+		mainPane.setPadding(new Insets(10));
+		//mainPane.maxWidth(Double.MAX_VALUE);
+		//mainPane.maxHeight(90);
 		mainPane.setStyle("-fx-border-color: black; -fx-background-color: #e5e4e0; -fx-border-width: 1; -fx-border-style: solid;");
 
-		addComponent(mainPane, getPanelLoad(), 12, 10, 523, 78);
-		addComponent(mainPane, getZoomSlider(), 750, 2, 24, 94);
-		addComponent(mainPane, getPanel1(), 541, 10, 197, 78);
-		addComponent(mainPane, getSnapshotPanel(), 968, 2, 120, 51);
-		addComponent(mainPane, getPanel0(), 786, 54, 300, 34);
-		addComponent(mainPane, getViewPanel(), 786, 2, 179, 51);
+		VBox loadOntologyOptions = createLoadOntologyOptions();
+		VBox checkBoxPanel = getPanelCheckBox();
+		Slider zoomSlider = getZoomSlider();
+		VBox viewSnapshotPanel = getViewSnapshotPanel();
 
-		setWidth(1040);
-		setHeight(108);
+		mainPane.getChildren().addAll(loadOntologyOptions, checkBoxPanel, zoomSlider, viewSnapshotPanel);
+		mainPane.setAlignment(Pos.CENTER);
+		mainPane.setSpacing(20);
 
-		/*
-			// Define column constraints for responsive design
-            ColumnConstraints col1 = new ColumnConstraints();
-            col1.setPercentWidth(20); // Set percentage width for first column
-            ColumnConstraints col2 = new ColumnConstraints();
-            col2.setPercentWidth(80); // Set percentage width for second column
-            panel1.getColumnConstraints().addAll(col1, col2);
+		setWidth(1300);
+		setHeight(100);
 
-            // Define row constraints for responsive design
-            RowConstraints row1 = new RowConstraints();
-            row1.setVgrow(Priority.ALWAYS); // Allow row to grow vertically
-            RowConstraints row2 = new RowConstraints();
-            row2.setVgrow(Priority.ALWAYS);
-            RowConstraints row3 = new RowConstraints();
-            row3.setVgrow(Priority.ALWAYS);
-            panel1.getRowConstraints().addAll(row1, row2, row3);
-
-            // Add components to GridPane with specified positions
-            panel1.add(getPropertiesCheckBox(), 0, 0); // Columna 0, Fila 0
-            panel1.add(getExpandCheckBox(), 0, 1); // Columna 0, Fila 1
-            panel1.add(getRenderLabel(), 0, 2); // Columna 0, Fila 2
-            panel1.add(getQualifiedNames(), 1, 2); // Columna 1, Fila 2
-		 */
 	}
 
-	private Pane getSnapshotPanel() {
+	private VBox getSnapshotPanel() {
 		if (snapshotPanel == null) {
-			snapshotPanel = new Pane();
-			snapshotPanel.setStyle("-fx-border-color: blue; -fx-border-width: 1; -fx-border-radius: 5; -fx-border-style: solid;");
-			addComponent(snapshotPanel, getSaveImageButton(), 8, 0, 30, 26);
-			addComponent(snapshotPanel, getSaveImagePartialButton(), 45, 0, 30, 26);
+			snapshotPanel = new VBox();
+			snapshotPanel.setPadding(new Insets(5));
+
+			Text titleText = new Text("Snapshot");
+			titleText.setFill(Color.BLUE);
+			titleText.setFont(Font.font("Dialog", FontWeight.BOLD, FontPosture.ITALIC, 12));
+
+			StackPane titlePane = new StackPane();
+			titlePane.getChildren().add(titleText);
+			StackPane.setAlignment(titleText, Pos.TOP_LEFT);
+			titlePane.setPadding(new Insets(0, 0, 2, 0));
+
+			HBox row = createRow(getSaveImageButton(), getSaveImagePartialButton());
+			row.setAlignment(Pos.CENTER);
+
+			snapshotPanel.getChildren().addAll(titlePane, row);
+			snapshotPanel.getStyleClass().add("container");
 
 		}
 		return snapshotPanel;
@@ -122,6 +119,10 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		System.out.println("getSaveImagePartialButton");
 		if (saveImagePartialButton == null) {
 			saveImagePartialButton = new Button();
+			saveImagePartialButton.getStyleClass().add("button");
+			saveImagePartialButton.setCursor(Cursor.HAND);
+			saveImagePartialButton.setMinWidth(60);
+
 			ClassLoader c = Thread.currentThread().getContextClassLoader();
 			Image image = new Image(Objects.requireNonNull(c.getResourceAsStream("saveImageParcial.JPG")));
 			saveImagePartialButton.setGraphic(new ImageView(image));
@@ -133,9 +134,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 	private CheckBox getQualifiedNames() {
 		if (qualifiedNames == null) {
-			qualifiedNames = new CheckBox();
-			qualifiedNames.setFont(Font.font("Dialog", FontWeight.NORMAL, 10));
-			qualifiedNames.setText("qualified names");
+			qualifiedNames = new CheckBox("qualified names");
+			qualifiedNames.setCursor(Cursor.HAND);
 			// TODO Auto-generated method stub
 			qualifiedNames.setOnAction(this::qualifiedNamesActionActionPerformed);
 		}
@@ -151,9 +151,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 	private CheckBox getRenderLabel() {
 		if (renderLabel == null) {
-			renderLabel = new CheckBox();
-			renderLabel.setFont(Font.font("Dialog", FontWeight.NORMAL, 10));
-			renderLabel.setText("label");
+			renderLabel = new CheckBox("label");
+			renderLabel.setCursor(Cursor.HAND);
 			renderLabel.setOnAction(this::renderLabelActionActionPerformed);
 		}
 		return renderLabel;
@@ -171,6 +170,10 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			zoomSlider.setBlockIncrement(3);
 			zoomSlider.setOrientation(Orientation.VERTICAL);
 			zoomSlider.setFocusTraversable(true);
+			zoomSlider.getStyleClass().add("zoom-slider");
+			zoomSlider.setPrefHeight(VisConstants.CONTAINER_SIZE);
+			zoomSlider.setMinHeight(VisConstants.CONTAINER_SIZE);
+			zoomSlider.setMaxHeight(VisConstants.CONTAINER_SIZE);
 			zoomSlider.valueProperty().addListener((obs, oldVal, newVal) -> zoomSliderChangeStateChanged(newVal));
 		}
 		return zoomSlider;
@@ -178,12 +181,14 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private Button getfileSystemButton() {
 		if (fileSystemButton == null) {
 			fileSystemButton = new Button();
+			fileSystemButton.getStyleClass().add("button");
+			fileSystemButton.setCursor(Cursor.HAND);
 
 			ClassLoader c = Thread.currentThread().getContextClassLoader();
 			Image icon = new Image(Objects.requireNonNull(c.getResourceAsStream("folder.png")));
 			ImageView imageView = new ImageView(icon);
-			imageView.setFitWidth(17);
-			imageView.setFitHeight(17);
+			imageView.setFitWidth(15);
+			imageView.setFitHeight(15);
 			imageView.setPreserveRatio(true);
 			fileSystemButton.setGraphic(imageView);
 			fileSystemButton.setOnAction(this::fileSystemButtonActionActionPerformed);
@@ -192,19 +197,21 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	}
 	private CheckBox getPropertiesCheckBox() {
 		if (Properties == null) {
-			Properties = new CheckBox();
-			Properties.setFont(Font.font("Dialog", FontWeight.NORMAL, 10));
+			Properties = new CheckBox("properties");
 			Properties.setText("properties");
+			Properties.setCursor(Cursor.HAND);
 			Properties.setOnAction(this::PropertiesActionActionPerformed);
 		}
 		return Properties;
 	}
-	private Pane getPanel0() {
+	private HBox getPanel0() {
 		if (panel0 == null) {
-			panel0 = new Pane();
-			panel0.setStyle("-fx-border-color: #a9a9a9; -fx-border-width: 1; -fx-border-style: solid;");
-			addComponent(panel0, getLabel0(), 8, 1, 22, 24);
-			addBilateralComponent(panel0, getComboBox0(), 39, 12, 4, 21);
+			panel0 = new HBox();
+			panel0.setPadding(new Insets(5));
+			panel0.setSpacing(5);
+			panel0.getStyleClass().add("container");
+
+			panel0.getChildren().addAll(getLabel0(), getComboBox0());
 		}
 		return panel0;
 	}
@@ -213,12 +220,12 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			comboBox = new ComboBox<>();
 			AutoCompletion.enable(comboBox);
 			comboBox.setEditable(true);
-			comboBox.setStyle("-fx-font-family: 'Dialog';" + "-fx-font-size: 10px;" +
-							"-fx-font-weight: bold;" + "-fx-text-fill: blue;");
+			comboBox.getStyleClass().add("custom-combo-box");
 
 			ObservableList<String> items = FXCollections.observableArrayList();
 			comboBox.setItems(items);
-			comboBox.setBorder(null);
+			HBox.setHgrow(comboBox, Priority.ALWAYS);
+			comboBox.setMaxWidth(Double.MAX_VALUE);
 
 			comboBox.valueProperty().addListener((options, oldValue, newValue) -> {
 				comboBox0ItemItemStateChanged(newValue);
@@ -228,26 +235,44 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		return comboBox;
 	}
 
-
 	private ComboBox<String> getKceComboBox() {
 		if (kceComboBox == null) {
 			kceComboBox = new ComboBox<>();
 			AutoCompletion.enable(kceComboBox);
 			kceComboBox.setEditable(true);
-			kceComboBox.setStyle("-fx-font-family: 'Dialog';" + "-fx-font-size: 10px;" +
-					"-fx-font-weight: bold;" + "-fx-text-fill: blue;");
+			kceComboBox.setPromptText("Select KCE");
+			kceComboBox.getStyleClass().add("custom-combo-box");
 
-			ObservableList<String> items = FXCollections.observableArrayList();
+			ObservableList<String> items = FXCollections.observableArrayList(VisConstants.KCECOMBOOPTION1,
+					VisConstants.KCECOMBOOPTION2, VisConstants.KCECOMBOOPTION3);
 			kceComboBox.setItems(items);
-			kceComboBox.setBorder(null);
+			HBox.setHgrow(kceComboBox, Priority.ALWAYS);
+			kceComboBox.setMaxWidth(Double.MAX_VALUE);
 
-			fillKceComboBox(items);
+			//fillKceComboBox(items);
 			if (parent.artPanel!=null) {
 				parent.artPanel.setKceOption((String)getKceComboBox().getItems().get(0));
 			}
 			kceComboBox.setOnAction(this::kceItemItemStateChanged);
 		}
 		return kceComboBox;
+	}
+
+	private VBox getViewSnapshotPanel() {
+		VBox viewPanel = getViewPanel();
+		VBox snapshotPanel = getSnapshotPanel();
+
+		HBox firstRow = new HBox(10, viewPanel, snapshotPanel);
+		VBox combinedPanel = createContainer(false, firstRow, getPanel0());
+		combinedPanel.setPrefHeight(VisConstants.CONTAINER_SIZE);
+		combinedPanel.setMinHeight(VisConstants.CONTAINER_SIZE);
+		combinedPanel.setMaxHeight(VisConstants.CONTAINER_SIZE);
+
+		/*
+		// COMBOBOX
+	    addComponent(mainPane, getPanel0(), 1100, 10, 300, 78);  // Ajustado*/
+
+		return combinedPanel;
 	}
 
 	private void fillKceComboBox(ObservableList<String> items){
@@ -276,9 +301,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 	private CheckBox getExpandCheckBox() {
 		if (expandCheckBox == null) {
-			expandCheckBox = new CheckBox();
-			expandCheckBox.setFont(Font.font("Dialog", FontWeight.NORMAL, 10));
-			expandCheckBox.setText("expand");
+			expandCheckBox = new CheckBox("expand");
+			expandCheckBox.setCursor(Cursor.HAND);
 			expandCheckBox.setOnAction(this::expandCheckBoxActionActionPerformed);
 		}
 		return expandCheckBox;
@@ -286,10 +310,11 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 	public Button getLoadReasonerButton() {
 		if (loadReasonerButton == null) {
-			loadReasonerButton = new Button();
+			loadReasonerButton = new Button("Sync");
+			loadReasonerButton.setMinWidth(80);
+			loadReasonerButton.setCursor(Cursor.HAND);
 			loadReasonerButton.setFont(Font.font("Dialog", FontWeight.NORMAL, 10));
-			loadReasonerButton.setStyle("-fx-text-fill: blue;");
-			loadReasonerButton.setText("Sync");
+			loadReasonerButton.getStyleClass().add("button");
 			loadReasonerButton.setOnAction(this::loadReasonerButtonActionActionPerformed);
 		}
 		return loadReasonerButton;
@@ -305,22 +330,42 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		return reduceLabel;
 	}
 
-	private Pane getPanelLoad() {
-		if (panelLoad == null) {
-			panelLoad = new Pane();
-			panelLoad.setStyle("-fx-border-color: #a9a9a9; -fx-border-width: 1; -fx-border-style: solid;");
+	private VBox createLoadOntologyOptions() {
+		if (panelLoad == null ) {
+			ComboBox<Object> urlComboBox = getOntologyCombo();
+			Button loadOntologyButton = getLoadOntologyButton();
+			Button folderOntologyButton = getfileSystemButton();
 
-			addComponent(panelLoad, getfileSystemButton(), 404, 12, 24, 23);
-			addComponent(panelLoad, getOntologyCombo(), 10, 12, 388, 23);
-			addComponent(panelLoad, getLoadOntologyButton(), 434, 12, 24, 23);
-			addComponent(panelLoad, getLoadReasonerButton(), 440, 45, 71, 23);
-			addComponent(panelLoad, getReasonerCombo(), 10, 45, 358, 23);
-			// addComponent(pane, getReduceCheckBox(), 407, 44, 24, 15);
-			// addComponent(pane, getReduceLabel(), 403, 52, 40, 23);
-			addComponent(panelLoad, getKceComboBox(), 373, 45, 60, 23);
+			ComboBox<String> reasonerComboBox = getReasonerCombo();
+			ComboBox<String> kceComboBox = getKceComboBox();
+			Button syncButton = getLoadReasonerButton();
 
+			HBox row1 = createRow(urlComboBox, folderOntologyButton, loadOntologyButton);
+			HBox row2 = createRow(reasonerComboBox, kceComboBox, syncButton);
+
+			panelLoad = createContainer(true, row1, row2);
 		}
 		return panelLoad;
+	}
+
+	private HBox createRow(Node... children) {
+		HBox row = new HBox(5);
+		row.getChildren().addAll(children);
+		return row;
+	}
+
+	private VBox createContainer(boolean applyStyle, Node... children) {
+		VBox container = new VBox(7);
+		container.getChildren().addAll(children);
+		container.setPadding(new Insets(5));
+		if (applyStyle) {
+			container.getStyleClass().add("container");
+		}
+		container.setPrefHeight(VisConstants.CONTAINER_SIZE);
+		container.setMinHeight(VisConstants.CONTAINER_SIZE);
+		container.setMaxHeight(VisConstants.CONTAINER_SIZE);
+		container.setAlignment(Pos.CENTER);
+		return container;
 	}
 
 	private CheckBox getReduceCheckBox() {
@@ -335,6 +380,10 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private Button getSaveImageButton() {
 		if (saveImageButton == null) {
 			saveImageButton = new Button();
+			saveImageButton.getStyleClass().add("button");
+			saveImageButton.setCursor(Cursor.HAND);
+			saveViewButton.setMinWidth(60);
+
 			ClassLoader c = Thread.currentThread().getContextClassLoader();
 			Image image = new Image(Objects.requireNonNull(c.getResourceAsStream("saveImage.JPG")));
 			saveImageButton.setGraphic(new ImageView(image));
@@ -343,75 +392,71 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		return saveImageButton;
 	}
 
-	private Pane getViewPanel() {
+	private VBox getViewPanel() {
 		if (viewPanel == null) {
-			viewPanel = new HBox(10);
+			viewPanel = new VBox();
+			viewPanel.setPadding(new Insets(5));
 
-			TitledPane titledPane = new TitledPane();
-			titledPane.setText("View");
-			titledPane.setFont(Font.font("Dialog", FontWeight.BOLD, FontPosture.ITALIC, 10));
-			titledPane.setCollapsible(false);
+			Text titledPane = new Text("View");
+			titledPane.setFill(Color.BLUE);
+			titledPane.setFont(Font.font("Dialog", FontWeight.BOLD, FontPosture.ITALIC, 12));
 
-			BorderStroke borderStroke = new BorderStroke(Color.BLUE, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT);
-			titledPane.setBorder(new Border(borderStroke));
+			StackPane titlePane = new StackPane();
+			titlePane.getChildren().add(titledPane);
+			StackPane.setAlignment(titledPane, Pos.TOP_LEFT);
+			titlePane.setPadding(new Insets(0, 0, 4, 0));
 
-			// Crear un nuevo HBox que contenga los botones
-			Pane contentBox = new Pane();
-			addComponent(contentBox, getSaveViewButton(), 6, -4, 76, 28);
-			addComponent(contentBox, getRestoreViewButton(), 88, -4, 76, 28);
+			HBox row = createRow(getSaveViewButton(), getRestoreViewButton());
+			row.setAlignment(Pos.CENTER);
 
-			//contentBox.getChildren().addAll(getSaveViewButton(), getRestoreViewButton());
-
-			// Establecer el nuevo HBox como el contenido del TitledPane
-			titledPane.setContent(contentBox);
-
-			// Agregar el TitledPane al viewPanel
-			viewPanel.getChildren().add(titledPane);
-
-
+			viewPanel.getChildren().addAll(titlePane, row);
+			viewPanel.getStyleClass().add("container");
 
 		}
 		return viewPanel;
 	}
 	private Button getRestoreViewButton() {
 		if (restoreViewButton == null) {
-			restoreViewButton = new Button();
-			restoreViewButton.setFont(Font.font("Dialog", FontWeight.NORMAL, 10));
-			restoreViewButton.setStyle("-fx-text-fill: blue;");
-			restoreViewButton.setText("Restore");
+			restoreViewButton = new Button("Restore");
+			restoreViewButton.getStyleClass().add("button");
+			restoreViewButton.setMinWidth(70);
+			restoreViewButton.setCursor(Cursor.HAND);
 			restoreViewButton.setOnAction(this::restoreViewButtonActionActionPerformed);
 		}
 		return restoreViewButton;
 	}
 	private Button getSaveViewButton() {
 		if (saveViewButton == null) {
-			saveViewButton = new Button();
-			saveViewButton.setFont(Font.font("Dialog", FontWeight.NORMAL, 10));
-			saveViewButton.setStyle("-fx-text-fill: blue;");
-			saveViewButton.setText("Save");
+			saveViewButton = new Button("Save");
+			saveViewButton.getStyleClass().add("button");
+			saveViewButton.setMinWidth(70);
+			saveViewButton.setCursor(Cursor.HAND);
 			saveViewButton.setOnAction(this::saveViewButtonActionActionPerformed);
 		}
 		return saveViewButton;
 	}
-	private Pane getPanel1() {
-		if (panel1 == null) {
-			panel1 = new Pane();
-			panel1.setStyle("-fx-border-color: black; -fx-border-width: 1; -fx-border-style: solid;");
+	private VBox getPanelCheckBox() {
+		if (panelCheckBox == null) {
+			panelCheckBox = new VBox();
+			//panelCheckBox.setStyle("-fx-border-color: black; -fx-border-width: 1; -fx-border-style: solid;");
 
-			addComponent(panel1, getPropertiesCheckBox(), 8.0, 6.0, 8, 10);
-			addComponent(panel1, getExpandCheckBox(), 8.0, 27.0, 8, 8);
-			addComponent(panel1, getRenderLabel(), 8.0, 45.0, 8, 8);
-			addComponent(panel1, getQualifiedNames(), 86.0, 45.0, 10, 8);
+			HBox row1 = createRow(getPropertiesCheckBox(), getExpandCheckBox());
+			HBox row2 = createRow(getRenderLabel(), getQualifiedNames());
+
+			panelCheckBox = createContainer(true, row1, row2);
+			panelCheckBox.setSpacing(20);
+			panelCheckBox.setMinWidth(200);
 		}
-		return panel1;
+		return panelCheckBox;
 	}
 
 	private Button getLoadOntologyButton() {
 		if (loadOntologyButton == null) {
-			loadOntologyButton = new Button();
+			loadOntologyButton = new Button("Load Ont");
+			loadOntologyButton.setCursor(Cursor.HAND);
 			loadOntologyButton.setFont(Font.font("Dialog", FontWeight.NORMAL, 10));
-			loadOntologyButton.setStyle("-fx-text-fill: blue;");
-			loadOntologyButton.setText("Load Ont");
+			loadOntologyButton.getStyleClass().add("button");
+			loadOntologyButton.setMinWidth(100);
 			loadOntologyButton.setOnAction(this::OntologyButtonActionActionPerformed);
 		}
 		return loadOntologyButton;
@@ -419,12 +464,13 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 	public ComboBox<String> getReasonerCombo() {
 		if (loadReasonerCombo == null) {
-			loadReasonerCombo = new ComboBox<>();
+			loadReasonerCombo = new ComboBox<>(FXCollections.observableArrayList("Pellet", "JFact", "Elk", "Jcel"));
 			loadReasonerCombo.setEditable(true);
-			loadReasonerCombo.setStyle("-fx-font-family: 'Dialog';" + "-fx-font-size: 10px;" +
-					"-fx-font-weight: normal;");
-			loadReasonerCombo.setItems(FXCollections.observableArrayList("Pellet", "JFact", "Elk", "Jcel"));
-			loadReasonerCombo.setBorder(null);
+			loadReasonerCombo.setPromptText("Select reasoner");
+			loadReasonerCombo.getStyleClass().add("custom-combo-box");
+			HBox.setHgrow(loadReasonerCombo, Priority.ALWAYS);
+			loadReasonerCombo.setMaxWidth(Double.MAX_VALUE);
+			//loadReasonerCombo.setBorder(null);
 			loadReasonerCombo.setDisable(true);
 		}
 		return loadReasonerCombo;
@@ -433,11 +479,13 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		if (loadOntologyCombo == null) {
 			loadOntologyCombo = new ComboBox<>();
 			loadOntologyCombo.setEditable(true);
-			loadOntologyCombo.setStyle("-fx-font-family: 'Dialog';" + "-fx-font-size: 10px;" +
-					"-fx-font-weight: normal;");
+			loadOntologyCombo.setPromptText("Enter URL or select from file system");
+			loadOntologyCombo.getStyleClass().add("custom-combo-box");
 			loadRecent();
-			loadOntologyCombo.setBorder(null);
-			loadOntologyCombo.setDisable(true);
+			HBox.setHgrow(loadOntologyCombo, Priority.ALWAYS);
+			loadOntologyCombo.setMaxWidth(Double.MAX_VALUE);
+			//loadOntologyCombo.setBorder(null);
+			loadOntologyCombo.setDisable(false);
 		}
 		return loadOntologyCombo;
 	}
@@ -633,7 +681,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	Dimension2D size = null;
 	private CheckBox renderLabel;
 	private CheckBox qualifiedNames;
-	private Pane snapshotPanel;
+	private VBox snapshotPanel;
 
 	private void zoomSliderChangeStateChanged(Number newValue) {
 		if (parent.artPanel!=null) {
