@@ -11,6 +11,7 @@ import java.net.URL;
 import javafx.application.Application;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
+import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
@@ -108,9 +109,9 @@ public class Mine extends Application implements Embedable{
 		viewer.scroll = new ScrollPane(viewer.artPanel);
 
 		VBox root = new VBox();
+		root.getChildren().addAll(viewer.nTopPanel.getMainPane(), viewer.scroll);
 		VBox.setVgrow(viewer.scroll, Priority.ALWAYS);
-		root.getChildren().add(viewer.nTopPanel.getMainPane());
-		root.getChildren().add(viewer.scroll);
+
 
 		viewer.artPanel.setStyle("-fx-background-color: white;");
 		viewer.nTopPanel.setStyle("-fx-border-color: black; -fx-border-width: 1;");
@@ -249,79 +250,6 @@ public class Mine extends Application implements Embedable{
 	public void applyRenaming(){
 		SIDClassExpressionNamer renamer = new SIDClassExpressionNamer(activeOntology, reasoner);
 		renamer.applyNaming(true);
-	}
-    /*public void refreshOntology (String ontologyString, String reasonerString) {
-
-    	 AccessController.doPrivileged(new RefreshingAction(ontologyString, reasonerString));
-
-    }*/
-
-	class RefreshingAction implements PrivilegedAction {
-		String ontologyString;
-		String reasonerString;
-
-		public RefreshingAction(String ontologyString, String reasonerString) {
-			this.ontologyString = ontologyString;
-			this.reasonerString = reasonerString;
-		}
-
-		public Object run() {
-
-			loadActiveOntology(IRI.create(ontologyString));
-			if (activeOntology != null) {
-				nTopPanel.getOntologyCombo().setValue(ontologyString);
-				nTopPanel.getLoadReasonerButton().setDisable(false);
-				nTopPanel.getReasonerCombo().setDisable(false);
-				if (artPanel != null){
-					artPanel.setActiveOntolgySource(ontologyString);
-				}
-				loadReasoner(reasonerString);
-				createButtonAction();
-
-			}
-			else {
-				System.err.println("Can't load ontology");
-			}
-
-			return null;
-		}
-	}
-    /*
-    public void refreshOntologyFromString(String ontologyString, String reasonerString) {
-    	 AccessController.doPrivileged(new RefreshingFromStringAction(ontologyString, reasonerString));
-    }*/
-
-	class RefreshingFromStringAction implements PrivilegedAction {
-		String ontologyString;
-		String reasonerString;
-
-		public RefreshingFromStringAction(String ontologyString, String reasonerString) {
-			this.ontologyString = ontologyString;
-			this.reasonerString = reasonerString;
-		}
-
-		public Object run() {
-
-			loadActiveOntologyFromString(ontologyString);
-			if (activeOntology != null) {
-				nTopPanel.getOntologyCombo().setValue(activeOntology.getOntologyID().getOntologyIRI());
-				nTopPanel.getLoadReasonerButton().setDisable(false);
-				nTopPanel.getReasonerCombo().setDisable(false);
-				if (artPanel != null){
-					artPanel.setActiveOntolgySource(ontologyString);
-				}
-
-				loadReasoner(reasonerString);
-
-				createButtonAction();
-
-			}
-			else {
-				System.err.println("Can't load ontology");
-			}
-
-			return null;
-		}
 	}
 
 

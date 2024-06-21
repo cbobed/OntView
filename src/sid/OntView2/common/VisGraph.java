@@ -8,8 +8,8 @@ import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 import org.xml.sax.SAXException;
-import sid.OntView.utils.ExpressionManager;
-import sid.OntView.utils.ProgressBarDialogThread;
+import sid.OntView2.utils.ExpressionManager;
+import sid.OntView2.utils.ProgressBarDialogThread;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;

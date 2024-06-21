@@ -276,7 +276,7 @@ public class VisClass extends Shape {
 		 
 			    //rectangle
 			    g.strokeRect(x -  (double) getWidth() /2, y - (double) currentHeight /2,  getWidth()-1, currentHeight-1);
-			    g.setFill(Color.LIGHTGRAY);
+			    g.setFill(Color.BLACK);
 			    if (propertyBox!=null){
 			    	g.fillRect(x -  (double) getWidth() /2, y + (double) currentHeight /2, getWidth()-1, 6);
 			    	g.setStroke(Color.BLACK);

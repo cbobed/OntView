@@ -116,7 +116,6 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	}
 
 	private Button getSaveImagePartialButton() {
-		System.out.println("getSaveImagePartialButton");
 		if (saveImagePartialButton == null) {
 			saveImagePartialButton = new Button();
 			saveImagePartialButton.getStyleClass().add("button");
@@ -243,13 +242,19 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			kceComboBox.setPromptText("Select KCE");
 			kceComboBox.getStyleClass().add("custom-combo-box");
 
-			ObservableList<String> items = FXCollections.observableArrayList(VisConstants.KCECOMBOOPTION1,
-					VisConstants.KCECOMBOOPTION2, VisConstants.KCECOMBOOPTION3);
+			ObservableList<String> items = FXCollections.observableArrayList(
+					VisConstants.KCECOMBOOPTION1,
+					VisConstants.KCECOMBOOPTION2,
+					VisConstants.KCECOMBOOPTION3);
 			kceComboBox.setItems(items);
+
 			HBox.setHgrow(kceComboBox, Priority.ALWAYS);
 			kceComboBox.setMaxWidth(Double.MAX_VALUE);
 
-			//fillKceComboBox(items);
+			if (!items.isEmpty()) {
+				kceComboBox.setValue(items.get(0));
+			}
+
 			if (parent.artPanel!=null) {
 				parent.artPanel.setKceOption((String)getKceComboBox().getItems().get(0));
 			}
@@ -267,10 +272,6 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		combinedPanel.setPrefHeight(VisConstants.CONTAINER_SIZE);
 		combinedPanel.setMinHeight(VisConstants.CONTAINER_SIZE);
 		combinedPanel.setMaxHeight(VisConstants.CONTAINER_SIZE);
-
-		/*
-		// COMBOBOX
-	    addComponent(mainPane, getPanel0(), 1100, 10, 300, 78);  // Ajustado*/
 
 		return combinedPanel;
 	}
@@ -468,7 +469,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			loadReasonerCombo.setEditable(true);
 			loadReasonerCombo.setPromptText("Select reasoner");
 			loadReasonerCombo.getStyleClass().add("custom-combo-box");
-			HBox.setHgrow(loadReasonerCombo, Priority.ALWAYS);
+			//HBox.setHgrow(loadReasonerCombo, Priority.ALWAYS);
 			loadReasonerCombo.setMaxWidth(Double.MAX_VALUE);
 			//loadReasonerCombo.setBorder(null);
 			loadReasonerCombo.setDisable(true);
@@ -482,7 +483,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			loadOntologyCombo.setPromptText("Enter URL or select from file system");
 			loadOntologyCombo.getStyleClass().add("custom-combo-box");
 			loadRecent();
-			HBox.setHgrow(loadOntologyCombo, Priority.ALWAYS);
+			//HBox.setHgrow(loadOntologyCombo, Priority.ALWAYS);
 			loadOntologyCombo.setMaxWidth(Double.MAX_VALUE);
 			//loadOntologyCombo.setBorder(null);
 			loadOntologyCombo.setDisable(false);
@@ -566,6 +567,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		
 		}	
 	}
+
 	private void expandCheckBoxActionActionPerformed(ActionEvent event) {
 		if (!getExpandCheckBox().isSelected()) {
 			parent.check=true;

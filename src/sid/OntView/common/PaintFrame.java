@@ -569,6 +569,9 @@ public class PaintFrame extends JPanel implements MouseListener,Runnable,MouseMo
         	int h  = (int) (shape.getHeight()/2*factor);
         	int vw = (int) (visible.getWidth());
         	int vh = (int) (visible.getHeight());
+
+			System.out.println("x: "+x+" y: "+y+" w: "+w+" h: "+h+" vw: "+vw+" vh: "+vh);
+
         	paintFrame.scrollRectToVisible(new Rectangle(x-w-vw/2, y-h-vh/2,vw,vh));
         }
        

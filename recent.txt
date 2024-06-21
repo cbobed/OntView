@@ -1,3 +1,4 @@
+file:/home/carlota/Desktop/TFG/ontologias/mascotas.owl
 http://www.co-ode.org/ontologies/pizza/pizza.owl
 http://horus.cps.unizar.es:18080/ontology/support.owl
 http://horus.cps.unizar.es:18080/ontology/myOntology.owl
@@ -12,4 +13,3 @@ http://protege.cim3.net/file/pub/ontologies/koala/koala.owl
 http://sid.cps.unizar.es/ontologies/semanticGranules.owl
 http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl
 http://ontology.dumontierlab.com/physics-primitive
-http://www.ordnancesurvey.co.uk/ontology/BuildingsAndPlaces/v1.1/BuildingsAndPlaces.owl

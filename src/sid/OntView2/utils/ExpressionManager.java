@@ -1,22 +1,59 @@
 package sid.OntView2.utils;
 
-import org.coode.xml.OWLOntologyXMLNamespaceManager;
-import org.semanticweb.owlapi.model.*;
-import sid.OntView.common.OntViewConstants;
-
 import java.util.Set;
+
+import org.coode.xml.OWLOntologyXMLNamespaceManager;
+import org.semanticweb.owlapi.model.ClassExpressionType;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLDataAllValuesFrom;
+import org.semanticweb.owlapi.model.OWLDataComplementOf;
+import org.semanticweb.owlapi.model.OWLDataExactCardinality;
+import org.semanticweb.owlapi.model.OWLDataHasValue;
+import org.semanticweb.owlapi.model.OWLDataIntersectionOf;
+import org.semanticweb.owlapi.model.OWLDataMaxCardinality;
+import org.semanticweb.owlapi.model.OWLDataMinCardinality;
+import org.semanticweb.owlapi.model.OWLDataOneOf;
+import org.semanticweb.owlapi.model.OWLDataProperty;
+import org.semanticweb.owlapi.model.OWLDataPropertyExpression;
+import org.semanticweb.owlapi.model.OWLDataRange;
+import org.semanticweb.owlapi.model.OWLDataSomeValuesFrom;
+import org.semanticweb.owlapi.model.OWLDataUnionOf;
+import org.semanticweb.owlapi.model.OWLDatatype;
+import org.semanticweb.owlapi.model.OWLDatatypeRestriction;
+import org.semanticweb.owlapi.model.OWLFacetRestriction;
+import org.semanticweb.owlapi.model.OWLIndividual;
+import org.semanticweb.owlapi.model.OWLLiteral;
+import org.semanticweb.owlapi.model.OWLObjectAllValuesFrom;
+import org.semanticweb.owlapi.model.OWLObjectComplementOf;
+import org.semanticweb.owlapi.model.OWLObjectExactCardinality;
+import org.semanticweb.owlapi.model.OWLObjectHasSelf;
+import org.semanticweb.owlapi.model.OWLObjectHasValue;
+import org.semanticweb.owlapi.model.OWLObjectIntersectionOf;
+import org.semanticweb.owlapi.model.OWLObjectMaxCardinality;
+import org.semanticweb.owlapi.model.OWLObjectMinCardinality;
+import org.semanticweb.owlapi.model.OWLObjectOneOf;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
+import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
+import org.semanticweb.owlapi.model.OWLObjectUnionOf;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+
+import sid.OntView2.common.OntViewConstants;
 
 public class ExpressionManager {
 	
-	public static OWLOntologyXMLNamespaceManager manager = null; 
-	public static String currentOntologyIRI = null; 
+	public static OWLOntologyXMLNamespaceManager manager = null;
+	public static String currentOntologyIRI = null;
 	
-	public static void setNamespaceManager (OWLOntologyManager om, OWLOntology o) {
-		manager = new OWLOntologyXMLNamespaceManager(om, o); 
-		currentOntologyIRI = o.getOntologyID().getOntologyIRI().toString(); 
+	public static void setNamespaceManager(OWLOntologyManager om, OWLOntology o) {
+		manager = new OWLOntologyXMLNamespaceManager(om, o);
+		currentOntologyIRI = o.getOntologyID().getOntologyIRI().toString();
 	}
 	
-	public static OWLOntologyXMLNamespaceManager getNamespaceManager () {
+	public static OWLOntologyXMLNamespaceManager getNamespaceManager() {
 		return manager; 
 	}
 	
@@ -236,7 +273,7 @@ public class ExpressionManager {
 					  OWLObjectOneOf oneOf = (OWLObjectOneOf) o;
 					  i = 1;
 					  for (OWLIndividual op :oneOf.getIndividuals()) {
-						  reduced += obtainQualifiedEntityNameFromIRI(op.asOWLNamedIndividual().getIRI()); 
+						  reduced += obtainQualifiedEntityNameFromIRI(op.asOWLNamedIndividual().getIRI());
 						  if (i<oneOf.getIndividuals().size()) {  
 							  reduced+=",\n";
 							  for (int j=0; j<level; j++) {
@@ -504,9 +541,9 @@ public class ExpressionManager {
 		}
 	}
 
-	public static String getReducedQualifiedObjectPropertyExpression (OWLObjectPropertyExpression e){
+	public static String getReducedQualifiedObjectPropertyExpression(OWLObjectPropertyExpression e){
 		if (e instanceof OWLObjectProperty) {
-			return obtainQualifiedEntityNameFromIRI(e.asOWLObjectProperty().getIRI()); 
+			return obtainQualifiedEntityNameFromIRI(e.asOWLObjectProperty().getIRI());
 		}
 		else 
 			return e.toString();
@@ -576,7 +613,7 @@ public class ExpressionManager {
 	}
 	
 	public static String obtainQualifiedEntityNameFromIRI(IRI iri) {
-		if (manager == null) System.out.println("manager null"); 
+		if (manager == null) System.out.println("manager null");
 		else if (iri == null) System.out.println(" iri null"); 
 		return manager.getQName(iri.toString()); 
 	}

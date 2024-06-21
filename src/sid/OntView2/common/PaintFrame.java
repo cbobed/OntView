@@ -199,7 +199,7 @@ public class PaintFrame extends Canvas implements Runnable{
 		visGraph.setReasoner(reasoner);
 
 		new Thread(visGraph).start();
-		paintFrame.setCursor(Cursor.WAIT); //DUDA
+		paintFrame.setCursor(Cursor.WAIT);
 
 		visGraph.addObserver(new ProgressBarDialogThread(this));
 
@@ -359,26 +359,32 @@ public class PaintFrame extends Canvas implements Runnable{
 		}
 		else {
 			double scrollX,scrollY;
-			Bounds visibleBounds = scroll.getViewportBounds();
+			Rectangle2D visibleRect = getVisibleRect();
 
 			if (draggedX < 0) {
-				scrollX = scroll.getHvalue() * (getWidth() - visibleBounds.getWidth()) - draggedX * 2;
+				scrollX = visibleRect.getMinX()* (visibleRect.getWidth() - draggedX * 2);
 			} else {
-				scrollX = scroll.getHvalue() * (getWidth() - visibleBounds.getWidth()) - draggedX;
+				scrollX = visibleRect.getMinX() - draggedX;
 			}
 
 			if (draggedY < 0) {
-				scrollY = scroll.getVvalue() * (getHeight() - visibleBounds.getHeight()) - draggedY * 2;
+				scrollY = visibleRect.getMinY() + visibleRect.getWidth() - draggedY * 2;
 			} else {
-				scrollY = scroll.getVvalue() * (getHeight() - visibleBounds.getHeight()) - draggedY;
+				scrollY = visibleRect.getMinY() - draggedY;
 			}
 
-			scrollX = Math.max(0, Math.min(scrollX / (getWidth() - visibleBounds.getWidth()), 1));
-			scrollY = Math.max(0, Math.min(scrollY / (getHeight() - visibleBounds.getHeight()), 1));
-
-			scroll.setHvalue(scrollX);
-			scroll.setVvalue(scrollY);
+			Rectangle rect = new Rectangle(scrollX, scrollY, 1, 1);
+			scrollRectToVisible(rect);
 		}
+	}
+
+	private void scrollRectToVisible(Rectangle rect) {
+		Bounds bounds = rect.getBoundsInParent();
+		double dx = bounds.getMinX() - paintFrame.getLayoutX();
+		double dy = bounds.getMinY() - paintFrame.getLayoutY();
+
+		paintFrame.setLayoutX(paintFrame.getLayoutX() - dx);
+		paintFrame.setLayoutY(paintFrame.getLayoutY() - dy);
 	}
 
 	public void handleMouseMoved(MouseEvent e) {
@@ -570,20 +576,29 @@ public class PaintFrame extends Canvas implements Runnable{
 		 * focus the frame on the shape pos
 		 * If shapeKey is  null, it will look for it
 		 */
-		Shape shape = pshape;
-		if (shape == null)
-			shape = visGraph.getShape(shapeKey);
+		Shape shape = pshape != null ? pshape : visGraph.getShape(shapeKey);
+
 		if (shape!= null) {
 			int x  = (int) (shape.getPosX()*factor);
 			int y  = (int) (shape.getPosY()*factor);
 			int w  = (int) (shape.getWidth()/2*factor);
 			int h  = (int) (shape.getHeight()/2*factor);
 
-			double scrollX = x - w - scroll.getViewportBounds().getWidth() / 2;
-			double scrollY = y - h - scroll.getViewportBounds().getHeight() / 2;
+			double viewportWidth = paintFrame.getWidth();
+			double viewportHeight = paintFrame.getHeight();
 
-			scroll.setHvalue(scrollX / (getWidth() - scroll.getViewportBounds().getWidth()));
-			scroll.setVvalue(scrollY / (getHeight() - scroll.getViewportBounds().getHeight()));
+			System.out.println("viewportWidth: " + viewportWidth + " viewportHeight: " + viewportHeight);
+
+			double newX = x - viewportWidth / 2 + w;
+			double newY = y - viewportHeight / 2 + h;
+
+			newX = Math.max(0, Math.min(newX, paintFrame.getBoundsInLocal().getWidth() - viewportWidth));
+			newY = Math.max(0, Math.min(newY, paintFrame.getBoundsInLocal().getHeight() - viewportHeight));
+
+			System.out.println("newX: " + newX + " newY: " + newY);
+
+			paintFrame.setTranslateX(-newX);
+			paintFrame.setTranslateY(-newY);
 
 		}
 
