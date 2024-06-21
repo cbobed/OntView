@@ -111,17 +111,19 @@ public class VisGraph extends Observable implements Runnable{
     }
     public int getHeight() {
     	int maxy=0;
-    	for (Entry<String,Shape> entry : shapeMap.entrySet()){
-    		maxy = (entry.getValue().getPosY()> maxy ? entry.getValue().getPosY() : maxy);
-    	}
+		for (Entry<String, Shape> entry : shapeMap.entrySet()) {
+			maxy = (entry.getValue().getPosY() > maxy ? entry.getValue().getPosY() : maxy);
+		}
+
     	return maxy+VisConstants.HEIGHT_MARGIN;
     }
     
     public void adjustPanelSize(float factor){
-    	int x = (int) (getWidth()*factor);
-    	int y = (int) (getHeight()*factor);
+		int x = (int) (getWidth() * factor);
+		int y = (int) (getHeight() * factor);
 		paintframe.setWidth(x);
 		paintframe.setHeight(y);
+
     }
 
 	private OWLClassExpression getTopClass(OWLOntology activeOntology) {

@@ -2,7 +2,9 @@ package sid.OntView2.common;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map.Entry;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -135,6 +137,9 @@ public class PaintFrame extends Canvas implements Runnable{
 
 	public void draw() {
 		GraphicsContext g = this.getGraphicsContext2D();
+
+		g.clearRect(0, 0, getWidth(), getHeight());
+
         if ((factor !=1.0)&&(stable)){
 			(g).scale(factor, factor);
 		}
@@ -148,22 +153,42 @@ public class PaintFrame extends Canvas implements Runnable{
 			}
 		}
 		if (visGraph!=null){
-			for (VisConnector c : visGraph.connectorList){
+
+			List<VisConnector> connectorsCopy;
+			synchronized (visGraph.connectorList) {
+				connectorsCopy = new ArrayList<>(visGraph.connectorList);
+			}
+			for (VisConnector c : connectorsCopy) {
 				c.draw(g);
 			}
-			for (VisConnector c : visGraph.dashedConnectorList){
+
+			List<VisConnector> dashedConnectorsCopy;
+			synchronized (visGraph.dashedConnectorList) {
+				dashedConnectorsCopy = new ArrayList<>(visGraph.dashedConnectorList);
+			}
+			for (VisConnector c : dashedConnectorsCopy) {
 				c.draw(g);
 			}
-			g.setStroke(Color.LIGHTGRAY);
-			for (VisLevel lvl : visGraph.levelSet){
+			g.setStroke(Color.BLACK);
+
+			List<VisLevel> levelsCopy;
+			synchronized (visGraph.levelSet) {
+				levelsCopy = new ArrayList<>(visGraph.levelSet);
+			}
+			for (VisLevel lvl : levelsCopy) {
 				(g).strokeLine(lvl.getXpos(), 0, lvl.getXpos(), (int) (getHeight()/factor));
 				//Uncomment this to get a vertical line in every level
-				g.setStroke(Color.LIGHTGRAY);
+				g.setStroke(Color.BLACK);
 
 			}
 			g.setStroke(Color.BLACK);
 			drawPropertyBoxes(g);
-			for (Entry<String,Shape> entry : visGraph.shapeMap.entrySet()){
+
+			HashMap<String, Shape> shapeMapCopy;
+			synchronized (visGraph.shapeMap) {
+				shapeMapCopy = new HashMap<>(visGraph.shapeMap);
+			}
+			for (Entry<String, Shape> entry : shapeMapCopy.entrySet()) {
 				entry.getValue().drawShape(g);
 			}
 
@@ -251,8 +276,14 @@ public class PaintFrame extends Canvas implements Runnable{
 			if (stateChanged) {
 
 				stateChanged = false;
-				for (Entry<String,Shape> e_i : visGraph.shapeMap.entrySet()){
-					for (Entry<String,Shape> e_j: visGraph.shapeMap.entrySet()){
+
+				HashMap<String, Shape> shapeMapCopy;
+				synchronized (visGraph.shapeMap) {
+					shapeMapCopy = new HashMap<>(visGraph.shapeMap);
+				}
+
+				for (Entry<String,Shape> e_i : shapeMapCopy.entrySet()){
+					for (Entry<String,Shape> e_j: shapeMapCopy.entrySet()){
 						s_i = e_i.getValue();
 						shape_j = e_j.getValue();
 						if ((s_i!=shape_j)&&(s_i.visible)){
@@ -380,11 +411,10 @@ public class PaintFrame extends Canvas implements Runnable{
 
 	private void scrollRectToVisible(Rectangle rect) {
 		Bounds bounds = rect.getBoundsInParent();
-		double dx = bounds.getMinX() - paintFrame.getLayoutX();
-		double dy = bounds.getMinY() - paintFrame.getLayoutY();
-
-		paintFrame.setLayoutX(paintFrame.getLayoutX() - dx);
-		paintFrame.setLayoutY(paintFrame.getLayoutY() - dy);
+		double hValue = (bounds.getMinX() - scroll.getHmin()) / (scroll.getHmax() - scroll.getHmin());
+		double vValue = (bounds.getMinY() - scroll.getVmin()) / (scroll.getVmax() - scroll.getVmin());
+		scroll.setHvalue(hValue);
+		scroll.setVvalue(vValue);
 	}
 
 	public void handleMouseMoved(MouseEvent e) {
@@ -584,26 +614,36 @@ public class PaintFrame extends Canvas implements Runnable{
 			int w  = (int) (shape.getWidth()/2*factor);
 			int h  = (int) (shape.getHeight()/2*factor);
 
-			double viewportWidth = paintFrame.getWidth();
-			double viewportHeight = paintFrame.getHeight();
+			double viewportWidth2 = paintFrame.getWidth();
+			double viewportHeight2 = paintFrame.getHeight();
+
+			double viewportWidth = scroll.getViewportBounds().getWidth();
+			double viewportHeight = scroll.getViewportBounds().getHeight();
 
 			System.out.println("viewportWidth: " + viewportWidth + " viewportHeight: " + viewportHeight);
+			System.out.println("viewportWidth2: " + viewportWidth2 + " viewportHeight2: " + viewportHeight2);
 
 			double newX = x - viewportWidth / 2 + w;
 			double newY = y - viewportHeight / 2 + h;
 
-			newX = Math.max(0, Math.min(newX, paintFrame.getBoundsInLocal().getWidth() - viewportWidth));
-			newY = Math.max(0, Math.min(newY, paintFrame.getBoundsInLocal().getHeight() - viewportHeight));
+			newX = Math.max(0, Math.min(newX, getWidth() - viewportWidth));
+			newY = Math.max(0, Math.min(newY, getHeight() - viewportHeight));
 
 			System.out.println("newX: " + newX + " newY: " + newY);
 
-			paintFrame.setTranslateX(-newX);
-			paintFrame.setTranslateY(-newY);
+			scrollToRect(new Rectangle2D(newX, newY, viewportWidth, viewportHeight));
 
 		}
 
 	}
 
+	private void scrollToRect(Rectangle2D rect) {
+		double hValue = rect.getMinX() / (getWidth() - rect.getWidth());
+		double vValue = rect.getMinY() / (getHeight() - rect.getHeight());
+
+		scroll.setHvalue(hValue);
+		scroll.setVvalue(vValue);
+	}
 
 	private boolean pressedOpen(Shape shape,int x, int y,MouseEvent e){
 		return (x >= shape.posx + shape.getWidth()/2 + 1 && x <= shape.posx + shape.getWidth()/2 + 10

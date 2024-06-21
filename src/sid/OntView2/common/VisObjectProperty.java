@@ -8,7 +8,7 @@ import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
-import sid.OntView.utils.ExpressionManager;
+import sid.OntView2.utils.ExpressionManager;
 
 import javafx.scene.text.Font;
 import javafx.scene.paint.Color;
@@ -211,7 +211,7 @@ public class VisObjectProperty extends VisProperty {
 			if (isTransitive|| isFunctional || isSymmetric || hasInverse || isReflexive || propertyChainAxiom!=null){
 				Color c = (Color) g.getFill();
 				g.strokeOval(circlePos.getX(),circlePos.getY()+2, 9,9);
-				g.setFill(Color.LIGHTGRAY);
+				g.setFill(Color.BLACK);
 				g.setStroke(Color.LIGHTGRAY);
 				g.fillOval(circlePos.getX(),circlePos.getY()+2, 9,9);
 				g.setFill(c);

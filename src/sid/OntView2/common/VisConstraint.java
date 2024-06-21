@@ -23,7 +23,7 @@ import org.semanticweb.owlapi.model.OWLObjectMinCardinality;
 import org.semanticweb.owlapi.model.OWLObjectOneOf;
 import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
 
-import sid.OntView.utils.ExpressionManager;
+import sid.OntView2.utils.ExpressionManager;
 
 public class VisConstraint extends Shape {
 	public static final int RELATIVE_POS =0;
@@ -173,7 +173,7 @@ public class VisConstraint extends Shape {
 
 			// Set font and fill color for background oval
 			g.setFont(Font.font("Dialog", FontWeight.NORMAL, 9));
-			g.setFill(Color.LIGHTGRAY);
+			g.setFill(Color.BLACK);
 			g.fillOval(x - (double) getWidth() / 2, y, getWidth(), getHeight());
 
 			// Set color for text

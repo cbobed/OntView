@@ -14,7 +14,7 @@ import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
-import sid.OntView.utils.ExpressionManager;
+import sid.OntView2.utils.ExpressionManager;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -296,7 +296,7 @@ public class VisClass extends Shape {
 	    	}
 	    	else {
 	    		
-	    		if (!label.startsWith(sid.OntView.expressionNaming.SIDClassExpressionNamer.className)) {
+	    		if (!label.startsWith(sid.OntView2.expressionNaming.SIDClassExpressionNamer.className)) {
 		    		// CBL: the new definitions representation 
 		    		// a Background white rectangle for the definition
 		    		// a grey for the 
@@ -345,7 +345,7 @@ public class VisClass extends Shape {
 			 
 				    //rectangle
 				    g.strokeRect(x -  (double) getWidth() /2, y - (double) currentHeight /2,  getWidth()-1, currentHeight-1);
-				    g.setFill(Color.LIGHTGRAY);
+				    g.setFill(Color.BLACK);
 				    if (propertyBox!=null){
 				    	g.fillRect(x -  (double) getWidth() /2, y + (double) currentHeight /2, getWidth()-1, 6);
 				    	g.setStroke(Color.BLACK);
@@ -605,7 +605,7 @@ public class VisClass extends Shape {
 					auxVisClass = graph.getVisualExtension(cl); 
 					if (auxVisClass != null) {
 						
-						if (auxVisClass.label.startsWith(sid.OntView.expressionNaming.SIDClassExpressionNamer.className)) {
+						if (auxVisClass.label.startsWith(sid.OntView2.expressionNaming.SIDClassExpressionNamer.className)) {
 							auxArray = auxVisClass.getDefinitions();
 							if (auxArray != null){ 
 								for (OWLClassExpression ce: auxArray) {
@@ -829,7 +829,7 @@ public class VisClass extends Shape {
     	String token; 
     	int candidate = 0;	
 	    if (!isAnonymous) {
-	    	if (!label.startsWith(sid.OntView.expressionNaming.SIDClassExpressionNamer.className)) {
+	    	if (!label.startsWith(sid.OntView2.expressionNaming.SIDClassExpressionNamer.className)) {
 				textNode.setText(visibleLabel);
 				max = (int) textNode.getLayoutBounds().getWidth() + 40;
 	    	}
@@ -913,7 +913,7 @@ public class VisClass extends Shape {
 	    	else {
 	    		
 	    		// we have to check whether it is a special defined concept
-	    		if (!label.startsWith(sid.OntView.expressionNaming.SIDClassExpressionNamer.className)) {
+	    		if (!label.startsWith(sid.OntView2.expressionNaming.SIDClassExpressionNamer.className)) {
 		    		// CBL: for the grey box
 		    		result += fontHeight+10;
 		    		// CBL: for the underlying white box containing the definitions

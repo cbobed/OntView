@@ -16,7 +16,6 @@ public class ProgressBarDialogThread extends VisGraphObserver{
 	Stage progressDialog;
 	ProgressBar progressBar;
 	PaintFrame paintframe;
-	Label progressLabel;
 	//	int mock = 0;
 	final static int BARWIDTH  = 100;
 	final static int BARHEIGHT = 20 ;
@@ -37,10 +36,7 @@ public class ProgressBarDialogThread extends VisGraphObserver{
 		progressBar.setPrefSize(BARWIDTH, BARHEIGHT);
 		progressBar.setProgress(0);
 
-		progressLabel = new Label("0%");
-		progressLabel.setAlignment(Pos.CENTER);
-
-		VBox vbox = new VBox(10, progressLabel, progressBar);
+		VBox vbox = new VBox(10, progressBar);
 		vbox.setAlignment(Pos.CENTER);
 
 		Scene scene = new Scene(vbox, DIALOGWIDTH, DIALOGHEIGHT);

@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public abstract class VisConnector {
     Shape from,to;
     Point2D fromPoint,toPoint;
-    public static Color altColor = Color.LIGHTGRAY;
+    public static Color altColor = Color.BLACK;
     public static Color color = Color.BLACK;
     boolean visible = true;
     boolean redundant = false;

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.net.URL;
 
 
@@ -112,9 +113,13 @@ public class Mine extends Application implements Embedable{
 		root.getChildren().addAll(viewer.nTopPanel.getMainPane(), viewer.scroll);
 		VBox.setVgrow(viewer.scroll, Priority.ALWAYS);
 
-
 		viewer.artPanel.setStyle("-fx-background-color: white;");
 		viewer.nTopPanel.setStyle("-fx-border-color: black; -fx-border-width: 1;");
+
+		viewer.scroll = new ScrollPane(viewer.artPanel);
+		//viewer.add(viewer.scroll);
+		//viewer.setVisible(true);
+		viewer.artPanel.scroll = viewer.scroll;
 
 		Scene scene = new Scene(root, 800, 600);
 		
