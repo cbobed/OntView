@@ -8,7 +8,7 @@ public class VisConstants {
 	
 	public static final int CONNECTOROFFSET = 7;
 
-	public static final int CONTAINER_SIZE = 100;
+	public static final int CONTAINER_SIZE = 65;
 	
 	final static int WIDTH_MARGIN        = 300;
     final static int HEIGHT_MARGIN       = 300;

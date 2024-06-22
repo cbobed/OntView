@@ -59,7 +59,6 @@
     -fx-border-width: 1px;
     -fx-border-radius: 5px;
     -fx-background-radius: 5px;
-    -fx-pref-height: 28px;
 }
 
 .custom-combo-box .list-cell {
