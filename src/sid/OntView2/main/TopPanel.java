@@ -72,7 +72,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private void initComponents() {
 		mainPane = new VBox(10);
 		mainPane.setPadding(new Insets(10));
-		mainPane.setStyle("-fx-border-color: black; -fx-background-color: #e5e4e0; -fx-border-width: 1; -fx-border-style: solid;");
+		mainPane.setStyle("-fx-border-color: #404472; -fx-background-color: #f9f9f9; -fx-border-width: 1; -fx-border-style: solid;");
 
 		VBox loadOntologyRow = createLoadOntologyRow();
 		HBox otherComponentsRow = createOtherComponentsRow();
@@ -136,7 +136,11 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 			ClassLoader c = Thread.currentThread().getContextClassLoader();
 			Image image = new Image(Objects.requireNonNull(c.getResourceAsStream("saveImageParcial.JPG")));
-			saveImagePartialButton.setGraphic(new ImageView(image));
+			ImageView imageView = new ImageView(image);
+			imageView.setFitWidth(20);
+			imageView.setFitHeight(20);
+			imageView.setPreserveRatio(true);
+			saveImagePartialButton.setGraphic(imageView);
 
 			saveImagePartialButton.setOnAction(this::saveImageButtonPartialActionActionPerformed);
 		}
@@ -200,8 +204,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			ClassLoader c = Thread.currentThread().getContextClassLoader();
 			Image icon = new Image(Objects.requireNonNull(c.getResourceAsStream("folder.png")));
 			ImageView imageView = new ImageView(icon);
-			imageView.setFitWidth(15);
-			imageView.setFitHeight(15);
+			imageView.setFitWidth(17);
+			imageView.setFitHeight(17);
 			imageView.setPreserveRatio(true);
 			fileSystemButton.setGraphic(imageView);
 			fileSystemButton.setOnAction(this::fileSystemButtonActionActionPerformed);
@@ -225,7 +229,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			panel0.setSpacing(5);
 
 
-			StackPane titlePane = createTitlePane("Reasoner");
+			StackPane titlePane = createTitlePane("Searcher");
 			HBox row = createRow(getLabel0(), getComboBox0());
 
 			panel0 = createContainer(true, titlePane, row);
@@ -294,6 +298,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			ClassLoader c = Thread.currentThread().getContextClassLoader();
 			Image image = new Image(Objects.requireNonNull(c.getResourceAsStream("search.JPG")));
 			ImageView imageView = new ImageView(image);
+			imageView.setFitWidth(18);
+			imageView.setFitHeight(18);
 			label0.setGraphic(imageView);
 		}
 		return label0;
@@ -394,7 +400,11 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 			ClassLoader c = Thread.currentThread().getContextClassLoader();
 			Image image = new Image(Objects.requireNonNull(c.getResourceAsStream("saveImage.JPG")));
-			saveImageButton.setGraphic(new ImageView(image));
+			ImageView imageView = new ImageView(image);
+			imageView.setFitWidth(20);
+			imageView.setFitHeight(20);
+			imageView.setPreserveRatio(true);
+			saveImageButton.setGraphic(imageView);
 			saveImageButton.setOnAction(this::saveImageButtonActionActionPerformed);
 		}
 		return saveImageButton;
