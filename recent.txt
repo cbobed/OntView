@@ -1,4 +1,5 @@
 https://protege.stanford.edu/ontologies/pizza/pizza.owl
+file:/home/carlota/Downloads/library_ontology.owl
 file:/home/carlota/Downloads/ontology--DEV_type=orig.owl
 file:/home/carlota/Desktop/TFG/ontologias/mascotas.owl
 http://www.co-ode.org/ontologies/pizza/pizza.owl
@@ -12,4 +13,3 @@ http://horus.cps.unizar.es:18080/ontology/technical.owl
 http://horus.cps.unizar.es:18080/ontology/time-entry.owl
 http://horus.cps.unizar.es:18080/ontology/travel.owl
 http://protege.cim3.net/file/pub/ontologies/koala/koala.owl
-http://sid.cps.unizar.es/ontologies/semanticGranules.owl

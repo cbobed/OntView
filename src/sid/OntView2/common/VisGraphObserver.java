@@ -20,14 +20,9 @@ public class VisGraphObserver extends Thread implements Observer {
 		graph = g;
 		milliseconds = pmilliseconds;
 	}
-	
-	public VisGraphObserver(){}
+
 	public VisGraphObserver(VisGraph g){
 		this(g, MILLIS_DEFAULT);
-	}
-	
-	public void terminate(){
-		cancel = true;
 	}
 	
 	public void run(){

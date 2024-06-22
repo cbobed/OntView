@@ -10,6 +10,7 @@ import java.net.URL;
 
 
 import javafx.application.Application;
+import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
@@ -132,7 +133,8 @@ public class Mine extends Application implements Embedable{
 
 	/* Rest of methods */
 
-	public void createButtonAction(){
+	// QUITAR COMENTARIO
+	/*public void createButtonAction(){
 		if (reasoner!= null) {
 			artPanel.setCursor(Cursor.WAIT);
 			//cant cast to set<OWLClassExpression> from set<OWLClass>
@@ -165,6 +167,51 @@ public class Mine extends Application implements Embedable{
 		}
 
 		artPanel.start();
+	}*/
+
+	public void createButtonAction() {
+		if (reasoner != null) {
+			artPanel.setCursor(Cursor.WAIT);
+			// No se puede convertir a set<OWLClassExpression> desde set<OWLClass>
+			HashSet<OWLClassExpression> set = new HashSet<>();
+			for (OWLClass d : reasoner.getTopClassNode().getEntities())
+				set.add(d);
+			try {
+				// Establecer reasoner y ontología antes de crear
+				artPanel.createReasonedGraph(set, check);
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+
+			Task<Void> task = new Task<>() {
+                @Override
+                protected Void call() throws Exception {
+                    while (!artPanel.isStable()) {
+                        Thread.sleep(2000);
+                        System.err.println("wait");
+                    }
+                    return null;
+                }
+
+                @Override
+                protected void succeeded() {
+                    artPanel.setCursor(Cursor.DEFAULT);
+                    nTopPanel.restoreSliderValue();
+                    artPanel.start();
+                }
+
+                @Override
+                protected void failed() {
+                    artPanel.setCursor(Cursor.DEFAULT);
+                    Throwable throwable = getException();
+                    if (throwable != null) {
+                        throwable.printStackTrace();
+                    }
+                }
+            };
+
+			new Thread(task).start();
+		}
 	}
 
 

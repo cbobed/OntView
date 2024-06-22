@@ -278,15 +278,16 @@ public class VisClass extends Shape {
 			    g.strokeRect(x -  (double) getWidth() /2, y - (double) currentHeight /2,  getWidth()-1, currentHeight-1);
 			    g.setFill(Color.BLACK);
 			    if (propertyBox!=null){
-			    	g.fillRect(x -  (double) getWidth() /2, y + (double) currentHeight /2, getWidth()-1, 6);
+					g.setFill(Color.LIGHTGRAY);
+					g.fillRect(x -  (double) getWidth() /2, y + (double) currentHeight /2, getWidth()-1, 6);
 			    	g.setStroke(Color.BLACK);
 			    	g.strokeRect(x -  (double) getWidth() /2, y + (double) currentHeight /2,getWidth()-1, 6);
 	
 			    }	
-			    g.setStroke(Color.BLACK);
+			    g.setFill(Color.BLACK);
 	
 	//    		g.drawString(label, x -(getWidth()-10)/2, (y - (oldHeight-4)/2) + fm.getAscent());
-			    if (!isAnonymous) { 
+			    if (!isAnonymous) {
 					g.fillText(visibleLabel, x - (double) (getWidth() - 10) / 2, (y -(double) (currentHeight - 4) / 2) + ascent);
 			    }
 			    else {
@@ -302,23 +303,17 @@ public class VisClass extends Shape {
 		    		// a grey for the 
 		    		g.setFill(Color.WHITE);
 		    		g.fillRect(x - (double) getWidth() /2, y- (double) currentHeight /2+5, getWidth(), currentHeight);
-		    		if (isBottom) 
-		    			g.setStroke(Color.RED);
-		    		else 
-		    			g.setStroke(Color.BLACK);
+					g.setStroke(isBottom ? Color.RED : Color.BLACK);
 		    		g.strokeRect(x -  (double) getWidth() /2, y - (double) currentHeight /2+5,  getWidth()-1, currentHeight-1);
 		    		
 		    		// now => the rectangle for the name of the concept
-		    			
 		    		g.setFill(mini);
 		    		g.fillRect(x - (double) getWidth() /2 + 5, y- (double) currentHeight /2, getWidth()-10, fontHeight+5);
-		    		if (isBottom) 
-		    			g.setStroke(Color.RED);
-		    		else 
-		    			g.setStroke(Color.BLACK);
+					g.setStroke(isBottom ? Color.RED : Color.BLACK);
 		    		g.strokeRect(x -  (double) getWidth() /2+5, y - (double) currentHeight /2,  getWidth()-10, fontHeight+4);
 		    		
 		    		// this is the name of the concept
+					g.setFill(Color.BLACK);
 		    		g.setFont(getDefinedClassFont()); 
 		    		g.fillText(visibleLabel, x - (double) (getWidth() - 16) /2, (y - (double) (currentHeight - 4) /2) + ascent);
 		    		
@@ -347,6 +342,7 @@ public class VisClass extends Shape {
 				    g.strokeRect(x -  (double) getWidth() /2, y - (double) currentHeight /2,  getWidth()-1, currentHeight-1);
 				    g.setFill(Color.BLACK);
 				    if (propertyBox!=null){
+						g.setFill(Color.LIGHTGRAY);
 				    	g.fillRect(x -  (double) getWidth() /2, y + (double) currentHeight /2, getWidth()-1, 6);
 				    	g.setStroke(Color.BLACK);
 				    	g.strokeRect(x -  (double) getWidth() /2, y + (double) currentHeight /2,getWidth()-1, 6);
@@ -357,6 +353,7 @@ public class VisClass extends Shape {
 		    		double auxY = (y - (double) (currentHeight - 4) /2);
 		    		if (visibleDefinitionLabels != null) {
 		    			for (String auxDefString: visibleDefinitionLabels) {
+							g.setFill(Color.BLACK);
 							drawFormattedString(g, auxDefString, x - (getWidth() - 10) / 2, (int) (auxY + ascent), (int) fontHeight);
 							auxY += (countLines(auxDefString)*fontHeight) + 5;
 		    			}
