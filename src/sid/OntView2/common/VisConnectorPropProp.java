@@ -58,15 +58,14 @@ public class VisConnectorPropProp extends VisConnector {
 	
 	@Override
 	public void draw(GraphicsContext g){
-		GraphicsContext g2d= (GraphicsContext) g;
-		if (drawable()){
-			Color prevColor = (Color) g2d.getStroke();
-			g2d.setStroke(Color.BLUE);
-			g2d.strokeOval(getFromPoint().getX()-8, getFromPoint().getY()-3, 3, 3);
+        if (drawable()){
+			Color prevColor = (Color) g.getStroke();
+			g.setStroke(Color.BLUE);
+			g.strokeOval(getFromPoint().getX()-8, getFromPoint().getY()-3, 3, 3);
 //			VisConnector.drawArrow(g,getFromPoint().x-5,getFromPoint().y, getToPoint().x-2, getToPoint().y);
 			setPath(path, getFromPoint().getX()-5,getFromPoint().getY(), getToPoint().getX()-2, getToPoint().getY());
 			drawPath(g, path);
-		 	g2d.setStroke(prevColor);
+		 	g.setStroke(prevColor);
 		} 	
 	}
 	

@@ -17,9 +17,8 @@ public class VisConnectorDisjoint extends VisConnectorEquiv {
 	public void draw(GraphicsContext g){
 		int posy1,posy2;
 		Color col = color;
-		GraphicsContext g2d= (GraphicsContext) g;
-		
-		if ((from.visible) &&(to.visible)&&(from.graph.disjoint)){
+
+        if ((from.visible) &&(to.visible)&&(from.graph.disjoint)){
 			if (color==null)
 				col = VisConnector.color;
 
@@ -34,11 +33,11 @@ public class VisConnectorDisjoint extends VisConnectorEquiv {
 				toPoint = new Point2D(to.posx, posy2 + (double) to.getHeight() / 2);
 
 			}
-		    Color prevColor = (Color) g2d.getStroke();
-			g2d.setStroke(col);
-		  	g2d.strokeLine(fromPoint.getX(), fromPoint.getY(), toPoint.getX(), toPoint.getY());
-		  	g2d.strokeLine(fromPoint.getX()-5, fromPoint.getY(), toPoint.getX()-5, toPoint.getY());
-			g2d.setStroke(prevColor);
+		    Color prevColor = (Color) g.getStroke();
+			g.setStroke(col);
+		  	g.strokeLine(fromPoint.getX(), fromPoint.getY(), toPoint.getX(), toPoint.getY());
+		  	g.strokeLine(fromPoint.getX()-5, fromPoint.getY(), toPoint.getX()-5, toPoint.getY());
+			g.setStroke(prevColor);
 		}	
 	}
 }

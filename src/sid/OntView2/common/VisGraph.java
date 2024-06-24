@@ -1481,7 +1481,7 @@ public class VisGraph extends Observable implements Runnable{
 	  * @return
 	  */
 	 
-	 public	 boolean subsumes (Shape b,Shape a,OWLOntology ontology,
+	 public	 boolean subsumes(Shape b,Shape a,OWLOntology ontology,
 			OWLReasoner reasoner,OWLDataFactory dFactory ){
 	 		OWLSubClassOfAxiom s = dFactory.getOWLSubClassOfAxiom(a.getLinkedClassExpression(),b.getLinkedClassExpression());
 	 		return reasoner.isEntailed(s);

@@ -25,11 +25,13 @@ import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 
+import javafx.stage.StageStyle;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.StringDocumentSource;
 import org.semanticweb.owlapi.model.IRI;
@@ -94,7 +96,6 @@ public class Mine extends Application implements Embedable{
 		return primaryStage;
 	}
 
-
 	public static void createAndShowGUI(Stage primaryStage) {
 		primaryStage.setTitle("Viewer");
 		primaryStage.setOnCloseRequest(event -> System.exit(0));
@@ -123,7 +124,8 @@ public class Mine extends Application implements Embedable{
 		viewer.artPanel.scroll = viewer.scroll;
 
 		Scene scene = new Scene(root, 800, 600);
-		
+
+
 		ClassLoader c = Thread.currentThread().getContextClassLoader();		
 		scene.getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
 		primaryStage.setScene(scene);
@@ -133,12 +135,11 @@ public class Mine extends Application implements Embedable{
 
 	/* Rest of methods */
 
-	// QUITAR COMENTARIO
-	/*public void createButtonAction(){
+	public void createButtonAction(){
 		if (reasoner!= null) {
 			artPanel.setCursor(Cursor.WAIT);
 			//cant cast to set<OWLClassExpression> from set<OWLClass>
-			HashSet<OWLClassExpression> set = new HashSet<OWLClassExpression>();
+			HashSet<OWLClassExpression> set = new HashSet<>();
 			for (OWLClass d : reasoner.getTopClassNode().getEntities())
 				set.add(d);
 			try {
@@ -167,54 +168,7 @@ public class Mine extends Application implements Embedable{
 		}
 
 		artPanel.start();
-	}*/
-
-	public void createButtonAction() {
-		if (reasoner != null) {
-			artPanel.setCursor(Cursor.WAIT);
-			// No se puede convertir a set<OWLClassExpression> desde set<OWLClass>
-			HashSet<OWLClassExpression> set = new HashSet<>();
-			for (OWLClass d : reasoner.getTopClassNode().getEntities())
-				set.add(d);
-			try {
-				// Establecer reasoner y ontología antes de crear
-				artPanel.createReasonedGraph(set, check);
-			} catch (Exception e1) {
-				e1.printStackTrace();
-			}
-
-			Task<Void> task = new Task<>() {
-                @Override
-                protected Void call() throws Exception {
-                    while (!artPanel.isStable()) {
-                        Thread.sleep(2000);
-                        System.err.println("wait");
-                    }
-                    return null;
-                }
-
-                @Override
-                protected void succeeded() {
-                    artPanel.setCursor(Cursor.DEFAULT);
-                    nTopPanel.restoreSliderValue();
-                    artPanel.start();
-                }
-
-                @Override
-                protected void failed() {
-                    artPanel.setCursor(Cursor.DEFAULT);
-                    Throwable throwable = getException();
-                    if (throwable != null) {
-                        throwable.printStackTrace();
-                    }
-                }
-            };
-
-			new Thread(task).start();
-		}
 	}
-
-
 
 	protected void loadActiveOntology(IRI source){
 		manager = OWLManager.createOWLOntologyManager();

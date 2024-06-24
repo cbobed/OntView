@@ -1,9 +1,20 @@
 package sid.OntView2.common;
 
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
+import javafx.scene.text.*;
 import javafx.stage.Stage;
+import javafx.scene.layout.VBox;
+
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.reasoner.NodeSet;
@@ -15,15 +26,15 @@ public class VisShapeContext extends ContextMenu {
 	Shape shape;
 	PaintFrame parent;
 	OWLClassExpression expression;
-	
 	double posx,posy;
-	public VisShapeContext (Shape s, PaintFrame parentFrame, MouseEvent e){
+
+	public VisShapeContext(Shape s, PaintFrame parentFrame, MouseEvent e){
 		
 		super();
-		shape =s;
-		posx =e.getScreenX();
-		posy =e.getScreenY();
-		parent= parentFrame;
+		shape = s;
+		posx = e.getScreenX();
+		posy = e.getScreenY();
+		parent = parentFrame;
 		boolean visc = shape instanceof VisClass;
 		expression = shape.asVisClass().getLinkedClassExpression();
        
@@ -44,23 +55,18 @@ public class VisShapeContext extends ContextMenu {
 		if (!shape.asVisClass().allSubHidden()) {
 			hideItem.setDisable(true);
 		}
-		hideItem.setOnAction(event -> {
-			shape.hide();
-		});
+		hideItem.setOnAction(event -> shape.hide());
 		
 		
 		this.getItems().add(getShowInstancesItem());
 		this.getItems().add(hideProperties);
 		this.getItems().add(hideItem);
-		
 	}
 	
 	private MenuItem getShowInstancesItem(){
 		if (showInstances == null) {
 			showInstances = new MenuItem("show instances");
-			showInstances.setOnAction(event -> {
-				showInstancesAction();
-			});
+			showInstances.setOnAction(event -> showInstancesAction());
 		}
 		return showInstances;
 	}
@@ -75,14 +81,28 @@ public class VisShapeContext extends ContextMenu {
 				}
 				
 			}
-			VisInstance c = new VisInstance();
-			c.setTitle("instances of " + shape.asVisClass().label);
-			c.setModel(instanceArray);
-			c.showAndWait();
+			Stage stage = new Stage();
+			stage.setTitle("Instances of " + shape.asVisClass().label);
 
-			Stage stage = (Stage) c.getDialogPane().getScene().getWindow();
+			ObservableList<String> items = FXCollections.observableArrayList(instanceArray);
+			ListView<String> listView = new ListView<>(items);
+
+			Text regularText = new Text("Instances of ");
+			Text boldBlueText = new Text(shape.asVisClass().label);
+			boldBlueText.setFill(Color.BLUE);
+			boldBlueText.setFont(Font.font("Dialog", FontWeight.BOLD, FontPosture.ITALIC, 14));
+
+			TextFlow textFlow = new TextFlow(regularText, boldBlueText);
+
+			VBox vbox = new VBox(textFlow, listView);
+			VBox.setMargin(listView, new Insets(10, 0, 0, 0));
+			vbox.setPadding(new Insets(10));
+
+			Scene scene = new Scene(vbox, 300, 400);
+			stage.setScene(scene);
 			stage.setX(posx);
 			stage.setY(posy);
+			stage.show();
 		
 		}
 	}

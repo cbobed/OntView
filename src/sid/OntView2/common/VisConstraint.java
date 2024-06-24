@@ -166,10 +166,9 @@ public class VisConstraint extends Shape {
 			}	
 		}
 
-		GraphicsContext g2d = (GraphicsContext)g;
-		if (visible) {
+        if (visible) {
 			Font prevFont = g.getFont();
-			Color prevColor = (Color) g.getFill();  // Type cast assuming the fill is set to a Color
+			Color prevColor = (Color) g.getFill();
 
 			// Set font and fill color for background oval
 			g.setFont(Font.font("Dialog", FontWeight.NORMAL, 9));
@@ -184,14 +183,14 @@ public class VisConstraint extends Shape {
 
 				case OBJECT_INTERSECTION_OF:
 				case OBJECT_UNION_OF:
-					g2d.setFont(Font.font("Dialog", FontWeight.BOLD, 14));
-					g2d.fillText(draw,getPosX() - (double) getWidth() /4, getPosY() + (double) getHeight() /2+2);
+					g.setFont(Font.font("Dialog", FontWeight.BOLD, 14));
+					g.fillText(draw,getPosX() - (double) getWidth() /4, getPosY() + (double) getHeight() /2+2);
 					g.setFont(Font.font("Dialog", FontWeight.BOLD, 9));
 					break;
 				case OBJECT_HAS_VALUE :	
-					g2d.fillText(property+" {"+filler+"}",getPosX() - (double) getWidth() /2, getPosY());
+					g.fillText(property+" {"+filler+"}",getPosX() - (double) getWidth() /2, getPosY());
 				case DATA_HAS_VALUE :
-					g2d.fillText(property+"="+filler,getPosX() - (double) getWidth() /2, getPosY());
+					g.fillText(property+"="+filler,getPosX() - (double) getWidth() /2, getPosY());
 					break;
 				case OBJECT_EXACT_CARDINALITY:
 				case OBJECT_MAX_CARDINALITY:
@@ -202,14 +201,14 @@ public class VisConstraint extends Shape {
 				case DATA_ALL_VALUES_FROM:	
 				case DATA_EXACT_CARDINALITY:	
 					auxStr = "/ "+property+"/ "+label;
-					g2d.fillText(auxStr,getPosX() - (double) getWidth() /2, getPosY());
+					g.fillText(auxStr,getPosX() - (double) getWidth() /2, getPosY());
 					break;
 				default:
-					g2d.fillText(draw,getPosX() - (double) getWidth() /2, getPosY());
+					g.fillText(draw,getPosX() - (double) getWidth() /2, getPosY());
 			}
-			g2d.strokeOval(x-getWidth()/2, y, getWidth(), getHeight());
-			g2d.setStroke(prevColor);
-			g2d.setFont(prevFont);
+			g.strokeOval(x-getWidth()/2, y, getWidth(), getHeight());
+			g.setStroke(prevColor);
+			g.setFont(prevFont);
 		}	
 	}
 

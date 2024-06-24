@@ -23,21 +23,20 @@ public class VisConnectorPropertyRange extends VisConnectorIsA {
 
 	@Override
 	public void draw(GraphicsContext g){
-		GraphicsContext g2d= (GraphicsContext) g;
-		boolean globalHide  = parentBox.vclass.graph.paintframe.hideRange;
+        boolean globalHide  = parentBox.vclass.graph.paintframe.hideRange;
 		if ((visible)&&(parentBox.visible)&&(!globalHide)){
 			if ((from != null) && (to!= null)){
 				if ((from.visible) && (to.visible)){
 					fromPoint = new Point2D(vprop.getPosX() + vprop.getLabelWidth()+15,vprop.getPosY());
 					toPoint = new Point2D(to.getPosX(),to.getPosY());
-					Color prevColor = (Color) g2d.getStroke();
-				  	g2d.setStroke(Color.GRAY);
-			  		g2d.fillOval(fromPoint.getX(), fromPoint.getY()-3, 4, 4);
+					Color prevColor = (Color) g.getStroke();
+				  	g.setStroke(Color.GRAY);
+			  		g.fillOval(fromPoint.getX(), fromPoint.getY()-3, 4, 4);
 //				  	g2d.drawLine(fromPoint.x+2, fromPoint.y-2, toPoint.x, toPoint.y);
-			  		drawCurve(g2d, VisConstants.NURB);
+			  		drawCurve(g, VisConstants.NURB);
 //			  		setPath(path,fromPoint.x+2, fromPoint.y-2, toPoint.x, toPoint.y);
 //			  		g2d.draw(path);
-				  	g2d.setStroke(prevColor);
+				  	g.setStroke(prevColor);
 				} 	
 			}
 		}	

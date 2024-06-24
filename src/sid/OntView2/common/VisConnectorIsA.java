@@ -22,11 +22,10 @@ public class VisConnectorIsA extends VisConnector {
 
 	@Override
 	public void draw(GraphicsContext g){
-		GraphicsContext g2d = g;
-        Color prevColor = (Color) g2d.getStroke();
-		double prevLineWidth = g2d.getLineWidth();
-		StrokeLineCap prevCap = g2d.getLineCap();
-		StrokeLineJoin prevJoin = g2d.getLineJoin();
+        Color prevColor = (Color) g.getStroke();
+		double prevLineWidth = g.getLineWidth();
+		StrokeLineCap prevCap = g.getLineCap();
+		StrokeLineJoin prevJoin = g.getLineJoin();
 
 		if (visible){
 			if ((from != null) && (to!= null)){
@@ -36,13 +35,13 @@ public class VisConnectorIsA extends VisConnector {
 			    Shape selected = from.graph.paintframe.getPressedShape();
 
 			    if (selected !=null) {
-					g2d.setLineWidth(width);
-					g2d.setLineCap(StrokeLineCap.SQUARE);
-					g2d.setLineJoin(StrokeLineJoin.MITER);
+					g.setLineWidth(width);
+					g.setLineCap(StrokeLineCap.SQUARE);
+					g.setLineJoin(StrokeLineJoin.MITER);
 
 					if ((from==selected)||(to==selected)){
-						g2d.setStroke(Color.ORANGE);
-						g2d.setFill(Color.ORANGE);
+						g.setStroke(Color.ORANGE);
+						g.setFill(Color.ORANGE);
 					}
 					else  {
 						g.setStroke(isaColor);
@@ -94,8 +93,8 @@ public class VisConnectorIsA extends VisConnector {
 
 	//REVISAR
 	protected void drawNurbs(GraphicsContext g2d, Point2D pfrom, Point2D pto){
-		double auxX1 = 0.2* (pto.getX()-pfrom.getX()) + pfrom.getX();
-        double auxX2 = 0.4* (pto.getX()-pfrom.getX()) + pfrom.getX();
+		double auxX1 = 0.2 * (pto.getX()-pfrom.getX()) + pfrom.getX();
+        double auxX2 = 0.4 * (pto.getX()-pfrom.getX()) + pfrom.getX();
 
 		g2d.beginPath();
 		g2d.moveTo(pfrom.getX(), pfrom.getY());

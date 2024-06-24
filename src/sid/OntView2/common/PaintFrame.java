@@ -25,6 +25,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.Cursor;
 
 import javafx.scene.text.Font;
+import javafx.scene.transform.Affine;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
@@ -124,8 +125,7 @@ public class PaintFrame extends Canvas implements Runnable{
 	 * @param size
 	 */
 	public void scale(double factor,Dimension2D size){
-
-		GraphicsContext g2d = (GraphicsContext) this.getGraphicsContext2D();
+		GraphicsContext g2d = this.getGraphicsContext2D();
 		g2d.scale(factor, factor);
 		if (factor>1.0) {
 			setWidth(size.getWidth() * factor);
@@ -662,19 +662,17 @@ public class PaintFrame extends Canvas implements Runnable{
 
 	private void showContextMenu(Shape s,MouseEvent e) {
 		double x,y;
-		x = e.getX();
-		y = e.getY();
+		x = e.getScreenX();
+		y = e.getScreenY();
 
 		VisShapeContext menu = new VisShapeContext(s,this,e);
 		menu.show(this,x,y);
-		return;
-	}
+    }
 
 	private void showContextMenu(int x, int y){
 		VisGeneralContext menu = new VisGeneralContext(this);
 		menu.show(this,x,y);
-		return;
-	}
+    }
 
 	public VisGraph getVisGraph() {return visGraph;}
 

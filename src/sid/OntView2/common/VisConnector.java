@@ -5,6 +5,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.shape.*;
 import javafx.scene.paint.Color;
 import javafx.geometry.Point2D;
+import javafx.scene.text.Font;
 
 import java.util.ArrayList;
 
