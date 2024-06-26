@@ -121,43 +121,6 @@ public class Mine extends JPanel implements Embedable{
         viewer.artPanel.scroll = viewer.scroll;
         viewer.validate();
     }
-   
-	public void createAndShowGUIApplet () {
-		System.out.println("Created GUI on EDT? "+SwingUtilities.isEventDispatchThread()); 
-    	
-    	JFrame frame = new JFrame("Viewer");
-
-        frame.addWindowListener(new java.awt.event.WindowAdapter(){
-           public void windowClosing(WindowEvent e){
-             System.exit(0);
-           }
-        }
-        );
-        
-        frame.add(this);
-        frame.setSize(800,600);
-        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        frame.setVisible(true);
- 
-    	this.self = this; 
-    	
-    	this.entityNameSet = new HashSet<String>();
-		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        this.artPanel = new PaintFrame();
-        this.artPanel.setParentFrame(this);
-        this.artPanel.setBorder(BorderFactory.createTitledBorder("Visor"));
-        this.artPanel.setBackground(new Color(255,255,255));
-        this.nTopPanel = new TopPanel(this);
-        this.nTopPanel.setAlignmentX(RIGHT_ALIGNMENT);
-        this.add(this.nTopPanel);
-       // JScrollPane scroll      = new JScrollPane(artPanel);   
-        this.scroll = new JScrollPane(this.artPanel);
-        this.add(this.scroll);
-        this.setVisible(true);
-        this.artPanel.scroll = this.scroll;
-        this.validate();
-	}
-	
 	
 	/* Rest of methods */ 
 	

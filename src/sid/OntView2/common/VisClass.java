@@ -259,7 +259,8 @@ public class VisClass extends Shape {
 	    }
 	    
 	    if (visible){
-			Color mini = Color.rgb(224, 224, 224);
+			//Color mini = Color.rgb(224, 224, 224);
+			Color mini = Color.LIGHTGRAY;
 
 	    	if (!isDefined) {
 	    		// CBL if it is not defined, we use the previous representation

@@ -76,7 +76,6 @@ public class Mine extends Application implements Embedable{
 	PaintFrame   artPanel;
 	TopPanel     nTopPanel;
 	ScrollPane  scroll;
-	boolean      firstItemStateChanged = false;
 	Mine         self= this;
 	boolean      check = true;
 
@@ -96,6 +95,8 @@ public class Mine extends Application implements Embedable{
 		return primaryStage;
 	}
 
+	public ScrollPane getScrollPane() { return scroll; }
+
 	public static void createAndShowGUI(Stage primaryStage) {
 		primaryStage.setTitle("Viewer");
 		primaryStage.setOnCloseRequest(event -> System.exit(0));
@@ -110,6 +111,8 @@ public class Mine extends Application implements Embedable{
 		viewer.nTopPanel = new TopPanel(viewer);
 
 		viewer.scroll = new ScrollPane(viewer.artPanel);
+		viewer.artPanel.scroll = viewer.scroll;
+
 
 		VBox root = new VBox();
 		root.getChildren().addAll(viewer.nTopPanel.getMainPane(), viewer.scroll);
@@ -118,10 +121,9 @@ public class Mine extends Application implements Embedable{
 		viewer.artPanel.setStyle("-fx-background-color: white;");
 		viewer.nTopPanel.setStyle("-fx-border-color: black; -fx-border-width: 1;");
 
-		viewer.scroll = new ScrollPane(viewer.artPanel);
+		//viewer.scroll = new ScrollPane();
 		//viewer.add(viewer.scroll);
 		//viewer.setVisible(true);
-		viewer.artPanel.scroll = viewer.scroll;
 
 		Scene scene = new Scene(root, 800, 600);
 

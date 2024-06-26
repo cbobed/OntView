@@ -255,9 +255,9 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			HBox.setHgrow(comboBox, Priority.ALWAYS);
 			comboBox.setMaxWidth(Double.MAX_VALUE);
 
-			comboBox.setOnAction(this::comboBox0ItemItemStateChanged);
+			//comboBox.setOnAction(this::comboBox0ItemItemStateChanged);
 
-			//comboBox.valueProperty().addListener((options, oldValue, newValue) -> comboBox0ItemItemStateChanged(newValue));
+			comboBox.valueProperty().addListener((options, oldValue, newValue) -> comboBox0ItemItemStateChanged(newValue));
 		}
 		return comboBox;
 	}
@@ -595,28 +595,9 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		parent.restoreViewButtonAction(event);
 	}
 
-	/*private void comboBox0ItemItemStateChanged(String selectedItem) {
-		System.out.println("Selected item: " + selectedItem);
-		if (parent.firstItemStateChanged) {
-			String key = parent.artPanel.getVisGraph().getQualifiedLabelMap().get(selectedItem);
-			parent.artPanel.focusOnShape(key, null);
-		} else {
-			parent.firstItemStateChanged = true;
-		}
-	}*/
-
-	private void comboBox0ItemItemStateChanged(ActionEvent event) {
-		System.out.println("aaaaaaaaaaaaaaaa");
-
-			if (parent.firstItemStateChanged) {
-				String selectedItem = (String)getComboBox0().getValue();
-				System.out.println("Selected item: " + selectedItem);
-				String key = parent.artPanel.getVisGraph().getQualifiedLabelMap().get(selectedItem);
-				parent.artPanel.focusOnShape(key, null);
-			} else {
-				parent.firstItemStateChanged = true;
-			}
-
+	private void comboBox0ItemItemStateChanged(String selectedItem) {
+		String key = parent.artPanel.getVisGraph().getQualifiedLabelMap().get(selectedItem);
+		parent.artPanel.focusOnShape(key, null);
 	}
 
 	private void saveViewButtonActionActionPerformed(ActionEvent event) {

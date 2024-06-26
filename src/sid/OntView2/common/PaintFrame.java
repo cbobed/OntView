@@ -405,17 +405,17 @@ public class PaintFrame extends Canvas implements Runnable{
 			}
 
 			Rectangle rect = new Rectangle(scrollX, scrollY, 1, 1);
-			scrollRectToVisible(rect);
+			//scrollRectToVisible(rect);
 		}
 	}
 
-	private void scrollRectToVisible(Rectangle rect) {
+	/*private void scrollRectToVisible(Rectangle rect) {
 		Bounds bounds = rect.getBoundsInParent();
 		double hValue = (bounds.getMinX() - scroll.getHmin()) / (scroll.getHmax() - scroll.getHmin());
 		double vValue = (bounds.getMinY() - scroll.getVmin()) / (scroll.getVmax() - scroll.getVmin());
 		scroll.setHvalue(hValue);
 		scroll.setVvalue(vValue);
-	}
+	}*/
 
 	public void handleMouseMoved(MouseEvent e) {
 		if (visGraph == null) {
@@ -609,41 +609,19 @@ public class PaintFrame extends Canvas implements Runnable{
 		Shape shape = pshape != null ? pshape : visGraph.getShape(shapeKey);
 
 		if (shape!= null) {
-			int x  = (int) (shape.getPosX()*factor);
-			int y  = (int) (shape.getPosY()*factor);
-			int w  = (int) (shape.getWidth()/2*factor);
-			int h  = (int) (shape.getHeight()/2*factor);
+			int x  = (int) (shape.getPosX() * factor);
+			int y  = (int) (shape.getPosY() * factor);
 
+			double scrollPaneWidth = scroll.getViewportBounds().getWidth();
+			double scrollPaneHeight = scroll.getViewportBounds().getHeight();
 
-			double viewportWidth = scroll.getViewportBounds().getWidth();
-			double viewportHeight = scroll.getViewportBounds().getHeight();
+			double hValue = (x - scrollPaneWidth / 2) / (getWidth() - scrollPaneWidth);
+			double vValue = (y - scrollPaneHeight / 2) / (getHeight() - scrollPaneHeight);
 
-			System.out.println("x: " + x + " y: " + y + " w: " + w + " h: " + h);
-
-			double newX = x - viewportWidth / 2 + (double) w / 2;
-			double newY = y - viewportHeight / 2 + (double) h / 2;
-
-			newX = Math.max(0, Math.min(newX, getWidth() - viewportWidth));
-			newY = Math.max(0, Math.min(newY, getHeight() - viewportHeight));
-
-			//scrollToPosition(newX, newY);
-			scrollToPosition(489, 50);
+			scroll.setHvalue(Math.max(0, Math.min(hValue, 1)));
+			scroll.setVvalue(Math.max(0, Math.min(vValue, 1)));
 		}
 
-	}
-
-	private void scrollToPosition(double newX, double newY) {
-		double contentWidth = getWidth();
-		double contentHeight = getHeight();
-
-		double hValue = newX / (contentWidth - scroll.getViewportBounds().getWidth());
-		double vValue = newY / (contentHeight - scroll.getViewportBounds().getHeight());
-
-		hValue = Math.max(0, Math.min(hValue, 1));
-		vValue = Math.max(0, Math.min(vValue, 1));
-
-		scroll.setHvalue(hValue);
-		scroll.setVvalue(vValue);
 	}
 
 	private boolean pressedOpen(Shape shape,int x, int y,MouseEvent e){
