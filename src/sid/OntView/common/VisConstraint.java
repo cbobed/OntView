@@ -159,7 +159,7 @@ public class VisConstraint extends Shape {
 	
 	
 	@Override
-	public void drawShape(Graphics g) {
+	 public void drawShape(Graphics g) {
 		int x = posx+1;
 		int y = posy;
 		String draw;

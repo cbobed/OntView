@@ -240,7 +240,7 @@ public class VisClass extends Shape {
 		return boldFont;
 	}
 	
-	public void drawShape(Graphics g) {
+	 public void drawShape(Graphics g) {
 	    int x = posx+1;
 	    int y = posy;
 	    	    

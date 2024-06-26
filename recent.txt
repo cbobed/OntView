@@ -1,3 +1,4 @@
+file:/home/carlota/Downloads/ontology_subniveles.owl
 file:/home/carlota/Downloads/library_ontology.owl
 https://protege.stanford.edu/ontologies/pizza/pizza.owl
 file:/home/carlota/Downloads/ontology--DEV_type=orig.owl
@@ -12,4 +13,3 @@ http://horus.cps.unizar.es:18080/ontology/spatial_ontology.owl
 http://horus.cps.unizar.es:18080/ontology/technical.owl
 http://horus.cps.unizar.es:18080/ontology/time-entry.owl
 http://horus.cps.unizar.es:18080/ontology/travel.owl
-http://protege.cim3.net/file/pub/ontologies/koala/koala.owl

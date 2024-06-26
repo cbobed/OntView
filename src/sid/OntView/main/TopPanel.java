@@ -593,12 +593,13 @@ public class TopPanel extends JPanel implements ControlPanelInterface {
 	
 	private void jComboBox0ItemItemStateChanged(ItemEvent event) {
 	if (event.getID()==ItemEvent.ITEM_STATE_CHANGED) {
-			if (parent.firstItemStateChanged) {
-				String selItem = (String)getJComboBox0().getSelectedItem();
-				String key = parent.artPanel.getVisGraph().getQualifiedLabelMap().get(selItem);
-			    parent.artPanel.focusOnShape(key,null); }
-			else {
-				parent.firstItemStateChanged = true; }
+		System.out.println("item state changed: " + event.getID());
+		if (parent.firstItemStateChanged) {
+			String selItem = (String)getJComboBox0().getSelectedItem();
+			String key = parent.artPanel.getVisGraph().getQualifiedLabelMap().get(selItem);
+			parent.artPanel.focusOnShape(key,null); }
+		else {
+			parent.firstItemStateChanged = true; }
 		}
 	}
 	private void saveViewButtonActionActionPerformed(ActionEvent event) {

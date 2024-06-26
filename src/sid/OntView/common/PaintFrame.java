@@ -14,6 +14,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
 
@@ -248,10 +249,13 @@ public class PaintFrame extends JPanel implements MouseListener,Runnable,MouseMo
 		  if (stateChanged) {
 			  
 			 stateChanged = false;
+
+
 			for (Entry<String,Shape> e_i : visGraph.shapeMap.entrySet()){
 				for (Entry<String,Shape> e_j: visGraph.shapeMap.entrySet()){
 					s_i = e_i.getValue();
 					shape_j = e_j.getValue();
+
 					if ((s_i!=shape_j)&&(s_i.visible)){
 						if ((s_i.getPosY()< shape_j.getPosY()) &&(s_i.getPosY()+s_i.getTotalHeight())> shape_j.getPosY()){
 							stateChanged = true;
@@ -569,6 +573,8 @@ public class PaintFrame extends JPanel implements MouseListener,Runnable,MouseMo
         	int h  = (int) (shape.getHeight()/2*factor);
         	int vw = (int) (visible.getWidth());
         	int vh = (int) (visible.getHeight());
+
+			System.out.println("x: " + x + " y: " + y + " w: " + w + " h: " + h + " vw: " + vw + " vh: " + vh);
 
         	paintFrame.scrollRectToVisible(new Rectangle(x-w-vw/2, y-h-vh/2,vw,vh));
         }

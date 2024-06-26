@@ -35,7 +35,7 @@ public class VisGraph extends Observable implements Runnable{
     ArrayList<VisConnector> connectorList;
 	ArrayList<VisConnector> dashedConnectorList;
 	
-    public HashMap<String, Shape>    shapeMap;
+    final public HashMap<String, Shape>    shapeMap;
 	HashMap<String, Shape>           tempMap;
 	HashMap<String, VisObjectProperty>     propertyMap;
 	HashMap<String, VisDataProperty> dPropertyMap;

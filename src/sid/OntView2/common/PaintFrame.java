@@ -117,7 +117,7 @@ public class PaintFrame extends Canvas implements Runnable{
 	 * sets scaling/zoom factor
 	 * @param d d
 	 */
-	public void setFactor(double d){factor = d;}
+	public void setFactor(double d){ factor = d; }
 	public void setOriginalSize(Dimension2D in){ oSize = in;}
 	/**
 	 * scales by factor and adjusts panel size
@@ -268,11 +268,7 @@ public class PaintFrame extends Canvas implements Runnable{
 
 		// repulsion and atraction between nodes
 		Shape shape_j,s_i;
-		if (!stable) {
-
-		}
-		else { //stable
-
+		if (stable) {
 			if (stateChanged) {
 
 				stateChanged = false;
@@ -281,13 +277,13 @@ public class PaintFrame extends Canvas implements Runnable{
 				synchronized (visGraph.shapeMap) {
 					shapeMapCopy = new HashMap<>(visGraph.shapeMap);
 				}
-
-				for (Entry<String,Shape> e_i : shapeMapCopy.entrySet()){
-					for (Entry<String,Shape> e_j: shapeMapCopy.entrySet()){
+				for (Entry<String, Shape> e_i : shapeMapCopy.entrySet()){
+					for (Entry<String, Shape> e_j: shapeMapCopy.entrySet()){
 						s_i = e_i.getValue();
 						shape_j = e_j.getValue();
+
 						if ((s_i!=shape_j)&&(s_i.visible)){
-							if ((s_i.getPosY()< shape_j.getPosY()) &&(s_i.getPosY()+s_i.getTotalHeight())> shape_j.getPosY()){
+							if ((s_i.getPosY() < shape_j.getPosY()) && (s_i.getPosY() + s_i.getTotalHeight()) > shape_j.getPosY()){
 								stateChanged = true;
 								shapeRepulsion(s_i, DOWN);
 							}
@@ -300,10 +296,13 @@ public class PaintFrame extends Canvas implements Runnable{
 						shapeRepulsion(s_i, DOWN);
 					}
 					visGraph.adjustPanelSize((float) factor);
+
 				}
 			}
 			draw();
 		}
+
+
 	}
 
 
@@ -389,6 +388,7 @@ public class PaintFrame extends Canvas implements Runnable{
 			draw();
 		}
 		else {
+			System.out.println("handleMouseDragged");
 			double scrollX,scrollY;
 			Rectangle2D visibleRect = getVisibleRect();
 
@@ -614,32 +614,33 @@ public class PaintFrame extends Canvas implements Runnable{
 			int w  = (int) (shape.getWidth()/2*factor);
 			int h  = (int) (shape.getHeight()/2*factor);
 
-			double viewportWidth2 = paintFrame.getWidth();
-			double viewportHeight2 = paintFrame.getHeight();
 
 			double viewportWidth = scroll.getViewportBounds().getWidth();
 			double viewportHeight = scroll.getViewportBounds().getHeight();
 
-			System.out.println("viewportWidth: " + viewportWidth + " viewportHeight: " + viewportHeight);
-			System.out.println("viewportWidth2: " + viewportWidth2 + " viewportHeight2: " + viewportHeight2);
+			System.out.println("x: " + x + " y: " + y + " w: " + w + " h: " + h);
 
-			double newX = x - viewportWidth / 2 + w;
-			double newY = y - viewportHeight / 2 + h;
+			double newX = x - viewportWidth / 2 + (double) w / 2;
+			double newY = y - viewportHeight / 2 + (double) h / 2;
 
 			newX = Math.max(0, Math.min(newX, getWidth() - viewportWidth));
 			newY = Math.max(0, Math.min(newY, getHeight() - viewportHeight));
 
-			System.out.println("newX: " + newX + " newY: " + newY);
-
-			scrollToRect(new Rectangle2D(newX, newY, viewportWidth, viewportHeight));
-
+			//scrollToPosition(newX, newY);
+			scrollToPosition(489, 50);
 		}
 
 	}
 
-	private void scrollToRect(Rectangle2D rect) {
-		double hValue = rect.getMinX() / (getWidth() - rect.getWidth());
-		double vValue = rect.getMinY() / (getHeight() - rect.getHeight());
+	private void scrollToPosition(double newX, double newY) {
+		double contentWidth = getWidth();
+		double contentHeight = getHeight();
+
+		double hValue = newX / (contentWidth - scroll.getViewportBounds().getWidth());
+		double vValue = newY / (contentHeight - scroll.getViewportBounds().getHeight());
+
+		hValue = Math.max(0, Math.min(hValue, 1));
+		vValue = Math.max(0, Math.min(vValue, 1));
 
 		scroll.setHvalue(hValue);
 		scroll.setVvalue(vValue);

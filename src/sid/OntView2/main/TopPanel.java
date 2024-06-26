@@ -184,7 +184,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		if (zoomSlider == null) {
 			zoomSlider = new Slider();
 			zoomSlider.setMin(0);
-			zoomSlider.setMax(25);
+			zoomSlider.setMax(10);
 			zoomSlider.setBlockIncrement(3);
 			zoomSlider.setOrientation(Orientation.VERTICAL);
 			zoomSlider.setValue(5);
@@ -255,7 +255,9 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			HBox.setHgrow(comboBox, Priority.ALWAYS);
 			comboBox.setMaxWidth(Double.MAX_VALUE);
 
-			comboBox.valueProperty().addListener((options, oldValue, newValue) -> comboBox0ItemItemStateChanged(newValue));
+			comboBox.setOnAction(this::comboBox0ItemItemStateChanged);
+
+			//comboBox.valueProperty().addListener((options, oldValue, newValue) -> comboBox0ItemItemStateChanged(newValue));
 		}
 		return comboBox;
 	}
@@ -593,13 +595,28 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		parent.restoreViewButtonAction(event);
 	}
 
-	private void comboBox0ItemItemStateChanged(String selectedItem) {
+	/*private void comboBox0ItemItemStateChanged(String selectedItem) {
+		System.out.println("Selected item: " + selectedItem);
 		if (parent.firstItemStateChanged) {
 			String key = parent.artPanel.getVisGraph().getQualifiedLabelMap().get(selectedItem);
 			parent.artPanel.focusOnShape(key, null);
 		} else {
 			parent.firstItemStateChanged = true;
 		}
+	}*/
+
+	private void comboBox0ItemItemStateChanged(ActionEvent event) {
+		System.out.println("aaaaaaaaaaaaaaaa");
+
+			if (parent.firstItemStateChanged) {
+				String selectedItem = (String)getComboBox0().getValue();
+				System.out.println("Selected item: " + selectedItem);
+				String key = parent.artPanel.getVisGraph().getQualifiedLabelMap().get(selectedItem);
+				parent.artPanel.focusOnShape(key, null);
+			} else {
+				parent.firstItemStateChanged = true;
+			}
+
 	}
 
 	private void saveViewButtonActionActionPerformed(ActionEvent event) {
@@ -693,14 +710,15 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private void zoomSliderChangeStateChanged(Number newValue) {
 		double roundedValue = Math.round(newValue.doubleValue() * 10) / 10.0;
 
+
 		if (parent.artPanel != null) {
-			double factor = (0.5 + roundedValue / 10.0);
+			double factor = (1 + roundedValue / 100.0);
 			if (size == null) {
 				size = new Dimension2D(parent.artPanel.getWidth(), parent.artPanel.getHeight());
 				parent.artPanel.setOriginalSize(size);
 			}
 			parent.artPanel.getVisGraph().setZoomLevel((int) getZoomSlider().getValue());
-			parent.artPanel.setFactor(factor);
+			parent.artPanel.setFactor(factor); // PROBLEMAS
 			parent.artPanel.scale(factor, size);
 		}
 	}
