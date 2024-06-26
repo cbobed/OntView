@@ -126,9 +126,7 @@ public class Mine extends Application implements Embedable{
 		//viewer.setVisible(true);
 
 		Scene scene = new Scene(root, 800, 600);
-
-
-		ClassLoader c = Thread.currentThread().getContextClassLoader();		
+		ClassLoader c = Thread.currentThread().getContextClassLoader();
 		scene.getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
 		primaryStage.setScene(scene);
 		primaryStage.setMaximized(true);

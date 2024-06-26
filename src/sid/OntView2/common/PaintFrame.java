@@ -10,6 +10,8 @@ import java.util.Map.Entry;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 
+import javafx.animation.PauseTransition;
+import javafx.application.Platform;
 import javafx.geometry.Bounds;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Point2D;
@@ -26,6 +28,7 @@ import javafx.scene.Cursor;
 
 import javafx.scene.text.Font;
 import javafx.scene.transform.Affine;
+import javafx.util.Duration;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
@@ -169,7 +172,7 @@ public class PaintFrame extends Canvas implements Runnable{
 			for (VisConnector c : dashedConnectorsCopy) {
 				c.draw(g);
 			}
-			g.setStroke(Color.BLACK);
+			g.setStroke(Color.LIGHTGRAY);
 
 			List<VisLevel> levelsCopy;
 			synchronized (visGraph.levelSet) {
@@ -178,7 +181,7 @@ public class PaintFrame extends Canvas implements Runnable{
 			for (VisLevel lvl : levelsCopy) {
 				(g).strokeLine(lvl.getXpos(), 0, lvl.getXpos(), (int) (getHeight()/factor));
 				//Uncomment this to get a vertical line in every level
-				g.setStroke(Color.BLACK);
+				g.setStroke(Color.LIGHTGRAY);
 
 			}
 			g.setStroke(Color.BLACK);
@@ -194,9 +197,6 @@ public class PaintFrame extends Canvas implements Runnable{
 
 		}
 	}
-
-
-
 	private void drawPropertyBoxes(GraphicsContext g2d){
 		for (Entry<String,Shape> entry : visGraph.shapeMap.entrySet()){
 			if (entry.getValue() instanceof VisClass){
@@ -321,7 +321,7 @@ public class PaintFrame extends Canvas implements Runnable{
 	Cursor cursorState = Cursor.DEFAULT;
 	public boolean hideRange = false;
 	private Embedable parentframe;
-	private Tooltip tooltip = new Tooltip();
+	private final Tooltip tooltip = new Tooltip();
 
 
 	public void handleMouseEntered(MouseEvent e) {
@@ -417,6 +417,8 @@ public class PaintFrame extends Canvas implements Runnable{
 		scroll.setVvalue(vValue);
 	}*/
 
+
+
 	public void handleMouseMoved(MouseEvent e) {
 		if (visGraph == null) {
 			return;
@@ -428,32 +430,56 @@ public class PaintFrame extends Canvas implements Runnable{
 		Shape shape = visGraph.findShape(p);
 		String tip;
 
-		if (shape !=null) {
-			tip = shape.getToolTipInfo();
-			tooltip.setText(tip);
-			tooltip.setShowDelay(javafx.util.Duration.seconds(15));
-			Tooltip.install(this, tooltip);
+		PauseTransition pause = new PauseTransition(Duration.seconds(4));
 
+		if (shape !=null) {
+			if(isInsideRect(e.getX(), e.getY(), shape.getPosX(), shape.getPosY())) {
+				tip = shape.getToolTipInfo();
+				tooltip.setText(formatToolTipText(tip));
+				Tooltip.install(this, tooltip);
+				pause.playFromStart();
+			}
 		}
 		else  {
+			tooltip.hide();
+			pause.stop();
+			Tooltip.uninstall(this, tooltip);
 			prop = movedOnVisPropertyDescription(x, y);
-			if (prop != null){
+			if (prop != null){/*
 				tip = prop.getTooltipText();
-				tooltip.setText(tip);
-				tooltip.setShowDelay(javafx.util.Duration.seconds(15));
 				Tooltip.install(this, tooltip);
+				tooltip.setText(tip);
+				tooltip.setShowDelay(Duration.seconds(3));*/
 			}
 		}
 		if ((shape !=null )||(prop != null)){
 			setCursor(Cursor.HAND);
-			cursorState=Cursor.HAND;
+			cursorState = Cursor.HAND;
 		}
-		else{
-			cursorState= Cursor.DEFAULT;
+		else {
+			cursorState = Cursor.DEFAULT;
 			setCursor(Cursor.DEFAULT);
 		}
+	}
 
+	private String formatToolTipText(String html) {
 
+		System.out.println("formatToolTipText: " + html);
+		// This is a simplified method to convert HTML-like content into JavaFX Tooltip styled text
+		return html.replaceAll("<html>", "")
+				.replaceAll("</html>", "")
+				.replaceAll("<b>", "")
+				.replaceAll("</b>", "")
+				.replaceAll("<br>", "\n")
+				.replaceAll("<ul>", "")
+				.replaceAll("</ul>", "")
+				.replaceAll("<li>", "\u2022 ")
+				.replaceAll("</li>", "\n");
+	}
+
+	private boolean isInsideRect(double mouseX, double mouseY, double rectX, double rectY) {
+		return mouseX >= rectX - (rectX/2) && mouseX <= rectX + (rectX/2) &&
+				mouseY >= rectY - (rectY/2) && mouseY <= rectY + (rectY/2);
 	}
 
 	/**
@@ -477,7 +503,6 @@ public class PaintFrame extends Canvas implements Runnable{
 		return new Rectangle2D(0, 0, getWidth(), getHeight());
 	}
 
-
 	private VisObjectProperty movedOnVisPropertyDescription(int x, int y){
 		for ( Entry<String, VisObjectProperty> entry : visGraph.propertyMap.entrySet()){
 			if (entry.getValue().onProperty(new Point2D(x,y)))
@@ -485,8 +510,6 @@ public class PaintFrame extends Canvas implements Runnable{
 		}
 		return null;
 	}
-
-
 
 	/*
 	 *  RUNNABLE METHODS

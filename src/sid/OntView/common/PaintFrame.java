@@ -386,7 +386,6 @@ public class PaintFrame extends JPanel implements MouseListener,Runnable,MouseMo
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		
 
 		Point p = translatePoint(e.getPoint());
 		int x = (int) p.getX();

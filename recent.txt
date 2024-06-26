@@ -1,6 +1,6 @@
+https://protege.stanford.edu/ontologies/pizza/pizza.owl
 file:/home/carlota/Downloads/ontology_subniveles.owl
 file:/home/carlota/Downloads/library_ontology.owl
-https://protege.stanford.edu/ontologies/pizza/pizza.owl
 file:/home/carlota/Downloads/ontology--DEV_type=orig.owl
 file:/home/carlota/Desktop/TFG/ontologias/mascotas.owl
 http://www.co-ode.org/ontologies/pizza/pizza.owl

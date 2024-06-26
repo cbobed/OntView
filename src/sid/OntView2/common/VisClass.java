@@ -259,8 +259,8 @@ public class VisClass extends Shape {
 	    }
 	    
 	    if (visible){
-			//Color mini = Color.rgb(224, 224, 224);
-			Color mini = Color.LIGHTGRAY;
+
+			Color mini = Color.rgb(224, 224, 224);
 
 	    	if (!isDefined) {
 	    		// CBL if it is not defined, we use the previous representation
@@ -268,14 +268,15 @@ public class VisClass extends Shape {
 		    		g.setFill(mini);
 		    	else
 		    		g.setFill(Color.WHITE);
-		    	
-			    g.fillRect(x - (double) getWidth() /2, y - (double) currentHeight /2, getWidth(), currentHeight);
+
+				g.fillRect(x - (double) getWidth() /2, y - (double) currentHeight /2, getWidth(), currentHeight);
 			    g.setStroke(Color.BLACK);
 			    if (isBottom) {
 			    	g.setStroke(Color.RED);
 			    }	
 		 
 			    //rectangle
+				//g.strokeRoundRect(x -  (double) getWidth() /2, y - (double) currentHeight /2,  getWidth()-1, currentHeight-1, 10, 10);
 			    g.strokeRect(x -  (double) getWidth() /2, y - (double) currentHeight /2,  getWidth()-1, currentHeight-1);
 			    g.setFill(Color.BLACK);
 			    if (propertyBox!=null){
@@ -293,7 +294,7 @@ public class VisClass extends Shape {
 			    }
 			    else {
 					drawFormattedString(g, visibleLabel, x - (getWidth() - 10) / 2,  (int) ((y - (currentHeight - 4) / 2) + ascent), (int) fontHeight);
-					//		    	g.drawString(removeFormatInformation(visibleLabel), x -(getWidth()-10)/2, (y - (currentHeight-4)/2) + fm.getAscent());
+					//g.drawString(removeFormatInformation(visibleLabel), x -(getWidth()-10)/2, (y - (currentHeight-4)/2) + fm.getAscent());
 			    }
 	    	}
 	    	else {
@@ -576,26 +577,8 @@ public class VisClass extends Shape {
 			other = "<html><b>"
 				+ (isAnonymous?removeFormatInformation(this.visibleLabel):this.visibleLabel)
 				+ "</b><br><br>";
-			// <CBL 24/9/13>
-			// This info is not included in the tooltip anymore 
-//			if ((isDefined)&&(!definitions.isEmpty())) {
-//				other+= (qualifiedRendering?
-//							ExpressionManager.getReducedQualifiedClassExpression(definition)
-//							:ExpressionManager.getReducedClassExpression(definition))+"<br><br>";
-//			}
 			if ((getDisjointClasses() !=null)&& (getDisjointClasses().size()>0)) {
-				other+="<b>Disjoint</b><ul>";
-				// <CBL 25/9/13> 
-				// updated to deal with the set of OWLClasses returned by the reasoner
-//				for ( OWLDisjointClassesAxiom axiom : getDisJointClassesAxioms()){
-//					for (OWLClass cl : axiom.getClassesInSignature()){
-//						if (cl!= this.getLinkedClassExpression()){
-//							other+="<li>"+(qualifiedRendering?
-//									ExpressionManager.getReducedQualifiedClassExpression(cl):
-//									ExpressionManager.getReducedClassExpression(cl))+"</li>";
-//						}
-//					}
-//				}
+				other+="<b>Disjoint</b><ul><br>";
 				
 				VisClass auxVisClass = null;
 				ArrayList<OWLClassExpression> auxArray = null; 
@@ -609,14 +592,14 @@ public class VisClass extends Shape {
 								for (OWLClassExpression ce: auxArray) {
 									other+="<li>"+(qualifiedRendering?
 											ExpressionManager.getReducedQualifiedClassExpression(ce):
-											ExpressionManager.getReducedClassExpression(ce)); 	
+											ExpressionManager.getReducedClassExpression(ce)) + "</li>";
 								}
 							}
 						}
 						else {	
-							other+="<li>"+(qualifiedRendering? 
+							other+="<li>"+(qualifiedRendering?
 									ExpressionManager.getReducedQualifiedClassExpression(cl):
-									ExpressionManager.getReducedClassExpression(cl)); 
+									ExpressionManager.getReducedClassExpression(cl)) + "</li>";
 							
 						}
 					}
@@ -625,31 +608,15 @@ public class VisClass extends Shape {
 				
 				other+="</ul>";
 			}
-//			if  (inherited.size()>0) {
-//				other += "<b>Inherited Properties</b><br><ul>";
-//				for (OWLObjectProperty prop : inherited) {
-//					other +="<li>" + VisObjectProperty.reduce(prop)+ "</li>";
-//				}
-//			}
-//			if  (dInherited.size()>0) {
-//				for (OWLDataProperty prop : dInherited) {
-//					other +="<li><b>(d)</b>" + VisDataProperty.reduce(prop)+ "</li>";
-//				}
-//			}
 			
 			if (aplicable.size()>0) {
-				other += "</ul><br><b>Aplicable</b><br><ul>";
+				other += "<br><b>Aplicable</b><br><ul>";
 				for (OWLObjectProperty prop : aplicable) {
 					other +="<li>" + (qualifiedRendering?
 										ExpressionManager.getReducedQualifiedObjectPropertyExpression(prop):
 										ExpressionManager.getReducedObjectPropertyExpression(prop))+ "</li>";
 				}
 			}
-//			if (dAplicable.size()>0) {
-//				for (OWLDataProperty prop : dAplicable) {
-//					other +="<li>" + VisDataProperty.reduce(prop)+ "</li>";
-//				}
-//			}
 			other += "</ul></html>";
 		}
 		return other;

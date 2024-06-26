@@ -67,6 +67,25 @@
     -fx-font-weight: normal;
 }
 
+.tooltipDesign {
+    -fx-background-color: lightblue;
+    -fx-text-fill: black;
+    -fx-padding: 10px;
+    -fx-border-color: black;
+    -fx-border-width: 1px;
+    -fx-font-weight: bold;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-font-size: 12px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.75), 10, 0, 0, 1);
+}
 
+.tooltipDesign .content {
+    -fx-background-color: lightblue;
+}
+
+.tooltipDesign .label {
+    -fx-text-fill: black;
+}
 
 
