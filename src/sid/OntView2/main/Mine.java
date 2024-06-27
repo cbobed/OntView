@@ -1,19 +1,18 @@
 package sid.OntView2.main;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.*;
 import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.net.URL;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.ImageOutputStream;
 
 
 import javafx.application.Application;
-import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
-import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
@@ -22,19 +21,16 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 
-import javafx.stage.StageStyle;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.StringDocumentSource;
 import org.semanticweb.owlapi.model.IRI;
@@ -61,9 +57,6 @@ import sid.OntView2.expressionNaming.SIDClassExpressionNamer;
 import sid.OntView2.utils.ExpressionManager;
 import uk.ac.manchester.cs.jfact.JFactFactory;
 
-import java.security.*;
-import java.util.Objects;
-import java.util.Optional;
 
 public class Mine extends Application implements Embedable{
 
@@ -94,9 +87,7 @@ public class Mine extends Application implements Embedable{
 		createAndShowGUI(primaryStage);
 	}
 
-	public Stage getPrimaryStage() {
-		return primaryStage;
-	}
+	public Stage getPrimaryStage() { return primaryStage; }
 
 	public ScrollPane getScrollPane() { return scroll; }
 
@@ -106,6 +97,7 @@ public class Mine extends Application implements Embedable{
 
 		Mine viewer = new Mine();
 		viewer.self = viewer;
+		viewer.primaryStage = primaryStage;
 
 		viewer.entityNameSet = new HashSet<>();
 		viewer.artPanel = new PaintFrame();
@@ -363,7 +355,15 @@ public class Mine extends Application implements Embedable{
 		params.setViewport(new Rectangle2D(xIni, yIni, w, h));
 		panel.snapshot(params, writableImage);
 
-		showCapturedImage(writableImage);
+		// To be able to use jpg format
+		BufferedImage bufferedImage = SwingFXUtils.fromFXImage(writableImage, null);
+		if (bufferedImage.getType() != BufferedImage.TYPE_INT_RGB) {
+			BufferedImage rgbImage = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), BufferedImage.TYPE_INT_RGB);
+			Graphics2D g = rgbImage.createGraphics();
+			g.drawImage(bufferedImage, 0, 0, null);
+			g.dispose();
+			bufferedImage = rgbImage;
+		}
 
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JPG", "*.jpg"));
@@ -371,6 +371,7 @@ public class Mine extends Application implements Embedable{
 
 		while (!done) {
 			File file = fileChooser.showSaveDialog(primaryStage);
+			System.out.println("file: " + file);
 
 			if (file != null) {
 				fl = file;
@@ -389,7 +390,10 @@ public class Mine extends Application implements Embedable{
 
 					if (!hasSuffix){
 						String newName = fl.getPath() + "." + extension;
+						System.out.println("writing to newName " + newName);
+
 						File fl2 = new File(newName);
+						System.out.println("fl2: " + fl2);
 						if (fl2.exists()) {
 							Alert alert = new Alert(AlertType.CONFIRMATION, "Overwrite?", ButtonType.OK, ButtonType.CANCEL);
 							Optional<ButtonType> result = alert.showAndWait();
@@ -397,11 +401,12 @@ public class Mine extends Application implements Embedable{
 								continue;
 							}
 						}
-						System.out.println("writing to " + fl2);
-						ImageIO.write(SwingFXUtils.fromFXImage(writableImage, null), extension, fl2);					}
+
+						ImageIO.write(SwingFXUtils.fromFXImage(writableImage, bufferedImage), extension, fl2);
+					}
 					else {
-						System.out.println("writing to " + fl);
-						ImageIO.write(SwingFXUtils.fromFXImage(writableImage, null), extension, fl);
+						System.out.println("writing to fl1 " + fl);
+						ImageIO.write(SwingFXUtils.fromFXImage(writableImage, bufferedImage), extension, fl);
 					}
 					done = true;
 				} catch (IOException e1) {
@@ -412,21 +417,6 @@ public class Mine extends Application implements Embedable{
 				break;
 			}
 		}
-	}
-
-	private void showCapturedImage(WritableImage writableImage) {
-		Stage previewStage = new Stage();
-		previewStage.initModality(Modality.APPLICATION_MODAL);
-		previewStage.initOwner(primaryStage);
-		VBox vbox = new VBox();
-		ImageView imageView = new ImageView(writableImage);
-		Button closeButton = new Button("Close");
-		closeButton.setOnAction(event -> previewStage.close());
-		vbox.getChildren().addAll(imageView, closeButton);
-		Scene scene = new Scene(vbox);
-		previewStage.setScene(scene);
-		previewStage.setTitle("Captured Image Preview");
-		previewStage.showAndWait();
 	}
 
 	public boolean hasValidSuffix(String in){
