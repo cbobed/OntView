@@ -27,7 +27,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.Cursor;
 
 import javafx.scene.text.Font;
-import javafx.scene.transform.Affine;
 import javafx.util.Duration;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -388,25 +387,43 @@ public class PaintFrame extends Canvas implements Runnable{
 			draw();
 		}
 		else {
-			System.out.println("handleMouseDragged");
-			double scrollX,scrollY;
-			Rectangle2D visibleRect = getVisibleRect();
+			double scrollHValue, scrollVValue;
+			double contentWidth = scroll.getContent().getBoundsInLocal().getWidth();
+			double contentHeight = scroll.getContent().getBoundsInLocal().getHeight();
 
-			if (draggedX < 0) {
-				scrollX = visibleRect.getMinX()* (visibleRect.getWidth() - draggedX * 2);
-			} else {
-				scrollX = visibleRect.getMinX() - draggedX;
-			}
+			scrollHValue = scroll.getHvalue() - draggedX / contentWidth;
+			scrollVValue = scroll.getVvalue() - draggedY / contentHeight;
 
-			if (draggedY < 0) {
-				scrollY = visibleRect.getMinY() + visibleRect.getWidth() - draggedY * 2;
-			} else {
-				scrollY = visibleRect.getMinY() - draggedY;
-			}
+			scrollHValue = Math.max(0, Math.min(scrollHValue, 1));
+			scrollVValue = Math.max(0, Math.min(scrollVValue, 1));
 
-			Rectangle rect = new Rectangle(scrollX, scrollY, 1, 1);
-			//scrollRectToVisible(rect);
+			scroll.setHvalue(scrollHValue);
+			scroll.setVvalue(scrollVValue);
+
 		}
+	}
+
+	public void focusOnShape2(String shapeKey,Shape pshape) {
+		/*
+		 * focus the frame on the shape pos
+		 * If shapeKey is  null, it will look for it
+		 */
+		Shape shape = pshape != null ? pshape : visGraph.getShape(shapeKey);
+
+		if (shape!= null) {
+			int x  = (int) (shape.getPosX() * factor);
+			int y  = (int) (shape.getPosY() * factor);
+
+			double scrollPaneWidth = scroll.getViewportBounds().getWidth();
+			double scrollPaneHeight = scroll.getViewportBounds().getHeight();
+
+			double hValue = (x - scrollPaneWidth / 2) / (getWidth() - scrollPaneWidth);
+			double vValue = (y - scrollPaneHeight / 2) / (getHeight() - scrollPaneHeight);
+
+			scroll.setHvalue(Math.max(0, Math.min(hValue, 1)));
+			scroll.setVvalue(Math.max(0, Math.min(vValue, 1)));
+		}
+
 	}
 
 	/*private void scrollRectToVisible(Rectangle rect) {
@@ -433,23 +450,21 @@ public class PaintFrame extends Canvas implements Runnable{
 		PauseTransition pause = new PauseTransition(Duration.seconds(4));
 
 		if (shape !=null) {
-			if(isInsideRect(e.getX(), e.getY(), shape.getPosX(), shape.getPosY())) {
-				tip = shape.getToolTipInfo();
-				tooltip.setText(formatToolTipText(tip));
-				Tooltip.install(this, tooltip);
-				pause.playFromStart();
-			}
+			tip = shape.getToolTipInfo();
+			tooltip.setText(formatToolTipText(tip));
+			Tooltip.install(this, tooltip);
+			pause.playFromStart();
 		}
 		else  {
 			tooltip.hide();
 			pause.stop();
 			Tooltip.uninstall(this, tooltip);
 			prop = movedOnVisPropertyDescription(x, y);
-			if (prop != null){/*
+			if (prop != null){
 				tip = prop.getTooltipText();
+				tooltip.setText(formatToolTipText(tip));
 				Tooltip.install(this, tooltip);
-				tooltip.setText(tip);
-				tooltip.setShowDelay(Duration.seconds(3));*/
+				pause.playFromStart();
 			}
 		}
 		if ((shape !=null )||(prop != null)){
@@ -462,10 +477,15 @@ public class PaintFrame extends Canvas implements Runnable{
 		}
 	}
 
+	/**
+	 * method to convert HTML-like content into JavaFX Tooltip styled text
+	 * @param html
+	 * @return String
+	 */
 	private String formatToolTipText(String html) {
+		tooltip.setFont(new Font("Dialog", 12));
+		tooltip.setStyle("-fx-background-color: #cedef7; -fx-text-fill: #000000;");
 
-		System.out.println("formatToolTipText: " + html);
-		// This is a simplified method to convert HTML-like content into JavaFX Tooltip styled text
 		return html.replaceAll("<html>", "")
 				.replaceAll("</html>", "")
 				.replaceAll("<b>", "")
@@ -477,6 +497,14 @@ public class PaintFrame extends Canvas implements Runnable{
 				.replaceAll("</li>", "\n");
 	}
 
+	/**
+	 * method to check if the mouse is inside a rectangle
+	 * @param mouseX
+	 * @param mouseY
+	 * @param rectX
+	 * @param rectY
+	 * @return boolean
+	 */
 	private boolean isInsideRect(double mouseX, double mouseY, double rectX, double rectY) {
 		return mouseX >= rectX - (rectX/2) && mouseX <= rectX + (rectX/2) &&
 				mouseY >= rectY - (rectY/2) && mouseY <= rectY + (rectY/2);

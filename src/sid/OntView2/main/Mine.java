@@ -19,14 +19,17 @@ import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -351,22 +354,23 @@ public class Mine extends Application implements Embedable{
 		boolean done = false;
 		int answer;
 		//BufferedImage bi = new BufferedImage(w+xIni,h+yIni, BufferedImage.TYPE_INT_RGB);
-		ArrayList<String> valid = new ArrayList<String>();
+		ArrayList<String> valid = new ArrayList<>();
 		valid.add("jpg");
 		valid.add("png");
 
-		WritableImage writableImage = new WritableImage(w + xIni, h + yIni);
+		WritableImage writableImage = new WritableImage(w, h);
 		SnapshotParameters params = new SnapshotParameters();
 		params.setViewport(new Rectangle2D(xIni, yIni, w, h));
 		panel.snapshot(params, writableImage);
 
-		FileChooser selector = new FileChooser();
-		boolean hasSuffix= true;
-		FileChooser.ExtensionFilter jpgFilter = new FileChooser.ExtensionFilter("JPG files (*.jpg)", "*.jpg");
-		FileChooser.ExtensionFilter pngFilter = new FileChooser.ExtensionFilter("PNG files (*.png)", "*.png");
-		selector.getExtensionFilters().addAll(jpgFilter, pngFilter);
+		showCapturedImage(writableImage);
+
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JPG", "*.jpg"));
+		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG", "*.png"));
+
 		while (!done) {
-			File file = selector.showSaveDialog(primaryStage);
+			File file = fileChooser.showSaveDialog(primaryStage);
 
 			if (file != null) {
 				fl = file;
@@ -379,21 +383,24 @@ public class Mine extends Application implements Embedable{
 					}
 				}
 				try {
-					String extension = getExtension(selector.getSelectedExtensionFilter().getDescription());
-					hasSuffix = hasValidSuffix(fl.getName().toLowerCase());
+					String extension = valid.contains(fileChooser.getSelectedExtensionFilter().getDescription().toLowerCase()) ?
+							fileChooser.getSelectedExtensionFilter().getDescription().toLowerCase() : "jpg";
+					boolean hasSuffix = hasValidSuffix(fl.getName().toLowerCase());
+
 					if (!hasSuffix){
 						String newName = fl.getPath() + "." + extension;
-						boolean exists = (new File(newName).exists());
 						File fl2 = new File(newName);
-						if (exists){
+						if (fl2.exists()) {
 							Alert alert = new Alert(AlertType.CONFIRMATION, "Overwrite?", ButtonType.OK, ButtonType.CANCEL);
 							Optional<ButtonType> result = alert.showAndWait();
 							if (result.isPresent() && result.get() == ButtonType.CANCEL) {
 								continue;
 							}
 						}
+						System.out.println("writing to " + fl2);
 						ImageIO.write(SwingFXUtils.fromFXImage(writableImage, null), extension, fl2);					}
 					else {
+						System.out.println("writing to " + fl);
 						ImageIO.write(SwingFXUtils.fromFXImage(writableImage, null), extension, fl);
 					}
 					done = true;
@@ -405,6 +412,21 @@ public class Mine extends Application implements Embedable{
 				break;
 			}
 		}
+	}
+
+	private void showCapturedImage(WritableImage writableImage) {
+		Stage previewStage = new Stage();
+		previewStage.initModality(Modality.APPLICATION_MODAL);
+		previewStage.initOwner(primaryStage);
+		VBox vbox = new VBox();
+		ImageView imageView = new ImageView(writableImage);
+		Button closeButton = new Button("Close");
+		closeButton.setOnAction(event -> previewStage.close());
+		vbox.getChildren().addAll(imageView, closeButton);
+		Scene scene = new Scene(vbox);
+		previewStage.setScene(scene);
+		previewStage.setTitle("Captured Image Preview");
+		previewStage.showAndWait();
 	}
 
 	public boolean hasValidSuffix(String in){

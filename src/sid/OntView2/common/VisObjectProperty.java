@@ -67,11 +67,11 @@ public class VisObjectProperty extends VisProperty {
 		if (description.equals("")){
 			description +="<html><b>"+visibleLabel+"</b><br><br>";
 			if ((parents != null)&&(parents.size()>1)){
-				description += "<b>Subproperty of</b><ul>";
+				description += "<b>Subproperty of</b><br><ul>";
 				for (VisObjectProperty p : parents){
 					description += "<li>"+p.visibleLabel+" </li>";
 				}
-				description+="</ul>";
+				description+="<br></ul>";
 			}
 			description +="<b>Domain:</b> "+getDomain().visibleLabel+"<br>";
 			description +="<b>Range     : </b>"; 
