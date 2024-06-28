@@ -37,22 +37,6 @@ public abstract class VisConnector {
     }
     
     public boolean isRedundant(){ return redundant;}
-    /**
-     * graphics.drawLine with an arrow
-     */
-    public static void drawArrow(GraphicsContext g, int x0, int y0, int x1, int y1){
-		double alfa=Math.atan2(y1-y0,x1-x0);
-		g.strokeLine(x0,y0,x1,y1);
-		int k=3;
-		int xa=(int)(x1 - k * Math.cos(alfa+1));
-		int ya=(int)(y1 - k * Math.sin(alfa+1));
-		// Se dibuja un extremo de la dirección de la flecha.
-		g.strokeLine(xa,ya,x1,y1);
-		xa=(int)(x1 - k * Math.cos(alfa-1));
-		ya=(int)(y1 - k * Math.sin(alfa-1));
-		// Se dibuja el otro extremo de la dirección de la flecha.
-		g.strokeLine(xa,ya,x1,y1);
-		}
     
     public abstract void draw (GraphicsContext g);
 

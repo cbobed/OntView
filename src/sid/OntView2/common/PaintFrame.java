@@ -18,6 +18,7 @@ import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseButton;
@@ -66,6 +67,11 @@ public class PaintFrame extends Canvas implements Runnable{
 	OWLReasoner    reasoner;
 	VisGraph       visGraph,oVisGraph,rVisGraph; //visGraph will handle both depending on which is currently selected
 //    public boolean reduceChecked = false;
+
+	String positionGraph = "LEFT";
+	private VisShapeContext menuVisShapeContext = null;
+	private VisGeneralContext menuVisGeneralContext = null;
+
 
 
 	public boolean isStable(){return stable;}
@@ -575,7 +581,10 @@ public class PaintFrame extends Canvas implements Runnable{
 		if (clickedOnShape(x, y,e))          return;
 		if (clickedOnClosePropertyBox(x, y)) return;
 		if (e.getButton()==MouseButton.SECONDARY){
-			showContextMenu((int) e.getX(), (int) e.getY());
+			if (menuVisGeneralContext != null){
+				closeContextMenu(menuVisGeneralContext);
+			}
+			showContextMenu((int) e.getScreenX(), (int) e.getScreenY());
 		}
 		draw();
 	}
@@ -600,6 +609,8 @@ public class PaintFrame extends Canvas implements Runnable{
 
 					//if right click on the figure
 					case SECONDARY :
+						if (menuVisShapeContext != null){ closeContextMenu(menuVisShapeContext); }
+						if (menuVisGeneralContext != null){ closeContextMenu(menuVisGeneralContext); }
 						showContextMenu(shape,e);
 						break;
 					case PRIMARY :
@@ -628,6 +639,10 @@ public class PaintFrame extends Canvas implements Runnable{
 				getVisGraph().updateObservers(VisConstants.GENERALOBSERVER);
 				return true;
 			}
+		}
+		else {
+			if (menuVisShapeContext != null){ closeContextMenu(menuVisShapeContext); }
+			if (menuVisGeneralContext != null){ closeContextMenu(menuVisGeneralContext); }
 		}
 
 		//notify graphObserver
@@ -695,13 +710,18 @@ public class PaintFrame extends Canvas implements Runnable{
 		x = e.getScreenX();
 		y = e.getScreenY();
 
-		VisShapeContext menu = new VisShapeContext(s,this,e);
-		menu.show(this,x,y);
+		menuVisShapeContext = new VisShapeContext(s,this,e);
+		menuVisShapeContext.show(this,x,y);
     }
 
+	private void closeContextMenu(ContextMenu menu){
+		menu.hide();
+		menu = null;
+	}
+
 	private void showContextMenu(int x, int y){
-		VisGeneralContext menu = new VisGeneralContext(this);
-		menu.show(this,x,y);
+		menuVisGeneralContext = new VisGeneralContext(this);
+		menuVisGeneralContext.show(this,x,y);
     }
 
 	public VisGraph getVisGraph() {return visGraph;}

@@ -14,12 +14,10 @@ import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import sid.OntView2.expressionNaming.SIDClassExpressionNamer;
 import sid.OntView2.utils.ExpressionManager;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.StringTokenizer;
+import java.util.*;
 
 public class VisClass extends Shape {
 	
@@ -230,12 +228,29 @@ public class VisClass extends Shape {
 			boldFont= Font.font("Dialog", FontWeight.BOLD, 10);
 		return boldFont;
 	}
-	
+
+
+	public void layoutChildren() {
+		int childX = posx - ((children.size() - 1) * (getWidth() / 2));
+		int verticalSpacing = 80;
+		int childY = posy + currentHeight + verticalSpacing;
+		for (Shape child : children) {
+			child.setPosition(childX, childY);
+			int horizontalSpacing = 20;
+			childX += child.getWidth() + horizontalSpacing;
+		}
+	}
+
 	public void drawShape(GraphicsContext g) {
-	    int x = posx+1;
-	    int y = posy;
-	    	    
-	    Font oldFont=g.getFont();
+		int x, y;
+		if (Objects.equals(graph.paintframe.positionGraph, "LEFT")) {
+			x = posx + 1;
+        } else {
+			x = posx;
+        }
+        y = posy;
+
+        Font oldFont=g.getFont();
 	    if (this.isDefined) {
 	        g.setFont(getDefinedClassFont());
 	    }
@@ -373,6 +388,12 @@ public class VisClass extends Shape {
 	    	}
 		    
 	    	//test
+			if (Objects.equals(graph.paintframe.positionGraph, "UP")) {
+				layoutChildren();
+				for (Shape child : children) {
+					child.drawShape(g);
+				}
+			}
 
 		    if (children.size() > 0 && (outConnectors!=null) &&(outConnectors.size()>0)){
 		    	switch (this.getState()) {

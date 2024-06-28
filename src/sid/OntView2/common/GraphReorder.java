@@ -17,15 +17,15 @@ public class GraphReorder {
 	public GraphReorder(VisGraph v ){
 		vgraph = v;
 	}
-	
+
 	public  void visualReorder(){
 		Graph graph = new Graph();
 		cloneGraph(graph, vgraph);
 
-		float minY = 0; 
+		float minY = 0;
 		float maxY = 0;
 		vgraphHeight = vgraph.getHeight();
-//		 Step 2
+		//Step 2
 		Sugiyama s = new Sugiyama(graph);
 		s.getLayoutedGraph();
 		s.run();
@@ -40,12 +40,12 @@ public class GraphReorder {
 			Entry<String,SugiyamaNodeView> entryCast = (Entry<String,SugiyamaNodeView>) entry;
 			nodeView = entryCast.getValue();
 			if (nodeView.getPosX()< minY) {minY = nodeView.getPosX();}
-			if (nodeView.getPosX()> maxY) {maxY = nodeView.getPosX();}					
+			if (nodeView.getPosX()> maxY) {maxY = nodeView.getPosX();}
 		}
-		
+
 		for(Object entry: layoutedGraph.getAllNodes().entrySet()){
 			@SuppressWarnings("unchecked")
-			
+
 			Entry<String,SugiyamaNodeView> entryCast = (Entry<String,SugiyamaNodeView>) entry;
 			nodeView = entryCast.getValue();
 			key = entryCast.getKey();
@@ -56,14 +56,9 @@ public class GraphReorder {
 					shape.setPosY(translateRelativePos(nodeView.getPosX(), minY, maxY));
 
 				}
-
-				
-			}	
-			
+			}
 		}
 	}
-	
-
 
 	/**
 	 * gets the relative equivalent point in visgraph
@@ -71,14 +66,11 @@ public class GraphReorder {
 	public int translateRelativePos(float in, float low,float high){
 
 		float total = high-low;
-		float perOne = (float) ((in-low)/total); 
-		
-		return (int)((float)(vgraphHeight * perOne));
-		
+		float perOne = (in-low)/total;
+
+		return (int) (vgraphHeight * perOne);
 	}
-	
-	
-	
+
 	public static void cloneGraph(Graph graph, VisGraph vgraph){
 		for (Entry<String, Shape> entry : vgraph.shapeMap.entrySet()){
 			if (!(entry.getValue().outConnectors.isEmpty()) ||(!(entry.getValue().inConnectors.isEmpty()))){
@@ -94,15 +86,8 @@ public class GraphReorder {
 					Node dst = graph.getNode(Shape.getKey(c.to.getLinkedClassExpression()));
 					dst.setIdDad(or.getId());
 					graph.addEdge(new Edge(or,dst));
-				}	
+				}
 			}
 		}
-			
-		
-		
-		
 	}
-
-	
-	
 }

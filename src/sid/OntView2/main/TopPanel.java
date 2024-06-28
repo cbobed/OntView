@@ -1,5 +1,6 @@
 package sid.OntView2.main;
 
+import javafx.animation.PauseTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -13,6 +14,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -20,6 +22,7 @@ import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
+import javafx.util.Duration;
 import org.semanticweb.owlapi.model.IRI;
 import sid.OntView2.common.*;
 
@@ -143,6 +146,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			saveImagePartialButton.setGraphic(imageView);
 
 			saveImagePartialButton.setOnAction(this::saveImageButtonPartialActionActionPerformed);
+
+			tooltipInfo(saveImagePartialButton, "Save visible graph as image");
 		}
 		return saveImagePartialButton;
 	}
@@ -200,6 +205,12 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		return zoomSlider;
 	}
 
+	private void tooltipInfo(Node node, String text) {
+		Tooltip tooltip = new Tooltip(text);
+		Tooltip.install(node, tooltip);
+		tooltip.setFont(new Font("Dialog", 12));
+	}
+
 	private Button getfileSystemButton() {
 		if (fileSystemButton == null) {
 			fileSystemButton = new Button();
@@ -214,6 +225,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			imageView.setPreserveRatio(true);
 			fileSystemButton.setGraphic(imageView);
 			fileSystemButton.setOnAction(this::fileSystemButtonActionActionPerformed);
+
+			tooltipInfo(fileSystemButton, "Select ontology file from file system");
 		}
 		return fileSystemButton;
 	}
@@ -258,6 +271,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			//comboBox.setOnAction(this::comboBox0ItemItemStateChanged);
 
 			comboBox.valueProperty().addListener((options, oldValue, newValue) -> comboBox0ItemItemStateChanged(newValue));
+
+			tooltipInfo(comboBox, "Search for a class onces the ontology is loaded");
 		}
 		return comboBox;
 	}
@@ -413,6 +428,9 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			imageView.setPreserveRatio(true);
 			saveImageButton.setGraphic(imageView);
 			saveImageButton.setOnAction(this::saveImageButtonActionActionPerformed);
+
+			tooltipInfo(saveImageButton, "Save graph as image");
+
 		}
 		return saveImageButton;
 	}
@@ -438,6 +456,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			restoreViewButton.setMinWidth(70);
 			restoreViewButton.setCursor(Cursor.HAND);
 			restoreViewButton.setOnAction(this::restoreViewButtonActionActionPerformed);
+
+			tooltipInfo(restoreViewButton, "Restore view from xml file");
 		}
 		return restoreViewButton;
 	}
@@ -449,6 +469,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			saveViewButton.setMinWidth(70);
 			saveViewButton.setCursor(Cursor.HAND);
 			saveViewButton.setOnAction(this::saveViewButtonActionActionPerformed);
+
+			tooltipInfo(saveViewButton, "Save current view as xml file");
 		}
 		return saveViewButton;
 	}

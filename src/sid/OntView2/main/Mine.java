@@ -371,7 +371,6 @@ public class Mine extends Application implements Embedable{
 
 		while (!done) {
 			File file = fileChooser.showSaveDialog(primaryStage);
-			System.out.println("file: " + file);
 
 			if (file != null) {
 				fl = file;
@@ -390,10 +389,8 @@ public class Mine extends Application implements Embedable{
 
 					if (!hasSuffix){
 						String newName = fl.getPath() + "." + extension;
-						System.out.println("writing to newName " + newName);
 
 						File fl2 = new File(newName);
-						System.out.println("fl2: " + fl2);
 						if (fl2.exists()) {
 							Alert alert = new Alert(AlertType.CONFIRMATION, "Overwrite?", ButtonType.OK, ButtonType.CANCEL);
 							Optional<ButtonType> result = alert.showAndWait();
@@ -405,7 +402,6 @@ public class Mine extends Application implements Embedable{
 						ImageIO.write(SwingFXUtils.fromFXImage(writableImage, bufferedImage), extension, fl2);
 					}
 					else {
-						System.out.println("writing to fl1 " + fl);
 						ImageIO.write(SwingFXUtils.fromFXImage(writableImage, bufferedImage), extension, fl);
 					}
 					done = true;

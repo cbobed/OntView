@@ -69,8 +69,12 @@ public abstract class Shape{
 		inDashedConnectors = new ArrayList<VisConnector>();
 		hiddenSubClasses = new ArrayList<Shape>();
 	}
-	
-	
+
+	public void setPosition(int x, int y) {
+		this.posx = x;
+		this.posy = y;
+	}
+
 	/** 
 	 * Marks as closed and hides subLevels 
 	 * Then looks for those remaining visible nodes and adds a reference (dashed line)
