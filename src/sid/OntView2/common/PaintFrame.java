@@ -584,7 +584,7 @@ public class PaintFrame extends Canvas implements Runnable{
 			if (menuVisGeneralContext != null){
 				closeContextMenu(menuVisGeneralContext);
 			}
-			showContextMenu((int) e.getScreenX(), (int) e.getScreenY());
+			showContextMenu((int) e.getSceneX(), (int) e.getSceneY());
 		}
 		draw();
 	}
@@ -707,8 +707,8 @@ public class PaintFrame extends Canvas implements Runnable{
 
 	private void showContextMenu(Shape s,MouseEvent e) {
 		double x,y;
-		x = e.getScreenX();
-		y = e.getScreenY();
+		x = e.getSceneX();
+		y = e.getSceneY();
 
 		menuVisShapeContext = new VisShapeContext(s,this,e);
 		menuVisShapeContext.show(this,x,y);

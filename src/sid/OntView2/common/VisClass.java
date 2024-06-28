@@ -6,10 +6,8 @@ import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Font;
 import javafx.scene.canvas.GraphicsContext;
-
-
 import javafx.scene.text.Text;
-import org.semanticweb.owlapi.apibinding.OWLManager;
+
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.NodeSet;
@@ -22,11 +20,7 @@ import java.util.*;
 public class VisClass extends Shape {
 	
     //Graphic
-	public static int instances = 0;
 	public static final int FIRST_X_SEPARATION = 200;
-	public static final int LAST_X_SEPARATION = 100;
-	public static final int NODES_X_SEPARATION = 200;
-	public static final int NODES_Y_SEPARATION = 40;
 	public static final int RELATIVE_POS = 0;
 	public static Color color;
 	
@@ -284,6 +278,15 @@ public class VisClass extends Shape {
 		    	else
 		    		g.setFill(Color.WHITE);
 
+				/**
+				 * fillRect(
+				 * 			coordenada x de la esquina superior izquierda del rectángulo
+				 * 			coordenada y de la esquina superior izquierda del rectángulo.
+				 * 			Ancho del rectángulo.
+				 * 			Alto del rectángulo.)
+				 */
+
+
 				g.fillRect(x - (double) getWidth() /2, y - (double) currentHeight /2, getWidth(), currentHeight);
 			    g.setStroke(Color.BLACK);
 			    if (isBottom) {
@@ -305,7 +308,7 @@ public class VisClass extends Shape {
 	
 	//    		g.drawString(label, x -(getWidth()-10)/2, (y - (oldHeight-4)/2) + fm.getAscent());
 			    if (!isAnonymous) {
-					g.fillText(visibleLabel, x - (double) (getWidth() - 10) / 2, (y -(double) (currentHeight - 4) / 2) + ascent);
+					g.fillText(visibleLabel, x - (double) (getWidth()) / 2 + 10, (y -(double) (currentHeight - 4) / 2) + ascent);
 			    }
 			    else {
 					drawFormattedString(g, visibleLabel, x - (getWidth() - 10) / 2,  (int) ((y - (currentHeight - 4) / 2) + ascent), (int) fontHeight);
@@ -375,15 +378,6 @@ public class VisClass extends Shape {
 							auxY += (countLines(auxDefString)*fontHeight) + 5;
 		    			}
 		    		}
-//		//    		g.drawString(label, x -(getWidth()-10)/2, (y - (oldHeight-4)/2) + fm.getAscent());
-//				    if (!isAnonymous) { 
-//				    	g.drawString(visibleLabel, x -(getWidth()-10)/2, (y - (currentHeight-4)/2) + fm.getAscent());
-//				    }
-//				    else {
-//				    	drawFormattedString(g, visibleLabel, x -(getWidth()-10)/2, (y - (currentHeight-4)/2) + fm.getAscent(), fm.getMaxAscent()); 
-//		//		    	g.drawString(removeFormatInformation(visibleLabel), x -(getWidth()-10)/2, (y - (currentHeight-4)/2) + fm.getAscent());
-//				    }
-//	    			
 	    		}
 	    	}
 		    
@@ -479,7 +473,6 @@ public class VisClass extends Shape {
 					}
 				}
 			}
-			
 		}
 		else {
 			if (qualifiedRendering) {
@@ -489,20 +482,9 @@ public class VisClass extends Shape {
 				visibleLabel = label; 
 			}
 		}
-			setWidth(calculateWidth());
-		
-//		if (!explicitLabel.equals("")){
-//			String aux = label;
-//			label = explicitLabel;
-//			explicitLabel = aux;
-//			setWidth(calculateWidth());
-////			if (getWidth() > getVisLevel().getWidth())
-////				getVisLevel().updateWidth(getWidth());
-//		}
+		setWidth(calculateWidth());
 	}
-	
-	
-	
+
      public void addParent(Shape parent) {
     	if (!parents.contains(parent)) {
     	    parents.add(parent);
@@ -594,7 +576,6 @@ public class VisClass extends Shape {
 		if (!isAnonymous){
 			getInheritedObjectProperties();
 			getInheritedDataProperties();
-			getAplicableObjectProperties();
 			other = "<html><b>"
 				+ (isAnonymous?removeFormatInformation(this.visibleLabel):this.visibleLabel)
 				+ "</b><br><br>";
@@ -625,18 +606,7 @@ public class VisClass extends Shape {
 						}
 					}
 				}
-				
-				
 				other+="</ul>";
-			}
-			
-			if (aplicable.size()>0) {
-				other += "<br><b>Aplicable</b><br><ul>";
-				for (OWLObjectProperty prop : aplicable) {
-					other +="<li>" + (qualifiedRendering?
-										ExpressionManager.getReducedQualifiedObjectPropertyExpression(prop):
-										ExpressionManager.getReducedObjectPropertyExpression(prop))+ "</li>";
-				}
 			}
 			other += "</ul></html>";
 		}
@@ -655,17 +625,15 @@ public class VisClass extends Shape {
 			for (OWLObjectProperty prop : objPropSet){
 				Set<Node<OWLClass>> domainNodes = reasoner.getObjectPropertyDomains(prop, false).getNodes();
 				Set<Node<OWLClass>> directNodes = reasoner.getObjectPropertyDomains(prop, true).getNodes();
-					for (Node<OWLClass>directNode : directNodes) {
-						if (directNode.contains((OWLClass) this.getLinkedClassExpression())){
-							inherited.add(prop);
-							domainNodes.removeAll(directNodes);
-							getSuperClassExpression(reasoner,inherited,domainNodes,objPropSet);
-						}
-					}	
+				for (Node<OWLClass>directNode : directNodes) {
+					if (directNode.contains((OWLClass) this.getLinkedClassExpression())){
+						inherited.add(prop);
+						domainNodes.removeAll(directNodes);
+						getSuperClassExpression(reasoner,inherited,domainNodes,objPropSet);
+					}
 				}
-
 			}
-			return;
+		}
 	}
 	
 	private void getSuperClassExpression(OWLReasoner reasoner,HashSet<OWLObjectProperty> inherited2,
@@ -679,7 +647,6 @@ public class VisClass extends Shape {
 							inherited2.add(prop);
 				}
 			}
-		
 		}
 	}
 	
@@ -709,91 +676,16 @@ public class VisClass extends Shape {
 			for (OWLDataProperty prop : objPropSet){
 				Set<Node<OWLClass>> domainNodes = reasoner.getDataPropertyDomains(prop, false).getNodes();
 				Set<Node<OWLClass>> directNodes = reasoner.getDataPropertyDomains(prop, true).getNodes();
-					for (Node<OWLClass>directNode : directNodes) {
-						if (directNode.contains((OWLClass) this.getLinkedClassExpression())){
-							dInherited.add(prop);
-							domainNodes.removeAll(directNodes);
-							getSuperClassExpression(reasoner,domainNodes,objPropSet);
-						}
-					}	
-				}
-
-		}
-		return;
-	}
-	
-
-
-	public void getAplicableObjectProperties(){
-		if (aplicable==null){
-			aplicable = new HashSet<OWLObjectProperty>();
-			OWLOntologyManager ontManager = OWLManager.createOWLOntologyManager();
-			OWLDataFactory dataFactory = ontManager.getOWLDataFactory();
-			OWLReasoner reasoner       = graph.paintframe.getReasoner();
-			OWLOntology activeOntology = graph.paintframe.getOntology();
-			//all properties
-			Set<OWLObjectProperty> objPropSet = activeOntology.getObjectPropertiesInSignature();
-			for (OWLObjectProperty prop : objPropSet){
-				//property domain
-				if (isAplicable(reasoner,dataFactory, activeOntology, prop)){
-					aplicable.add(prop);
+				for (Node<OWLClass>directNode : directNodes) {
+					if (directNode.contains((OWLClass) this.getLinkedClassExpression())){
+						dInherited.add(prop);
+						domainNodes.removeAll(directNodes);
+						getSuperClassExpression(reasoner,domainNodes,objPropSet);
+					}
 				}
 			}
-			// getDefinition();
-			return;
-		}		
-	}
-	
-	public void getAplicableDataProperties(){
-		if (dAplicable==null){
-			dAplicable = new HashSet<OWLDataProperty>();
-			OWLOntologyManager ontManager = OWLManager.createOWLOntologyManager();
-			OWLDataFactory dataFactory = ontManager.getOWLDataFactory();
-			OWLReasoner reasoner       = graph.paintframe.getReasoner();
-			OWLOntology activeOntology = graph.paintframe.getOntology();
-			//all properties
-			Set<OWLDataProperty> dPropSet = activeOntology.getDataPropertiesInSignature();
-			for (OWLDataProperty prop : dPropSet){
-				//property domain
-				if (isAplicable(reasoner,dataFactory, activeOntology, prop)){
-					dAplicable.add(prop);
-				}
-			}
-			//getDefinition();
-			return;
-		}		
-	}
-	
-	private boolean isAplicable(OWLReasoner reasoner,OWLDataFactory dFactory,OWLOntology activeOntology, OWLObjectProperty prop) {
-		
-		// returns true if the intersection of the concept and the property domain is satisfiable
-		Set<Node<OWLClass>> domainNodeSet = reasoner.getObjectPropertyDomains(prop, true).getNodes();
-		HashSet<OWLClassExpression> terms = new HashSet<OWLClassExpression>();
-		for (Node<OWLClass> node : domainNodeSet){
-			for (OWLClassExpression exp : node){
-				terms.add(exp);
-			}
 		}
-		terms.add(this.linkedClassExpression);
-		OWLObjectIntersectionOf result = dFactory.getOWLObjectIntersectionOf(terms);
-		return reasoner.isSatisfiable(result);
 	}
-
-	private boolean isAplicable(OWLReasoner reasoner,OWLDataFactory dFactory,OWLOntology activeOntology, OWLDataProperty prop) {
-		
-		// returns true if the intersection of the concept and the property domain is satisfiable
-		Set<Node<OWLClass>> domainNodeSet = reasoner.getDataPropertyDomains(prop, true).getNodes();
-		HashSet<OWLClassExpression> terms = new HashSet<OWLClassExpression>();
-		for (Node<OWLClass> node : domainNodeSet){
-			for (OWLClassExpression exp : node){
-				terms.add(exp);
-			}
-		}
-		terms.add(this.linkedClassExpression);
-		OWLObjectIntersectionOf result = dFactory.getOWLObjectIntersectionOf(terms);
-		return reasoner.isSatisfiable(result);
-	}
-
 	
 	@Override
 	public int getLevelRelativePos() {
@@ -810,14 +702,16 @@ public class VisClass extends Shape {
 		// Way to measure text width
 		Text textNode = new Text();
 		textNode.setFont(Font.font("Dialog", FontWeight.BOLD, 10));
-	    
+
 	    StringTokenizer sTokenizer = null; 
     	String token; 
     	int candidate = 0;	
 	    if (!isAnonymous) {
-	    	if (!label.startsWith(sid.OntView2.expressionNaming.SIDClassExpressionNamer.className)) {
+	    	if (!label.startsWith(SIDClassExpressionNamer.className)) {
 				textNode.setText(visibleLabel);
-				max = (int) textNode.getLayoutBounds().getWidth() + 40;
+				System.out.println("width: " + textNode.getLayoutBounds().getWidth() + " height: " + textNode.getLayoutBounds().getHeight());
+
+				max = (int) textNode.getLayoutBounds().getWidth() + 25 ;
 	    	}
 	    	else {
 	    		// there is no label as it is supposed to be anonymous
@@ -840,7 +734,6 @@ public class VisClass extends Shape {
 	    	    		}
 	    	    	}	    			
 	    		}
-	    		
 	    	}	    	
 	    }
 	    else {
@@ -926,32 +819,26 @@ public class VisClass extends Shape {
 		return visibleDefinitionLabels;
 	}
 
-	public void setVisibleDefinitionLabels(ArrayList<String> visibleDefinitionLabels) {
-		this.visibleDefinitionLabels = visibleDefinitionLabels;
-	}
-
 	public boolean onCloseBox(int x,int y){
 		int px,py;
 		px = getPosX()-getWidth()/2;
 		py = getPosY()+getHeight()/2;
 		return ((x>= px)&&(x<=px+getWidth()) &&(y>=py) &&(y<=py+6));
 	}
-
 	
-	public  NodeSet<OWLNamedIndividual> getInstances(){
+	public NodeSet<OWLNamedIndividual> getInstances(){
 		OWLReasoner reasoner = graph.paintframe.getReasoner();
 		return reasoner.getInstances(this.getLinkedClassExpression(), false);
 	}
 	
-	
-	public String removeFormatInformation (String str) {
+	public String removeFormatInformation(String str) {
 		String aux; 
 		aux = str.replace("\n", ""); 
 		aux = str.replace("\t", ""); 
 		return aux; 
 	}
 	
-	public int countLines (String str) {
+	public int countLines(String str) {
 		int lines=1; 
 		for (int i=0; i<str.length(); i++)
 		{
@@ -962,7 +849,7 @@ public class VisClass extends Shape {
 		return lines; 
 	}
 	
-	public int tabsSize (String str) {
+	public int tabsSize(String str) {
 		boolean noMore = false; 
 		int numTabs = 0;
 		for (int i=0; i<str.length() && !noMore; i++) {
@@ -990,9 +877,7 @@ public class VisClass extends Shape {
 			currentY += VisProperty.stringHeight(font, g)+6;
 		}
 	}
-	
-//	x -(getWidth()-10)/2, (y - (currentHeight-4)/2) + fm.getAscent()
-	
+
 }
 
 
