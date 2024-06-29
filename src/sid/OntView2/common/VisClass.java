@@ -264,7 +264,7 @@ public class VisClass extends Shape {
 	    		currentHeight = getHeight();
 	    	}
 	    	else {
-	    		currentHeight = calculateHeight(); 
+	    		currentHeight = calculateHeight();
 	    	}
 	    }
 	    
@@ -272,6 +272,7 @@ public class VisClass extends Shape {
 
 			Color mini = Color.rgb(224, 224, 224);
 			Color lightgray = Color.rgb(234, 234, 234);
+			Color lightBlue = Color.rgb(212, 238, 247);
 
 	    	if (!isDefined) {
 	    		// CBL if it is not defined, we use the previous representation
@@ -327,7 +328,7 @@ public class VisClass extends Shape {
 		    		// a Background white rectangle for the definition
 		    		// a grey for the
 					//g.setFill(Color.WHITE);
-		    		g.setFill(Color.PINK);
+		    		g.setFill(lightBlue);
 		    		g.fillRect(x - (double) getWidth() /2, y- (double) currentHeight /2+5, getWidth(), currentHeight+10);
 					g.setStroke(isBottom ? Color.RED : Color.BLACK);
 		    		g.strokeRect(x - (double) getWidth() /2, y - (double) currentHeight /2+5, getWidth()-1, currentHeight+10);
@@ -343,25 +344,20 @@ public class VisClass extends Shape {
 		    		g.setFont(getDefinedClassFont()); 
 		    		g.fillText(visibleLabel, x - (double) (getWidth() - 16) /2 + 5, (y - (double) (currentHeight - 4) /2) + ascent);
 
-					// AQUI
-		    		g.setFont(getBoldFont()); 
+		    		g.setFont(getBoldFont());
 		    		double auxY = y - ((double) currentHeight /2) + (fontHeight +5) + 2;
 		    		if (visibleDefinitionLabels != null) {
 		    			for (String auxDefString: visibleDefinitionLabels) {
-							drawFormattedString(g, auxDefString, x - (getWidth() - 12) / 2, (int) (auxY + ascent)+5, (int) fontHeight);  // FALLA TAMAÑO
+							drawFormattedString(g, auxDefString, x - (getWidth() - 12) / 2, (int) (auxY + ascent)+5, (int) fontHeight);
 							auxY += (countLines(auxDefString)*fontHeight) + 5;
 		    			}
 		    		}
-
-					// FALTA ARRIBA
-	    		}
+				}
 	    		else {
 	    			// CBL: it is an auxiliar definition 
 	    			// CBL if it is not defined, we use the previous representation
 
-					//g.setFill(Color.WHITE);
-			    	g.setFill(Color.YELLOW);
-			    	
+					g.setFill(Color.WHITE);
 				    g.fillRoundRect(x - (double) getWidth() /2, y - (double) currentHeight /2, getWidth(), currentHeight+10, roundCornerValue, roundCornerValue);
 				    g.setStroke(Color.BLACK);
 				    if (isBottom) {
@@ -378,18 +374,17 @@ public class VisClass extends Shape {
 				    	g.strokeRoundRect(x -  (double) getWidth() /2, y + (double) currentHeight/2+3,getWidth()-1, 6, 5, 5);
 		
 				    }
-					// AQUI
+
 				    g.setStroke(Color.BLACK);
 				    g.setFont(getBoldFont()); 
 		    		double auxY = (y - (double) (currentHeight - 4) /2);
 		    		if (visibleDefinitionLabels != null) {
 		    			for (String auxDefString: visibleDefinitionLabels) {
 							g.setFill(Color.BLACK);
-							drawFormattedString(g, auxDefString, x - (getWidth() - 10) / 2, (int) (auxY + ascent)-1, (int) fontHeight); // FALLA TAMAÑO
+							drawFormattedString(g, auxDefString, x - (getWidth() - 10) / 2, (int) (auxY + ascent)-1, (int) fontHeight);
 							auxY += (countLines(auxDefString)*fontHeight) + 5;
 		    			}
 		    		}
-					// FALTA ARRIBA
 	    		}
 	    	}
 		    
@@ -814,7 +809,6 @@ public class VisClass extends Shape {
 	    		}
 	    		else {
 	    			for (String auxLabel: getVisibleDefinitionLabels()) {
-						System.out.println("auxLabel " + auxLabel);
 						result += calculateTextHeight(auxLabel) + 5;
 					}
 		    		
@@ -822,22 +816,23 @@ public class VisClass extends Shape {
 	    	}
 	    	
 	    }
-		if (propertyBox != null) {
+		/*if (propertyBox != null) { // por que??
 			result += getPropertyBox().getHeight();
-		}
+		}*/
 		return result;
 	}
 
 	private int calculateTextHeight(String text) {
 		String[] lines = text.split("\n");
 		int totalHeight = 0;
+
 		for (String line : lines) {
 			Text textNode = new Text(line);
 			textNode.setFont(Font.font("Dialog", FontWeight.BOLD, 10));
 			totalHeight += (int) textNode.getLayoutBounds().getHeight();
 		}
 
-		return totalHeight + (lines.length - 1) * 5;
+		return totalHeight + (lines.length - 1) * 5 + 5;
 	}
 	
 	public ArrayList<String> getVisibleDefinitionLabels() {

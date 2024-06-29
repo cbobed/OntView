@@ -364,7 +364,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 			HBox row1 = createRow(reasonerComboBox, kceComboBox, syncButton);
 
-			StackPane titlePane = createTitlePane("Reasoner");
+			StackPane titlePane = createTitlePane("Reasoner & KCE");
 
 			panelLoad = createContainer(true, titlePane, row1);
 			panelLoad.setMinWidth(200);
