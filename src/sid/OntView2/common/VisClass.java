@@ -237,6 +237,7 @@ public class VisClass extends Shape {
 
 	public void drawShape(GraphicsContext g) {
 		int x, y;
+		int roundCornerValue = 10;
 		if (Objects.equals(graph.paintframe.positionGraph, "LEFT")) {
 			x = posx + 1;
         } else {
@@ -255,7 +256,7 @@ public class VisClass extends Shape {
 		Text textNode = new Text();
 		textNode.setFont(g.getFont());
 		double fontHeight = textNode.getBoundsInLocal().getHeight();
-		double ascent = textNode.getBaselineOffset();
+		double ascent = textNode.getBaselineOffset() + 5.5;
 	    
 	    if (currentHeight == 0) {
 	    	
@@ -270,45 +271,49 @@ public class VisClass extends Shape {
 	    if (visible){
 
 			Color mini = Color.rgb(224, 224, 224);
+			Color lightgray = Color.rgb(234, 234, 234);
 
 	    	if (!isDefined) {
 	    		// CBL if it is not defined, we use the previous representation
 		    	if (!isAnonymous) 
-		    		g.setFill(mini);
+		    		g.setFill(lightgray);
 		    	else
 		    		g.setFill(Color.WHITE);
 
 				/**
-				 * fillRect(
-				 * 			coordenada x de la esquina superior izquierda del rectángulo
-				 * 			coordenada y de la esquina superior izquierda del rectángulo.
-				 * 			Ancho del rectángulo.
-				 * 			Alto del rectángulo.)
+				 * fillRect(coordenada x de la esquina superior izquierda del rectángulo,
+				 * 			coordenada y de la esquina superior izquierda del rectángulo,
+				 * 			Ancho del rectángulo,
+				 * 			Alto del rectángulo)
+				 */
+				/**
+				 * g.fillRoundRect(rectX, rectY, rectWidth, rectHeight, arcWidth, arcHeight);
+				 *
+				 * añadir + 10 en tamaño
+				 * añadir + 5 en posición letra
 				 */
 
-
-				g.fillRect(x - (double) getWidth() /2, y - (double) currentHeight /2, getWidth(), currentHeight);
+				g.fillRoundRect(x - (double) getWidth()/2, y - (double) currentHeight/2, getWidth(), currentHeight+10, roundCornerValue, roundCornerValue);
 			    g.setStroke(Color.BLACK);
 			    if (isBottom) {
 			    	g.setStroke(Color.RED);
 			    }	
 		 
 			    //rectangle
-				//g.strokeRoundRect(x -  (double) getWidth() /2, y - (double) currentHeight /2,  getWidth()-1, currentHeight-1, 10, 10);
-			    g.strokeRect(x -  (double) getWidth() /2, y - (double) currentHeight /2,  getWidth()-1, currentHeight-1);
+				g.strokeRoundRect(x -  (double) getWidth()/2, y - (double) currentHeight/2,  getWidth()-1, currentHeight+9, roundCornerValue, roundCornerValue);
 			    g.setFill(Color.BLACK);
 			    if (propertyBox!=null){
-					g.setFill(Color.LIGHTGRAY);
-					g.fillRect(x -  (double) getWidth() /2, y + (double) currentHeight /2, getWidth()-1, 6);
+					g.setFill(Color.LIGHTBLUE);
+					g.fillRoundRect(x -  (double) getWidth() /2, y + (double) currentHeight /2 + 3, getWidth()-1, 6, 5, 5);
 			    	g.setStroke(Color.BLACK);
-			    	g.strokeRect(x -  (double) getWidth() /2, y + (double) currentHeight /2,getWidth()-1, 6);
+			    	g.strokeRoundRect(x -  (double) getWidth() /2, y + (double) currentHeight /2 + 3,getWidth()-1, 6, 5, 5);
 	
 			    }	
 			    g.setFill(Color.BLACK);
 	
 	//    		g.drawString(label, x -(getWidth()-10)/2, (y - (oldHeight-4)/2) + fm.getAscent());
 			    if (!isAnonymous) {
-					g.fillText(visibleLabel, x - (double) (getWidth()) / 2 + 10, (y -(double) (currentHeight - 4) / 2) + ascent);
+					g.fillText(visibleLabel, x - (double) (getWidth()) / 2+10, (y -(double) (currentHeight - 4) / 2) + ascent);
 			    }
 			    else {
 					drawFormattedString(g, visibleLabel, x - (getWidth() - 10) / 2,  (int) ((y - (currentHeight - 4) / 2) + ascent), (int) fontHeight);
@@ -317,67 +322,74 @@ public class VisClass extends Shape {
 	    	}
 	    	else {
 	    		
-	    		if (!label.startsWith(sid.OntView2.expressionNaming.SIDClassExpressionNamer.className)) {
+	    		if (!label.startsWith(SIDClassExpressionNamer.className)) {
 		    		// CBL: the new definitions representation 
 		    		// a Background white rectangle for the definition
-		    		// a grey for the 
-		    		g.setFill(Color.WHITE);
-		    		g.fillRect(x - (double) getWidth() /2, y- (double) currentHeight /2+5, getWidth(), currentHeight);
+		    		// a grey for the
+					//g.setFill(Color.WHITE);
+		    		g.setFill(Color.PINK);
+		    		g.fillRect(x - (double) getWidth() /2, y- (double) currentHeight /2+5, getWidth(), currentHeight+10);
 					g.setStroke(isBottom ? Color.RED : Color.BLACK);
-		    		g.strokeRect(x -  (double) getWidth() /2, y - (double) currentHeight /2+5,  getWidth()-1, currentHeight-1);
+		    		g.strokeRect(x - (double) getWidth() /2, y - (double) currentHeight /2+5, getWidth()-1, currentHeight+10);
 		    		
 		    		// now => the rectangle for the name of the concept
 		    		g.setFill(mini);
-		    		g.fillRect(x - (double) getWidth() /2 + 5, y- (double) currentHeight /2, getWidth()-10, fontHeight+5);
+		    		g.fillRect(x - (double) getWidth() /2+5, y- (double) currentHeight /2, getWidth()-10, fontHeight+15);
 					g.setStroke(isBottom ? Color.RED : Color.BLACK);
-		    		g.strokeRect(x -  (double) getWidth() /2+5, y - (double) currentHeight /2,  getWidth()-10, fontHeight+4);
-		    		
+		    		g.strokeRect(x -  (double) getWidth() /2+5, y - (double) currentHeight /2,  getWidth()-10, fontHeight+14);
+
 		    		// this is the name of the concept
 					g.setFill(Color.BLACK);
 		    		g.setFont(getDefinedClassFont()); 
-		    		g.fillText(visibleLabel, x - (double) (getWidth() - 16) /2, (y - (double) (currentHeight - 4) /2) + ascent);
-		    		
+		    		g.fillText(visibleLabel, x - (double) (getWidth() - 16) /2 + 5, (y - (double) (currentHeight - 4) /2) + ascent);
+
+					// AQUI
 		    		g.setFont(getBoldFont()); 
 		    		double auxY = y - ((double) currentHeight /2) + (fontHeight +5) + 2;
 		    		if (visibleDefinitionLabels != null) {
 		    			for (String auxDefString: visibleDefinitionLabels) {
-							drawFormattedString(g, auxDefString, x - (getWidth() - 12) / 2, (int) (auxY + ascent), (int) fontHeight);
+							drawFormattedString(g, auxDefString, x - (getWidth() - 12) / 2, (int) (auxY + ascent)+5, (int) fontHeight);  // FALLA TAMAÑO
 							auxY += (countLines(auxDefString)*fontHeight) + 5;
 		    			}
 		    		}
+
+					// FALTA ARRIBA
 	    		}
 	    		else {
 	    			// CBL: it is an auxiliar definition 
 	    			// CBL if it is not defined, we use the previous representation
+
+					//g.setFill(Color.WHITE);
+			    	g.setFill(Color.YELLOW);
 			    	
-			    	g.setFill(Color.WHITE);
-			    	
-				    g.fillRect(x - (double) getWidth() /2, y - (double) currentHeight /2, getWidth(), currentHeight);
+				    g.fillRoundRect(x - (double) getWidth() /2, y - (double) currentHeight /2, getWidth(), currentHeight+10, roundCornerValue, roundCornerValue);
 				    g.setStroke(Color.BLACK);
 				    if (isBottom) {
 				    	g.setStroke(Color.RED);
 				    }	
 			 
 				    //rectangle
-				    g.strokeRect(x -  (double) getWidth() /2, y - (double) currentHeight /2,  getWidth()-1, currentHeight-1);
+				    g.strokeRoundRect(x - (double) getWidth() /2, y - (double) currentHeight /2,  getWidth()-1, currentHeight+9, roundCornerValue, roundCornerValue);
 				    g.setFill(Color.BLACK);
 				    if (propertyBox!=null){
 						g.setFill(Color.LIGHTGRAY);
-				    	g.fillRect(x -  (double) getWidth() /2, y + (double) currentHeight /2, getWidth()-1, 6);
+				    	g.fillRoundRect(x -  (double) getWidth() /2, y + (double) currentHeight/2+3, getWidth()-1, 6, 5, 5);
 				    	g.setStroke(Color.BLACK);
-				    	g.strokeRect(x -  (double) getWidth() /2, y + (double) currentHeight /2,getWidth()-1, 6);
+				    	g.strokeRoundRect(x -  (double) getWidth() /2, y + (double) currentHeight/2+3,getWidth()-1, 6, 5, 5);
 		
-				    }	
+				    }
+					// AQUI
 				    g.setStroke(Color.BLACK);
 				    g.setFont(getBoldFont()); 
 		    		double auxY = (y - (double) (currentHeight - 4) /2);
 		    		if (visibleDefinitionLabels != null) {
 		    			for (String auxDefString: visibleDefinitionLabels) {
 							g.setFill(Color.BLACK);
-							drawFormattedString(g, auxDefString, x - (getWidth() - 10) / 2, (int) (auxY + ascent), (int) fontHeight);
+							drawFormattedString(g, auxDefString, x - (getWidth() - 10) / 2, (int) (auxY + ascent)-1, (int) fontHeight); // FALLA TAMAÑO
 							auxY += (countLines(auxDefString)*fontHeight) + 5;
 		    			}
 		    		}
+					// FALTA ARRIBA
 	    		}
 	    	}
 		    
@@ -438,7 +450,7 @@ public class VisClass extends Shape {
  	  }
       g.setFont(oldFont);
 	}
-	
+
 	public void swapLabel(Boolean labelRendering, Boolean qualifiedRendering){
 		
 		String oldVisibleLabel = visibleLabel; 
@@ -695,7 +707,7 @@ public class VisClass extends Shape {
 	
 	public int calculateWidth () {
 		GraphicsContext g = graph.paintframe.getGraphicsContext2D();
-	    int max = getWidth();
+	    int max;
 	    Font prevFont = g.getFont();
 		g.setFont(Font.font("Dialog", FontWeight.BOLD, 10));
 
@@ -709,8 +721,6 @@ public class VisClass extends Shape {
 	    if (!isAnonymous) {
 	    	if (!label.startsWith(SIDClassExpressionNamer.className)) {
 				textNode.setText(visibleLabel);
-				System.out.println("width: " + textNode.getLayoutBounds().getWidth() + " height: " + textNode.getLayoutBounds().getHeight());
-
 				max = (int) textNode.getLayoutBounds().getWidth() + 25 ;
 	    	}
 	    	else {
@@ -792,18 +802,21 @@ public class VisClass extends Shape {
 	    	else {
 	    		
 	    		// we have to check whether it is a special defined concept
-	    		if (!label.startsWith(sid.OntView2.expressionNaming.SIDClassExpressionNamer.className)) {
+	    		if (!label.startsWith(SIDClassExpressionNamer.className)) { //PINK
 		    		// CBL: for the grey box
 		    		result += fontHeight+10;
 		    		// CBL: for the underlying white box containing the definitions
-		    		for (String auxLabel: getVisibleDefinitionLabels()) 
-		    			result += (countLines(auxLabel)*fontHeight);
+		    		for (String auxLabel: getVisibleDefinitionLabels()) {
+						result += calculateTextHeight(auxLabel);
+					}
 		    		if (!getVisibleDefinitionLabels().isEmpty())
 		    			result += (getVisibleDefinitionLabels().size()-1)*5; 
 	    		}
 	    		else {
-	    			for (String auxLabel: getVisibleDefinitionLabels()) 
-		    			result += (countLines(auxLabel)*fontHeight + 5);
+	    			for (String auxLabel: getVisibleDefinitionLabels()) {
+						System.out.println("auxLabel " + auxLabel);
+						result += calculateTextHeight(auxLabel) + 5;
+					}
 		    		
 	    		}
 	    	}
@@ -812,7 +825,19 @@ public class VisClass extends Shape {
 		if (propertyBox != null) {
 			result += getPropertyBox().getHeight();
 		}
-		return result; 
+		return result;
+	}
+
+	private int calculateTextHeight(String text) {
+		String[] lines = text.split("\n");
+		int totalHeight = 0;
+		for (String line : lines) {
+			Text textNode = new Text(line);
+			textNode.setFont(Font.font("Dialog", FontWeight.BOLD, 10));
+			totalHeight += (int) textNode.getLayoutBounds().getHeight();
+		}
+
+		return totalHeight + (lines.length - 1) * 5;
 	}
 	
 	public ArrayList<String> getVisibleDefinitionLabels() {

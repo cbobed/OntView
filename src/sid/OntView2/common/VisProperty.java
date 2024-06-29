@@ -27,12 +27,20 @@ public abstract class VisProperty {
 
 	}
 	
-	public static int stringHeight(Font f,GraphicsContext g){
+	public static int stringHeight(Font f, GraphicsContext g){
 		Text text = new Text();
 		text.setFont(f);
 		return (int) text.getLayoutBounds().getHeight();
 	}
-    
+
+	public static int stringHeight2(Font font, GraphicsContext g) {
+
+		Text text = new Text();
+		text.setFont(font);
+		System.out.println("text.getFont().getSize(): " + text.getFont().getSize());
+		System.out.println("text.getLayoutBounds().getHeight(): " + text.getLayoutBounds().getHeight());
+		return (int) text.getFont().getSize();
+	}
 
 }
 	

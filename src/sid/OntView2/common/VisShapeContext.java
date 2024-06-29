@@ -32,8 +32,8 @@ public class VisShapeContext extends ContextMenu {
 		
 		super();
 		shape = s;
-		posx = e.getSceneX();
-		posy = e.getSceneY();
+		posx = e.getScreenX();
+		posy = e.getScreenY();
 		parent = parentFrame;
 		boolean visc = shape instanceof VisClass;
 		expression = shape.asVisClass().getLinkedClassExpression();
