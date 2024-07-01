@@ -11,8 +11,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 
 import javafx.animation.PauseTransition;
-import javafx.application.Platform;
-import javafx.geometry.Bounds;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
@@ -23,7 +21,6 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.paint.Color;
 import javafx.scene.Cursor;
 
@@ -74,7 +71,11 @@ public class PaintFrame extends Canvas implements Runnable{
 
 
 
-	public boolean isStable(){return stable;}
+	public boolean isStable(){
+		System.out.println("isStable is " + stable);
+
+		return stable;
+	}
 	public void setReasoner(OWLReasoner preasoner){reasoner = preasoner;}
 	public OWLReasoner getReasoner(){return reasoner;}
 	public void setOntology(OWLOntology ac){activeOntology = ac;}
@@ -167,6 +168,7 @@ public class PaintFrame extends Canvas implements Runnable{
 				connectorsCopy = new ArrayList<>(visGraph.connectorList);
 			}
 			for (VisConnector c : connectorsCopy) {
+				//System.out.println("Drawing connector with color: " + VisConnector.color);
 				c.draw(g);
 			}
 
@@ -175,6 +177,7 @@ public class PaintFrame extends Canvas implements Runnable{
 				dashedConnectorsCopy = new ArrayList<>(visGraph.dashedConnectorList);
 			}
 			for (VisConnector c : dashedConnectorsCopy) {
+				//System.out.println("Drawing dashed connector with color: " + VisConnector.color);
 				c.draw(g);
 			}
 			g.setStroke(Color.LIGHTGRAY);
@@ -184,6 +187,7 @@ public class PaintFrame extends Canvas implements Runnable{
 				levelsCopy = new ArrayList<>(visGraph.levelSet);
 			}
 			for (VisLevel lvl : levelsCopy) {
+				//System.out.println("Drawing level with light gray color: " + Color.LIGHTGRAY);
 				(g).strokeLine(lvl.getXpos(), 0, lvl.getXpos(), (int) (getHeight()/factor));
 				//Uncomment this to get a vertical line in every level
 				g.setStroke(Color.LIGHTGRAY);
@@ -197,6 +201,7 @@ public class PaintFrame extends Canvas implements Runnable{
 				shapeMapCopy = new HashMap<>(visGraph.shapeMap);
 			}
 			for (Entry<String, Shape> entry : shapeMapCopy.entrySet()) {
+				//System.out.println("Drawing shape with current color: " + g.getStroke());
 				entry.getValue().drawShape(g);
 			}
 
@@ -206,7 +211,7 @@ public class PaintFrame extends Canvas implements Runnable{
 		for (Entry<String,Shape> entry : visGraph.shapeMap.entrySet()){
 			if (entry.getValue() instanceof VisClass){
 				VisClass v = entry.getValue().asVisClass();
-				if ((v.getPropertyBox()!=null) && (v.getPropertyBox().visible==true)) {
+				if ((v.getPropertyBox()!=null) && (v.getPropertyBox().visible)) {
 					Font c = g2d.getFont();
 					g2d.setStroke(Color.BLACK);
 					v.getPropertyBox().draw(g2d);
@@ -222,6 +227,7 @@ public class PaintFrame extends Canvas implements Runnable{
 
 		visGraph = rVisGraph;
 		stable = false;
+		System.out.println("createReasonedGraph is " + stable);
 		visGraph.setActiveOntology(activeOntology);
 //	   applyStructuralReduction();
 		visGraph.setOWLClassExpressionSet(set);
@@ -241,6 +247,7 @@ public class PaintFrame extends Canvas implements Runnable{
 
 //
 		stable       = true;
+		System.out.println("createReasonedGraph is " + stable);
 		stateChanged = true;
 //	   relax();
 		factor = 1.0;
@@ -260,22 +267,24 @@ public class PaintFrame extends Canvas implements Runnable{
 
 
 	boolean stateChanged = true;
-	public void setStateChanged(boolean b){stateChanged = b;}
-	public boolean stateChanged(){
-		return stateChanged;
-	}
 	/**
 	 * Updates node positions
 	 * Avoids shapes being on top of each other
 	 * updates y coord until there's no overlap
 	 **/
+
 	synchronized void relax() {
+		if (visGraph == null) {
+			System.err.println("visGraph is null in relax method.");
+			return;
+		}
 
 		// repulsion and atraction between nodes
 		Shape shape_j,s_i;
+
 		if (stable) {
 			if (stateChanged) {
-
+				//System.out.println("relax is " + stateChanged);
 				stateChanged = false;
 
 				HashMap<String, Shape> shapeMapCopy;
@@ -306,8 +315,6 @@ public class PaintFrame extends Canvas implements Runnable{
 			}
 			draw();
 		}
-
-
 	}
 
 

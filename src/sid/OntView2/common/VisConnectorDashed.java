@@ -24,9 +24,10 @@ public class VisConnectorDashed extends VisConnectorIsA {
 			Color prevStroke = (Color) g.getStroke();
 			double prevLineWidth = g.getLineWidth();
 			StrokeLineCap prevLineCap = g.getLineCap();
-			double[] prevDashes = g.getLineDashes();
 			double prevDashOffset = g.getLineDashOffset();
 			double prevMiterLimit = g.getMiterLimit();
+			double[] prevDashes = g.getLineDashes();
+
 
 			fromPoint = from.getConnectionPoint(new Point2D(from.getPosX(),from.getPosY()),false);
 			toPoint   = to.getConnectionPoint(new Point2D(from.getPosX(),from.getPosY()),true);
@@ -50,8 +51,8 @@ public class VisConnectorDashed extends VisConnectorIsA {
 			g.setLineCap(prevLineCap);
 			g.setLineJoin(StrokeLineJoin.MITER);
 			g.setMiterLimit(prevMiterLimit);
-			g.setLineDashes(prevDashes);
 			g.setLineDashOffset(prevDashOffset);
+			g.setLineDashes(prevDashes);
 		}
 	}
 

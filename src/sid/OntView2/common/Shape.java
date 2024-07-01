@@ -6,7 +6,6 @@ import javafx.scene.canvas.GraphicsContext;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 

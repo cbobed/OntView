@@ -702,63 +702,69 @@ public class VisClass extends Shape {
 	
 	public int calculateWidth () {
 		GraphicsContext g = graph.paintframe.getGraphicsContext2D();
-	    int max;
+	    int max = 0;
 	    Font prevFont = g.getFont();
-		g.setFont(Font.font("Dialog", FontWeight.BOLD, 10));
+		Font newFont = Font.font("Dialog", FontWeight.BOLD, 10);
+
+		g.setFont(newFont);
 
 		// Way to measure text width
 		Text textNode = new Text();
-		textNode.setFont(Font.font("Dialog", FontWeight.BOLD, 10));
+		textNode.setFont(newFont);
 
 	    StringTokenizer sTokenizer = null; 
     	String token; 
-    	int candidate = 0;	
-	    if (!isAnonymous) {
-	    	if (!label.startsWith(SIDClassExpressionNamer.className)) {
-				textNode.setText(visibleLabel);
-				max = (int) textNode.getLayoutBounds().getWidth() + 25 ;
-	    	}
-	    	else {
-	    		// there is no label as it is supposed to be anonymous
-	    		max = 0; 
-	    	}
-	    	//<CBL> for the defined, max might not be the desired value
-	    	if (isDefined) {
-	    		
-    			// we have to do the same as for the anonymous ones
-	    		// for each of the definitions 
-	    		for (String auxLabel: getVisibleDefinitionLabels()) {
-	    			sTokenizer = new StringTokenizer(auxLabel, "\n");
-	    			while (sTokenizer.hasMoreElements()) {
-	    	    		token = sTokenizer.nextToken();
-						textNode.setText(removeFormatInformation(token));
-						candidate = (int) textNode.getLayoutBounds().getWidth() + 25;
-						candidate += tabsSize(token);
-	    	    		if (candidate > max) {
-	    	    			max = candidate; 
-	    	    		}
-	    	    	}	    			
-	    		}
-	    	}	    	
-	    }
-	    else {
-	    	sTokenizer = new StringTokenizer(visibleLabel, "\n");
-	    	max = 0;	    	    	
-	    	while (sTokenizer.hasMoreElements()) {
-	    		token = sTokenizer.nextToken();
-				textNode.setText(removeFormatInformation(token));
-				candidate = (int) textNode.getLayoutBounds().getWidth() + 25;
-	    		candidate += tabsSize(token); 
-	    		
-	    		if (candidate > max) {
-	    			max = candidate; 
-	    		}
-	    	}
-	    }
+    	int candidate = 0;
+		try {
+			if (!isAnonymous) {
+				if (!label.startsWith(SIDClassExpressionNamer.className)) {
+					textNode.setText(visibleLabel);
+					max = (int) textNode.getLayoutBounds().getWidth() + 25 ;
+				}
+				else {
+					// there is no label as it is supposed to be anonymous
+					max = 0;
+				}
+				//<CBL> for the defined, max might not be the desired value
+				if (isDefined) {
 
-	    g.setFont(prevFont);
-		textNode.setFont(Font.font("Dialog", FontPosture.ITALIC, 9));
-	    return max;
+					// we have to do the same as for the anonymous ones
+					// for each of the definitions
+					for (String auxLabel: getVisibleDefinitionLabels()) {
+						sTokenizer = new StringTokenizer(auxLabel, "\n");
+						while (sTokenizer.hasMoreElements()) {
+							token = sTokenizer.nextToken();
+							textNode.setText(removeFormatInformation(token));
+							candidate = (int) textNode.getLayoutBounds().getWidth() + 25;
+							candidate += tabsSize(token);
+							if (candidate > max) {
+								max = candidate;
+							}
+						}
+					}
+				}
+			}
+			else {
+				sTokenizer = new StringTokenizer(visibleLabel, "\n");
+				max = 0;
+				while (sTokenizer.hasMoreElements()) {
+					token = sTokenizer.nextToken();
+					textNode.setText(removeFormatInformation(token));
+					candidate = (int) textNode.getLayoutBounds().getWidth() + 25;
+					candidate += tabsSize(token);
+
+					if (candidate > max) {
+						max = candidate;
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			g.setFont(prevFont);
+		}
+
+		return max;
 		
 	}
 	public void createPropertyBox() {
