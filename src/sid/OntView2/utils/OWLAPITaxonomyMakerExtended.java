@@ -47,7 +47,7 @@ public class OWLAPITaxonomyMakerExtended implements ITaxonomyMaker{
 
 		/**
 		 * Constructor, initializes OWL Model handler based on the supplied ontology and project names
-		 * @throws NeOnCoreException 
+		 * @throws OWLOntologyCreationException
 		 */
 				
 	   public OWLAPITaxonomyMakerExtended(String uri, boolean useImports){

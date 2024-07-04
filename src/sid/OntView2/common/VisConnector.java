@@ -30,8 +30,6 @@ public abstract class VisConnector {
     	to = par_to;
     }
 
-	public static double getLineWidth() { return width;	}
-
     public void setRedundant(){
     	redundant = true;
     }

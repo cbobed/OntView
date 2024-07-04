@@ -169,7 +169,7 @@ public class PaintFrame extends Canvas implements Runnable{
 			}
 			for (VisConnector c : connectorsCopy) {
 				//System.out.println("Drawing connector with color: " + VisConnector.color);
-				c.draw(g);
+				// c.draw(g);
 			}
 
 			List<VisConnector> dashedConnectorsCopy;
@@ -178,7 +178,7 @@ public class PaintFrame extends Canvas implements Runnable{
 			}
 			for (VisConnector c : dashedConnectorsCopy) {
 				//System.out.println("Drawing dashed connector with color: " + VisConnector.color);
-				c.draw(g);
+				// c.draw(g);
 			}
 			g.setStroke(Color.LIGHTGRAY);
 
@@ -312,8 +312,9 @@ public class PaintFrame extends Canvas implements Runnable{
 					visGraph.adjustPanelSize((float) factor);
 
 				}
+				draw();
+
 			}
-			draw();
 		}
 	}
 
@@ -497,7 +498,7 @@ public class PaintFrame extends Canvas implements Runnable{
 	 */
 	private String formatToolTipText(String html) {
 		tooltip.setFont(new Font("Dialog", 12));
-		tooltip.setStyle("-fx-background-color: #cedef7; -fx-text-fill: #000000;");
+		//tooltip.setStyle("-fx-background-color: #cedef7; -fx-text-fill: #000000;");
 
 		return html.replaceAll("<html>", "")
 				.replaceAll("</html>", "")
@@ -561,7 +562,7 @@ public class PaintFrame extends Canvas implements Runnable{
 		while (relaxer == me) {
 			relax();
 			try {
-				Thread.sleep(stable ? 500 : 300);
+				Thread.sleep(stable ?  800 : 500);
 				while (pressedShape!=null){
 					Thread.sleep(400);
 				}
@@ -757,16 +758,14 @@ public class PaintFrame extends Canvas implements Runnable{
 			switch (direction){
 				case UP:
 					if (repellingIndex> 0) {
-//						Shape upperShape = orderedList.get(repellingIndex-1);
 						Shape upperShape = getUpperShape(repellingIndex, orderedList);
 						if (upperShape ==null) //it's the visible upper shape
 							return;
-						int upperShapeHeight = upperShape.getHeight();
+						int upperShapeHeight = upperShape.getHeight()+7;
 						if ((upperShape instanceof VisClass)&&(upperShape.asVisClass().propertyBox!=null))
-							upperShapeHeight +=  upperShape.asVisClass().getTotalHeight();
-						if (repellingShape.getPosY()< (upperShape.getPosY()+upperShapeHeight+MIN_Y_SEP)) {
+							upperShapeHeight +=  upperShape.asVisClass().getTotalHeight()-7;
+						if (repellingShape.getPosY() < (upperShape.getPosY()+upperShapeHeight+MIN_Y_SEP)) {
 							upperShape.setPosY(upperShape.getPosY()-upperShape.getHeight()/2);
-//							repaint();
 						}
 						shapeRepulsion(upperShape, direction);
 					}
@@ -775,7 +774,6 @@ public class PaintFrame extends Canvas implements Runnable{
 
 				case DOWN:
 					if (repellingIndex < orderedList.size()-1) {
-//						Shape lowerShape = orderedList.get(repellingIndex+1);
 						Shape lowerShape = getLowerShape(repellingIndex, orderedList);
 						if (lowerShape ==null) //it's the visible upper shape 
 							return;
@@ -784,7 +782,6 @@ public class PaintFrame extends Canvas implements Runnable{
 							z = repellingShape.asVisClass().getTotalHeight();
 						if (repellingShape.getPosY()+z > lowerShape.getPosY()-lowerShape.getHeight()-MIN_Y_SEP) {
 							lowerShape.setPosY(lowerShape.getPosY()+lowerShape.getHeight()/2);
-//							repaint();
 						}
 						shapeRepulsion(lowerShape, direction);
 					}

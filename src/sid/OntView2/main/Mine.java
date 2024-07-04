@@ -113,16 +113,16 @@ public class Mine extends Application implements Embedable{
 		root.getChildren().addAll(viewer.nTopPanel.getMainPane(), viewer.scroll);
 		VBox.setVgrow(viewer.scroll, Priority.ALWAYS);
 
-		viewer.artPanel.setStyle("-fx-background-color: white;");
-		viewer.nTopPanel.setStyle("-fx-border-color: black; -fx-border-width: 1;");
+		//viewer.artPanel.setStyle("-fx-background-color: white;");
+		//viewer.nTopPanel.setStyle("-fx-border-color: black; -fx-border-width: 1;");
 
 		//viewer.scroll = new ScrollPane();
 		//viewer.add(viewer.scroll);
 		//viewer.setVisible(true);
 
 		Scene scene = new Scene(root, 800, 600);
-		ClassLoader c = Thread.currentThread().getContextClassLoader();
-		scene.getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
+		//ClassLoader c = Thread.currentThread().getContextClassLoader();
+		//scene.getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
 		primaryStage.setScene(scene);
 		primaryStage.setMaximized(true);
 		primaryStage.show();

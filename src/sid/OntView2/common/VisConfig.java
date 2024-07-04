@@ -19,9 +19,6 @@ public class VisConfig {
 	DocumentBuilderFactory domFactory;
 	Document doc;
 	XPath xpath;
-	
-	
-	HashMap<String, Color> map;
 
 	private VisConfig() throws ParserConfigurationException, SAXException, IOException{
 		  DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
@@ -38,8 +35,6 @@ public class VisConfig {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	      map = new  HashMap<String, Color>();
-	      mapColor();
 	      
 	      xpath = XPathFactory.newInstance().newXPath();
 	}
@@ -48,19 +43,7 @@ public class VisConfig {
 			instance = new VisConfig();
 		}
 	}
-	
-	private void mapColor (){
-		map.put("blue",Color.BLUE);
-		map.put("red",Color.RED);
-		map.put("black",Color.BLACK);
-		map.put("cyan",Color.CYAN);
-		map.put("darkGray",Color.DARKGRAY);
-		map.put("orange",Color.ORANGE);
-		map.put("lightGray",Color.LIGHTGRAY);
-		map.put("magenta", Color.MAGENTA);
-		map.put("yellow", Color.YELLOW);
-		map.put("green", Color.GREEN);
-	}
+
 	public static VisConfig getInstance() throws ParserConfigurationException, SAXException, IOException{
 		if (instance == null) 
 			createInstance();
@@ -76,13 +59,13 @@ public class VisConfig {
 	public void connectorColor() throws XPathExpressionException{
 		XPathExpression expr = xpath.compile("//connector/color/text()");
         Object result = expr.evaluate(doc, XPathConstants.STRING);
-        VisConnector.color =  map.get((String)result);
+        VisConnector.color =  Color.BLUE;
 	}
 	
 	public void dashedConnectorColor() throws XPathExpressionException{
 		XPathExpression expr = xpath.compile("//dashedConnector/color/text()");
         Object result = expr.evaluate(doc, XPathConstants.STRING);
-        VisConnectorDashed.color =  map.get((String)result);
+        VisConnectorDashed.color = Color.GREEN;
 	}
 	
 	

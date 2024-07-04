@@ -21,9 +21,6 @@ public class VisPositionConfig {
 	DocumentBuilderFactory domFactory;
 	Document doc;
 	XPath xpath;
-	
-	
-	HashMap<String, Color> map;
 
 	
 	public void setup(String path){
@@ -39,9 +36,7 @@ public class VisPositionConfig {
 
 	    	  e.printStackTrace();
 		  }	
-	      map = new  HashMap<String, Color>();
-	      mapColor();
-	      
+
 	      xpath = XPathFactory.newInstance().newXPath();
 	}
 	
@@ -135,17 +130,7 @@ public class VisPositionConfig {
         shape.visible= mapBool((String)result);
         
 	}
-	
-	
-	private void mapColor (){
-		map.put("blue",Color.BLUE);
-		map.put("red",Color.RED);
-		map.put("black",Color.BLACK);
-		map.put("cyan",Color.CYAN);
-		map.put("darkGray",Color.DARKGRAY);
-		map.put("orange",Color.ORANGE);
-		map.put("lightGray",Color.LIGHTGRAY);
-	}
+
 	
 	public int mapState(String stateString){
 		if (stateString.equals("closed")) 		return Shape.CLOSED;

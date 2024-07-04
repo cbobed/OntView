@@ -22,7 +22,7 @@ public class VisInstance extends Dialog<Void> implements Serializable {
 
 	private void initComponents() {
 		setResizable(false);
-		getDialogPane().setStyle("-fx-background-color: rgb(233, 233, 233); -fx-text-fill: black; -fx-font-size: 12px;");
+		//getDialogPane().setStyle("-fx-background-color: rgb(233, 233, 233); -fx-text-fill: black; -fx-font-size: 12px;");
 		list0 = getList0();
 
 		ScrollPane scrollPane0 = new ScrollPane(list0);
@@ -44,7 +44,7 @@ public class VisInstance extends Dialog<Void> implements Serializable {
 			list0 = new ListView<>();
 			ObservableList<String> items = FXCollections.observableArrayList();
 			list0.setItems(items);
-			list0.setStyle("-fx-selection-bar: rgb(100, 154, 191);");
+			//list0.setStyle("-fx-selection-bar: rgb(100, 154, 191);");
 			if ( items.isEmpty() ){
 				list0.setCursor(javafx.scene.Cursor.DEFAULT);
 			} else {
