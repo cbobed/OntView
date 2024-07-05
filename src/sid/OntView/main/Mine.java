@@ -34,11 +34,7 @@ import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.reasoner.ConsoleProgressMonitor;
-import org.semanticweb.owlapi.reasoner.OWLReasoner;
-import org.semanticweb.owlapi.reasoner.OWLReasonerConfiguration;
-import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
-import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
+import org.semanticweb.owlapi.reasoner.*;
 
 import com.clarkparsia.pellet.owlapiv3.PelletReasonerFactory;
 
@@ -239,7 +235,7 @@ public class Mine extends JPanel implements Embedable{
 	         // between creating and precomputing 
 	         applyRenaming();
 	         
-	         reasoner.precomputeInferences();
+	         reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
              artPanel.setReasoner(reasoner);
 		}
     }

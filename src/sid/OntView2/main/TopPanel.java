@@ -134,7 +134,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private Button getSaveImagePartialButton() {
 		if (saveImagePartialButton == null) {
 			saveImagePartialButton = new Button();
-			//saveImagePartialButton.getStyleClass().add("button");
+			saveImagePartialButton.getStyleClass().add("button");
 			saveImagePartialButton.setCursor(Cursor.HAND);
 			saveImagePartialButton.setMinWidth(40);
 
@@ -195,7 +195,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			zoomSlider.setOrientation(Orientation.VERTICAL);
 			zoomSlider.setValue(5);
 
-			//zoomSlider.getStyleClass().add("zoom-slider");
+			zoomSlider.getStyleClass().add("zoom-slider");
 			zoomSlider.setPrefHeight(VisConstants.CONTAINER_SIZE);
 			zoomSlider.setMinHeight(VisConstants.CONTAINER_SIZE);
 			zoomSlider.setMaxHeight(VisConstants.CONTAINER_SIZE);
@@ -215,7 +215,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private Button getfileSystemButton() {
 		if (fileSystemButton == null) {
 			fileSystemButton = new Button();
-			//fileSystemButton.getStyleClass().add("button");
+			fileSystemButton.getStyleClass().add("button");
 			fileSystemButton.setCursor(Cursor.HAND);
 
 			ClassLoader c = Thread.currentThread().getContextClassLoader();
@@ -262,7 +262,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			comboBox = new ComboBox<>();
 			AutoCompletion.enable(comboBox);
 			comboBox.setEditable(true);
-			//comboBox.getStyleClass().add("custom-combo-box");
+			comboBox.getStyleClass().add("custom-combo-box");
 
 			ObservableList<String> items = FXCollections.observableArrayList();
 			comboBox.setItems(items);
@@ -281,7 +281,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			AutoCompletion.enable(kceComboBox);
 			kceComboBox.setEditable(true);
 			kceComboBox.setPromptText("Select KCE");
-			//kceComboBox.getStyleClass().add("custom-combo-box");
+			kceComboBox.getStyleClass().add("custom-combo-box");
 
 			ObservableList<String> items = FXCollections.observableArrayList(
 					VisConstants.KCECOMBOOPTION1,
@@ -340,7 +340,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			loadReasonerButton.setMinWidth(80);
 			loadReasonerButton.setCursor(Cursor.HAND);
 			loadReasonerButton.setFont(Font.font("Dialog", FontWeight.NORMAL, 10));
-			//loadReasonerButton.getStyleClass().add("button");
+			loadReasonerButton.getStyleClass().add("button");
 			loadReasonerButton.setOnAction(this::loadReasonerButtonActionActionPerformed);
 		}
 		return loadReasonerButton;
@@ -381,7 +381,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		container.getChildren().addAll(children);
 		container.setPadding(new Insets(10, 10, 10, 10));
 		if (applyStyle) {
-			//container.getStyleClass().add("container");
+			container.getStyleClass().add("container");
 		}
 		container.setPrefHeight(VisConstants.CONTAINER_SIZE);
 		container.setMinHeight(VisConstants.CONTAINER_SIZE);
@@ -414,7 +414,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private Button getSaveImageButton() {
 		if (saveImageButton == null) {
 			saveImageButton = new Button();
-			//saveImageButton.getStyleClass().add("button");
+			saveImageButton.getStyleClass().add("button");
 			saveImageButton.setCursor(Cursor.HAND);
 			saveImageButton.setMinWidth(40);
 
@@ -450,7 +450,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private Button getRestoreViewButton() {
 		if (restoreViewButton == null) {
 			restoreViewButton = new Button("Restore");
-			//restoreViewButton.getStyleClass().add("button");
+			restoreViewButton.getStyleClass().add("button");
 			restoreViewButton.setMinWidth(70);
 			restoreViewButton.setCursor(Cursor.HAND);
 			restoreViewButton.setOnAction(this::restoreViewButtonActionActionPerformed);
@@ -463,7 +463,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private Button getSaveViewButton() {
 		if (saveViewButton == null) {
 			saveViewButton = new Button("Save");
-			//saveViewButton.getStyleClass().add("button");
+			saveViewButton.getStyleClass().add("button");
 			saveViewButton.setMinWidth(70);
 			saveViewButton.setCursor(Cursor.HAND);
 			saveViewButton.setOnAction(this::saveViewButtonActionActionPerformed);
@@ -491,7 +491,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			loadOntologyButton = new Button("Load Ont");
 			loadOntologyButton.setCursor(Cursor.HAND);
 			loadOntologyButton.setFont(Font.font("Dialog", FontWeight.NORMAL, 10));
-			//loadOntologyButton.getStyleClass().add("button");
+			loadOntologyButton.getStyleClass().add("button");
 			loadOntologyButton.setMinWidth(100);
 			loadOntologyButton.setOnAction(this::OntologyButtonActionActionPerformed);
 		}
@@ -503,14 +503,14 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			loadReasonerCombo = new ComboBox<>();
 			loadReasonerCombo.setEditable(true);
 			loadReasonerCombo.setPromptText("Select reasoner");
-			ObservableList <String> items = FXCollections.observableArrayList("Pellet", "JFact", "Elk", "Jcel");
+			ObservableList <String> items = FXCollections.observableArrayList("HermiT", "Pellet", "JFact");
 			loadReasonerCombo.setItems(items);
 
 			if (!items.isEmpty()) {
 				loadReasonerCombo.setValue(items.get(0));
 			}
 
-			//loadReasonerCombo.getStyleClass().add("custom-combo-box");
+			loadReasonerCombo.getStyleClass().add("custom-combo-box");
 			loadReasonerCombo.setMaxWidth(Double.MAX_VALUE);
 			loadReasonerCombo.setDisable(true);
 		}
@@ -522,7 +522,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			loadOntologyCombo = new ComboBox<>();
 			loadOntologyCombo.setEditable(true);
 			loadOntologyCombo.setPromptText("Enter URL or select from file system");
-			//loadOntologyCombo.getStyleClass().add("custom-combo-box");
+			loadOntologyCombo.getStyleClass().add("custom-combo-box");
 			loadRecent();
 			loadOntologyCombo.setMaxWidth(Double.MAX_VALUE);
 			HBox.setHgrow(loadOntologyCombo, Priority.ALWAYS);

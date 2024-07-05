@@ -66,24 +66,7 @@ public class SIDClassExpressionNamer {
 		OWLDataFactory dataFactory = manager.getOWLDataFactory(); 
 		OWLEquivalentClassesAxiom equivalentAxiom = null; 
 		
-		classesFiltered.clear(); 
-		
-//		for (int i=0; i<classesToAdd.size(); i++) {
-//			// System.out.println("comparing "+renderer.render(classesToAdd.get(i))); 
-//			for (int j=classesToAdd.size()-1; j>i; j--) {
-//				// we go backwards because we remove elements on the fly
-//				// System.out.println("  to "+renderer.render(classesToAdd.get(j))); 
-//				equivalentAxiom = dataFactory.getOWLEquivalentClassesAxiom(classesToAdd.get(i), classesToAdd.get(j)); 
-//				if (reasoner.isEntailed(equivalentAxiom)){
-//					// System.out.println("    which is removed due to equivalence"); 
-//					classesFiltered.add(new Explanation (classesToAdd.get(i), classesToAdd.get(j))); 
-//					classesToAdd.remove(j); 
-//				}
-//			}			
-//		}
-		
-// 		System.out.println("--> "+classesToAdd.size()+" class expressions after semantic sieve"); 
-		
+		classesFiltered.clear();
 		classesToAdd.clear(); 
 		classesToAdd.addAll(syntacticalSieve.values()) ;
 		

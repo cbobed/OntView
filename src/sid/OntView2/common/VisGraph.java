@@ -83,15 +83,15 @@ public class VisGraph extends Observable implements Runnable{
 	 */
     public  VisGraph(PaintFrame pframe) {
 		shapeMap     = new HashMap<String, Shape>();
-		definitionsMap = new HashMap <String, Shape>(); 
-		tempMap      = new HashMap<String, Shape>();
-		propertyMap  = new HashMap<String, VisObjectProperty>();
-		dPropertyMap = new HashMap<String, VisDataProperty>();
-		connectorList 		= new ArrayList<VisConnector>();
-		dashedConnectorList = new ArrayList<VisConnector>();
-		levelSet 			= new HashSet<VisLevel>();
+		definitionsMap = new HashMap<>();
+		tempMap      = new HashMap<>();
+		propertyMap  = new HashMap<>();
+		dPropertyMap = new HashMap<>();
+		connectorList 		= new ArrayList<>();
+		dashedConnectorList = new ArrayList<>();
+		levelSet 			= new HashSet<>();
 		paintframe = pframe;
-		observers  = new LinkedHashSet<Observer>();
+		observers  = new LinkedHashSet<>();
 		qualifiedLabelMap = new HashMap<String, String>();
 		
 	}
@@ -663,7 +663,6 @@ public class VisGraph extends Observable implements Runnable{
 	 */
 	public VisClass getVisualExtension(OWLClassExpression o){
 		if (o  instanceof OWLClass) {
-//			return (VisClass)shapeMap.get(o.asOWLClass().getIRI().getFragment());
 			return (VisClass)shapeMap.get(o.asOWLClass().getIRI().toString());
 		}		
 		if (o  instanceof OWLClassExpression) {

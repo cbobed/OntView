@@ -9,8 +9,6 @@ import javafx.scene.control.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import javax.swing.*;
-
 //VS4E -- DO NOT REMOVE THIS LINE!
 public class VisInstance extends Dialog<Void> implements Serializable {
 

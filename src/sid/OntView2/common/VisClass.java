@@ -135,20 +135,6 @@ public class VisClass extends Shape {
 	}
 	
 	// <CBL 25/9/13> 
-	// updated to use the reasoner to obtain the disjoint classes
-	public void addReasonedDisjointConnectors(){
-		OWLReasoner reasoner = graph.paintframe.getReasoner(); 
-		
-		for (Node<OWLClass> disjointNode: reasoner.getDisjointClasses(this.getLinkedClassExpression())) {
-			for (OWLClass c: disjointNode.getEntitiesMinusTop()) {
-				if (c != this.getLinkedClassExpression() && reasoner.isSatisfiable(c)) {
-					addDisjointConnector(graph.getVisualExtension(c)); 
-				}
-			}
-		}
-	}
-	
-	// <CBL 25/9/13> 
 	// we process the disjointness axioms also to check 
 	// whether someone has explicitly asserted the disjointness to Thing or Bottom
 	
@@ -156,8 +142,9 @@ public class VisClass extends Shape {
 		if (getDisJointClassesAxioms()!=null){
 			for (OWLDisjointClassesAxiom axiom: getDisJointClassesAxioms()){
 				for (OWLClassExpression e : axiom.getClassExpressions()){
-					if(e != this.getLinkedClassExpression()){	
-						addDisjointConnector(graph.getVisualExtension(e));
+					if(e != this.getLinkedClassExpression()){ //CAMBIAR
+						if (graph.getVisualExtension(e)!=null)
+							addDisjointConnector(graph.getVisualExtension(e));
 					}
 				}
 		    }	 

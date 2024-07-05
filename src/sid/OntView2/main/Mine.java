@@ -6,9 +6,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import javax.imageio.ImageIO;
-import javax.imageio.ImageWriter;
-import javax.imageio.stream.ImageOutputStream;
-
 
 import javafx.application.Application;
 import javafx.embed.swing.SwingFXUtils;
@@ -18,19 +15,17 @@ import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 
+import org.semanticweb.HermiT.Configuration;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.StringDocumentSource;
 import org.semanticweb.owlapi.model.IRI;
@@ -46,8 +41,7 @@ import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
 
 import com.clarkparsia.pellet.owlapiv3.PelletReasonerFactory;
-
-//import org.jdesktop.swingx.autocomplete.*;
+import org.semanticweb.HermiT.Reasoner.ReasonerFactory;
 
 import sid.OntView2.common.Embedable;
 import sid.OntView2.common.PaintFrame;
@@ -113,16 +107,12 @@ public class Mine extends Application implements Embedable{
 		root.getChildren().addAll(viewer.nTopPanel.getMainPane(), viewer.scroll);
 		VBox.setVgrow(viewer.scroll, Priority.ALWAYS);
 
-		//viewer.artPanel.setStyle("-fx-background-color: white;");
-		//viewer.nTopPanel.setStyle("-fx-border-color: black; -fx-border-width: 1;");
+		viewer.artPanel.setStyle("-fx-background-color: white;");
+		viewer.nTopPanel.setStyle("-fx-border-color: black; -fx-border-width: 1;");
 
-		//viewer.scroll = new ScrollPane();
-		//viewer.add(viewer.scroll);
-		//viewer.setVisible(true);
-
-		Scene scene = new Scene(root, 800, 600);
-		//ClassLoader c = Thread.currentThread().getContextClassLoader();
-		//scene.getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
+		Scene scene = new Scene(root, 1200, 600);
+		ClassLoader c = Thread.currentThread().getContextClassLoader();
+		scene.getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
 		primaryStage.setScene(scene);
 		primaryStage.setMaximized(true);
 		primaryStage.show();
@@ -134,9 +124,10 @@ public class Mine extends Application implements Embedable{
 		if (reasoner!= null) {
 			artPanel.setCursor(Cursor.WAIT);
 			//cant cast to set<OWLClassExpression> from set<OWLClass>
-			HashSet<OWLClassExpression> set = new HashSet<>();
-			for (OWLClass d : reasoner.getTopClassNode().getEntities())
-				set.add(d);
+			System.out.println("reasoner: " + reasoner);
+			System.out.println("reasoner.isConsistent(): " + reasoner.isConsistent());
+
+			HashSet<OWLClassExpression> set = new HashSet<>(reasoner.getTopClassNode().getEntities());
 			try {
 				//set reasoner and ontology before creating
 				artPanel.createReasonedGraph(set,check);
@@ -157,9 +148,7 @@ public class Mine extends Application implements Embedable{
 					e.printStackTrace();
 				}
 			}
-
 			nTopPanel.restoreSliderValue();
-
 		}
 
 		artPanel.start();
@@ -195,24 +184,6 @@ public class Mine extends Application implements Embedable{
 		}
 	}
 
-	protected void loadActiveOntologyFromString(String ontology) {
-
-		manager = OWLManager.createOWLOntologyManager();
-		artPanel.setCursor(Cursor.WAIT);
-		try {
-			activeOntology = manager.loadOntologyFromOntologyDocument(new StringDocumentSource(ontology));
-		} catch (OWLOntologyCreationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			artPanel.setCursor(Cursor.DEFAULT);
-			activeOntology = null;
-			manager = null;
-		}
-		artPanel.setCursor(Cursor.DEFAULT);
-		artPanel.setOntology(activeOntology);
-		artPanel.setActiveOntolgySource(ontology);
-	}
-
 	protected void loadActiveOntology(String source){
 		manager = OWLManager.createOWLOntologyManager();
 		artPanel.setCursor(Cursor.WAIT);
@@ -231,7 +202,6 @@ public class Mine extends Application implements Embedable{
 
 	protected void loadReasoner(String reasonerString){
 		if (activeOntology!=null) {
-
 			ConsoleProgressMonitor progressMonitor = new ConsoleProgressMonitor();
 			// Specify the progress monitor via a configuration.  We could also specify other setup parameters in
 			// the configuration, and different reasoners may accept their own defined parameters this way.
@@ -242,7 +212,6 @@ public class Mine extends Application implements Embedable{
 
 			// between creating and precomputing
 			applyRenaming();
-
 			reasoner.precomputeInferences();
 			artPanel.setReasoner(reasoner);
 		}
@@ -253,7 +222,6 @@ public class Mine extends Application implements Embedable{
 		renamer.applyNaming(true);
 	}
 
-
 	private OWLReasonerFactory getReasonerFactory(String r){
 		OWLReasonerFactory reasonerFactory = null;
 		if (r.equalsIgnoreCase("Pellet")) {
@@ -261,6 +229,9 @@ public class Mine extends Application implements Embedable{
 		}
 		else if (r.equalsIgnoreCase("JFact")) {
 			reasonerFactory = new JFactFactory();
+		}
+		else if (r.equalsIgnoreCase("HermiT")) {
+			reasonerFactory = new ReasonerFactory();
 		}
 //    	else if (r.equalsIgnoreCase("Elk")) {
 //    		reasonerFactory = new ElkReasonerFactory();
@@ -305,9 +276,6 @@ public class Mine extends Application implements Embedable{
 				VisPositionConfig.restoreState(path, artPanel.getVisGraph());
 			}
 		}
-	}
-	public void createImageButtonAction(ActionEvent e) {
-		createImage(artPanel);
 	}
 
 	public void createImage(Canvas panel) {
@@ -419,15 +387,6 @@ public class Mine extends Application implements Embedable{
 		if (in.endsWith("jpg")) return true;
 		if (in.endsWith("png")) return true;
 		return false;
-	}
-
-	private String getExtension(String description) {
-		if (description.contains("jpg")) {
-			return "jpg";
-		} else if (description.contains("png")) {
-			return "png";
-		}
-		return "jpg";
 	}
 
 	@Override

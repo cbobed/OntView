@@ -607,6 +607,12 @@ public class PaintFrame extends Canvas implements Runnable{
 			if (e.getClickCount() == 2 && !e.isConsumed() && e.getButton() == MouseButton.PRIMARY) {
 				//double click
 				e.consume();
+				if (shape instanceof VisClass visClass) {
+					OWLClassExpression classExpression = visClass.getLinkedClassExpression();
+					if (classExpression != null && classExpression.isOWLThing()) {
+						return false;
+					}
+				}
 				if (shape.allSubHidden()){
 					shape.hide();
 					return true;
