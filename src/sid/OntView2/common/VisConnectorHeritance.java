@@ -15,6 +15,9 @@ public class VisConnectorHeritance extends VisConnectorPropProp {
 
 	@Override
 	public void draw(GraphicsContext g){
+		if (g == null){
+			return;
+		}
         if ((visible)&&(from.asVisClass().getPropertyBox().visible)){
 			if ((from != null) && (to!= null)){
 				if ((from.visible) && (to.visible)){

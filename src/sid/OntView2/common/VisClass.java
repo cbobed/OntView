@@ -223,6 +223,9 @@ public class VisClass extends Shape {
 	}
 
 	public void drawShape(GraphicsContext g) {
+		if (g == null){
+			return;
+		}
 		int x, y;
 		int roundCornerValue = 10;
 		if (Objects.equals(graph.paintframe.positionGraph, "LEFT")) {

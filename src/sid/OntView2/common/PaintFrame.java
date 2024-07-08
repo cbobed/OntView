@@ -142,10 +142,30 @@ public class PaintFrame extends Canvas implements Runnable{
 		}
 	}
 
+	public void scaleGraphicsContext(double factor){
+		GraphicsContext gc = this.getGraphicsContext2D();
+		if (gc != null) {
+			gc.restore();
+			gc.save();
+			gc.clearRect(0, 0, getWidth(), getHeight());
+			gc.scale(factor, factor);
+
+
+			this.setWidth(oSize.getWidth() * factor);
+			this.setHeight(oSize.getHeight() * factor);
+			this.draw();
+		}
+
+	}
+
+
 	/*-*************************************************************/
 
 	public void draw() {
 		GraphicsContext g = this.getGraphicsContext2D();
+		if (g == null) {
+			return;
+		}
 
 		g.clearRect(0, 0, getWidth(), getHeight());
 
@@ -208,6 +228,9 @@ public class PaintFrame extends Canvas implements Runnable{
 		}
 	}
 	private void drawPropertyBoxes(GraphicsContext g2d){
+		if (g2d == null){
+			return;
+		}
 		for (Entry<String,Shape> entry : visGraph.shapeMap.entrySet()){
 			if (entry.getValue() instanceof VisClass){
 				VisClass v = entry.getValue().asVisClass();

@@ -58,6 +58,9 @@ public class VisConnectorPropProp extends VisConnector {
 	
 	@Override
 	public void draw(GraphicsContext g){
+		if (g == null){
+			return;
+		}
         if (drawable()){
 			Color prevColor = (Color) g.getStroke();
 			g.setStroke(Color.BLUE);

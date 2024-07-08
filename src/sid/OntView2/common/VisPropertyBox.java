@@ -78,7 +78,9 @@ public class VisPropertyBox {
 	}
 	
 	public void draw(GraphicsContext g){
-
+		if (g == null){
+			return;
+		}
 		Font font = Font.font("Dialog", FontWeight.NORMAL, 9);
 		g.setFont(font);
 	    for (VisObjectProperty p: propertyList){

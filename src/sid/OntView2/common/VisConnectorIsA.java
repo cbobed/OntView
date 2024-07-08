@@ -22,6 +22,9 @@ public class VisConnectorIsA extends VisConnector {
 
 	@Override
 	public void draw(GraphicsContext g){
+		if (g == null){
+			return;
+		}
         Color prevColor = (Color) g.getStroke();
 		double prevLineWidth = g.getLineWidth();
 		StrokeLineCap prevCap = g.getLineCap();

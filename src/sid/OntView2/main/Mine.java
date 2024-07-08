@@ -25,6 +25,8 @@ import javafx.stage.Stage;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.semanticweb.HermiT.Configuration;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.StringDocumentSource;
@@ -54,6 +56,9 @@ import uk.ac.manchester.cs.jfact.JFactFactory;
 
 public class Mine extends Application implements Embedable{
 
+	static Logger logger = Logger.getLogger(Mine.class);
+
+
 	private Stage primaryStage;
 	private static final long serialVersionUID = 1L;
 	boolean DEBUG=false;
@@ -72,6 +77,7 @@ public class Mine extends Application implements Embedable{
 	/* Code for standalone app initialization */
 
 	public static void main(String[] args) {
+		PropertyConfigurator.configure("src/log4j.properties");
 		launch(args);
 	}
 
@@ -113,6 +119,7 @@ public class Mine extends Application implements Embedable{
 		Scene scene = new Scene(root, 1200, 600);
 		ClassLoader c = Thread.currentThread().getContextClassLoader();
 		scene.getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
+
 		primaryStage.setScene(scene);
 		primaryStage.setMaximized(true);
 		primaryStage.show();
@@ -126,6 +133,7 @@ public class Mine extends Application implements Embedable{
 			//cant cast to set<OWLClassExpression> from set<OWLClass>
 			System.out.println("reasoner: " + reasoner);
 			System.out.println("reasoner.isConsistent(): " + reasoner.isConsistent());
+			logger.debug(reasoner.getTopClassNode().getEntities());
 
 			HashSet<OWLClassExpression> set = new HashSet<>(reasoner.getTopClassNode().getEntities());
 			try {
@@ -239,6 +247,7 @@ public class Mine extends Application implements Embedable{
 //    	else if (r.equalsIgnoreCase("Jcel")) {
 //    		reasonerFactory = new JcelReasonerFactory();
 //    	}
+		System.out.println("Reasoner factory: " + reasonerFactory);
 		return reasonerFactory;
 	}
 

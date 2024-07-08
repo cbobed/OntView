@@ -112,6 +112,9 @@ public class VisDataProperty extends VisProperty {
 	}
 
 	public void draw(GraphicsContext g){
+		if (g == null){
+			return;
+		}
 		if ((pbox.visible)&&(visible)&&(pbox.vclass.visible)){
 			g.setFont(textFont);
 			if ((parents!=null)&&(parents.size() > 0)) {

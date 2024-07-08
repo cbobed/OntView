@@ -198,6 +198,9 @@ public class VisObjectProperty extends VisProperty {
 	}
 
 	public void draw(GraphicsContext g){
+		if (g == null){
+			return;
+		}
 		Point2D p = getClosePoint();
 		if ((pbox.visible)&&(visible)&&(pbox.vclass.visible)){
 			g.setFont(textFont);
@@ -248,6 +251,9 @@ public class VisObjectProperty extends VisProperty {
 	}
 
 	public void drawConnectors(GraphicsContext g) {
+		if (g == null){
+			return;
+		}
 		if (visible) {
 			if (rangeConnector != null)
 				rangeConnector.draw(g);

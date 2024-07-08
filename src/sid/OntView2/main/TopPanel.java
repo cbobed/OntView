@@ -191,14 +191,16 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			zoomSlider = new Slider();
 			zoomSlider.setMin(0);
 			zoomSlider.setMax(10);
-			zoomSlider.setBlockIncrement(3);
+			//zoomSlider.setBlockIncrement(3);
 			zoomSlider.setOrientation(Orientation.VERTICAL);
-			zoomSlider.setValue(5);
+			zoomSlider.setValue(1);
 
 			zoomSlider.getStyleClass().add("zoom-slider");
 			zoomSlider.setPrefHeight(VisConstants.CONTAINER_SIZE);
 			zoomSlider.setMinHeight(VisConstants.CONTAINER_SIZE);
 			zoomSlider.setMaxHeight(VisConstants.CONTAINER_SIZE);
+
+			System.out.println("zoomSlider.getValue(): " + zoomSlider.getValue());
 
 			zoomSlider.valueProperty().addListener((obs, oldVal, newVal) -> zoomSliderChangeStateChanged(newVal));
 
@@ -479,9 +481,10 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 			StackPane titlePane = createTitlePane("Options");
 			HBox row = createRow(getPropertiesCheckBox(), getRenderLabel(), getExpandCheckBox(), getQualifiedNames());
+			row.setAlignment(Pos.CENTER);
 
 			panelCheckBox = createContainer(true, titlePane, row);
-			panelCheckBox.setMinWidth(300);
+			panelCheckBox.setMinWidth(400);
 		}
 		return panelCheckBox;
 	}
@@ -716,18 +719,18 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private VBox snapshotPanel;
 
 	private void zoomSliderChangeStateChanged(Number newValue) {
-		double roundedValue = Math.round(newValue.doubleValue() * 10) / 10.0;
-
 
 		if (parent.artPanel != null) {
-			double factor = (1 + roundedValue / 100.0);
+			double factor = (0.5+(double)newValue/10.0);
+			factor = Math.round(factor * 100.0) / 100.0;
 			if (size == null) {
 				size = new Dimension2D(parent.artPanel.getWidth(), parent.artPanel.getHeight());
 				parent.artPanel.setOriginalSize(size);
 			}
 			parent.artPanel.getVisGraph().setZoomLevel((int) getZoomSlider().getValue());
-			parent.artPanel.setFactor(factor); // PROBLEMAS
-			parent.artPanel.scale(factor, size);
+			//parent.artPanel.setFactor(factor); // PROBLEMAS
+			//parent.artPanel.scale(factor, size);
+			parent.artPanel.scaleGraphicsContext(factor);
 		}
 	}
 }

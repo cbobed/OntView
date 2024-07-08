@@ -15,6 +15,9 @@ public class VisConnectorDisjoint extends VisConnectorEquiv {
 
 	@Override
 	public void draw(GraphicsContext g){
+		if (g == null){
+			return;
+		}
 		int posy1,posy2;
 		Color col = color;
 
