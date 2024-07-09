@@ -62,7 +62,7 @@ public class AutoCompletion {
                 hitBackspaceOnSelection = editor.getSelection().getStart() != editor.getSelection().getEnd();
             } else if (e.getCode() == KeyCode.DELETE) {
                 e.consume();
-                playBeepSound();
+                //playBeepSound();
             }
         };
 
@@ -100,12 +100,12 @@ public class AutoCompletion {
         new AutoCompletion(comboBox);
     }
 
-    private void playBeepSound() {
+    /*private void playBeepSound() {
         String filePath = "sounds/beep.mp3";
         File soundFile = new File(filePath);
         AudioClip beep = new AudioClip(soundFile.toURI().toString());
         beep.play();
-    }
+    }*/
     
     void configureEditor(TextField newEditor) {
         if (editor != null) {
@@ -129,7 +129,7 @@ public class AutoCompletion {
                 if (hitBackspaceOnSelection) offs--;
             } else {
                 // User hit backspace with the cursor positioned on the start => beep
-                playBeepSound();
+                //playBeepSound();
             }
             highlightCompletedText(offs);
         } /*else {
@@ -156,7 +156,7 @@ public class AutoCompletion {
             // imitate no insert (later on offs will be incremented by str.length(): selection won't move forward)
             offs = offs-str.length();
             // provide feedbaOntology(<http://protege.stanford.edu/plugins/owl/owl-library/koala.owl> [Axioms: 70] [Logical axioms: 42])ck to the user that his input has been received but can not be accepted
-            playBeepSound();
+            //playBeepSound();
         }
         setText(item.toString());
         // select the completed part

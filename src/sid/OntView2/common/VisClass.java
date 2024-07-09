@@ -200,7 +200,7 @@ public class VisClass extends Shape {
 	private Font boldFont;
 	private Font getDefinedClassFont(){
 		if (defFont==null)
-			defFont = Font.font("Dialog", FontPosture.ITALIC, 12);
+			defFont = Font.font("Dialog", FontWeight.BOLD, 10);
 		return defFont;
 	}
 	

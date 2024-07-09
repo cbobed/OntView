@@ -131,16 +131,7 @@ public class PaintFrame extends Canvas implements Runnable{
 	/**
 	 * scales by factor and adjusts panel size
 	 * @param factor
-	 * @param size
 	 */
-	public void scale(double factor,Dimension2D size){
-		GraphicsContext g2d = this.getGraphicsContext2D();
-		g2d.scale(factor, factor);
-		if (factor>1.0) {
-			setWidth(size.getWidth() * factor);
-			setHeight(size.getHeight() * factor);
-		}
-	}
 
 	public void scaleGraphicsContext(double factor){
 		GraphicsContext gc = this.getGraphicsContext2D();
@@ -150,95 +141,131 @@ public class PaintFrame extends Canvas implements Runnable{
 			gc.clearRect(0, 0, getWidth(), getHeight());
 			gc.scale(factor, factor);
 
+			Dimension2D graphSize = calculateGraphSize(factor);
+			setOriginalSize(graphSize);
+			this.setWidth(graphSize.getWidth());
+			this.setHeight(graphSize.getHeight());
 
-			this.setWidth(oSize.getWidth() * factor);
-			this.setHeight(oSize.getHeight() * factor);
+			if (scroll != null) {
+				scroll.setPrefViewportWidth(graphSize.getWidth());
+				scroll.setPrefViewportHeight(graphSize.getHeight());
+				scroll.setContent(this);
+			}
+			System.out.println("Original size: " + oSize);
 			this.draw();
 		}
 
+	}
+
+	public Dimension2D calculateGraphSize(double factor) {
+		if (visGraph != null) {
+			double maxX = 0;
+			double maxY = 0;
+
+			HashMap<String, Shape> shapeMapCopy;
+			synchronized (visGraph.shapeMap) {
+				shapeMapCopy = new HashMap<>(visGraph.shapeMap);
+			}
+
+			for (Shape shape : shapeMapCopy.values()) {
+				double shapeMaxX = shape.getPosX() + shape.getWidth();
+				double shapeMaxY = shape.getPosY() + shape.getHeight();
+				if (shapeMaxX > maxX) {
+					maxX = shapeMaxX;
+				}
+				if (shapeMaxY > maxY) {
+					maxY = shapeMaxY;
+				}
+			}
+
+			double widthValue = Math.round(maxX * factor * 1000.0)/1000.0;
+			double heightValue = Math.round(maxY * factor * 1000.0)/1000.0;
+
+			scroll.setContent(this);
+			scroll.setPrefViewportWidth(widthValue / factor);
+			scroll.setPrefViewportHeight(10000);
+
+			return new Dimension2D(widthValue, heightValue);
+
+		}
+		return new Dimension2D(1200 * factor, 600 * factor);
 	}
 
 
 	/*-*************************************************************/
 
 	public void draw() {
-		GraphicsContext g = this.getGraphicsContext2D();
-		if (g == null) {
-			return;
-		}
+		if (!this.isDisabled() && this.isVisible() && this.getGraphicsContext2D() != null) {
+			GraphicsContext g = this.getGraphicsContext2D();
+			g.clearRect(0, 0, getWidth(), getHeight());
 
-		g.clearRect(0, 0, getWidth(), getHeight());
+			/*if ((factor != 1.0) && (stable)) {
+				g.scale(factor, factor);
+			}*/
+			if (prevFactor != factor) {
+				prevFactor = factor;
+				if ((factor >= 1.0) && (getWidth() != prevSize.getWidth() || getHeight() != prevSize.getHeight())) {
+					prevSize = new Dimension2D(oSize.getWidth() * factor, oSize.getHeight() * factor);
+				}
+			}
+			if (visGraph != null) {
 
-        if ((factor !=1.0)&&(stable)){
-			(g).scale(factor, factor);
-		}
-		if (prevFactor!=factor){
-			prevFactor = factor;
-			if ((factor >=1.0) && (getWidth() != prevSize.getWidth() || getHeight() != prevSize.getHeight())) {
-				prevSize = new Dimension2D(getWidth(), getHeight());
-				setWidth(oSize.getWidth() * factor);
-				setHeight(oSize.getHeight() * factor);
+				List<VisConnector> connectorsCopy;
+				synchronized (visGraph.connectorList) {
+					connectorsCopy = new ArrayList<>(visGraph.connectorList);
+				}
+				for (VisConnector c : connectorsCopy) {
+					//System.out.println("Drawing connector with color: " + VisConnector.color);
+					// c.draw(g);
+				}
 
-			}
-		}
-		if (visGraph!=null){
-
-			List<VisConnector> connectorsCopy;
-			synchronized (visGraph.connectorList) {
-				connectorsCopy = new ArrayList<>(visGraph.connectorList);
-			}
-			for (VisConnector c : connectorsCopy) {
-				//System.out.println("Drawing connector with color: " + VisConnector.color);
-				// c.draw(g);
-			}
-
-			List<VisConnector> dashedConnectorsCopy;
-			synchronized (visGraph.dashedConnectorList) {
-				dashedConnectorsCopy = new ArrayList<>(visGraph.dashedConnectorList);
-			}
-			for (VisConnector c : dashedConnectorsCopy) {
-				//System.out.println("Drawing dashed connector with color: " + VisConnector.color);
-				// c.draw(g);
-			}
-			g.setStroke(Color.LIGHTGRAY);
-
-			List<VisLevel> levelsCopy;
-			synchronized (visGraph.levelSet) {
-				levelsCopy = new ArrayList<>(visGraph.levelSet);
-			}
-			for (VisLevel lvl : levelsCopy) {
-				//System.out.println("Drawing level with light gray color: " + Color.LIGHTGRAY);
-				(g).strokeLine(lvl.getXpos(), 0, lvl.getXpos(), (int) (getHeight()/factor));
-				//Uncomment this to get a vertical line in every level
+				List<VisConnector> dashedConnectorsCopy;
+				synchronized (visGraph.dashedConnectorList) {
+					dashedConnectorsCopy = new ArrayList<>(visGraph.dashedConnectorList);
+				}
+				for (VisConnector c : dashedConnectorsCopy) {
+					//System.out.println("Drawing dashed connector with color: " + VisConnector.color);
+					// c.draw(g);
+				}
 				g.setStroke(Color.LIGHTGRAY);
 
-			}
-			g.setStroke(Color.BLACK);
-			drawPropertyBoxes(g);
+				List<VisLevel> levelsCopy;
+				synchronized (visGraph.levelSet) {
+					levelsCopy = new ArrayList<>(visGraph.levelSet);
+				}
+				for (VisLevel lvl : levelsCopy) {
+					//System.out.println("Drawing level with light gray color: " + Color.LIGHTGRAY);
+					(g).strokeLine(lvl.getXpos(), 0, lvl.getXpos(), (int) (getHeight() / factor));
+					//Uncomment this to get a vertical line in every level
+					g.setStroke(Color.LIGHTGRAY);
 
-			HashMap<String, Shape> shapeMapCopy;
-			synchronized (visGraph.shapeMap) {
-				shapeMapCopy = new HashMap<>(visGraph.shapeMap);
-			}
-			for (Entry<String, Shape> entry : shapeMapCopy.entrySet()) {
-				//System.out.println("Drawing shape with current color: " + g.getStroke());
-				entry.getValue().drawShape(g);
-			}
+				}
+				g.setStroke(Color.BLACK);
+				drawPropertyBoxes(g);
 
+				HashMap<String, Shape> shapeMapCopy;
+				synchronized (visGraph.shapeMap) {
+					shapeMapCopy = new HashMap<>(visGraph.shapeMap);
+				}
+				for (Entry<String, Shape> entry : shapeMapCopy.entrySet()) {
+					//System.out.println("Drawing shape with current color: " + g.getStroke());
+					entry.getValue().drawShape(g);
+				}
+			}
 		}
 	}
+
 	private void drawPropertyBoxes(GraphicsContext g2d){
-		if (g2d == null){
-			return;
-		}
-		for (Entry<String,Shape> entry : visGraph.shapeMap.entrySet()){
-			if (entry.getValue() instanceof VisClass){
-				VisClass v = entry.getValue().asVisClass();
-				if ((v.getPropertyBox()!=null) && (v.getPropertyBox().visible)) {
-					Font c = g2d.getFont();
-					g2d.setStroke(Color.BLACK);
-					v.getPropertyBox().draw(g2d);
-					g2d.setFont(c);
+		if (!this.isDisabled() && this.isVisible() && g2d != null) {
+			for (Entry<String, Shape> entry : visGraph.shapeMap.entrySet()) {
+				if (entry.getValue() instanceof VisClass) {
+					VisClass v = entry.getValue().asVisClass();
+					if ((v.getPropertyBox() != null) && (v.getPropertyBox().visible)) {
+						Font c = g2d.getFont();
+						g2d.setStroke(Color.BLACK);
+						v.getPropertyBox().draw(g2d);
+						g2d.setFont(c);
+					}
 				}
 			}
 		}
@@ -440,39 +467,6 @@ public class PaintFrame extends Canvas implements Runnable{
 		}
 	}
 
-	public void focusOnShape2(String shapeKey,Shape pshape) {
-		/*
-		 * focus the frame on the shape pos
-		 * If shapeKey is  null, it will look for it
-		 */
-		Shape shape = pshape != null ? pshape : visGraph.getShape(shapeKey);
-
-		if (shape!= null) {
-			int x  = (int) (shape.getPosX() * factor);
-			int y  = (int) (shape.getPosY() * factor);
-
-			double scrollPaneWidth = scroll.getViewportBounds().getWidth();
-			double scrollPaneHeight = scroll.getViewportBounds().getHeight();
-
-			double hValue = (x - scrollPaneWidth / 2) / (getWidth() - scrollPaneWidth);
-			double vValue = (y - scrollPaneHeight / 2) / (getHeight() - scrollPaneHeight);
-
-			scroll.setHvalue(Math.max(0, Math.min(hValue, 1)));
-			scroll.setVvalue(Math.max(0, Math.min(vValue, 1)));
-		}
-
-	}
-
-	/*private void scrollRectToVisible(Rectangle rect) {
-		Bounds bounds = rect.getBoundsInParent();
-		double hValue = (bounds.getMinX() - scroll.getHmin()) / (scroll.getHmax() - scroll.getHmin());
-		double vValue = (bounds.getMinY() - scroll.getVmin()) / (scroll.getVmax() - scroll.getVmin());
-		scroll.setHvalue(hValue);
-		scroll.setVvalue(vValue);
-	}*/
-
-
-
 	public void handleMouseMoved(MouseEvent e) {
 		if (visGraph == null) {
 			return;
@@ -585,7 +579,7 @@ public class PaintFrame extends Canvas implements Runnable{
 		while (relaxer == me) {
 			relax();
 			try {
-				Thread.sleep(stable ?  800 : 500);
+				Thread.sleep(stable ?  1000 : 800);
 				while (pressedShape!=null){
 					Thread.sleep(400);
 				}

@@ -725,7 +725,6 @@ public class TopPanel extends JPanel implements ControlPanelInterface {
 				size= parent.artPanel.getSize();
 				parent.artPanel.setOriginalSize(size);
 			}
-			System.out.println("getZoomSlider().getValue(): "+getZoomSlider().getValue());
 			parent.artPanel.getVisGraph().setZoomLevel(getZoomSlider().getValue());
 			parent.artPanel.setFactor(factor);	
 			parent.artPanel.scale(factor, size);

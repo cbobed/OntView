@@ -29,14 +29,11 @@ public class VisInstance extends Dialog<Void> implements Serializable {
 		getDialogPane().setPrefSize(221, 451);
 	}
 
-	// REVISAR
 	public void setModel(ArrayList<String> model){
 		ObservableList<String> items = FXCollections.observableArrayList(model);
 		list0.setItems(items);
 	}
 
-
-	// REVISAR
 	private ListView<String> getList0() {
 		if (list0 == null) {
 			list0 = new ListView<>();
@@ -44,25 +41,13 @@ public class VisInstance extends Dialog<Void> implements Serializable {
 			list0.setItems(items);
 			//list0.setStyle("-fx-selection-bar: rgb(100, 154, 191);");
 			if ( items.isEmpty() ){
-				list0.setCursor(javafx.scene.Cursor.DEFAULT);
+				list0.setCursor(Cursor.DEFAULT);
 			} else {
 				list0.setCursor(Cursor.HAND);
 			}
 		}
 		return list0;
 	}
-
-	/*private static void installLnF() {
-		try {
-			String lnfClassname = PREFERRED_LOOK_AND_FEEL;
-			if (lnfClassname == null)
-				lnfClassname = UIManager.getCrossPlatformLookAndFeelClassName();
-			UIManager.setLookAndFeel(lnfClassname);
-		} catch (Exception e) {
-			System.err.println("Cannot install " + PREFERRED_LOOK_AND_FEEL
-					+ " on this platform:" + e.getMessage());
-		}
-	}*/
 
 	/**
 	 * Main entry of the class.

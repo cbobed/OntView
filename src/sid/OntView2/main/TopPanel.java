@@ -199,9 +199,6 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			zoomSlider.setPrefHeight(VisConstants.CONTAINER_SIZE);
 			zoomSlider.setMinHeight(VisConstants.CONTAINER_SIZE);
 			zoomSlider.setMaxHeight(VisConstants.CONTAINER_SIZE);
-
-			System.out.println("zoomSlider.getValue(): " + zoomSlider.getValue());
-
 			zoomSlider.valueProperty().addListener((obs, oldVal, newVal) -> zoomSliderChangeStateChanged(newVal));
 
 		}
@@ -724,13 +721,14 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			double factor = (0.5+(double)newValue/10.0);
 			factor = Math.round(factor * 100.0) / 100.0;
 			if (size == null) {
-				size = new Dimension2D(parent.artPanel.getWidth(), parent.artPanel.getHeight());
+				size = parent.artPanel.calculateGraphSize(1.0);
 				parent.artPanel.setOriginalSize(size);
 			}
 			parent.artPanel.getVisGraph().setZoomLevel((int) getZoomSlider().getValue());
-			//parent.artPanel.setFactor(factor); // PROBLEMAS
-			//parent.artPanel.scale(factor, size);
+			parent.artPanel.setFactor(factor);
 			parent.artPanel.scaleGraphicsContext(factor);
 		}
 	}
+
+
 }

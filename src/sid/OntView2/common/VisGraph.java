@@ -25,6 +25,7 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class VisGraph extends Observable implements Runnable{
 
@@ -35,7 +36,7 @@ public class VisGraph extends Observable implements Runnable{
     ArrayList<VisConnector> connectorList;
 	ArrayList<VisConnector> dashedConnectorList;
 	
-    final public HashMap<String, Shape>    shapeMap;
+    final public Map<String, Shape>    shapeMap;
 	HashMap<String, Shape>           tempMap;
 	HashMap<String, VisObjectProperty>     propertyMap;
 	HashMap<String, VisDataProperty> dPropertyMap;
@@ -82,7 +83,7 @@ public class VisGraph extends Observable implements Runnable{
 	 * Progress bar criteria. From 0-70 % it will depend on the number of shapes added to the map
 	 */
     public  VisGraph(PaintFrame pframe) {
-		shapeMap     = new HashMap<String, Shape>();
+		shapeMap     = new ConcurrentHashMap<>();
 		definitionsMap = new HashMap<>();
 		tempMap      = new HashMap<>();
 		propertyMap  = new HashMap<>();

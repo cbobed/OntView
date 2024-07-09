@@ -1,13 +1,12 @@
 package sid.OntView2.main;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import javax.imageio.ImageIO;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.geometry.Rectangle2D;
@@ -25,13 +24,8 @@ import javafx.stage.Stage;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-import org.semanticweb.HermiT.Configuration;
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.io.StringDocumentSource;
 import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -55,10 +49,6 @@ import uk.ac.manchester.cs.jfact.JFactFactory;
 
 
 public class Mine extends Application implements Embedable{
-
-	static Logger logger = Logger.getLogger(Mine.class);
-
-
 	private Stage primaryStage;
 	private static final long serialVersionUID = 1L;
 	boolean DEBUG=false;
@@ -77,7 +67,6 @@ public class Mine extends Application implements Embedable{
 	/* Code for standalone app initialization */
 
 	public static void main(String[] args) {
-		PropertyConfigurator.configure("src/log4j.properties");
 		launch(args);
 	}
 
@@ -120,9 +109,13 @@ public class Mine extends Application implements Embedable{
 		ClassLoader c = Thread.currentThread().getContextClassLoader();
 		scene.getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
 
-		primaryStage.setScene(scene);
+		viewer.primaryStage.setScene(scene);
+		viewer.primaryStage.setMaximized(true);
+		viewer.primaryStage.show();
+
+		/*primaryStage.setScene(scene);
 		primaryStage.setMaximized(true);
-		primaryStage.show();
+		primaryStage.show();*/
 	}
 
 	/* Rest of methods */
@@ -133,7 +126,6 @@ public class Mine extends Application implements Embedable{
 			//cant cast to set<OWLClassExpression> from set<OWLClass>
 			System.out.println("reasoner: " + reasoner);
 			System.out.println("reasoner.isConsistent(): " + reasoner.isConsistent());
-			logger.debug(reasoner.getTopClassNode().getEntities());
 
 			HashSet<OWLClassExpression> set = new HashSet<>(reasoner.getTopClassNode().getEntities());
 			try {
@@ -324,7 +316,6 @@ public class Mine extends Application implements Embedable{
 		int answer;
 		//BufferedImage bi = new BufferedImage(w+xIni,h+yIni, BufferedImage.TYPE_INT_RGB);
 		ArrayList<String> valid = new ArrayList<>();
-		valid.add("jpg");
 		valid.add("png");
 
 		WritableImage writableImage = new WritableImage(w, h);
@@ -332,18 +323,7 @@ public class Mine extends Application implements Embedable{
 		params.setViewport(new Rectangle2D(xIni, yIni, w, h));
 		panel.snapshot(params, writableImage);
 
-		// To be able to use jpg format
-		BufferedImage bufferedImage = SwingFXUtils.fromFXImage(writableImage, null);
-		if (bufferedImage.getType() != BufferedImage.TYPE_INT_RGB) {
-			BufferedImage rgbImage = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), BufferedImage.TYPE_INT_RGB);
-			Graphics2D g = rgbImage.createGraphics();
-			g.drawImage(bufferedImage, 0, 0, null);
-			g.dispose();
-			bufferedImage = rgbImage;
-		}
-
 		FileChooser fileChooser = new FileChooser();
-		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JPG", "*.jpg"));
 		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG", "*.png"));
 
 		while (!done) {
@@ -361,7 +341,7 @@ public class Mine extends Application implements Embedable{
 				}
 				try {
 					String extension = valid.contains(fileChooser.getSelectedExtensionFilter().getDescription().toLowerCase()) ?
-							fileChooser.getSelectedExtensionFilter().getDescription().toLowerCase() : "jpg";
+							fileChooser.getSelectedExtensionFilter().getDescription().toLowerCase() : "png";
 					boolean hasSuffix = hasValidSuffix(fl.getName().toLowerCase());
 
 					if (!hasSuffix){
@@ -376,10 +356,10 @@ public class Mine extends Application implements Embedable{
 							}
 						}
 
-						ImageIO.write(SwingFXUtils.fromFXImage(writableImage, bufferedImage), extension, fl2);
+						ImageIO.write(SwingFXUtils.fromFXImage(writableImage, null), extension, fl2);
 					}
 					else {
-						ImageIO.write(SwingFXUtils.fromFXImage(writableImage, bufferedImage), extension, fl);
+						ImageIO.write(SwingFXUtils.fromFXImage(writableImage, null), extension, fl);
 					}
 					done = true;
 				} catch (IOException e1) {
