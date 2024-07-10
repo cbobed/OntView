@@ -1,5 +1,6 @@
 package sid.OntView2.common;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,8 +20,10 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.Cursor;
 
@@ -115,6 +118,39 @@ public class PaintFrame extends Canvas implements Runnable{
 	}
 
 	/*-*************************************************************
+	 * Methods to handle the canvas
+	 *-*************************************************************/
+	public void clearCanvas() {
+		GraphicsContext gc = this.getGraphicsContext2D();
+		gc.clearRect(0, 0, getWidth(), getHeight());
+	}
+
+	private Canvas recreateCanvas(Canvas oldCanvas) {
+		double width = oldCanvas.getWidth();
+		double height = oldCanvas.getHeight();
+		Canvas newCanvas = new Canvas(width, height);
+		GraphicsContext gc = newCanvas.getGraphicsContext2D();
+		gc.drawImage(snapshotCanvas(oldCanvas), 0, 0);
+		return newCanvas;
+	}
+
+	public void handleCanvasFailure(Canvas oldCanvas) {
+		Canvas newCanvas = recreateCanvas(oldCanvas);
+		// Reemplaza el canvas roto en tu contenedor
+		((Pane) oldCanvas.getParent()).getChildren().remove(oldCanvas);
+		((Pane) oldCanvas.getParent()).getChildren().add(newCanvas);
+	}
+
+	private WritableImage snapshotCanvas(Canvas canvas) {
+		WritableImage snapshot = new WritableImage((int)canvas.getWidth(), (int)canvas.getHeight());
+		canvas.snapshot(null, snapshot);
+		return snapshot;
+	}
+
+
+
+
+	/*-*************************************************************
 	 * Scaling  issues
 	 *-*************************************************************/
 
@@ -133,69 +169,22 @@ public class PaintFrame extends Canvas implements Runnable{
 	 * @param factor
 	 */
 
-	public void scaleGraphicsContext(double factor){
+	public void scale(double factor){
 		GraphicsContext gc = this.getGraphicsContext2D();
 		if (gc != null) {
 			gc.restore();
 			gc.save();
 			gc.clearRect(0, 0, getWidth(), getHeight());
 			gc.scale(factor, factor);
-
-			Dimension2D graphSize = calculateGraphSize(factor);
-			setOriginalSize(graphSize);
-			this.setWidth(graphSize.getWidth());
-			this.setHeight(graphSize.getHeight());
-
-			if (scroll != null) {
-				scroll.setPrefViewportWidth(graphSize.getWidth());
-				scroll.setPrefViewportHeight(graphSize.getHeight());
-				scroll.setContent(this);
-			}
-			System.out.println("Original size: " + oSize);
-			this.draw();
-		}
-
-	}
-
-	public Dimension2D calculateGraphSize(double factor) {
-		if (visGraph != null) {
-			double maxX = 0;
-			double maxY = 0;
-
-			HashMap<String, Shape> shapeMapCopy;
-			synchronized (visGraph.shapeMap) {
-				shapeMapCopy = new HashMap<>(visGraph.shapeMap);
-			}
-
-			for (Shape shape : shapeMapCopy.values()) {
-				double shapeMaxX = shape.getPosX() + shape.getWidth();
-				double shapeMaxY = shape.getPosY() + shape.getHeight();
-				if (shapeMaxX > maxX) {
-					maxX = shapeMaxX;
-				}
-				if (shapeMaxY > maxY) {
-					maxY = shapeMaxY;
-				}
-			}
-
-			double widthValue = Math.round(maxX * factor * 1000.0)/1000.0;
-			double heightValue = Math.round(maxY * factor * 1000.0)/1000.0;
-
-			scroll.setContent(this);
-			scroll.setPrefViewportWidth(widthValue / factor);
-			scroll.setPrefViewportHeight(10000);
-
-			return new Dimension2D(widthValue, heightValue);
+			//this.draw();
 
 		}
-		return new Dimension2D(1200 * factor, 600 * factor);
 	}
-
 
 	/*-*************************************************************/
 
 	public void draw() {
-		if (!this.isDisabled() && this.isVisible() && this.getGraphicsContext2D() != null) {
+		if (this.getScene() != null && !this.isDisabled() && this.isVisible() && this.getGraphicsContext2D() != null) {
 			GraphicsContext g = this.getGraphicsContext2D();
 			g.clearRect(0, 0, getWidth(), getHeight());
 
@@ -210,13 +199,12 @@ public class PaintFrame extends Canvas implements Runnable{
 			}
 			if (visGraph != null) {
 
-				List<VisConnector> connectorsCopy;
+				/*List<VisConnector> connectorsCopy;
 				synchronized (visGraph.connectorList) {
 					connectorsCopy = new ArrayList<>(visGraph.connectorList);
 				}
 				for (VisConnector c : connectorsCopy) {
-					//System.out.println("Drawing connector with color: " + VisConnector.color);
-					// c.draw(g);
+					 c.draw(g);
 				}
 
 				List<VisConnector> dashedConnectorsCopy;
@@ -224,17 +212,15 @@ public class PaintFrame extends Canvas implements Runnable{
 					dashedConnectorsCopy = new ArrayList<>(visGraph.dashedConnectorList);
 				}
 				for (VisConnector c : dashedConnectorsCopy) {
-					//System.out.println("Drawing dashed connector with color: " + VisConnector.color);
-					// c.draw(g);
-				}
-				g.setStroke(Color.LIGHTGRAY);
+					 c.draw(g);
+				}*/
 
+				g.setStroke(Color.LIGHTGRAY);
 				List<VisLevel> levelsCopy;
 				synchronized (visGraph.levelSet) {
 					levelsCopy = new ArrayList<>(visGraph.levelSet);
 				}
 				for (VisLevel lvl : levelsCopy) {
-					//System.out.println("Drawing level with light gray color: " + Color.LIGHTGRAY);
 					(g).strokeLine(lvl.getXpos(), 0, lvl.getXpos(), (int) (getHeight() / factor));
 					//Uncomment this to get a vertical line in every level
 					g.setStroke(Color.LIGHTGRAY);
@@ -248,7 +234,6 @@ public class PaintFrame extends Canvas implements Runnable{
 					shapeMapCopy = new HashMap<>(visGraph.shapeMap);
 				}
 				for (Entry<String, Shape> entry : shapeMapCopy.entrySet()) {
-					//System.out.println("Drawing shape with current color: " + g.getStroke());
 					entry.getValue().drawShape(g);
 				}
 			}
@@ -334,7 +319,7 @@ public class PaintFrame extends Canvas implements Runnable{
 
 		if (stable) {
 			if (stateChanged) {
-				//System.out.println("relax is " + stateChanged);
+				System.out.println("relax");
 				stateChanged = false;
 
 				HashMap<String, Shape> shapeMapCopy;
@@ -348,13 +333,23 @@ public class PaintFrame extends Canvas implements Runnable{
 
 						if ((s_i!=shape_j)&&(s_i.visible)){
 							if ((s_i.getPosY() < shape_j.getPosY()) && (s_i.getPosY() + s_i.getTotalHeight()) > shape_j.getPosY()){
-								stateChanged = true;
+								/*System.out.println("primer if");
+								System.out.println("s_i " + s_i + ". shape_j " + shape_j);
+
+								System.out.println("s_i.getPosY() " + s_i.getPosY() + " < shape_j.getPosY() " + shape_j.getPosY());
+								System.out.println("s_i.getTotalHeight() " + s_i.getTotalHeight());
+								System.out.println("s_i.getPosY() + s_i.getTotalHeight() " + (s_i.getPosY() + s_i.getTotalHeight()) + " > shape_j.getPosY() " + shape_j.getPosY());
+								System.out.println(" ");*/
+
+								//stateChanged = true;
 								shapeRepulsion(s_i, DOWN);
 							}
 						}
 					}
 					s_i = e_i.getValue();
 					if (s_i.getPosY() < BORDER_PANEL){
+						System.out.println("segundo if");
+
 						s_i.setPosY(BORDER_PANEL);
 						stateChanged = true;
 						shapeRepulsion(s_i, DOWN);

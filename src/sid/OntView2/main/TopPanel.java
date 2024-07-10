@@ -340,6 +340,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			loadReasonerButton.setCursor(Cursor.HAND);
 			loadReasonerButton.setFont(Font.font("Dialog", FontWeight.NORMAL, 10));
 			loadReasonerButton.getStyleClass().add("button");
+			loadReasonerButton.setOnAction(event -> parent.artPanel.handleCanvasFailure(this));
 			loadReasonerButton.setOnAction(this::loadReasonerButtonActionActionPerformed);
 		}
 		return loadReasonerButton;
@@ -558,6 +559,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	}
 
 	private void OntologyButtonActionActionPerformed(ActionEvent event) {
+		parent.artPanel.stop();
 		String x = (String) getOntologyCombo().getValue();
 		if ((x != null) && (!x.equals(""))) {
 			parent.loadActiveOntology(IRI.create(x));
@@ -721,14 +723,12 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			double factor = (0.5+(double)newValue/10.0);
 			factor = Math.round(factor * 100.0) / 100.0;
 			if (size == null) {
-				size = parent.artPanel.calculateGraphSize(1.0);
+				size = new Dimension2D(parent.artPanel.getWidth(), parent.artPanel.getHeight());
 				parent.artPanel.setOriginalSize(size);
 			}
 			parent.artPanel.getVisGraph().setZoomLevel((int) getZoomSlider().getValue());
 			parent.artPanel.setFactor(factor);
-			parent.artPanel.scaleGraphicsContext(factor);
+			parent.artPanel.scale(factor);
 		}
 	}
-
-
 }
