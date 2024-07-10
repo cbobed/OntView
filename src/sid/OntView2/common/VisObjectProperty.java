@@ -201,7 +201,6 @@ public class VisObjectProperty extends VisProperty {
 		if (g == null){
 			return;
 		}
-		Point2D p = getClosePoint();
 		if ((pbox.visible)&&(visible)&&(pbox.vclass.visible)){
 			g.setFont(textFont);
 			if ((parents!=null)&&(parents.size() > 0)) {

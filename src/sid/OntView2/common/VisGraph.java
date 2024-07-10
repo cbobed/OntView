@@ -780,6 +780,9 @@ public class VisGraph extends Observable implements Runnable{
 	       if (e instanceof OWLClass){
     		   getQualifiedLabelMap().put(vis.label, e.asOWLClass().getIRI().toString());
 	       }
+
+		   System.out.println("Adding class: "+vis.label + " with height: " + vis.getHeight());
+
 	       return vis;
 	}
 	

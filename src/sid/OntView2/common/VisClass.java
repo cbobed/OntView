@@ -427,10 +427,10 @@ public class VisClass extends Shape {
 	     }
 
 		  for (VisConnectorDisjoint disj :  getDisjointConnectors()){
-			  disj.draw(g);
+			  //disj.draw(g);
 		  }
 		  for (VisConnectorEquiv equ: getEquivConnectors()){
-			  equ.draw(g);
+			  //equ.draw(g);
 		  }
  	  }
       g.setFont(oldFont);

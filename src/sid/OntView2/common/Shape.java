@@ -62,11 +62,11 @@ public abstract class Shape{
 
     /**************************************************************/
 	public Shape(){
-		inConnectors = new ArrayList<VisConnector>();
-		outConnectors = new ArrayList<VisConnector>();
-		outDashedConnectors = new ArrayList<VisConnector>();
-		inDashedConnectors = new ArrayList<VisConnector>();
-		hiddenSubClasses = new ArrayList<Shape>();
+		inConnectors = new ArrayList<>();
+		outConnectors = new ArrayList<>();
+		outDashedConnectors = new ArrayList<>();
+		inDashedConnectors = new ArrayList<>();
+		hiddenSubClasses = new ArrayList<>();
 	}
 
 	public void setPosition(int x, int y) {
@@ -118,7 +118,7 @@ public abstract class Shape{
 	/**
 	 *  hides shape, connector and notifies parents
      */
-	public void hide (){
+	public void hide(){
 
 		 this.visible = false;
 		 for (VisConnector c : inConnectors) {
@@ -178,7 +178,7 @@ public abstract class Shape{
 		//if all subclasses are hidden
 		for (VisConnector c : this.outConnectors){
 			if (c.visible) 
-			return false;
+				return false;
 		}	
 		return true;
 	}		 

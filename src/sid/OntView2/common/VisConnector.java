@@ -63,8 +63,8 @@ public abstract class VisConnector {
 	   return false;
    }
    
-   public void hide (){visible = false;}
-   public void show (){visible = true;}
+   public void hide(){ visible = false; }
+   public void show(){ visible = true; }
    
    public static VisConnector getConnector(ArrayList<? extends VisConnector>list, Shape s1, Shape s2){
 	   for (VisConnector c : list){
@@ -74,7 +74,6 @@ public abstract class VisConnector {
 	   }
 	   return null;
    }
-  
 
 	public static double distance(Point2D p1,Point2D p2) {
 		return  Math.sqrt(Math.pow((p1.getX()-p2.getX()),2) + Math.pow((p1.getY()-p2.getY()),2));

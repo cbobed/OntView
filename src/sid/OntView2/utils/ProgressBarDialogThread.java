@@ -58,4 +58,5 @@ public class ProgressBarDialogThread extends VisGraphObserver{
 		});
 
 	}
+
 }
