@@ -23,14 +23,13 @@ public abstract class VisProperty {
 	public static int stringWidth(String s, Font f, GraphicsContext g){
 		Text text = new Text(s);
 		text.setFont(f);
-        return (int) text.getLayoutBounds().getWidth();
-
+		return (int) Math.ceil(text.getLayoutBounds().getWidth());
 	}
 	
 	public static int stringHeight(Font f, GraphicsContext g){
 		Text text = new Text();
 		text.setFont(f);
-		return (int) text.getLayoutBounds().getHeight();
+		return (int) Math.ceil(text.getLayoutBounds().getHeight());
 	}
 
 }

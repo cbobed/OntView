@@ -106,6 +106,9 @@ public class VisClass extends Shape {
         visibleDefinitionLabels = new ArrayList<String>(); 
       
 	}
+
+	@Override
+	public String getLabel() { return label; }
 	
 	private ArrayList<VisConnectorDisjoint> getDisjointConnectors(){
 		if (disjointList==null) {
@@ -779,10 +782,12 @@ public class VisClass extends Shape {
 		textNode.setFont(g.getFont());
 
 		int fontHeight = (int) textNode.getFont().getSize();
+		//System.out.println("Font Height: " + fontHeight);
 	    
 	    int result = 0;
 	    if (isAnonymous) {
-	    	result += (countLines(label) * fontHeight) + 5;  
+	    	//result += (countLines(label) * fontHeight) + 5;
+			result += calculateTextHeight(label);
 	    }
 	    else {
 	    	// <CBL 24/9/13> <
@@ -793,7 +798,7 @@ public class VisClass extends Shape {
 	    	else {
 	    		
 	    		// we have to check whether it is a special defined concept
-	    		if (!label.startsWith(SIDClassExpressionNamer.className)) { //PINK
+	    		if (!label.startsWith(SIDClassExpressionNamer.className)) {
 		    		// CBL: for the grey box
 		    		result += fontHeight+10;
 		    		// CBL: for the underlying white box containing the definitions
@@ -812,7 +817,7 @@ public class VisClass extends Shape {
 	    	}
 	    	
 	    }
-		/*if (propertyBox != null) { // por que??
+		/*if (propertyBox != null) {
 			result += getPropertyBox().getHeight();
 		}*/
 		return result;

@@ -140,10 +140,10 @@ public class PaintFrame extends JPanel implements MouseListener,Runnable,MouseMo
         }
         if (visGraph!=null){
              for (VisConnector c : visGraph.connectorList){
-            	 c.draw(g);
+            	 //c.draw(g);
              }
              for (VisConnector c : visGraph.dashedConnectorList){
-      	       	 c.draw(g);
+      	       	 //c.draw(g);
              }      	
 	         g.setColor(Color.LIGHT_GRAY);
         	 for (VisLevel lvl : visGraph.levelSet){

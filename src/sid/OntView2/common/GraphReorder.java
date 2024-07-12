@@ -34,7 +34,6 @@ public class GraphReorder {
 		SugiyamaNodeView nodeView;
 		Object key;
 		vgraph.paintframe.stable = true;
-		System.out.println("visualReorder is " + vgraph.paintframe.stable);
 
 		for(Object entry: layoutedGraph.getAllNodes().entrySet()){
 			@SuppressWarnings("unchecked")

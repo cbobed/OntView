@@ -130,7 +130,7 @@ public class VisObjectProperty extends VisProperty {
 		range    = prange;
 		voffset  = pvoffset;
 
-		textFont    = Font.font("Dialog", FontWeight.NORMAL, FontPosture.REGULAR, 12);
+		textFont    = Font.font("Dialog", FontWeight.NORMAL, FontPosture.REGULAR, 11);
 		circleFont  = Font.font("Dialog", FontWeight.BOLD, 10);
 
 		connectionPoints = new ArrayList<Point2D>();
@@ -170,7 +170,7 @@ public class VisObjectProperty extends VisProperty {
 	
 	public int getLabelWidth(){
 		if (width ==0){
-			Font font = Font.font("Dialog", FontWeight.NORMAL, 9);
+			Font font = Font.font("Dialog", FontWeight.NORMAL, 11);
 			width = VisProperty.stringWidth(label, font, getDomain().graph.paintframe.getGraphicsContext2D());
 		}
 		return width;
@@ -203,6 +203,8 @@ public class VisObjectProperty extends VisProperty {
 		}
 		if ((pbox.visible)&&(visible)&&(pbox.vclass.visible)){
 			g.setFont(textFont);
+			g.setFill(Color.BLACK);
+
 			if ((parents!=null)&&(parents.size() > 0)) {
 				g.fillText(visibleLabel, getPosX(), getPosY());
 			}	
@@ -212,21 +214,14 @@ public class VisObjectProperty extends VisProperty {
 			Point2D circlePos = new Point2D(getPosX()-17, getPosY()-11);
 			if (isTransitive|| isFunctional || isSymmetric || hasInverse || isReflexive || propertyChainAxiom!=null){
 				Color c = (Color) g.getFill();
-				g.strokeOval(circlePos.getX(),circlePos.getY()+2, 9,9);
+				g.strokeOval(circlePos.getX(),circlePos.getY()+2, 10,10);
 				g.setFill(Color.BLACK);
 				g.setStroke(Color.LIGHTGRAY);
-				g.fillOval(circlePos.getX(),circlePos.getY()+2, 9,9);
+				g.fillOval(circlePos.getX(),circlePos.getY()+2, 10,10);
 				g.setFill(c);
 				g.setStroke(c);
-			}
+			} //PIZZABASE - ISBASEOF circulo debajo de n
 		}
-	}
-	
-	public Point2D getClosePoint(){
-		return new Point2D(getPosX()+pbox.getMaxWidth()+15,getPosY()-5);
-	}
-	public Point2D getOvalCoord(){
-		return new Point2D(getPosX()+pbox.getMaxWidth()+25,getPosY()-5);
 	}
 
 	public Point2D getConnectionPoint(int index) {

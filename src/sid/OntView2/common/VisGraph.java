@@ -302,7 +302,7 @@ public class VisGraph extends Observable implements Runnable{
 							shape.asVisClass().addDefinition(definition);
 							// <CBL 25/9/13>
 							// We also add the definition to the aliases handling
-							definitionsMap.put(Shape.getKey(definition), shape);
+							definitionsMap.put(Shape.getKey(definition), shape); // CONCURRENCIA
 							// <CBL 24/9/13> 
 							// the definitions are now displayed along with the name
 							// in the same shape 
@@ -780,9 +780,6 @@ public class VisGraph extends Observable implements Runnable{
 	       if (e instanceof OWLClass){
     		   getQualifiedLabelMap().put(vis.label, e.asOWLClass().getIRI().toString());
 	       }
-
-		   System.out.println("Adding class: "+vis.label + " with height: " + vis.getHeight());
-
 	       return vis;
 	}
 	

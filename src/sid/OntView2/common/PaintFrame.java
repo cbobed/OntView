@@ -74,11 +74,7 @@ public class PaintFrame extends Canvas implements Runnable{
 
 
 
-	public boolean isStable(){
-		System.out.println("isStable is " + stable);
-
-		return stable;
-	}
+	public boolean isStable(){ return stable; }
 	public void setReasoner(OWLReasoner preasoner){reasoner = preasoner;}
 	public OWLReasoner getReasoner(){return reasoner;}
 	public void setOntology(OWLOntology ac){activeOntology = ac;}
@@ -120,11 +116,6 @@ public class PaintFrame extends Canvas implements Runnable{
 	/*-*************************************************************
 	 * Methods to handle the canvas
 	 *-*************************************************************/
-	public void clearCanvas() {
-		GraphicsContext gc = this.getGraphicsContext2D();
-		gc.clearRect(0, 0, getWidth(), getHeight());
-	}
-
 	private Canvas recreateCanvas(Canvas oldCanvas) {
 		double width = oldCanvas.getWidth();
 		double height = oldCanvas.getHeight();
@@ -262,7 +253,6 @@ public class PaintFrame extends Canvas implements Runnable{
 
 		visGraph = rVisGraph;
 		stable = false;
-		System.out.println("createReasonedGraph is " + stable);
 		visGraph.setActiveOntology(activeOntology);
 //	   applyStructuralReduction();
 		visGraph.setOWLClassExpressionSet(set);
@@ -282,7 +272,6 @@ public class PaintFrame extends Canvas implements Runnable{
 
 //
 		stable       = true;
-		System.out.println("createReasonedGraph is " + stable);
 		stateChanged = true;
 //	   relax();
 		factor = 1.0;
@@ -331,25 +320,17 @@ public class PaintFrame extends Canvas implements Runnable{
 						s_i = e_i.getValue();
 						shape_j = e_j.getValue();
 
-						if ((s_i!=shape_j)&&(s_i.visible)){
-							if ((s_i.getPosY() < shape_j.getPosY()) && (s_i.getPosY() + s_i.getTotalHeight()) > shape_j.getPosY()){
-								/*System.out.println("primer if");
-								System.out.println("s_i " + s_i + ". shape_j " + shape_j);
-
-								System.out.println("s_i.getPosY() " + s_i.getPosY() + " < shape_j.getPosY() " + shape_j.getPosY());
-								System.out.println("s_i.getTotalHeight() " + s_i.getTotalHeight());
-								System.out.println("s_i.getPosY() + s_i.getTotalHeight() " + (s_i.getPosY() + s_i.getTotalHeight()) + " > shape_j.getPosY() " + shape_j.getPosY());
-								System.out.println(" ");*/
-
-								//stateChanged = true;
-								shapeRepulsion(s_i, DOWN);
+						if(s_i.getVisLevel() == shape_j.getVisLevel()) {
+							if ((s_i != shape_j) && (s_i.visible)) {
+								if ((s_i.getPosY() < shape_j.getPosY()) && (s_i.getPosY() + s_i.getTotalHeight()) > shape_j.getPosY()) {
+									stateChanged = true;
+									shapeRepulsion(s_i, DOWN);
+								}
 							}
 						}
 					}
 					s_i = e_i.getValue();
 					if (s_i.getPosY() < BORDER_PANEL){
-						System.out.println("segundo if");
-
 						s_i.setPosY(BORDER_PANEL);
 						stateChanged = true;
 						shapeRepulsion(s_i, DOWN);

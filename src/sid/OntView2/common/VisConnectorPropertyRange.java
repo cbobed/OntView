@@ -27,16 +27,19 @@ public class VisConnectorPropertyRange extends VisConnectorIsA {
 		if ((visible)&&(parentBox.visible)&&(!globalHide)){
 			if ((from != null) && (to!= null)){
 				if ((from.visible) && (to.visible)){
-					fromPoint = new Point2D(vprop.getPosX() + vprop.getLabelWidth()+15,vprop.getPosY());
+					fromPoint = new Point2D(vprop.getPosX() + vprop.getLabelWidth()+5,vprop.getPosY()-5);
 					toPoint = new Point2D(to.getPosX(),to.getPosY());
 					Color prevColor = (Color) g.getStroke();
-				  	g.setStroke(Color.GRAY);
-			  		g.fillOval(fromPoint.getX(), fromPoint.getY()-3, 4, 4);
+				  	g.setFill(Color.DARKCYAN);
+			  		g.fillOval(fromPoint.getX(), fromPoint.getY()-2, 4, 4);
 //				  	g2d.drawLine(fromPoint.x+2, fromPoint.y-2, toPoint.x, toPoint.y);
+					g.setStroke(Color.LIGHTBLUE);
 			  		drawCurve(g, VisConstants.NURB);
+					  g.setStroke(prevColor);
 //			  		setPath(path,fromPoint.x+2, fromPoint.y-2, toPoint.x, toPoint.y);
 //			  		g2d.draw(path);
-				  	g.setStroke(prevColor);
+
+				  	g.setFill(prevColor);
 				} 	
 			}
 		}	

@@ -37,7 +37,8 @@ public abstract class Shape{
 	boolean wasVisible = true;
 	boolean selected = false;
 	boolean moved = false;
-   
+
+	public abstract String getLabel();
 	private int getZoomLevel(){return 1;}
 	public boolean isVisible(){ return visible;}
 	public void setVisible(boolean b){visible = b;}

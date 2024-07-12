@@ -145,6 +145,10 @@ public class VisConstraint extends Shape {
 	    }
 	}
 
+	@Override
+	public String getLabel() {
+		return label;
+	}
 	
 	
 	@Override
