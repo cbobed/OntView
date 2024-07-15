@@ -124,9 +124,6 @@ public class Mine extends Application implements Embedable{
 		if (reasoner!= null) {
 			artPanel.setCursor(Cursor.WAIT);
 			//cant cast to set<OWLClassExpression> from set<OWLClass>
-			System.out.println("reasoner: " + reasoner);
-			System.out.println("reasoner.isConsistent(): " + reasoner.isConsistent());
-
 			HashSet<OWLClassExpression> set = new HashSet<>(reasoner.getTopClassNode().getEntities());
 			try {
 				//set reasoner and ontology before creating
@@ -239,7 +236,6 @@ public class Mine extends Application implements Embedable{
 //    	else if (r.equalsIgnoreCase("Jcel")) {
 //    		reasonerFactory = new JcelReasonerFactory();
 //    	}
-		System.out.println("Reasoner factory: " + reasonerFactory);
 		return reasonerFactory;
 	}
 

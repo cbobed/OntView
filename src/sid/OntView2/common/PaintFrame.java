@@ -1,6 +1,5 @@
 package sid.OntView2.common;
 
-import java.awt.*;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
@@ -13,7 +12,6 @@ import javax.xml.xpath.XPathExpressionException;
 import javafx.animation.PauseTransition;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Point2D;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ContextMenu;
@@ -26,8 +24,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.Cursor;
 
-import javafx.scene.shape.StrokeLineCap;
-import javafx.scene.shape.StrokeLineJoin;
 import javafx.scene.text.Font;
 import javafx.util.Duration;
 import org.semanticweb.owlapi.model.OWLClassExpression;
@@ -90,6 +86,8 @@ public class PaintFrame extends Canvas implements Runnable{
 //	public boolean isReduceChecked(){return reduceChecked;}
 //	public boolean setReduceChecke(boolean b){return reduceCheck;}
 
+	Shape connectorToChange = null;
+	Shape shapeToChange = null;
 
 	public PaintFrame(){
 		super();
@@ -178,7 +176,7 @@ public class PaintFrame extends Canvas implements Runnable{
 
 	/*-*************************************************************/
 
-	public void drawConectorShape(Shape shape) {
+	public void drawConnectorShape(Shape shape) {
 		if (this.getScene() != null && !this.isDisabled() && this.isVisible() && this.getGraphicsContext2D() != null) {
 			GraphicsContext g = this.getGraphicsContext2D();
 
@@ -213,19 +211,18 @@ public class PaintFrame extends Canvas implements Runnable{
 //				synchronized (visGraph.connectorList) {
 //					connectorsCopy = new ArrayList<>(visGraph.connectorList);
 //				}
-				for (VisConnector c : visGraph.connectorList) {
-					c.draw(g);
-					//visGraph.showConnectionsForShape2();
-				}
+//				for (VisConnector c : visGraph.connectorList) {
+//					c.draw(g);
+//				}
 				
 
 //				List<VisConnector> dashedConnectorsCopy;
 //				synchronized (visGraph.dashedConnectorList) {
 //					dashedConnectorsCopy = new ArrayList<>(visGraph.dashedConnectorList);
 //				}
-				for (VisConnector c : visGraph.dashedConnectorList) {
-					 c.draw(g);
-				}
+//				for (VisConnector c : visGraph.dashedConnectorList) {
+//					 c.draw(g);
+//				}
 
 				g.setStroke(Color.LIGHTGRAY);
 //				List<VisLevel> levelsCopy;
@@ -316,6 +313,10 @@ public class PaintFrame extends Canvas implements Runnable{
 		return pressedShape;
 	}
 
+	public Shape getEraseConnector(){
+		return eraseConnector;
+	}
+
 
 	boolean stateChanged = true;
 	/**
@@ -382,7 +383,9 @@ public class PaintFrame extends Canvas implements Runnable{
 
 	int mouseLastY = 0;
 	int mouseLastX = 0;
-	Shape pressedShape =null;
+	Shape pressedShape = null;
+	Shape drawConnector = null;
+	Shape eraseConnector = null;
 	Cursor cursorState = Cursor.DEFAULT;
 	public boolean hideRange = false;
 	private Embedable parentframe;
@@ -406,18 +409,22 @@ public class PaintFrame extends Canvas implements Runnable{
 
 		if (pressedShape!=null) {
 			mouseLastY= (int) p.getY();
-		}
-		else {
+		} else {
 			mouseLastX = (int) p.getX();
 			mouseLastY = (int) p.getY();
 			setCursor(Cursor.MOVE);
 		}
 		//draw();
-		drawConectorShape(pressedShape);
+		drawConnectorShape(pressedShape);
 	}
 
 	public void handleMouseReleased(MouseEvent e) {
-
+		if (visGraph == null) {
+			return;
+		}
+		Point2D p = translatePoint(new Point2D(e.getX(), e.getY()));
+		eraseConnector = visGraph.findShape(p);
+		drawConnectorShape(eraseConnector);
 		pressedShape=null;
 		repulsion = true;
 		mouseLastY=0;
@@ -452,6 +459,7 @@ public class PaintFrame extends Canvas implements Runnable{
 			mouseLastX = (int)p.getX();
 			mouseLastY = (int)p.getY();
 			draw();
+			drawConnectorShape(pressedShape);
 		}
 		else {
 			double scrollHValue, scrollVValue;
@@ -558,11 +566,6 @@ public class PaintFrame extends Canvas implements Runnable{
 		 */
 		return  new Point2D ((int) (p.getX()/factor), (int) (p.getY()/factor));
 
-	}
-
-	private Rectangle2D getVisibleRect() {
-		// Implement this method to return the visible rectangle
-		return new Rectangle2D(0, 0, getWidth(), getHeight());
 	}
 
 	private VisObjectProperty movedOnVisPropertyDescription(int x, int y){

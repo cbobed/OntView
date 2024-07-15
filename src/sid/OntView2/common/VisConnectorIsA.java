@@ -36,6 +36,7 @@ public class VisConnectorIsA extends VisConnector {
 				toPoint   = to.getConnectionPoint(new Point2D(from.getPosX(),from.getPosY()),true);
 
 			    Shape selected = from.graph.paintframe.getPressedShape();
+				Shape erase = from.graph.paintframe.getEraseConnector();
 
 			    if (selected !=null) {
 					g.setLineWidth(width);
@@ -51,7 +52,10 @@ public class VisConnectorIsA extends VisConnector {
 						g.setFill(isaColor);
 						g.setLineWidth(minWidth);
 					}
-			    }	
+			    } else if (erase != null) {
+					g.setStroke(Color.WHITE);
+					g.setFill(Color.WHITE);
+				}
 			    else {
 					double lineWidth = (redundant ? minWidth : width);
 					Color col = (redundant ? altColor : isaColor);
