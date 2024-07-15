@@ -38,28 +38,13 @@ public class VisGeneralContext extends ContextMenu {
 		super();	
 		parent = pparent;
 		getItems().add(getMenuItem1());
-		item1.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				propertiesItemClicked();
-			}
-		});
+		item1.setOnAction(e -> propertiesItemClicked());
 
 		getItems().add(getMenuItem2());
-		item2.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				disjointItemClicked();
-			}
-		});
+		item2.setOnAction(e -> disjointItemClicked());
 
 		getItems().add(getMenuItem3());
-		getMenuItem3().setOnAction(new EventHandler<ActionEvent>(){
-			@Override
-			public void handle(ActionEvent actionEvent) {
-				rangeItemClicked();
-			}
-		});
+		getMenuItem3().setOnAction(actionEvent -> rangeItemClicked());
 	}
 	
 	

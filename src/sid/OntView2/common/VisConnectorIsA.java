@@ -6,7 +6,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 
 public class VisConnectorIsA extends VisConnector {
-	
+
 	Color isaColor = null;
 	
 	private static double PATH_OFFSET = 5.0;
@@ -85,8 +85,6 @@ public class VisConnectorIsA extends VisConnector {
 				drawNurbs(g2d, fromPoint, toPoint);
 		
 		}
-		
-		
 	}
 	
 	protected void drawBezier(GraphicsContext g2d){
@@ -94,7 +92,6 @@ public class VisConnectorIsA extends VisConnector {
 		drawPath(g2d, path);
 	}
 
-	//REVISAR
 	protected void drawNurbs(GraphicsContext g2d, Point2D pfrom, Point2D pto){
 		double auxX1 = 0.2 * (pto.getX()-pfrom.getX()) + pfrom.getX();
         double auxX2 = 0.4 * (pto.getX()-pfrom.getX()) + pfrom.getX();
@@ -146,7 +143,7 @@ public class VisConnectorIsA extends VisConnector {
 		
 	}
 	
-	private void drawArrow(GraphicsContext g,int height,double pATH_OFFSET2,double d,double e){
+	public void drawArrow(GraphicsContext g,int height,double pATH_OFFSET2,double d,double e){
 	    double[] xPoints = { (d+pATH_OFFSET2), (d+pATH_OFFSET2),  (int) d};
 	    double[] yPoints = { (e-height), (e+height), (int) e};
 	    g.fillPolygon(xPoints, yPoints, 3);

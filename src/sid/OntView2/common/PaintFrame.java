@@ -2,11 +2,10 @@ package sid.OntView2.common;
 
 import java.awt.*;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.concurrent.CountDownLatch;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
@@ -27,6 +26,8 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.Cursor;
 
+import javafx.scene.shape.StrokeLineCap;
+import javafx.scene.shape.StrokeLineJoin;
 import javafx.scene.text.Font;
 import javafx.util.Duration;
 import org.semanticweb.owlapi.model.OWLClassExpression;
@@ -40,15 +41,18 @@ import sid.OntView2.utils.ProgressBarDialogThread;
 
 public class PaintFrame extends Canvas implements Runnable{
 
+	private CountDownLatch latch;
 	private static final long serialVersionUID = 1L;
 	public ScrollPane scroll;
 	static final int BORDER_PANEL = 50;
+	static final int MIN_SPACE = 20;
 	static final int MIN_Y_SEP = 3;
 	static final int SEP = 200;
 	private static final int DOWN = 0;
 	private static final int UP = -1;
 	int     		width,height;
 	boolean 		stable      = false;
+	public boolean	zoomStable  = false;
 	boolean 		repulsion   = true;
 	public  boolean renderLabel = false;
 //	private boolean kceEnabled = false;
@@ -95,6 +99,7 @@ public class PaintFrame extends Canvas implements Runnable{
 			prevSize = new Dimension2D(getWidth(), getHeight());
 			VisConfig.getInstance().setConstants();
 			//visGraph = new VisGraph(this);
+			latch = new CountDownLatch(1);
 			addEventHandlers();
 
 		}
@@ -167,21 +172,35 @@ public class PaintFrame extends Canvas implements Runnable{
 			gc.save();
 			gc.clearRect(0, 0, getWidth(), getHeight());
 			gc.scale(factor, factor);
-			//this.draw();
-
+			draw();
 		}
 	}
 
 	/*-*************************************************************/
+
+	public void drawConectorShape(Shape shape) {
+		if (this.getScene() != null && !this.isDisabled() && this.isVisible() && this.getGraphicsContext2D() != null) {
+			GraphicsContext g = this.getGraphicsContext2D();
+
+			if (visGraph != null) {
+				List<VisConnector> connectorsCopy;
+				synchronized (visGraph.connectorList) {
+					connectorsCopy = new ArrayList<>(visGraph.connectorList);
+				}
+				for (VisConnector c : connectorsCopy) {
+					if (c.from == shape || c.to == shape) {
+						c.draw(g);
+					}
+				}
+			}
+		}
+	}
 
 	public void draw() {
 		if (this.getScene() != null && !this.isDisabled() && this.isVisible() && this.getGraphicsContext2D() != null) {
 			GraphicsContext g = this.getGraphicsContext2D();
 			g.clearRect(0, 0, getWidth(), getHeight());
 
-			/*if ((factor != 1.0) && (stable)) {
-				g.scale(factor, factor);
-			}*/
 			if (prevFactor != factor) {
 				prevFactor = factor;
 				if ((factor >= 1.0) && (getWidth() != prevSize.getWidth() || getHeight() != prevSize.getHeight())) {
@@ -190,28 +209,30 @@ public class PaintFrame extends Canvas implements Runnable{
 			}
 			if (visGraph != null) {
 
-				/*List<VisConnector> connectorsCopy;
-				synchronized (visGraph.connectorList) {
-					connectorsCopy = new ArrayList<>(visGraph.connectorList);
+//				List<VisConnector> connectorsCopy;
+//				synchronized (visGraph.connectorList) {
+//					connectorsCopy = new ArrayList<>(visGraph.connectorList);
+//				}
+				for (VisConnector c : visGraph.connectorList) {
+					c.draw(g);
+					//visGraph.showConnectionsForShape2();
 				}
-				for (VisConnector c : connectorsCopy) {
-					 c.draw(g);
-				}
+				
 
-				List<VisConnector> dashedConnectorsCopy;
-				synchronized (visGraph.dashedConnectorList) {
-					dashedConnectorsCopy = new ArrayList<>(visGraph.dashedConnectorList);
-				}
-				for (VisConnector c : dashedConnectorsCopy) {
+//				List<VisConnector> dashedConnectorsCopy;
+//				synchronized (visGraph.dashedConnectorList) {
+//					dashedConnectorsCopy = new ArrayList<>(visGraph.dashedConnectorList);
+//				}
+				for (VisConnector c : visGraph.dashedConnectorList) {
 					 c.draw(g);
-				}*/
+				}
 
 				g.setStroke(Color.LIGHTGRAY);
-				List<VisLevel> levelsCopy;
-				synchronized (visGraph.levelSet) {
-					levelsCopy = new ArrayList<>(visGraph.levelSet);
-				}
-				for (VisLevel lvl : levelsCopy) {
+//				List<VisLevel> levelsCopy;
+//				synchronized (visGraph.levelSet) {
+//					levelsCopy = new ArrayList<>(visGraph.levelSet);
+//				}
+				for (VisLevel lvl : visGraph.levelSet) {
 					(g).strokeLine(lvl.getXpos(), 0, lvl.getXpos(), (int) (getHeight() / factor));
 					//Uncomment this to get a vertical line in every level
 					g.setStroke(Color.LIGHTGRAY);
@@ -252,6 +273,7 @@ public class PaintFrame extends Canvas implements Runnable{
 		rVisGraph = new VisGraph(this);
 
 		visGraph = rVisGraph;
+		visGraph.setLatch(latch);
 		stable = false;
 		visGraph.setActiveOntology(activeOntology);
 //	   applyStructuralReduction();
@@ -278,6 +300,11 @@ public class PaintFrame extends Canvas implements Runnable{
 		paintFrame.setCursor(Cursor.DEFAULT);
 		// scroll.getVerticalScrollBar().setUnitIncrement(15);
 
+		try {
+			latch.await();  // Block until latch.countDown() is called in VisGraph
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 
 
 	}
@@ -322,7 +349,7 @@ public class PaintFrame extends Canvas implements Runnable{
 
 						if(s_i.getVisLevel() == shape_j.getVisLevel()) {
 							if ((s_i != shape_j) && (s_i.visible)) {
-								if ((s_i.getPosY() < shape_j.getPosY()) && (s_i.getPosY() + s_i.getTotalHeight()) > shape_j.getPosY()) {
+								if ((s_i.getPosY() < shape_j.getPosY()) && (s_i.getPosY() + s_i.getTotalHeight() + MIN_SPACE) >= shape_j.getPosY()) {
 									stateChanged = true;
 									shapeRepulsion(s_i, DOWN);
 								}
@@ -331,7 +358,7 @@ public class PaintFrame extends Canvas implements Runnable{
 					}
 					s_i = e_i.getValue();
 					if (s_i.getPosY() < BORDER_PANEL){
-						s_i.setPosY(BORDER_PANEL);
+						s_i.setPosY(BORDER_PANEL + MIN_SPACE);
 						stateChanged = true;
 						shapeRepulsion(s_i, DOWN);
 					}
@@ -339,7 +366,6 @@ public class PaintFrame extends Canvas implements Runnable{
 
 				}
 				draw();
-
 			}
 		}
 	}
@@ -386,7 +412,8 @@ public class PaintFrame extends Canvas implements Runnable{
 			mouseLastY = (int) p.getY();
 			setCursor(Cursor.MOVE);
 		}
-		draw();
+		//draw();
+		drawConectorShape(pressedShape);
 	}
 
 	public void handleMouseReleased(MouseEvent e) {
@@ -575,7 +602,6 @@ public class PaintFrame extends Canvas implements Runnable{
 	}
 
 	public void handleMouseClicked(MouseEvent e) {
-
 		Point2D p = translatePoint(new Point2D(e.getX(), e.getY()));
 		int x = (int) p.getX();
 		int y = (int) p.getY();
@@ -749,7 +775,8 @@ public class PaintFrame extends Canvas implements Runnable{
 		}
 		return null;
 	}
-	private void shapeRepulsion(Shape repellingShape, int direction){
+
+		private void shapeRepulsion(Shape repellingShape, int direction){
 		if (repulsion){
 			VisLevel currentLevel = repellingShape.getVisLevel();
 			ArrayList<Shape> orderedList = currentLevel.orderedList();
@@ -760,9 +787,10 @@ public class PaintFrame extends Canvas implements Runnable{
 						Shape upperShape = getUpperShape(repellingIndex, orderedList);
 						if (upperShape ==null) //it's the visible upper shape
 							return;
-						int upperShapeHeight = upperShape.getHeight()+7;
+
+						int upperShapeHeight = upperShape.getHeight();
 						if ((upperShape instanceof VisClass)&&(upperShape.asVisClass().propertyBox!=null))
-							upperShapeHeight +=  upperShape.asVisClass().getTotalHeight()-7;
+							upperShapeHeight +=  upperShape.asVisClass().getTotalHeight();
 						if (repellingShape.getPosY() < (upperShape.getPosY()+upperShapeHeight+MIN_Y_SEP)) {
 							upperShape.setPosY(upperShape.getPosY()-upperShape.getHeight()/2);
 						}
@@ -776,6 +804,7 @@ public class PaintFrame extends Canvas implements Runnable{
 						Shape lowerShape = getLowerShape(repellingIndex, orderedList);
 						if (lowerShape ==null) //it's the visible upper shape 
 							return;
+
 						int z = repellingShape.getHeight();
 						if ((repellingShape instanceof VisClass)&& (repellingShape.asVisClass().propertyBox!=null))
 							z = repellingShape.asVisClass().getTotalHeight();

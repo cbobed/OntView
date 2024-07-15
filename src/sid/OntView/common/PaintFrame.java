@@ -34,8 +34,7 @@ import sid.OntView.utils.ProgressBarDialogThread;
 
 
 public class PaintFrame extends JPanel implements MouseListener,Runnable,MouseMotionListener{
-    
-	
+
 	private static final long serialVersionUID = 1L;
     public JScrollPane scroll;
     static final int BORDER_PANEL = 50;
@@ -256,10 +255,12 @@ public class PaintFrame extends JPanel implements MouseListener,Runnable,MouseMo
 					s_i = e_i.getValue();
 					shape_j = e_j.getValue();
 
-					if ((s_i!=shape_j)&&(s_i.visible)){
-						if ((s_i.getPosY()< shape_j.getPosY()) &&(s_i.getPosY()+s_i.getTotalHeight())> shape_j.getPosY()){
-							stateChanged = true;
-							shapeRepulsion(s_i, DOWN);
+					if(s_i.getVisLevel() == shape_j.getVisLevel()) {
+						if ((s_i!=shape_j)&&(s_i.visible)) {
+							if ((s_i.getPosY() < shape_j.getPosY()) && (s_i.getPosY() + s_i.getTotalHeight()) > shape_j.getPosY()) {
+								stateChanged = true;
+								shapeRepulsion(s_i, DOWN);
+							}
 						}
 					}
 				}
@@ -272,8 +273,9 @@ public class PaintFrame extends JPanel implements MouseListener,Runnable,MouseMo
 				visGraph.adjustPanelSize((float) factor);
 		
 			}
-		 }
-		  repaint();
+			  repaint();
+
+		  }
 	  }
 		  
 	      

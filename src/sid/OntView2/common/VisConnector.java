@@ -30,6 +30,14 @@ public abstract class VisConnector {
     	to = par_to;
     }
 
+	public void setVisible(boolean visible) {
+		this.visible = visible;
+	}
+
+	public boolean isVisible() {
+		return visible;
+	}
+
     public void setRedundant(){
     	redundant = true;
     }
@@ -38,7 +46,7 @@ public abstract class VisConnector {
     
     public abstract void draw (GraphicsContext g);
 
-    public static void removeConnector(ArrayList<VisConnector> list , Shape origin, Shape dst){
+	public static void removeConnector(ArrayList<VisConnector> list , Shape origin, Shape dst){
 	   VisConnector c = null;
 
 	   for (VisConnector con : list){

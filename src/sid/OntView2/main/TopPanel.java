@@ -191,7 +191,6 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			zoomSlider = new Slider();
 			zoomSlider.setMin(0);
 			zoomSlider.setMax(10);
-			//zoomSlider.setBlockIncrement(3);
 			zoomSlider.setOrientation(Orientation.VERTICAL);
 			zoomSlider.setValue(1);
 
@@ -199,7 +198,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			zoomSlider.setPrefHeight(VisConstants.CONTAINER_SIZE);
 			zoomSlider.setMinHeight(VisConstants.CONTAINER_SIZE);
 			zoomSlider.setMaxHeight(VisConstants.CONTAINER_SIZE);
-			zoomSlider.valueProperty().addListener((obs, oldVal, newVal) -> zoomSliderChangeStateChanged(newVal));
+			zoomSlider.onMouseReleasedProperty().set((MouseEvent event) -> zoomSliderChangeStateChanged(zoomSlider.getValue()));
 
 		}
 		return zoomSlider;
@@ -718,7 +717,6 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private VBox snapshotPanel;
 
 	private void zoomSliderChangeStateChanged(Number newValue) {
-
 		if (parent.artPanel != null) {
 			double factor = (0.5+(double)newValue/10.0);
 			factor = Math.round(factor * 100.0) / 100.0;

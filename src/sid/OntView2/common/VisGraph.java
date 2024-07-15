@@ -1,6 +1,7 @@
 package sid.OntView2.common;
 
 import javafx.geometry.Point2D;
+import javafx.scene.canvas.GraphicsContext;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.Node;
@@ -26,6 +27,7 @@ import java.util.Observer;
 import java.util.Set;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
 
 public class VisGraph extends Observable implements Runnable{
 
@@ -77,7 +79,11 @@ public class VisGraph extends Observable implements Runnable{
 	
 	//<CBL 25/9/13> 
 	// Added a field to handle the aliases of the different shapes
-	public HashMap<String, Shape> definitionsMap = null; 
+	public HashMap<String, Shape> definitionsMap = null;
+
+	private CountDownLatch latch;
+	public void setLatch(CountDownLatch latch) { this.latch = latch; }
+
 	
 	/**
 	 * Progress bar criteria. From 0-70 % it will depend on the number of shapes added to the map
@@ -825,46 +831,7 @@ public class VisGraph extends Observable implements Runnable{
 			}
 		}
 	}
-	/**
-	 * Executed after creating the graph. It prevents right-to-left lines
-	 * by moving shapes horizontally	
-	 */
-//	public void arrangePos() {
-//
-//		boolean done = false;
-//		int i = 0;
-////		while (!done){
-//		while ((!done) || (i< 50)){
-//		i++;
-//			done = true;
-//			for (Entry<String,Shape> entry : shapeMap.entrySet()){
-//				Shape currentShape=entry.getValue();
-//				int currentShapeLevel = currentShape.getVisLevel().getID();
-//				for (VisConnector con : currentShape.inConnectors){
-//					Shape parentShape = con.from;
-//					VisLevel parentLevel = parentShape.getVisLevel();
-//					if (parentShape.getVisLevel().getID() >= currentShapeLevel) {
-//						done = false;
-//						//to
-//						if (VisLevel.getLevelFromID(levelSet, currentShapeLevel).isBottomLevel()){
-//							VisLevel.insertLevel(levelSet, currentShapeLevel, this);
-//							currentShape.setVisLevel(VisLevel.getLevelFromID(levelSet, currentShapeLevel-1));
-//						}
-//						else {
-//							VisLevel newl = VisLevel.getLevelFromID(levelSet, parentShape.getVisLevel().getID()+1);
-//							if (newl == null){
-//					    		 newl = new VisLevel(this, parentLevel.getID()+1, 
-//					    				                   parentLevel.getXpos()+parentLevel.getWidth()+30);
-//						    	 levelSet.add(newl);
-//     	                    }
-//							currentShape.setVisLevel(newl);
-//						}
-//					}
-//				}
-//			}
-//		}
-//	}
-	
+
 	public void arrangePos() {
 
 		boolean done = false;
@@ -1394,46 +1361,6 @@ public class VisGraph extends Observable implements Runnable{
 	 private void remove(HashSet<Shape>parents,Shape son,OWLReasoner reasoner,OWLOntology ontology){
 		 //to remove unnecesary connectors
 		 OWLDataFactory dFactory = OWLManager.getOWLDataFactory();
-//		 HashSet<Shape> equivalentSet;
-//		 HashSet<Shape> aux = new HashSet<Shape>();
-//		 HashSet<Shape> aux2 = new HashSet<Shape>();
-//		 Shape equivCandidate = null;
-////		 System.out.println(son.asVisClass().label);
-//		 for (Shape parent: parents) {
-//			 aux.add(parent);
-//			 equivalentSet = getEquivalentShapeSet(aux, ontology, reasoner);
-//			 //deepest of the equivalent
-//			 for (Shape p : equivalentSet){
-//				 if (equivCandidate == null){ 
-//					 equivCandidate = p;
-//				 }	 
-//				 else {
-//					 equivCandidate = (p.getVisLevel().getID()> equivCandidate.getVisLevel().getID() ? p:equivCandidate);
-//				 }
-//			 }
-//			 //remove
-//			 System.out.println(equivalentSet.size());
-//			 for (Shape p : equivalentSet){
-//				 
-//
-//				 if (p!=equivCandidate){
-//					 aux2.add(p);
-//					 VisConnector c = VisConnector.getConnector(connectorList, p, son);
-//					 if ( (son instanceof VisConstraint)||(p instanceof VisConstraint)){
-//						 c.setRedundant();
-//					 }
-//					 else {
-//						 VisConnector.removeConnector(connectorList, p, son);
-//						 System.out.println(p.asVisClass().label+" "+son.asVisClass().label);
-//					 }
-//				}
-//			 }
-//			 aux.clear();
-//			 equivCandidate = null;
-//		 }
-//		 for (Shape d : aux2){
-//			 parents.remove(d);
-//		 }
 		// until here we had the definition and equivalent problems for removing connectors
 		removeImplicitConnectorsBySubsumption(son, parents, ontology, reasoner, dFactory);
 			 
@@ -1496,24 +1423,6 @@ public class VisGraph extends Observable implements Runnable{
 	 		return reasoner.isEntailed(s);
 	 }
 	 
-	 
-	 public HashSet<Shape> getEquivalentShapeSet(HashSet<Shape> parents,OWLOntology ontology,OWLReasoner reasoner ){
-		 HashSet<Shape> set = new HashSet<Shape>();
-		 OWLDataFactory dFactory = OWLManager.getOWLDataFactory();
-		 for (Shape pi: parents){
-			 for (Shape pj: parents){
-				 if (!set.contains(pj)){
-					 if (reasoner.isEntailed(dFactory.getOWLEquivalentClassesAxiom(pj.getLinkedClassExpression(),pi.getLinkedClassExpression()))){
-						 set.add(pi);
-						 set.add(pj);
-					 } 
-				 }
-			 }
-		 }	 
-		 
-		 return set;
-	 }
-	 
 	 /**
 	 * looks up for the shape or creates if not found
 	 * @param e
@@ -1547,17 +1456,7 @@ public class VisGraph extends Observable implements Runnable{
 			
 			HashSet<OWLClassExpression> topSet = new HashSet<>(); 
 			topSet.add(getActiveOntology().getOWLOntologyManager().getOWLDataFactory().getOWLThing()); 
-			
-//			this.buildReasonedGraph(getActiveOntology(), 
-//					getReasoner(), 
-//					getOWLClassExpressionSet(), 
-//					isExpanded());
-			
-
-			this.buildReasonedGraph(getActiveOntology(), 
-					getReasoner(), 
-					topSet, 
-					isExpanded());
+			this.buildReasonedGraph(getActiveOntology(), getReasoner(), topSet, isExpanded());
 		} catch (XPathExpressionException e) {
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {
@@ -1566,11 +1465,12 @@ public class VisGraph extends Observable implements Runnable{
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			// Release the latch to unblock the main thread
+			latch.countDown();
 		}
 		updateProgressBarObserver(100);
-		
-	
-		
+
 	}
 	
 	
@@ -1652,10 +1552,6 @@ public class VisGraph extends Observable implements Runnable{
 			}
 		}
 	}
-	
-	
-
-	
 
 
 }
