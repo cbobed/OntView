@@ -42,6 +42,7 @@ public class PaintFrame extends Canvas implements Runnable{
 	public ScrollPane scroll;
 	static final int BORDER_PANEL = 50;
 	static final int MIN_SPACE = 20;
+	static int PROPETY_BOX_HEIGHT = 0;
 	static final int MIN_Y_SEP = 3;
 	static final int SEP = 200;
 	private static final int DOWN = 0;
@@ -85,9 +86,8 @@ public class PaintFrame extends Canvas implements Runnable{
 	public void setKceOption(String itemAt) {kceOption = itemAt;}
 //	public boolean isReduceChecked(){return reduceChecked;}
 //	public boolean setReduceChecke(boolean b){return reduceCheck;}
-
-	Shape connectorToChange = null;
-	Shape shapeToChange = null;
+	private boolean showConnectors = false;
+	public void setShowConnectors(boolean b){showConnectors = b;}
 
 	public PaintFrame(){
 		super();
@@ -115,34 +115,6 @@ public class PaintFrame extends Canvas implements Runnable{
 		this.addEventHandler(MouseEvent.MOUSE_ENTERED, this::handleMouseEntered);
 		this.addEventHandler(MouseEvent.MOUSE_EXITED, this::handleMouseExited);
 	}
-
-	/*-*************************************************************
-	 * Methods to handle the canvas
-	 *-*************************************************************/
-	private Canvas recreateCanvas(Canvas oldCanvas) {
-		double width = oldCanvas.getWidth();
-		double height = oldCanvas.getHeight();
-		Canvas newCanvas = new Canvas(width, height);
-		GraphicsContext gc = newCanvas.getGraphicsContext2D();
-		gc.drawImage(snapshotCanvas(oldCanvas), 0, 0);
-		return newCanvas;
-	}
-
-	public void handleCanvasFailure(Canvas oldCanvas) {
-		Canvas newCanvas = recreateCanvas(oldCanvas);
-		// Reemplaza el canvas roto en tu contenedor
-		((Pane) oldCanvas.getParent()).getChildren().remove(oldCanvas);
-		((Pane) oldCanvas.getParent()).getChildren().add(newCanvas);
-	}
-
-	private WritableImage snapshotCanvas(Canvas canvas) {
-		WritableImage snapshot = new WritableImage((int)canvas.getWidth(), (int)canvas.getHeight());
-		canvas.snapshot(null, snapshot);
-		return snapshot;
-	}
-
-
-
 
 	/*-*************************************************************
 	 * Scaling  issues
@@ -207,28 +179,17 @@ public class PaintFrame extends Canvas implements Runnable{
 			}
 			if (visGraph != null) {
 
-//				List<VisConnector> connectorsCopy;
-//				synchronized (visGraph.connectorList) {
-//					connectorsCopy = new ArrayList<>(visGraph.connectorList);
-//				}
-//				for (VisConnector c : visGraph.connectorList) {
-//					c.draw(g);
-//				}
-				
-
-//				List<VisConnector> dashedConnectorsCopy;
-//				synchronized (visGraph.dashedConnectorList) {
-//					dashedConnectorsCopy = new ArrayList<>(visGraph.dashedConnectorList);
-//				}
-//				for (VisConnector c : visGraph.dashedConnectorList) {
-//					 c.draw(g);
-//				}
+				// draw connectors
+				if (showConnectors) {
+					for (VisConnector c : visGraph.connectorList) {
+						c.draw(g);
+					}
+					for (VisConnector c : visGraph.dashedConnectorList) {
+						c.draw(g);
+					}
+				}
 
 				g.setStroke(Color.LIGHTGRAY);
-//				List<VisLevel> levelsCopy;
-//				synchronized (visGraph.levelSet) {
-//					levelsCopy = new ArrayList<>(visGraph.levelSet);
-//				}
 				for (VisLevel lvl : visGraph.levelSet) {
 					(g).strokeLine(lvl.getXpos(), 0, lvl.getXpos(), (int) (getHeight() / factor));
 					//Uncomment this to get a vertical line in every level
@@ -238,12 +199,24 @@ public class PaintFrame extends Canvas implements Runnable{
 				g.setStroke(Color.BLACK);
 				drawPropertyBoxes(g);
 
-				HashMap<String, Shape> shapeMapCopy;
-				synchronized (visGraph.shapeMap) {
-					shapeMapCopy = new HashMap<>(visGraph.shapeMap);
-				}
-				for (Entry<String, Shape> entry : shapeMapCopy.entrySet()) {
+				for (Entry<String, Shape> entry : visGraph.shapeMap.entrySet()) {
 					entry.getValue().drawShape(g);
+				}
+			}
+		}
+	}
+
+	public void drawConnectors(){
+		if (this.getScene() != null && !this.isDisabled() && this.isVisible() && this.getGraphicsContext2D() != null) {
+			GraphicsContext g = this.getGraphicsContext2D();
+
+			if (visGraph != null) {
+				for (VisConnector c : visGraph.connectorList) {
+					c.draw(g);
+				}
+
+				for (VisConnector c : visGraph.dashedConnectorList) {
+					c.draw(g);
 				}
 			}
 		}
@@ -339,18 +312,24 @@ public class PaintFrame extends Canvas implements Runnable{
 				System.out.println("relax");
 				stateChanged = false;
 
-				HashMap<String, Shape> shapeMapCopy;
+				/*HashMap<String, Shape> shapeMapCopy;
 				synchronized (visGraph.shapeMap) {
 					shapeMapCopy = new HashMap<>(visGraph.shapeMap);
-				}
-				for (Entry<String, Shape> e_i : shapeMapCopy.entrySet()){
-					for (Entry<String, Shape> e_j: shapeMapCopy.entrySet()){
+				}*/
+				for (Entry<String, Shape> e_i : visGraph.shapeMap.entrySet()){
+					for (Entry<String, Shape> e_j: visGraph.shapeMap.entrySet()){
 						s_i = e_i.getValue();
 						shape_j = e_j.getValue();
 
 						if(s_i.getVisLevel() == shape_j.getVisLevel()) {
 							if ((s_i != shape_j) && (s_i.visible)) {
-								if ((s_i.getPosY() < shape_j.getPosY()) && (s_i.getPosY() + s_i.getTotalHeight() + MIN_SPACE) >= shape_j.getPosY()) {
+								/*if (s_i.asVisClass().getPropertyBox() != null) {
+									PROPETY_BOX_HEIGHT = s_i.asVisClass().getHeight();
+								} else {
+									PROPETY_BOX_HEIGHT = 0;
+								}*/
+
+								if ((s_i.getPosY() < shape_j.getPosY()) && (s_i.getPosY() + s_i.getTotalHeight() + MIN_SPACE + PROPETY_BOX_HEIGHT) >= shape_j.getPosY()) {
 									stateChanged = true;
 									shapeRepulsion(s_i, DOWN);
 								}
@@ -422,9 +401,11 @@ public class PaintFrame extends Canvas implements Runnable{
 		if (visGraph == null) {
 			return;
 		}
-		Point2D p = translatePoint(new Point2D(e.getX(), e.getY()));
-		eraseConnector = visGraph.findShape(p);
-		drawConnectorShape(eraseConnector);
+		if (!showConnectors) {
+			Point2D p = translatePoint(new Point2D(e.getX(), e.getY()));
+			eraseConnector = visGraph.findShape(p);
+			drawConnectorShape(eraseConnector);
+		}
 		pressedShape=null;
 		repulsion = true;
 		mouseLastY=0;
@@ -656,6 +637,7 @@ public class PaintFrame extends Canvas implements Runnable{
 								//si estaba cerrado el nodo [+] abrirlo
 								shape.open();
 								refreshDashedConnectors();
+								draw();
 							}
 						}
 						//Click on the close symbol
@@ -664,6 +646,7 @@ public class PaintFrame extends Canvas implements Runnable{
 								//if [-] clicked, close the node
 								shape.close();
 								refreshDashedConnectors();
+								draw();
 							}
 						}
 						else { // pressed elsewhere on the shape
@@ -855,8 +838,6 @@ public class PaintFrame extends Canvas implements Runnable{
 	}
 	public void setParentFrame(Embedable pemb) {parentframe = pemb;}
 	public Embedable getParentFrame() {return parentframe;}
-
-
 }
 
 

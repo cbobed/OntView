@@ -50,6 +50,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private ComboBox<String> comboBox;
 	private ComboBox<String> kceComboBox;
 	private VBox panel0;
+	private VBox connectorPanel;
+	private ToggleButton toggleSwitch;
 	private Mine parent;
 	static String RESOURCE_BASE;
 	private CheckBox Properties;
@@ -110,7 +112,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 				getZoomSlider(),
 				getViewPanel(),
 				getSnapshotPanel(),
-				getPanel0());
+				getPanel0(),
+				getConnectorsSwitch());
 		row.setAlignment(Pos.CENTER);
 
 		return row;
@@ -255,6 +258,39 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		return panel0;
 	}
 
+	private VBox getConnectorsSwitch() {
+		if (connectorPanel == null) {
+			connectorPanel = new VBox();
+			connectorPanel.setPadding(new Insets(5));
+			connectorPanel.setSpacing(5);
+
+			StackPane titlePane = createTitlePane("Connectors");
+			toggleSwitch = new ToggleButton("Show");
+			toggleSwitch.getStyleClass().add("button");
+
+			/*if (!parent.artPanel.isStable()) {
+				toggleSwitch.setDisable(true);
+			}*/
+
+			// Add a listener to handle the switch state
+			toggleSwitch.selectedProperty().addListener((observable, oldValue, newValue) -> {
+				if (newValue) {
+					toggleSwitch.setText("Hide");
+					parent.artPanel.setShowConnectors(true);
+					parent.artPanel.draw();
+				} else {
+					toggleSwitch.setText("Show");
+					parent.artPanel.setShowConnectors(false);
+					parent.artPanel.draw();
+
+				}
+			});
+			connectorPanel = createContainer(true, titlePane, toggleSwitch);
+
+		}
+		return connectorPanel;
+	}
+
 	private ComboBox<String> getComboBox0() {
 		if (comboBox == null) {
 			comboBox = new ComboBox<>();
@@ -339,7 +375,6 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			loadReasonerButton.setCursor(Cursor.HAND);
 			loadReasonerButton.setFont(Font.font("Dialog", FontWeight.NORMAL, 10));
 			loadReasonerButton.getStyleClass().add("button");
-			loadReasonerButton.setOnAction(event -> parent.artPanel.handleCanvasFailure(this));
 			loadReasonerButton.setOnAction(this::loadReasonerButtonActionActionPerformed);
 		}
 		return loadReasonerButton;
@@ -577,6 +612,10 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 	private void loadReasonerButtonActionActionPerformed(ActionEvent event) {
 		String x = (String) getReasonerCombo().getValue();
+		parent.artPanel.setShowConnectors(false);
+		if(toggleSwitch != null)
+			toggleSwitch.setSelected(false);
+
 		if ((x != null) && (!x.equals(""))) {
 			try {
 				parent.loadReasoner(x);
@@ -621,6 +660,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 	private void restoreViewButtonActionActionPerformed(ActionEvent event) {
 		parent.restoreViewButtonAction(event);
+		parent.artPanel.draw();
 	}
 
 	private void comboBox0ItemItemStateChanged(String selectedItem) {

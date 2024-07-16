@@ -38,7 +38,7 @@ public class GraphReorderBackUp {
 		LayoutedGraph layoutedGraph = s.getLayoutedGraph();
 		SugiyamaNodeView nodeView;
 		Object key;
-		vgraph.paintframe.stable = true;
+		vgraph.paintframe.stable.set(true);
 
 		for (Object entry : layoutedGraph.getAllNodes().entrySet()) {
 			Entry<String, SugiyamaNodeView> entryCast = (Entry<String, SugiyamaNodeView>) entry;

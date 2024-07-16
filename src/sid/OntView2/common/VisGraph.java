@@ -357,6 +357,10 @@ public class VisGraph extends Observable implements Runnable{
 //			}
 //			
 			
+//			System.out.println(property);
+//			System.out.println("domain: "+propertyDomainNodeSet);
+//			System.out.println("range: "+propertyRangeNodeSet);
+			
 			// CBL: 
 			// changed the way the range shape is added and handled
 			if (propertyRangeNodeSet.getNodes().size()>1) {

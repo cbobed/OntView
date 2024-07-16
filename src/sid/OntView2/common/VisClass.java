@@ -252,7 +252,6 @@ public class VisClass extends Shape {
 		double ascent = textNode.getBaselineOffset() + 5.5;
 	    
 	    if (currentHeight == 0) {
-	    	
 	    	if (!isAnonymous && !isDefined) {
 	    		currentHeight = getHeight();
 	    	}
