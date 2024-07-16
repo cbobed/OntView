@@ -683,15 +683,29 @@ public class PaintFrame extends JPanel implements MouseListener,Runnable,MouseMo
 		
 		if (getKceOption().equals(VisConstants.KCECOMBOOPTION1)){ //"None"
 			getVisGraph().showAll();
-		}
-		if (getKceOption().equals(VisConstants.KCECOMBOOPTION2)){ //"KCE10"
+		} else if (getKceOption().equals(VisConstants.KCECOMBOOPTION2)){ //"KCE10"
 			getVisGraph().showAll();
 			KConceptExtraction.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 10);
-		}
-		if (getKceOption().equals(VisConstants.KCECOMBOOPTION3)){ //"KCE20"
+		} else if (getKceOption().equals(VisConstants.KCECOMBOOPTION3)){ //"KCE20"
 			getVisGraph().showAll();
 			KConceptExtraction.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20);
+		} else if (getKceOption().equals(VisConstants.PAGERANKCOMBOOPTION1)) {
+			getVisGraph().showAll();
+			RDFRankConceptExtraction.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 10, false);
 		}
+		else if (getKceOption().equals(VisConstants.PAGERANKCOMBOOPTION2)) {
+			getVisGraph().showAll();
+			RDFRankConceptExtraction.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20, false);
+		}
+		else if (getKceOption().equals(VisConstants.RDFRANKCOMBOOPTION1)) {
+			getVisGraph().showAll();
+			RDFRankConceptExtraction.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 10, true);
+		}
+		else if (getKceOption().equals(VisConstants.RDFRANKCOMBOOPTION2)) {
+			getVisGraph().showAll();
+			RDFRankConceptExtraction.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20, true);
+		}
+		
 	}
 	
 	

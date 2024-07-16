@@ -6,6 +6,12 @@ public class VisConstants {
 	public static final String KCECOMBOOPTION2 = "KCE 10";
 	public static final String KCECOMBOOPTION3 = "KCE 20";
 	
+	public static final String PAGERANKCOMBOOPTION1 = "PageRank 10"; 
+	public static final String PAGERANKCOMBOOPTION2 = "PageRank 20"; 
+	
+	public static final String RDFRANKCOMBOOPTION1 = "RDFRank 10"; 
+	public static final String RDFRANKCOMBOOPTION2 = "RDFRank 20"; 
+	
 	public static final int CONNECTOROFFSET = 7;
 	
 	

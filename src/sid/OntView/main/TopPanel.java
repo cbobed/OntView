@@ -293,7 +293,10 @@ public class TopPanel extends JPanel implements ControlPanelInterface {
 		getKceComboBox().addItem(VisConstants.KCECOMBOOPTION1);
 		getKceComboBox().addItem(VisConstants.KCECOMBOOPTION2);
 		getKceComboBox().addItem(VisConstants.KCECOMBOOPTION3);
-
+		getKceComboBox().addItem(VisConstants.PAGERANKCOMBOOPTION1);
+		getKceComboBox().addItem(VisConstants.PAGERANKCOMBOOPTION2);
+		getKceComboBox().addItem(VisConstants.RDFRANKCOMBOOPTION1);
+		getKceComboBox().addItem(VisConstants.RDFRANKCOMBOOPTION2);
 	}
 	
 	protected void kceItemItemStateChanged(ItemEvent event) {
