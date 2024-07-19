@@ -7,16 +7,17 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashSet;
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.io.OWLXMLOntologyFormat;
+import org.semanticweb.owlapi.formats.OWLXMLDocumentFormat;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLDeclarationAxiom;
+import org.semanticweb.owlapi.model.OWLDocumentFormat;
 import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyFormat;
+import org.semanticweb.owlapi.model.OWLDocumentFormat;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
@@ -64,10 +65,10 @@ public class Util {
 		// loaded. In this case the ontology was loaded from an rdf/xml file We
 		// can get information about the format of an ontology from its manager
 
-		OWLOntologyFormat format = manager.getOntologyFormat(onto);
+		OWLDocumentFormat format = manager.getOntologyFormat(onto);
 		// We can save the ontology in a different format Lets save the ontology
 		// in owl/xml format
-		OWLXMLOntologyFormat owlxmlFormat = new OWLXMLOntologyFormat();
+		OWLXMLDocumentFormat owlxmlFormat = new OWLXMLDocumentFormat();
 		// Some ontology formats support prefix names and prefix IRIs. In our
 		// case we loaded the pizza ontology from an rdf/xml format, which
 		// supports prefixes. When we save the ontology in the new format we
@@ -104,44 +105,7 @@ public class Util {
 		}*/
     }
 
-	public void shouldWalkOntology(OWLOntology onto, OWLOntologyManager manager) throws OWLOntologyCreationException {
-		// This example shows how to use an ontology walker to walk the asserted
-		// structure of an ontology. Suppose we want to find the axioms that use
-		// a some values from (existential restriction) we can use the walker to
-		// do this. We'll use the pizza ontology as an example. Load the
-		// ontology from the web:
-		IRI ontoIRI = manager.getOntologyDocumentIRI(onto);
 
-		OWLOntologyManager man = OWLManager.createOWLOntologyManager();
-		OWLOntology ont = man.loadOntologyFromOntologyDocument(ontoIRI);
-		// Create the walker. Pass in the pizza ontology - we need to put it
-		// into a set though, so we just create a singleton set in this case.
-		OWLOntologyWalker walker = new OWLOntologyWalker(Collections.singleton(ont));
-		// Now ask our walker to walk over the ontology. We specify a visitor
-		// who gets visited by the various objects as the walker encounters
-		// them. We need to create out visitor. This can be any ordinary
-		// visitor, but we will extend the OWLOntologyWalkerVisitor because it
-		// provides a convenience method to get the current axiom being visited
-		// as we go. Create an instance and override the
-		// visit(OWLObjectSomeValuesFrom) method, because we are interested in
-		// some values from restrictions.
-		OWLOntologyWalkerVisitor<Object> visitor = new OWLOntologyWalkerVisitor<Object>(
-				walker) {
-			@Override
-			public Object visit(OWLObjectSomeValuesFrom desc) {
-				// Print out the restriction
-				System.out.println(desc);
-				// Print out the axiom where the restriction is used
-				System.out.println("         " + getCurrentAxiom());
-				System.out.println();
-				// We don't need to return anything here.
-				return null;
-			}
-		};
-		// Now ask the walker to walk over the ontology structure using our
-		// visitor instance.
-		walker.walkStructure(visitor);
-	}
 	
 	static public OWLClass createFreshClass(OWLOntology onto, OWLDataFactory dataFactory, OWLOntologyManager manager){
 		OWLClass cls = dataFactory.getOWLClass(
@@ -150,7 +114,7 @@ public class Util {
 				);
 		
 		OWLDeclarationAxiom declAxiom = dataFactory.getOWLDeclarationAxiom(cls, new HashSet<OWLAnnotation>()); 
-		manager.applyChange(manager.addAxiom(onto, declAxiom).get(0));
+		manager.addAxiom(onto, declAxiom); 
 		
 		++nextFreshId;
 				

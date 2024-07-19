@@ -24,6 +24,7 @@ import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
+import org.semanticweb.owlapi.model.parameters.Imports;
 
 import sid.OntView.utils.Params;
 import sid.OntView.utils.Util;
@@ -66,12 +67,12 @@ public class StructuralReducer {
 		StructuralReducer.onto = onto;
 		OWLAxiomReducerVisitor axVisitor = new OWLAxiomReducerVisitor();
 		
-		for (OWLAxiom ax : onto.getTBoxAxioms(false)) {
+		for (OWLAxiom ax : onto.getTBoxAxioms(Imports.EXCLUDED)) {
 			System.out.println("\n" + ax);
 			ax.accept(axVisitor);									
 		}
 
-		System.out.println(toAdd.size() + "/" + onto.getTBoxAxioms(false).size());
+		System.out.println(toAdd.size() + "/" + onto.getTBoxAxioms(Imports.EXCLUDED).size());
 		
 		OWLClassExpression ce = null;
 		OWLClassExpressionVisitor visitor = new OWLClassExpressioneReducerVisitor();
@@ -88,9 +89,9 @@ public class StructuralReducer {
 		}
 		System.out.println(b);
 		
-		List<OWLOntologyChange> changes = manager.removeAxioms(onto, toDelete);
-		changes.addAll(manager.addAxioms(onto, toAdd));
-		manager.applyChanges(changes);
+		manager.removeAxioms(onto, toDelete);
+		manager.addAxioms(onto, toAdd);
+		
 	}
 	
 	/**
@@ -101,7 +102,7 @@ public class StructuralReducer {
 		StructuralReducer.onto = onto;
 		OWLAxiomReducerVisitor axVisitor = new OWLAxiomReducerVisitor();
 		
-		for (OWLAxiom ax : onto.getTBoxAxioms(false)) {
+		for (OWLAxiom ax : onto.getTBoxAxioms(Imports.EXCLUDED)) {
 			ax.accept(axVisitor);									
 		}
 		
@@ -122,8 +123,8 @@ public class StructuralReducer {
 			++b;
 		}
 		
-		List<OWLOntologyChange> changes = manager.removeAxioms(onto, toDelete);
-		changes.addAll(manager.addAxioms(onto, toAdd));
-		manager.applyChanges(changes);
+		manager.removeAxioms(onto, toDelete);
+		manager.addAxioms(onto, toAdd);
+		
 	}
 }

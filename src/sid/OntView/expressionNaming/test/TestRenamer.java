@@ -11,7 +11,7 @@ import java.util.Stack;
 
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.io.OWLXMLOntologyFormat;
+import org.semanticweb.owlapi.formats.OWLXMLDocumentFormat;
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
@@ -26,7 +26,7 @@ import org.semanticweb.owlapi.model.OWLObjectPropertyDomainAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyFormat;
+import org.semanticweb.owlapi.model.OWLDocumentFormat;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.reasoner.BufferingMode;
@@ -100,10 +100,10 @@ public class TestRenamer {
 		// loaded. In this case the ontology was loaded from an rdf/xml file We
 		// can get information about the format of an ontology from its manager
 
-		OWLOntologyFormat format = manager.getOntologyFormat(onto);
+		OWLDocumentFormat format = manager.getOntologyFormat(onto);
 		// We can save the ontology in a different format Lets save the ontology
 		// in owl/xml format
-		OWLXMLOntologyFormat owlxmlFormat = new OWLXMLOntologyFormat();
+		OWLXMLDocumentFormat owlxmlFormat = new OWLXMLDocumentFormat();
 		// Some ontology formats support prefix names and prefix IRIs. In our
 		// case we loaded the pizza ontology from an rdf/xml format, which
 		// supports prefixes. When we save the ontology in the new format we

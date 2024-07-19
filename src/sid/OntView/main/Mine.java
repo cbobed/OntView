@@ -46,7 +46,6 @@ import sid.OntView.common.VisGraph;
 import sid.OntView.common.VisPositionConfig;
 import sid.OntView.expressionNaming.SIDClassExpressionNamer;
 import sid.OntView.utils.ExpressionManager;
-import uk.ac.manchester.cs.jfact.JFactFactory;
 
 import java.security.*;
 
@@ -325,9 +324,9 @@ public class Mine extends JPanel implements Embedable{
     	if (r.equalsIgnoreCase("Pellet")) {
     		reasonerFactory = new PelletReasonerFactory();
     	}
-    	else if (r.equalsIgnoreCase("JFact")) {
-    		reasonerFactory = new JFactFactory();
-    	}
+//    	else if (r.equalsIgnoreCase("JFact")) {
+//    		reasonerFactory = new JFactFactory();
+//    	}
 //    	else if (r.equalsIgnoreCase("Elk")) {
 //    		reasonerFactory = new ElkReasonerFactory(); 
 //    	}

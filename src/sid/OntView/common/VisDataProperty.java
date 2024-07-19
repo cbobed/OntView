@@ -19,6 +19,7 @@ import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import org.semanticweb.owlapi.search.EntitySearcher;
 
 import sid.OntView.utils.ExpressionManager;
 
@@ -74,7 +75,8 @@ public class VisDataProperty extends VisProperty {
 		textFont    = new Font(Font.DIALOG,Font.PLAIN,10);
 		circleFont  = new Font(Font.DIALOG,Font.BOLD, 10);
 		connectionPoints = new ArrayList<Point>();
-		if (dPropExp.isFunctional(ontology)) isFunctional = true;
+		
+		if (EntitySearcher.isFunctional(dPropExp.asOWLDataProperty(), ontology)) isFunctional = true; 
 	
 	}
 	

@@ -10,6 +10,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -42,43 +44,23 @@ public abstract class RDFRankConceptExtraction {
 			for (Shape ch: node.getChildren()) {
 				strBuilder.append("<"+Shape.getKey(ch.getLinkedClassExpression())+"> <rdfs:subClassOf> <"+nodeStr+"> . \n"); 
 				if (bidirectional) {
-					strBuilder.append("<"+nodeStr+"> <rdfs:superClassOf> <"+Shape.getKey(ch.getLinkedClassExpression())+">");
+					strBuilder.append("<"+nodeStr+"> <rdfs:superClassOf> <"+Shape.getKey(ch.getLinkedClassExpression())+"> . \n");
 				}
 			}
 		}
 		
-		if (RDFRankDebug) {
-			String filename = "debugRank-"+limitResultSize+"-"+bidirectional+".nt"; 
-			try (PrintWriter out = new PrintWriter(new BufferedOutputStream(new FileOutputStream(filename)))) {
-				out.println(strBuilder.toString()); 
-			}
-			catch (IOException e) {
-				System.err.println("Debugging the RDF ... not being able to write the file"); 
-				e.printStackTrace();
-			}
-		}
+	
+    		String filename = "tmp-"+limitResultSize+"-"+bidirectional+".nt"; 
+    		try (PrintWriter out = new PrintWriter(new BufferedOutputStream(new FileOutputStream(filename)))) {
+    			out.println(strBuilder.toString()); 
+    		}
+    		catch (IOException e) {
+    			System.err.println("Debugging the RDF ... not being able to write the file"); 
+    			e.printStackTrace();
+    		}
+    	
+	
 		
-		PageRankRDF pageRankRDF = new PageRankRDF(strBuilder.toString(), 0.85, 0.15 , 40, true, true);
-		pageRankRDF.compute(); 
-        List<PageRankScore> scores = pageRankRDF.getPageRankScores();
-
-        // we have to sort the results 
-        Collections.sort(scores, new PageRankScoreComparator());
-        Set<String> conceptSet = new HashSet<String>();
-        ListIterator<PageRankScore> it = scores.listIterator();
-        int count = 0; 
-        while (it.hasNext() && count < limitResultSize) {
-        	conceptSet.add(it.next().node); 
-        	count++; 
-        }
-        
-        for (Entry<String,Shape> entry : shapeMap.entrySet()){
-			Shape shape = entry.getValue();
-			if (isNonKeyConcept(entry.getKey(),conceptSet,shapeMap)){
-				shape.hide();
-			}
-		}
-	    graph.addDashedConnectors();
 
 	}
 		
@@ -124,4 +106,17 @@ public abstract class RDFRankConceptExtraction {
     	}
     	return false;
     }
+    
+    public static void main(String[] args) {
+    	
+    	try {
+    		
+    		
+    		
+    	}
+    	catch (Exception e) {
+    		e.printStackTrace();
+    	}
+    	
+	}
 }

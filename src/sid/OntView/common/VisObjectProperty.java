@@ -8,8 +8,6 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import org.coode.owlapi.functionalparser.Node;
-import org.coode.owlapi.obo.parser.InverseHandler;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
@@ -21,6 +19,7 @@ import org.semanticweb.owlapi.model.OWLObjectUnionOf;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLSubPropertyChainOfAxiom;
 import org.semanticweb.owlapi.reasoner.*;
+import org.semanticweb.owlapi.search.EntitySearcher;
 
 import sid.OntView.utils.ExpressionManager;
 
@@ -143,15 +142,15 @@ public class VisObjectProperty extends VisProperty  {
 		if (getDomain() != range) {
 			rangeConnector = new VisConnectorPropertyRange(ppbox, pbox.vclass , range, this);
 		}	
-		if (oPropExp.isFunctional(ontology)) isFunctional = true;
-		if (oPropExp.isTransitive(ontology)) isTransitive = true;
-		if (oPropExp.isSymmetric(ontology )) isSymmetric  = true;
+		if (EntitySearcher.isFunctional(oPropExp, ontology)) isFunctional = true;
+		if (EntitySearcher.isTransitive(oPropExp, ontology)) isTransitive = true;
+		if (EntitySearcher.isSymmetric(oPropExp, ontology)) isSymmetric  = true;
 		inverseOf  = getReasoner().getInverseObjectProperties(po);
 		hasInverse = ((inverseOf !=null)&&(inverseOf.getEntities().size())>0);
-		if (oPropExp.isReflexive(ontology)) isReflexive =true;
-		if (oPropExp.isAsymmetric(ontology)) isAsymmetric = true;
-		if (oPropExp.isIrreflexive(ontology)) isIrreflexive = true;
-		if (oPropExp.isInverseFunctional(ontology))	isInverseFunctional = true;
+		if (EntitySearcher.isReflexive(oPropExp, ontology)) isReflexive =true;
+		if (EntitySearcher.isAsymmetric(oPropExp, ontology)) isAsymmetric = true;
+		if (EntitySearcher.isIrreflexive(oPropExp, ontology)) isIrreflexive = true;
+		if (EntitySearcher.isInverseFunctional(oPropExp, ontology))	isInverseFunctional = true;
 		if (pbox.vclass.graph.chainPropertiesMap!=null)
 			propertyChainAxiom = pbox.vclass.graph.chainPropertiesMap.get(getKey (oPropExp));
 	}

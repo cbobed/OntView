@@ -85,7 +85,7 @@ import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.impl.OWLClassNode;
-import org.semanticweb.owlapi.util.OWLAxiomTypeProcessor;
+import org.semanticweb.owlapi.search.EntitySearcher;
 import org.semanticweb.owlapi.util.VersionInfo;
 import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 import org.xml.sax.SAXException;
@@ -93,7 +93,8 @@ import org.xml.sax.SAXException;
 import pedviz.algorithms.GraphRepair;
 import sid.OntView.utils.ExpressionManager;
 import sid.OntView.utils.ProgressBarDialogThread;
-import uk.ac.manchester.cs.owl.owlapi.mansyntaxrenderer.ManchesterOWLSyntaxOWLObjectRendererImpl;
+import org.semanticweb.owlapi.manchestersyntax.renderer.ManchesterOWLSyntaxOWLObjectRendererImpl;
+
 
 public class VisGraph extends Observable implements Runnable{
     
@@ -357,7 +358,8 @@ public class VisGraph extends Observable implements Runnable{
 			if ((shape instanceof VisClass) && (shape.asVisClass().isDefined)){
 				VisClass defClassShape = entry.getValue().asVisClass();
 				if (defClassShape.getLinkedClassExpression() instanceof OWLClass){
-					for (OWLClassExpression definition : defClassShape.getLinkedClassExpression().asOWLClass().getEquivalentClasses(activeOntology)){
+					for (OWLClassExpression definition : EntitySearcher.getEquivalentClasses(defClassShape.getLinkedClassExpression().asOWLClass(), activeOntology)){
+							
 						if (definition.isAnonymous()) {
 							shape.asVisClass().addDefinition(definition);
 							// <CBL 25/9/13>
@@ -497,7 +499,7 @@ public class VisGraph extends Observable implements Runnable{
 		String dRange ="unknown";
 		for (OWLDataProperty dataProperty : dataPropertySet){
 			
-			for (OWLDataRange z : dataProperty.getRanges(activeOntology)) //one range
+			for (OWLDataRange z : EntitySearcher.getRanges(dataProperty, activeOntology)) //one range
 			{
 				dRange = removePrefix(z.toString(),":");
 			}
@@ -642,7 +644,7 @@ public class VisGraph extends Observable implements Runnable{
 				 o.setVisLevel(newl);
 			 }
 			 
-		     for (OWLClassExpression exp : e.getEquivalentClasses(activeOntology)){
+		     for (OWLClassExpression exp : EntitySearcher.getEquivalentClasses(e, activeOntology)){
 		    	 if (!(exp instanceof OWLClass) && (shapeMap.get(exp.toString())==null)){
 		    		addVisClass(exp.toString(), maxLevel+1, exp, activeOntology,reasoner); 
 		    	 }
@@ -791,7 +793,7 @@ public class VisGraph extends Observable implements Runnable{
 	       //actual add of the visclass to both the graph and the level
 	       VisClass vis = new VisClass(depthlevel,e,label,this);
 	       if (e instanceof OWLClass){
-	    	   for (OWLAnnotation  an : e.asOWLClass().getAnnotations(activeOntology)){
+	    	   for (OWLAnnotation  an : EntitySearcher.getAnnotations(e.asOWLClass(), activeOntology) ){
 	    		   if (an.getProperty().toString().equals("rdfs:label")){
 	    			   vis.explicitLabel = an.getValue().toString();
 	    			   vis.explicitLabel.replaceAll("\"", "");
@@ -823,7 +825,7 @@ public class VisGraph extends Observable implements Runnable{
 		   vis.setVisLevel(vlevel);
 		   if (e.isAnonymous()) {
 	           vis.isAnonymous = true;}
-	       if ((e instanceof OWLClass) && (e.asOWLClass().isDefined(activeOntology))) {
+	       if ((e instanceof OWLClass) && (EntitySearcher.isDefined(e.asOWLClass(), activeOntology) )) {
 	           vis.isDefined = true;}   
 	       if (reasoner != null){
 	    	   Node<OWLClass> equivClasses = reasoner.getEquivalentClasses(e);
