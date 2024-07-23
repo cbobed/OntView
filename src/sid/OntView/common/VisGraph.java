@@ -862,9 +862,11 @@ public class VisGraph extends Observable implements Runnable{
 		 dashedConnectorList.clear();
 		 for (Entry<String,Shape> entry : shapeMap.entrySet()) {
     		Shape s = entry.getValue();
-			if (((s.getState()==Shape.CLOSED) || (s.getState()==Shape.PARTIALLY_CLOSED)) && (s.visible))  {
-				 dashLink((VisClass)s,(VisClass) s);
-			 }	 
+    		if (!s.getLinkedClassExpression().isOWLThing()) {
+				if (((s.getState()==Shape.CLOSED) || (s.getState()==Shape.PARTIALLY_CLOSED)) && (s.visible))  {
+					 dashLink((VisClass)s,(VisClass) s);
+				 }
+    		}
 		 }
 	 }
 	 

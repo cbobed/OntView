@@ -25,8 +25,7 @@ import java.util.Map.Entry;
 
 import org.semanticweb.owlapi.model.OWLOntology;
 
-import eu.wdaqua.pagerank.PageRankRDF;
-import eu.wdaqua.pagerank.PageRankScore;
+import sid.OntView.utils.JarClassLoader;
 import sid.OntView.utils.PageRankScoreComparator;
 
 public abstract class RDFRankConceptExtraction {
@@ -35,31 +34,31 @@ public abstract class RDFRankConceptExtraction {
 	
 	public static void hideNonKeyConcepts(OWLOntology activeOntology,VisGraph graph,int limitResultSize, boolean bidirectional){
 		
-		Map<String, Shape> shapeMap = graph.getShapeMap();
-		// first, build the graph to obtain the centrality of the nodes
-		StringBuilder strBuilder = new StringBuilder(); 
-		for (Entry<String, Shape> entry : shapeMap.entrySet()){
-			VisClass node = entry.getValue().asVisClass();
-			String nodeStr = Shape.getKey(node.getLinkedClassExpression()); 
-			for (Shape ch: node.getChildren()) {
-				strBuilder.append("<"+Shape.getKey(ch.getLinkedClassExpression())+"> <rdfs:subClassOf> <"+nodeStr+"> . \n"); 
-				if (bidirectional) {
-					strBuilder.append("<"+nodeStr+"> <rdfs:superClassOf> <"+Shape.getKey(ch.getLinkedClassExpression())+"> . \n");
-				}
-			}
-		}
-		
-	
-    		String filename = "tmp-"+limitResultSize+"-"+bidirectional+".nt"; 
-    		try (PrintWriter out = new PrintWriter(new BufferedOutputStream(new FileOutputStream(filename)))) {
-    			out.println(strBuilder.toString()); 
-    		}
-    		catch (IOException e) {
-    			System.err.println("Debugging the RDF ... not being able to write the file"); 
-    			e.printStackTrace();
-    		}
-    	
-	
+//		Map<String, Shape> shapeMap = graph.getShapeMap();
+//		// first, build the graph to obtain the centrality of the nodes
+//		StringBuilder strBuilder = new StringBuilder(); 
+//		for (Entry<String, Shape> entry : shapeMap.entrySet()){
+//			VisClass node = entry.getValue().asVisClass();
+//			String nodeStr = Shape.getKey(node.getLinkedClassExpression()); 
+//			for (Shape ch: node.getChildren()) {
+//				strBuilder.append("<"+Shape.getKey(ch.getLinkedClassExpression())+"> <rdfs:subClassOf> <"+nodeStr+"> . \n"); 
+//				if (bidirectional) {
+//					strBuilder.append("<"+nodeStr+"> <rdfs:superClassOf> <"+Shape.getKey(ch.getLinkedClassExpression())+"> . \n");
+//				}
+//			}
+//		}
+//		
+//	
+//		String filename = "tmp-"+limitResultSize+"-"+bidirectional+".nt"; 
+//		try (PrintWriter out = new PrintWriter(new BufferedOutputStream(new FileOutputStream(filename)))) {
+//			out.println(strBuilder.toString()); 
+//		}
+//		catch (IOException e) {
+//			System.err.println("Debugging the RDF ... not being able to write the file"); 
+//			e.printStackTrace();
+//		}
+//	
+//		JarClassLoader classLoader = new 
 		
 
 	}
