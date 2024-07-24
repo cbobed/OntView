@@ -272,6 +272,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 				toggleSwitch.setDisable(true);
 			}*/
 
+			toggleSwitch.disableProperty().bind(parent.artPanel.stableChangeProperty());
+
 			// Add a listener to handle the switch state
 			toggleSwitch.selectedProperty().addListener((observable, oldValue, newValue) -> {
 				if (newValue) {

@@ -31,21 +31,13 @@ public class VisLevel {
 	}
  
 	public ArrayList<Shape> orderedList(){
-		ArrayList<Shape> list = new ArrayList<Shape>();
+		ArrayList<Shape> list = new ArrayList<>();
 		for (Shape shape : levelShapes){
 			list.add(shape);
 		}
 		Collections.sort(list,Shape.POSY_ORDER);
 		return list;
 	}
-
-	public int getShapeNo(){
-		int c=0;
-		for (Shape s : levelShapes){
-			c++;
-		}	
-		return c;		
-	}	
 	
 	public void put(Shape s){levelShapes.add(s);}
 	public HashSet<Shape> getShapeSet(){return levelShapes;}

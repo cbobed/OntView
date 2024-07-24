@@ -10,6 +10,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 
 import javafx.animation.PauseTransition;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
@@ -17,10 +19,8 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tooltip;
-import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.Cursor;
 
@@ -47,9 +47,7 @@ public class PaintFrame extends Canvas implements Runnable{
 	static final int SEP = 200;
 	private static final int DOWN = 0;
 	private static final int UP = -1;
-	int     		width,height;
 	boolean 		stable      = false;
-	public boolean	zoomStable  = false;
 	boolean 		repulsion   = true;
 	public  boolean renderLabel = false;
 //	private boolean kceEnabled = false;
@@ -84,8 +82,6 @@ public class PaintFrame extends Canvas implements Runnable{
 	public void setActiveOntolgySource (String p ){ activeOntologySource = p;}
 	public String getKceOption() {return kceOption;}
 	public void setKceOption(String itemAt) {kceOption = itemAt;}
-//	public boolean isReduceChecked(){return reduceChecked;}
-//	public boolean setReduceChecke(boolean b){return reduceCheck;}
 	private boolean showConnectors = false;
 	public void setShowConnectors(boolean b){showConnectors = b;}
 
@@ -153,11 +149,7 @@ public class PaintFrame extends Canvas implements Runnable{
 			GraphicsContext g = this.getGraphicsContext2D();
 
 			if (visGraph != null) {
-				List<VisConnector> connectorsCopy;
-				synchronized (visGraph.connectorList) {
-					connectorsCopy = new ArrayList<>(visGraph.connectorList);
-				}
-				for (VisConnector c : connectorsCopy) {
+				for (VisConnector c : visGraph.connectorList) {
 					if (c.from == shape || c.to == shape) {
 						c.draw(g);
 					}
@@ -239,7 +231,7 @@ public class PaintFrame extends Canvas implements Runnable{
 	}
 
 
-	public  void createReasonedGraph(HashSet<OWLClassExpression> set,boolean check) throws XPathExpressionException, ParserConfigurationException, SAXException, IOException{
+	public  void createReasonedGraph(HashSet<OWLClassExpression> set,boolean check) {
 		rVisGraph = new VisGraph(this);
 
 		visGraph = rVisGraph;
@@ -264,7 +256,7 @@ public class PaintFrame extends Canvas implements Runnable{
 
 //
 		stable       = true;
-		stateChanged = true;
+		stateChanged.set(true);
 //	   relax();
 		factor = 1.0;
 		paintFrame.setCursor(Cursor.DEFAULT);
@@ -290,8 +282,9 @@ public class PaintFrame extends Canvas implements Runnable{
 		return eraseConnector;
 	}
 
+	BooleanProperty stateChanged = new SimpleBooleanProperty(true);
+	public BooleanProperty stableChangeProperty() { return stateChanged; }
 
-	boolean stateChanged = true;
 	/**
 	 * Updates node positions
 	 * Avoids shapes being on top of each other
@@ -306,11 +299,12 @@ public class PaintFrame extends Canvas implements Runnable{
 
 		// repulsion and atraction between nodes
 		Shape shape_j,s_i;
+		boolean recentChange = false;
 
 		if (stable) {
-			if (stateChanged) {
+			while (stateChanged.get()) {
 				System.out.println("relax");
-				stateChanged = false;
+				stateChanged.set(false);
 
 				/*HashMap<String, Shape> shapeMapCopy;
 				synchronized (visGraph.shapeMap) {
@@ -330,7 +324,7 @@ public class PaintFrame extends Canvas implements Runnable{
 								}*/
 
 								if ((s_i.getPosY() < shape_j.getPosY()) && (s_i.getPosY() + s_i.getTotalHeight() + MIN_SPACE + PROPETY_BOX_HEIGHT) >= shape_j.getPosY()) {
-									stateChanged = true;
+									stateChanged.set(true);
 									shapeRepulsion(s_i, DOWN);
 								}
 							}
@@ -339,12 +333,14 @@ public class PaintFrame extends Canvas implements Runnable{
 					s_i = e_i.getValue();
 					if (s_i.getPosY() < BORDER_PANEL){
 						s_i.setPosY(BORDER_PANEL + MIN_SPACE);
-						stateChanged = true;
+						stateChanged.set(true);
 						shapeRepulsion(s_i, DOWN);
 					}
 					visGraph.adjustPanelSize((float) factor);
-
+					recentChange = true;
 				}
+			}
+			if (recentChange) {
 				draw();
 			}
 		}
@@ -435,7 +431,7 @@ public class PaintFrame extends Canvas implements Runnable{
 		if (pressedShape!=null) {
 			direction = ((draggedY > 0) ?  DOWN : UP);
 			pressedShape.setPosY(pressedShape.getPosY()+ draggedY);
-			stateChanged = true;
+			stateChanged.set(true);
 			shapeRepulsion (pressedShape,direction);
 			mouseLastX = (int)p.getX();
 			mouseLastY = (int)p.getY();
@@ -507,6 +503,7 @@ public class PaintFrame extends Canvas implements Runnable{
 	 */
 	private String formatToolTipText(String html) {
 		tooltip.setFont(new Font("Dialog", 12));
+		tooltip.setMaxHeight(200);
 		//tooltip.setStyle("-fx-background-color: #cedef7; -fx-text-fill: #000000;");
 
 		return html.replaceAll("<html>", "")
@@ -564,7 +561,7 @@ public class PaintFrame extends Canvas implements Runnable{
 	public void run() {
 		Thread me = Thread.currentThread();
 		while (relaxer == me) {
-			relax();
+            relax();
 			try {
 				Thread.sleep(stable ?  1000 : 800);
 				while (pressedShape!=null){
@@ -808,17 +805,23 @@ public class PaintFrame extends Canvas implements Runnable{
 	 * Action done when changing kce Combo 
 	 */
 	public void doKceOptionAction() {
+		AbstractConceptExtractor extractor = null;
 
 		if (getKceOption().equals(VisConstants.KCECOMBOOPTION1)){ //"None"
 			getVisGraph().showAll();
+			draw();
 		}
 		if (getKceOption().equals(VisConstants.KCECOMBOOPTION2)){ //"KCE10"
 			getVisGraph().showAll();
-			KConceptExtraction.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 10);
+			extractor = new KConceptExtraction();
+			extractor.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 10);
+			draw();
 		}
 		if (getKceOption().equals(VisConstants.KCECOMBOOPTION3)){ //"KCE20"
 			getVisGraph().showAll();
-			KConceptExtraction.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20);
+			extractor = new KConceptExtraction();
+			extractor.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20);
+			draw();
 		}
 	}
 

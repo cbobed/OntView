@@ -273,7 +273,7 @@ public class PaintFrame extends JPanel implements MouseListener,Runnable,MouseMo
 				visGraph.adjustPanelSize((float) factor);
 		
 			}
-			  repaint();
+			repaint();
 
 		  }
 	  }
@@ -515,6 +515,7 @@ public class PaintFrame extends JPanel implements MouseListener,Runnable,MouseMo
 				    	 		  //si estaba cerrado el nodo [+] abrirlo
 				  	              shape.open();
 				  	              refreshDashedConnectors();
+									repaint();
 				  	          }
 				        }
 				    	//Click on the close symbol
@@ -523,6 +524,7 @@ public class PaintFrame extends JPanel implements MouseListener,Runnable,MouseMo
 				    			  //if [-] clicked, close the node
 				  	              shape.close();     
 				  	              refreshDashedConnectors();
+									repaint();
 				  	          }
 				  	     }
 				    	else { // pressed elsewhere on the shape

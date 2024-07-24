@@ -1,11 +1,9 @@
 package sid.OntView2.common;
 
-
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.shape.*;
 import javafx.scene.paint.Color;
 import javafx.geometry.Point2D;
-import javafx.scene.text.Font;
 
 import java.util.ArrayList;
 
@@ -62,14 +60,6 @@ public abstract class VisConnector {
 		   list.remove(c);
 	   }
    }
-    
-   public static boolean isInArray(ArrayList<VisConnector> list, Shape or, Shape dst){
-	   for (VisConnector c : list){
-		   if ((c.from == or) && (c.to == dst))
-			   return true;
-	   }
-	   return false;
-   }
    
    public void hide(){ visible = false; }
    public void show(){ visible = true; }
@@ -82,10 +72,6 @@ public abstract class VisConnector {
 	   }
 	   return null;
    }
-
-	public static double distance(Point2D p1,Point2D p2) {
-		return  Math.sqrt(Math.pow((p1.getX()-p2.getX()),2) + Math.pow((p1.getY()-p2.getY()),2));
-	}
    
    
 	/**
@@ -171,18 +157,15 @@ public abstract class VisConnector {
 	
 	
 	protected void calculateNurbPoints(double fromPointX, double fromPointY, double toPointX,double toPointY){
-		
 
-		final int MINDIF = 50;
 		double xdiff = toPointX-fromPointX;
 //		double ydiff = toPointY-toPointY;
-	    if  (xdiff > 0){
-	    	controlx1 = fromPointX + 0.1 * (xdiff);
-	    	controly1 = fromPointY;
-	    	controlx2 = fromPointX + 0.4 * (xdiff);
-	    	controly2 = toPointY;
-        }
-	    
+	    if  (xdiff > 0) {
+			controlx1 = fromPointX + 0.1 * (xdiff);
+			controly1 = fromPointY;
+			controlx2 = fromPointX + 0.4 * (xdiff);
+			controly2 = toPointY;
+		}
 	    else {
 
 	    	controlx1 = toPointX + 0.4 * (-1.0) * (xdiff);
@@ -206,9 +189,7 @@ public abstract class VisConnector {
 				controlx1, controly1, controlx2, controly2, toPointX, toPointY
 		));
 		path.getElements().add(new LineTo(toPointX, toPointY));
-		
 	}
-	
 
 	protected void drawCurve(GraphicsContext g2d, int method) {};
 

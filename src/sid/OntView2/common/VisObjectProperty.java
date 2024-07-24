@@ -63,53 +63,54 @@ public class VisObjectProperty extends VisProperty {
 	
 	public String getTooltipText(){
 	
-		String description ="";
-		if (description.equals("")){
-			description +="<html><b>"+visibleLabel+"</b><br><br>";
+		StringBuilder description = new StringBuilder();
+		if (description.toString().isEmpty()){
+			description.append("<html><b>").append(visibleLabel).append("</b><br><br>");
 			if ((parents != null)&&(parents.size()>1)){
-				description += "<b>Subproperty of</b><br><ul>";
+				description.append("<b>Subproperty of</b><br><ul>");
 				for (VisObjectProperty p : parents){
-					description += "<li>"+p.visibleLabel+" </li>";
-				}
-				description+="<br></ul>";
+					if (!description.toString().contains("<li>" + p.visibleLabel + " </li>")) {
+						description.append("<li>").append(p.visibleLabel).append(" </li>");
+					}				}
+				description.append("<br></ul>");
 			}
-			description +="<b>Domain:</b> "+getDomain().visibleLabel+"<br>";
-			description +="<b>Range     : </b>"; 
-			description += (qualifiedRendering?
-								ExpressionManager.getReducedQualifiedClassExpression(range.getLinkedClassExpression()):
-								ExpressionManager.getReducedClassExpression(range.getLinkedClassExpression()))+"<br><br>";
-			description += "<b>Property Description</b><br>";
+			description.append("<b>Domain:</b> ").append(getDomain().visibleLabel).append("<br>");
+			description.append("<b>Range     : </b>");
+			description.append(qualifiedRendering ?
+                    ExpressionManager.getReducedQualifiedClassExpression(range.getLinkedClassExpression()) :
+                    ExpressionManager.getReducedClassExpression(range.getLinkedClassExpression())).append("<br><br>");
+			description.append("<b>Property Description</b><br>");
 
 			if (isTransitive)
-				description +="<li>Transitive</li>";	
+				description.append("<li>Transitive</li>");
 			if (isFunctional)
-				description +="<li>Functional</li>";	
+				description.append("<li>Functional</li>");
 			if (isReflexive)
-				description +="<li>Reflexive</li>";	
+				description.append("<li>Reflexive</li>");
 			if (isSymmetric)
-				description +="<li>Symmetric</li>";
+				description.append("<li>Symmetric</li>");
 			if (hasInverse){
-				description+="<li> inverse of <b>";
+				description.append("<li> inverse of <b>");
 				for (OWLObjectPropertyExpression inv : inverseOf.getEntitiesMinusTop()){
-					description+= (qualifiedRendering?
-										ExpressionManager.getReducedQualifiedObjectPropertyExpression(inv):
-										ExpressionManager.getReducedObjectPropertyExpression (inv))+" ";
+					description.append(qualifiedRendering ?
+                            ExpressionManager.getReducedQualifiedObjectPropertyExpression(inv) :
+                            ExpressionManager.getReducedObjectPropertyExpression(inv)).append(" ");
 				}
-				description+="</b></li>";
+				description.append("</b></li>");
 			}
 			if (propertyChainAxiom != null) {
-				description+= "<b>Chain Property</b><ul>";
+				description.append("<b>Chain Property</b><ul>");
 				for (OWLObjectPropertyExpression c: propertyChainAxiom.getPropertyChain()){
-					description+="<li>"+(qualifiedRendering?
-											ExpressionManager.getReducedQualifiedObjectPropertyExpression(c):
-											ExpressionManager.getReducedObjectPropertyExpression(c))+"</li>";
+					description.append("<li>").append(qualifiedRendering ?
+                            ExpressionManager.getReducedQualifiedObjectPropertyExpression(c) :
+                            ExpressionManager.getReducedObjectPropertyExpression(c)).append("</li>");
 				}
-				description+="</ul>";
+				description.append("</ul>");
 			}
 			
-			description += "</html>";
+			description.append("</html>");
 		}
-		return description;
+		return description.toString();
 		
 	}
 	

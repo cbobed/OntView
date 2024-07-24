@@ -566,24 +566,28 @@ public class VisClass extends Shape {
 	public ArrayList<OWLClassExpression> getDefinitions(){
 		return definitions;
 	}
-	
+
+
+
 	public String getToolTipInfo() {
 	/*
 	 * Renders html for class info
 	 */			
-		String other = "";
+		StringBuilder other = new StringBuilder();
 		if (!isAnonymous){
 			getInheritedObjectProperties();
 			getInheritedDataProperties();
-			other = "<html><b>"
-				+ (isAnonymous?removeFormatInformation(this.visibleLabel):this.visibleLabel)
-				+ "</b><br><br>";
+			other = new StringBuilder("<html><b>"
+                    + (isAnonymous ? removeFormatInformation(this.visibleLabel) : this.visibleLabel)
+                    + "</b><br><br>");
 			if ((getDisjointClasses() !=null)&& (getDisjointClasses().size()>0)) {
-				other+="<b>Disjoint</b><ul><br>";
+				other.append("<b>Disjoint</b><ul><br>");
 				
 				VisClass auxVisClass = null;
-				ArrayList<OWLClassExpression> auxArray = null; 
+				ArrayList<OWLClassExpression> auxArray = null;
+				int count = 0;
 				for (OWLClass cl: getDisjointClasses()) {
+
 					auxVisClass = graph.getVisualExtension(cl); 
 					if (auxVisClass != null) {
 						
@@ -591,25 +595,28 @@ public class VisClass extends Shape {
 							auxArray = auxVisClass.getDefinitions();
 							if (auxArray != null){ 
 								for (OWLClassExpression ce: auxArray) {
-									other+="<li>"+(qualifiedRendering?
-											ExpressionManager.getReducedQualifiedClassExpression(ce):
-											ExpressionManager.getReducedClassExpression(ce)) + "</li>";
+									other.append("<li>").append(qualifiedRendering ?
+                                            ExpressionManager.getReducedQualifiedClassExpression(ce) :
+                                            ExpressionManager.getReducedClassExpression(ce)).append("</li>");
+
 								}
 							}
 						}
 						else {	
-							other+="<li>"+(qualifiedRendering?
-									ExpressionManager.getReducedQualifiedClassExpression(cl):
-									ExpressionManager.getReducedClassExpression(cl)) + "</li>";
+							other.append("<li>").append(qualifiedRendering ?
+                                    ExpressionManager.getReducedQualifiedClassExpression(cl) :
+                                    ExpressionManager.getReducedClassExpression(cl)).append("</li>");
+
+
 							
 						}
 					}
 				}
-				other+="</ul>";
+				other.append("</ul>");
 			}
-			other += "</ul></html>";
+			other.append("</ul></html>");
 		}
-		return other;
+		return other.toString();
 	}
 
 	

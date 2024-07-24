@@ -225,7 +225,7 @@ public class VisGraph extends Observable implements Runnable{
     	VisLevel.adjustWidthAndPos(getLevelSet());
     	paintframe.getParentFrame().loadSearchCombo();
     	updateProgressBarObserver(100);
-    	paintframe.stateChanged = true;
+    	paintframe.stateChanged.set(true);
     	
 	}
 	
@@ -810,7 +810,7 @@ public class VisGraph extends Observable implements Runnable{
 		 for (Entry<String,Shape> entry : shapeMap.entrySet()) {
     		Shape s = entry.getValue();
 			if (((s.getState()==Shape.CLOSED) || (s.getState()==Shape.PARTIALLY_CLOSED)) && (s.visible))  {
-				 dashLink((VisClass)s,(VisClass) s);
+				 dashLink(s, s);
 			 }	 
 		 }
 	 }
