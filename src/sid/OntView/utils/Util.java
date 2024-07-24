@@ -110,7 +110,7 @@ public class Util {
 	static public OWLClass createFreshClass(OWLOntology onto, OWLDataFactory dataFactory, OWLOntologyManager manager){
 		OWLClass cls = dataFactory.getOWLClass(
 					freshClassPrefix + nextFreshId, 
-					new DefaultPrefixManager(onto.getOntologyID().getOntologyIRI().toString())
+					new DefaultPrefixManager(onto.getOntologyID().getOntologyIRI().get().toString())
 				);
 		
 		OWLDeclarationAxiom declAxiom = dataFactory.getOWLDeclarationAxiom(cls, new HashSet<OWLAnnotation>()); 

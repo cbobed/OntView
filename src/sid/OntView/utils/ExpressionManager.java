@@ -5,8 +5,6 @@ import java.util.Set;
 import org.semanticweb.owlapi.rdf.rdfxml.renderer.OWLOntologyXMLNamespaceManager;
 import org.semanticweb.owlapi.util.OWLDocumentFormatFactoryImpl;
 
-import com.google.common.base.Optional;
-
 import org.semanticweb.owlapi.formats.OWLXMLDocumentFormat;
 import org.semanticweb.owlapi.formats.OWLXMLDocumentFormatFactory;
 import org.semanticweb.owlapi.model.ClassExpressionType;
@@ -626,7 +624,7 @@ public class ExpressionManager {
 	}
 
 
-	public static String qualifyLabel(Optional<IRI> optional, OWLClass c, String label) {
+	public static String qualifyLabel(OWLClass c, String label) {
 	
 		String result = label; 
 		

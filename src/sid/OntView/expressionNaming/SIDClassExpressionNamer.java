@@ -106,7 +106,7 @@ public class SIDClassExpressionNamer {
 		OWLClass auxiliarClass = null; 
 		
 		axiomsToAdd.clear();  
-		String baseIRI = ontology.getOntologyID().getOntologyIRI().toString(); 
+		String baseIRI = ontology.getOntologyID().getOntologyIRI().get().toString(); 
 		
 		if (baseIRI.endsWith(".owl")) {
 			baseIRI += "#"; 

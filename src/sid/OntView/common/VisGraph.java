@@ -798,8 +798,7 @@ public class VisGraph extends Observable implements Runnable{
 	    			   vis.explicitLabel = an.getValue().toString();
 	    			   vis.explicitLabel.replaceAll("\"", "");
 	    			   vis.explicitLabel = ExpressionManager.replaceString(vis.explicitLabel); 
-	    			   auxQLabel = ExpressionManager.qualifyLabel (activeOntology.getOntologyID().getOntologyIRI(),
-  								e.asOWLClass(), vis.explicitLabel); 
+	    			   auxQLabel = ExpressionManager.qualifyLabel (e.asOWLClass(), vis.explicitLabel); 
 	    			   if (auxQLabel != null && !"null".equalsIgnoreCase(auxQLabel)) {
 	    				   vis.explicitQualifiedLabel = auxQLabel; 
 	    			   }   

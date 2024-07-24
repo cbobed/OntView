@@ -1,15 +1,15 @@
 package sid.OntView.utils;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.Comparator;
 
-import eu.wdaqua.pagerank.PageRankScore;
 
-public class PageRankScoreComparator implements Comparator<PageRankScore>{
-	public int compare(PageRankScore o1, PageRankScore o2) {
+public class PageRankScoreComparator implements Comparator<SimpleEntry<String, Float>>{
+	public int compare(SimpleEntry<String, Float> o1, SimpleEntry<String, Float> o2) {
 		// TODO Auto-generated method stub
-		if (o1.pageRank < o2.pageRank) 
+		if (o1.getValue() < o2.getValue()) 
 			return  -1; 
-		else if (o1.pageRank > o2.pageRank) 
+		else if (o1.getValue() > o2.getValue()) 
 			return 1; 
 		else 
 			return 0;
