@@ -27,9 +27,9 @@ public abstract class RDFRankConceptExtraction {
 		//first retrieve Key Concepts
 		Map<String, Shape> shapeMap = graph.getShapeMap();
 		Set<String> conceptSet = retrieveKeyConcepts(activeOntology,shapeMap, limitResultSize, bidirectional);
-		
-		OWLDataFactory dataFactory = activeOntology.getOWLOntologyManager().getOWLDataFactory(); 
-		conceptSet.add(dataFactory.getOWLThing().toString()); 
+		 
+		conceptSet.add(VisConstants.THING_ENTITY);
+		conceptSet.add(VisConstants.NOTHING_ENTITY); 
 		
 		// TODO: we must find the way to force the OWLNothing to appear in the graph 
 		for (Entry<String,Shape> entry : shapeMap.entrySet()){
