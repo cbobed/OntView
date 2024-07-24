@@ -1,11 +1,11 @@
 package sid.OntView.utils;
 
-import java.util.AbstractMap.SimpleEntry;
 import java.util.Comparator;
+import java.util.Map.Entry;
 
 
-public class PageRankScoreComparator implements Comparator<SimpleEntry<String, Float>>{
-	public int compare(SimpleEntry<String, Float> o1, SimpleEntry<String, Float> o2) {
+public class PageRankScoreComparator implements Comparator<Entry<String, Double>>{
+	public int compare(Entry<String, Double> o1, Entry<String, Double> o2) {
 		// TODO Auto-generated method stub
 		if (o1.getValue() < o2.getValue()) 
 			return  -1; 

@@ -358,24 +358,28 @@ public class VisGraph extends Observable implements Runnable{
 			if ((shape instanceof VisClass) && (shape.asVisClass().isDefined)){
 				VisClass defClassShape = entry.getValue().asVisClass();
 				if (defClassShape.getLinkedClassExpression() instanceof OWLClass){
-					for (OWLClassExpression definition : EntitySearcher.getEquivalentClasses(defClassShape.getLinkedClassExpression().asOWLClass(), activeOntology)){
-							
-						if (definition.isAnonymous()) {
-							shape.asVisClass().addDefinition(definition);
-							// <CBL 25/9/13>
-							// We also add the definition to the aliases handling
-							definitionsMap.put(Shape.getKey(definition), shape);
-							// <CBL 24/9/13> 
-							// the definitions are now displayed along with the name
-							// in the same shape 
-							// we don't need to create this connector any longer 
-//							Shape definitionShape =  shapeMap.get(definition.toString()); 
-//							connect(definitionShape,defClassShape);
-//							((VisClass) definitionShape).addSon((VisClass)defClassShape);
-//							defClassShape.addParent((VisClass)definitionShape);
-//							</CBL>
-						}	
-					}	
+				
+					EntitySearcher.getEquivalentClasses(defClassShape.getLinkedClassExpression().asOWLClass(), activeOntology).forEach(
+								definition -> {
+									if (definition.isAnonymous()) {
+										shape.asVisClass().addDefinition(definition);
+										// <CBL 25/9/13>
+										// We also add the definition to the aliases handling
+										definitionsMap.put(Shape.getKey(definition), shape);
+										// <CBL 24/9/13> 
+										// the definitions are now displayed along with the name
+										// in the same shape 
+										// we don't need to create this connector any longer 
+	//									Shape definitionShape =  shapeMap.get(definition.toString()); 
+	//									connect(definitionShape,defClassShape);
+	//									((VisClass) definitionShape).addSon((VisClass)defClassShape);
+	//									defClassShape.addParent((VisClass)definitionShape);
+	//									</CBL>
+									}	
+								}
+							); 
+					
+					
 				}
 				// <CBL 25/9/13> 
 				// if we have added definitions
@@ -499,7 +503,7 @@ public class VisGraph extends Observable implements Runnable{
 		String dRange ="unknown";
 		for (OWLDataProperty dataProperty : dataPropertySet){
 			
-			for (OWLDataRange z : EntitySearcher.getRanges(dataProperty, activeOntology)) //one range
+			for (OWLDataRange z : EntitySearcher.getRanges(dataProperty, activeOntology).toList()) //one range
 			{
 				dRange = removePrefix(z.toString(),":");
 			}
@@ -644,7 +648,7 @@ public class VisGraph extends Observable implements Runnable{
 				 o.setVisLevel(newl);
 			 }
 			 
-		     for (OWLClassExpression exp : EntitySearcher.getEquivalentClasses(e, activeOntology)){
+		     for (OWLClassExpression exp : EntitySearcher.getEquivalentClasses(e, activeOntology).toList()){
 		    	 if (!(exp instanceof OWLClass) && (shapeMap.get(exp.toString())==null)){
 		    		addVisClass(exp.toString(), maxLevel+1, exp, activeOntology,reasoner); 
 		    	 }
@@ -793,7 +797,7 @@ public class VisGraph extends Observable implements Runnable{
 	       //actual add of the visclass to both the graph and the level
 	       VisClass vis = new VisClass(depthlevel,e,label,this);
 	       if (e instanceof OWLClass){
-	    	   for (OWLAnnotation  an : EntitySearcher.getAnnotations(e.asOWLClass(), activeOntology) ){
+	    	   for (OWLAnnotation  an : EntitySearcher.getAnnotations(e.asOWLClass(), activeOntology).toList() ){
 	    		   if (an.getProperty().toString().equals("rdfs:label")){
 	    			   vis.explicitLabel = an.getValue().toString();
 	    			   vis.explicitLabel.replaceAll("\"", "");
@@ -861,11 +865,10 @@ public class VisGraph extends Observable implements Runnable{
 		 dashedConnectorList.clear();
 		 for (Entry<String,Shape> entry : shapeMap.entrySet()) {
     		Shape s = entry.getValue();
-    		if (!s.getLinkedClassExpression().isOWLThing()) {
-				if (((s.getState()==Shape.CLOSED) || (s.getState()==Shape.PARTIALLY_CLOSED)) && (s.visible))  {
-					 dashLink((VisClass)s,(VisClass) s);
-				 }
-    		}
+			if (((s.getState()==Shape.CLOSED) || (s.getState()==Shape.PARTIALLY_CLOSED)) && (s.visible))  {
+				 dashLink((VisClass)s,(VisClass) s);
+			 }
+	
 		 }
 	 }
 	 

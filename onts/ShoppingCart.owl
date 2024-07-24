@@ -1,0 +1,168 @@
+<?xml version='1.0' encoding='ISO-8859-1'?>
+<!DOCTYPE uridef[
+  <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns">
+  <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema">
+    <!ENTITY owl "http://www.w3.org/2002/07/owl">
+  <!ENTITY xsd "http://www.w3.org/2001/XMLSchema">
+]>
+
+<rdf:RDF
+  xmlns:rdf = "&rdf;#"
+  xmlns:rdfs ="&rdfs;#"
+  xmlns:owl ="&owl;#"
+  xmlns:xsd ="&xsd;#"
+  xmlns    ="http://horus.cps.unizar.es:18080/ontology/ShoppingCart.owl#"
+  xml:base ="http://horus.cps.unizar.es:18080/ontology/ShoppingCart.owl"
+ >
+
+<owl:Ontology rdf:about="">
+ <owl:versionInfo> </owl:versionInfo>
+ <rdfs:comment> 
+ </rdfs:comment>
+ <owl:imports rdf:resource="&owl;"/>
+</owl:Ontology>
+
+<!-- Created: Thu Apr  3 10:34:11 2003 -->
+
+			
+<owl:Class rdf:ID="ShoppingCartRequest">
+  
+</owl:Class>
+
+<owl:DatatypeProperty rdf:ID="tag">
+  <rdfs:domain rdf:resource="#ShoppingCartRequest"/>
+  <rdfs:range rdf:resource="&xsd;#string"/>
+</owl:DatatypeProperty>
+
+<owl:DatatypeProperty rdf:ID="devtag">
+  <rdfs:domain rdf:resource="#ShoppingCartRequest"/>
+  <rdfs:range rdf:resource="&xsd;#string"/>
+</owl:DatatypeProperty>
+
+<owl:DatatypeProperty rdf:ID="cartID">
+  <rdfs:domain rdf:resource="#ShoppingCartRequest"/>
+  <rdfs:range rdf:resource="&xsd;#string"/>
+</owl:DatatypeProperty>
+
+<owl:DatatypeProperty rdf:ID="HMAC">
+  <rdfs:domain rdf:resource="#ShoppingCartRequest"/>
+  <rdfs:range rdf:resource="&xsd;#string"/>
+</owl:DatatypeProperty>
+
+<owl:DatatypeProperty rdf:ID="items">
+   <rdfs:domain rdf:resource="#ShoppingCartRequest"/>
+  <rdfs:range rdf:resource="#ShoppingCartRequestItems"/>
+</owl:DatatypeProperty>
+
+<owl:DatatypeProperty rdf:ID="locale">
+  <rdfs:domain rdf:resource="#ShoppingCartRequest"/>
+  <rdfs:range rdf:resource="&xsd;#string"/>
+</owl:DatatypeProperty>
+
+<owl:Class rdf:ID="ShoppingCartRequestItems">
+  <owl:intersectionOf rdf:parseType="owl:collection">
+    <owl:Class rdf:about="&owl;#List"/>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="&owl;#item"/>
+      <owl:toClass rdf:resource="#Items"/>
+    </owl:Restriction>
+  </owl:intersectionOf>
+</owl:Class>
+
+<owl:Class rdf:ID="Items">
+</owl:Class>
+<owl:DatatypeProperty rdf:ID="Asin">
+  <rdfs:domain rdf:resource="#Items"/>
+  <rdfs:range rdf:resource="&xsd;#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:ID="exchangeId">
+  <rdfs:domain rdf:resource="#Items"/>
+  <rdfs:range rdf:resource="&xsd;#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:ID="quantity">
+  <rdfs:domain rdf:resource="#Items"/>
+  <rdfs:range rdf:resource="&xsd;#string"/>
+</owl:DatatypeProperty>
+
+<!-- This class is used to define the instances returned by the Shopping cart operations-->
+
+<owl:Class rdf:ID="ShoppingCartResponse">
+  
+</owl:Class>
+<owl:DatatypeProperty rdf:ID="cartID">
+  <rdfs:domain rdf:resource="#ShoppingCartResponse"/>
+  <rdfs:range rdf:resource="&xsd;#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:ID="HMAC">
+  <rdfs:domain rdf:resource="#ShoppingCartResponse"/>
+  <rdfs:range rdf:resource="&xsd;#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:ID="purchaseUrl">
+  <rdfs:domain rdf:resource="#ShoppingCartResponse"/>
+  <rdfs:range rdf:resource="&xsd;#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:ID="items">
+   <rdfs:domain rdf:resource="#ShoppingCartRequest"/>
+  <rdfs:range rdf:resource="#ShoppingCartResponseItems"/>
+</owl:DatatypeProperty>
+
+
+<owl:Class rdf:ID="ShoppingCartResponseItems">
+  <owl:intersectionOf rdf:parseType="owl:collection">
+    <owl:Class rdf:about="&owl;#List"/>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="&owl;#item"/>
+      <owl:toClass rdf:resource="#ShoppingCartItems"/>
+    </owl:Restriction>
+  </owl:intersectionOf>
+</owl:Class>
+
+
+<owl:Class rdf:ID="ShoppingCartItems">
+  
+</owl:Class>
+<owl:DatatypeProperty rdf:ID="itemId">
+  <rdfs:domain rdf:resource="#ShoppingCartItems"/>
+  <rdfs:range rdf:resource="&xsd;#string"/>
+</owl:DatatypeProperty>
+
+<owl:DatatypeProperty rdf:ID="productName">
+  <rdfs:domain rdf:resource="#ShoppingCartItems"/>
+  <rdfs:range rdf:resource="&xsd;#string"/>
+</owl:DatatypeProperty>
+
+<owl:DatatypeProperty rdf:ID="catalog">
+  <rdfs:domain rdf:resource="#ShoppingCartItems"/>
+  <rdfs:range rdf:resource="&xsd;#string"/>
+</owl:DatatypeProperty>
+
+<owl:DatatypeProperty rdf:ID="Asin">
+  <rdfs:domain rdf:resource="#ShoppingCartItems"/>
+  <rdfs:range rdf:resource="&xsd;#string"/>
+</owl:DatatypeProperty>
+
+
+<owl:DatatypeProperty rdf:ID="exchangeId">
+  <rdfs:domain rdf:resource="#ShoppingCartItems"/>
+  <rdfs:range rdf:resource="&xsd;#string"/>
+</owl:DatatypeProperty>
+
+<owl:DatatypeProperty rdf:ID="quantity">
+  <rdfs:domain rdf:resource="#ShoppingCartItems"/>
+  <rdfs:range rdf:resource="&xsd;#string"/>
+</owl:DatatypeProperty>
+
+
+<owl:DatatypeProperty rdf:ID="listPrice">
+  <rdfs:domain rdf:resource="#ShoppingCartItems"/>
+  <rdfs:range rdf:resource="&xsd;#string"/>
+</owl:DatatypeProperty>
+
+
+<owl:DatatypeProperty rdf:ID="ourPrice">
+  <rdfs:domain rdf:resource="#ShoppingCartItems"/>
+  <rdfs:range rdf:resource="&xsd;#string"/>
+</owl:DatatypeProperty>
+
+
+</rdf:RDF>

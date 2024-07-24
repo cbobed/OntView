@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE rdf:RDF [
+  <!ENTITY owl "http://www.w3.org/2002/07/owl#">
+  <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#">
+  <!ENTITY technical.owl "http://horus.cps.unizar.es:18080/ontology/technical.owl">
+  <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#">
+]>
+<rdf:RDF xml:base="&technical.owl;"
+         xmlns ="&technical.owl;#"
+         xmlns:owl="&owl;"
+         xmlns:rdf="&rdf;"
+         xmlns:rdfs="&rdfs;">
+
+<!-- Ontology Information -->
+  <owl:Ontology rdf:about=""/>
+
+<!-- Classes -->
+  <owl:Class rdf:about="#DepictedThing"
+             rdfs:label="Depicted Thing">
+    <owl:equivalentClass>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://xmlns.com/foaf/0.1/depiction"/>
+        <owl:someValuesFrom rdf:resource="&owl;Thing"/>
+      </owl:Restriction>
+    </owl:equivalentClass>
+  </owl:Class>
+
+  <owl:Class rdf:about="#Image"
+             rdfs:comment="The class of images"
+             rdfs:label="Image">
+    <rdfs:subClassOf rdf:resource="#MultimediaContent"/>
+    <rdfs:subClassOf rdf:resource="http://xmlns.com/foaf/0.1/Image"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="#ImagePart"
+             rdfs:label="Image Part">
+    <rdfs:comment>2D spatial regions of an image or video frame</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="#Segment"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="#ImageText"
+             rdfs:label="Image Text">
+    <rdfs:comment>Spatial regions of an image or video frame that correspond to text or 
+captions</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="#StillRegion"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="#Mosaic"
+             rdfs:label="Mosaic">
+    <rdfs:comment>Mosaic or panaoramic view of a video segment</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="#StillRegion"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="#MovingRegion"
+             rdfs:label="Moving Region">
+    <rdfs:comment>2D spatio-temporal regions of video data</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="#Segment"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="#Multimedia"
+             rdfs:comment="The class of multimedia resources"
+             rdfs:label="Multimedia">
+    <rdfs:subClassOf rdf:resource="#MultimediaContent"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="#MultimediaContent"
+             rdfs:comment="The class of multimedia data"
+             rdfs:label="Multimedia Content">
+    <rdfs:subClassOf rdf:resource="http://www.mindswap.org/~glapizco/simpleABC.owl#Actuality"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="#Segment"
+             rdfs:label="Segment">
+    <rdfs:comment>The class of  fragments of multimedia content</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="#MultimediaContent"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="#StillRegion"
+             rdfs:label="Still Region">
+    <rdfs:comment>2D spatial regions of an image or video frame</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="#Segment"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="#Video"
+             rdfs:comment="The class of videos"
+             rdfs:label="Video">
+    <rdfs:subClassOf rdf:resource="#MultimediaContent"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="#VideoFrame"
+             rdfs:comment="Frame of a video"
+             rdfs:label="VideoFrame">
+    <rdfs:subClassOf rdf:resource="#MultimediaContent"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="#VideoSegment"
+             rdfs:label="Video Segment">
+    <rdfs:comment>Temporal intervals or segments of video data</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="#Segment"/>
+    <rdfs:subClassOf rdf:resource="#Video"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="#VideoSegmentsOrStillRegions"
+             rdfs:label="VideoSegmentsOrStillRegions">
+    <rdf:type rdf:resource="&owl;Thing"/>
+    <owl:unionOf rdf:datatype="&rdf;XMLLiteral">
+       &lt;owl:Class rdf:about="#VideoSegment">&lt;/owl:Class>
+       &lt;owl:Class rdf:about="#StillRegion">&lt;/owl:Class>
+    </owl:unionOf>
+  </owl:Class>
+
+  <owl:Class rdf:about="#VideoText"
+             rdfs:label="Video Text">
+    <rdfs:comment>Spatio-temporal regions of video data that correspond to text or captions</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="#MovingRegion"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://www.mindswap.org/~glapizco/simpleABC.owl#Actuality"/>
+  <owl:Class rdf:about="http://xmlns.com/foaf/0.1/Image"/>
+
+<!-- Annotation Properties -->
+  <owl:AnnotationProperty rdf:about="&rdfs;comment"/>
+  <owl:AnnotationProperty rdf:about="&rdfs;label"/>
+
+<!-- Datatype Properties -->
+  <owl:DatatypeProperty rdf:about="#endFrame"
+                        rdfs:label="endFrame">
+    <rdfs:domain rdf:resource="#VideoSegment"/>
+  </owl:DatatypeProperty>
+
+  <owl:DatatypeProperty rdf:about="#frameNumber"
+                        rdfs:label="frameNumber">
+    <rdfs:domain rdf:resource="#VideoFrame"/>
+  </owl:DatatypeProperty>
+
+  <owl:DatatypeProperty rdf:about="#hasDurationSeconds"
+                        rdfs:label="hasDurationSeconds">
+    <rdfs:domain rdf:resource="#Video"/>
+  </owl:DatatypeProperty>
+
+  <owl:DatatypeProperty rdf:about="#hasTotalFrames"
+                        rdfs:label="hasTotalFrames">
+    <rdfs:domain rdf:resource="#Video"/>
+  </owl:DatatypeProperty>
+
+  <owl:DatatypeProperty rdf:about="#startFrame"
+                        rdfs:label="startFrame">
+    <rdfs:domain rdf:resource="#VideoSegment"/>
+  </owl:DatatypeProperty>
+
+  <owl:DatatypeProperty rdf:about="#svgOutline"
+                        rdfs:label="svgOutline">
+    <rdfs:domain rdf:resource="#ImagePart"/>
+  </owl:DatatypeProperty>
+
+  <owl:DatatypeProperty rdf:about="&owl;unionOf"/>
+
+<!-- Object Properties -->
+  <owl:ObjectProperty rdf:about="#depiction"
+                      rdfs:label="depiction">
+    <rdfs:subPropertyOf rdf:resource="http://xmlns.com/foaf/0.1/depiction"/>
+  </owl:ObjectProperty>
+  
+  <owl:ObjectProperty rdf:about="#depicts"
+                      rdfs:label="depicts">
+    <owl:inverseOf rdf:resource="#depiction"/>
+    <rdfs:subPropertyOf rdf:resource="http://xmlns.com/foaf/0.1/depicts"/>
+  </owl:ObjectProperty>
+
+  <owl:ObjectProperty rdf:about="#descriptor">
+    <rdf:type rdf:resource="&owl;Thing"/>
+    <rdfs:domain rdf:resource="#MultimediaContent"/>
+  </owl:ObjectProperty>
+
+  <owl:ObjectProperty rdf:about="#frameOf"
+                      rdfs:label="frameOf">
+    <rdfs:domain rdf:resource="#VideoFrame"/>
+    <rdfs:range rdf:resource="#Video"/>
+  </owl:ObjectProperty>
+
+  <owl:ObjectProperty rdf:about="#hasRegion"
+                      rdfs:label="hasRegion">
+    <rdfs:domain rdf:resource="#MultimediaContent"/>
+    <rdfs:range rdf:resource="#ImagePart"/>
+  </owl:ObjectProperty>
+
+  <owl:ObjectProperty rdf:about="#hasSegment"
+                      rdfs:label="hasSegment">
+    <rdfs:domain rdf:resource="#Video"/>
+    <rdfs:range rdf:resource="#VideoSegment"/>
+  </owl:ObjectProperty>
+
+  <owl:ObjectProperty rdf:about="#regionOf"
+                      rdfs:label="regionOf">
+    <rdfs:domain rdf:resource="#ImagePart"/>
+    <rdfs:range rdf:resource="#MultimediaContent"/>
+    <owl:inverseOf rdf:resource="#hasRegion"/>
+  </owl:ObjectProperty>
+
+  <owl:ObjectProperty rdf:about="#segmentOf"
+                      rdfs:label="segmentOf">
+    <rdfs:domain rdf:resource="#VideoSegment"/>
+    <rdfs:range rdf:resource="#Video"/>
+    <owl:inverseOf rdf:resource="#hasSegment"/>
+  </owl:ObjectProperty>
+
+  <owl:ObjectProperty rdf:about="#visualDescriptor">
+    <rdf:type rdf:resource="&owl;Thing"/>
+    <rdfs:comment>Descriptor - applicable to images, videos, video segments, still regions and moving 
+regions.</rdfs:comment>
+    <owl:subPropertyOf rdf:resource="#descriptor"/>
+  </owl:ObjectProperty>
+
+  <owl:ObjectProperty rdf:about="&owl;subPropertyOf"/>
+</rdf:RDF>

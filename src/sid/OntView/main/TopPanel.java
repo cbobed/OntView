@@ -478,7 +478,7 @@ public class TopPanel extends JPanel implements ControlPanelInterface {
 		if (loadReasonerCombo == null) {
 			loadReasonerCombo = new JComboBox();
 			loadReasonerCombo.setFont(new Font("Dialog", Font.PLAIN, 10));
-			loadReasonerCombo.setModel(new DefaultComboBoxModel(new Object[] { "Pellet", "JFact", "Elk", "Jcel" }));
+			loadReasonerCombo.setModel(new DefaultComboBoxModel(new Object[] { "Openllet"}));
 			loadReasonerCombo.setDoubleBuffered(false);
 			loadReasonerCombo.setBorder(null);
 			loadReasonerCombo.setEnabled(false);

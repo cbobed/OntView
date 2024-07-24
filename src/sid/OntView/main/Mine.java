@@ -36,7 +36,7 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.reasoner.*;
 
-import com.clarkparsia.pellet.owlapiv3.PelletReasonerFactory;
+import openllet.owlapi.OpenlletReasonerFactory;
 
 //import org.jdesktop.swingx.autocomplete.*;
 
@@ -321,8 +321,8 @@ public class Mine extends JPanel implements Embedable{
     
     private OWLReasonerFactory getReasonerFactory(String r){
     	OWLReasonerFactory reasonerFactory = null;
-    	if (r.equalsIgnoreCase("Pellet")) {
-    		reasonerFactory = new PelletReasonerFactory();
+    	if (r.equalsIgnoreCase("Openllet")) {
+    		reasonerFactory = new OpenlletReasonerFactory();
     	}
 //    	else if (r.equalsIgnoreCase("JFact")) {
 //    		reasonerFactory = new JFactFactory();

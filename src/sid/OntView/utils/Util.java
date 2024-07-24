@@ -61,23 +61,6 @@ public class Util {
 		//File file = File.createTempFile("owlapiexamples", "saving");
 		File file = new File(destFile);
 		manager.saveOntology(onto, IRI.create(file.toURI()));
-		// By default ontologies are saved in the format from which they were
-		// loaded. In this case the ontology was loaded from an rdf/xml file We
-		// can get information about the format of an ontology from its manager
-
-		OWLDocumentFormat format = manager.getOntologyFormat(onto);
-		// We can save the ontology in a different format Lets save the ontology
-		// in owl/xml format
-		OWLXMLDocumentFormat owlxmlFormat = new OWLXMLDocumentFormat();
-		// Some ontology formats support prefix names and prefix IRIs. In our
-		// case we loaded the pizza ontology from an rdf/xml format, which
-		// supports prefixes. When we save the ontology in the new format we
-		// will copy the prefixes over so that we have nicely abbreviated IRIs
-		// in the new ontology document
-		if (format.isPrefixOWLOntologyFormat()) {
-			owlxmlFormat.copyPrefixesFrom(format.asPrefixOWLOntologyFormat());
-		}
-		manager.saveOntology(onto, owlxmlFormat, IRI.create(file.toURI()));
 	}
 	
 	public static void printExplanation(OWLOntology ontology, OWLReasonerFactory factory, 
