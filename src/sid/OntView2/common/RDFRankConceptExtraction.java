@@ -1,6 +1,5 @@
 package sid.OntView2.common;
 
-import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -37,13 +36,9 @@ public class RDFRankConceptExtraction extends AbstractConceptExtractor{
         }
         graph.addDashedConnectors();
     }
-    public Set<String> retrieveKeyConcepts(OWLOntology activeOntology,
-                                                   Map<String, Shape> shapeMap,
-                                                   int limitResultSize,
-                                                   boolean bidirectional) {
-
+    public Set<String> retrieveKeyConcepts(OWLOntology activeOntology, Map<String, Shape> shapeMap,
+                                           int limitResultSize, boolean bidirectional) {
         // Implementation with JGraphT => clearer and cleaner
-
         DefaultDirectedGraph<String, DefaultEdge> pageRankGraph = new DefaultDirectedGraph<String, DefaultEdge>(DefaultEdge.class);
 
         for (Entry<String, Shape> entry : shapeMap.entrySet()){
@@ -66,9 +61,9 @@ public class RDFRankConceptExtraction extends AbstractConceptExtractor{
         if (RDFRankDebug) {
             System.out.println("Vertices: "+pageRankGraph.vertexSet().size());
             System.out.println("Edges: "+pageRankGraph.edgeSet().size());
-            System.out.println(pageRankScorer.DAMPING_FACTOR_DEFAULT);
-            System.out.println(pageRankScorer.MAX_ITERATIONS_DEFAULT);
-            System.out.println(pageRankScorer.TOLERANCE_DEFAULT);
+            System.out.println(PageRank.DAMPING_FACTOR_DEFAULT);
+            System.out.println(PageRank.MAX_ITERATIONS_DEFAULT);
+            System.out.println(PageRank.TOLERANCE_DEFAULT);
         }
 
         Map<String, Double> scoreMap = pageRankScorer.getScores();
@@ -89,16 +84,5 @@ public class RDFRankConceptExtraction extends AbstractConceptExtractor{
             results.add(scoreList.get(i).getKey());
         }
         return results;
-    }
-
-    public static void main(String[] args) {
-
-        try {
-
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-
     }
 }

@@ -10,7 +10,7 @@ import javafx.stage.Stage;
 import sid.OntView2.common.PaintFrame;
 import sid.OntView2.common.VisGraphObserver;
 
-public class ProgressBarDialogThread extends VisGraphObserver{
+public class ProgressBarDialogThread extends VisGraphObserver {
 
 	Stage progressDialog;
 	ProgressBar progressBar;

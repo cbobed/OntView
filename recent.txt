@@ -1,6 +1,6 @@
+file:/home/carlota/Downloads/ontology_subniveles.owl
 https://protege.stanford.edu/ontologies/pizza/pizza.owl
 file:/home/carlota/Downloads/ontology--DEV_type=orig.owl
-file:/home/carlota/Downloads/ontology_subniveles.owl
 http://horus.cps.unizar.es:18080/ontology/support.owl
 https://w3id.org/example
 file:/home/carlota/Downloads/library_ontology.owl

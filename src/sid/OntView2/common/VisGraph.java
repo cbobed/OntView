@@ -103,9 +103,25 @@ public class VisGraph extends Observable implements Runnable{
 		levelSet 			= new HashSet<>();
 		paintframe = pframe;
 		observers  = new LinkedHashSet<>();
-		qualifiedLabelMap = new HashMap<String, String>();
-		
+		qualifiedLabelMap = new HashMap<>();
 	}
+
+	/**
+	 * To avoid possible inheritance problems
+	 */
+	public void clearShapeMap() {
+		shapeMap.clear();
+		definitionsMap.clear();
+		tempMap.clear();
+		propertyMap.clear();
+		dPropertyMap.clear();
+		connectorList.clear();
+		dashedConnectorList.clear();
+		levelSet.clear();
+		observers.clear();
+		qualifiedLabelMap.clear();
+	}
+
     private void addChainProperty(String str, OWLSubPropertyChainOfAxiom axiom){
     	if (chainPropertiesMap== null)
     		chainPropertiesMap = new HashMap<String, OWLSubPropertyChainOfAxiom>();
@@ -155,10 +171,10 @@ public class VisGraph extends Observable implements Runnable{
 	}
 	
 	
-/**
- *  builds the complete graph
- *  relies on wether it's expanded or not, and rearranging visual info 
- */
+	/**
+	 *  builds the complete graph
+	 *  relies on wether it's expanded or not, and rearranging visual info
+	 */
 	public void buildReasonedGraph(OWLOntology activeOntology,OWLReasoner reasoner, HashSet<OWLClassExpression> set,boolean check) throws XPathExpressionException, ParserConfigurationException, SAXException, IOException {
 		
 		//It's important to set config constants before creating 
@@ -1503,10 +1519,10 @@ public class VisGraph extends Observable implements Runnable{
 	
 	
 
-/*-**************************************************************************************
- * Graph Observer methods 
- * 
- ****************************************************************************************/
+	/*-**************************************************************************************
+	 * Graph Observer methods
+	 *
+	 ****************************************************************************************/
 	
 	/**
 	 * Updates progress bar observer
@@ -1534,18 +1550,6 @@ public class VisGraph extends Observable implements Runnable{
     	updateProgressBarObserver(progress);
     }
 
-    /**
-     * Generic observer pattern method.
-     * Gets a list of observers added to the graph
-     * @return
-     */
-    
-	public LinkedHashSet<Observer> getObservers(){
-		if (observers == null) 
-			return new LinkedHashSet<Observer>();
-		else return observers;
-	}
-	
 	public void addObserver(Observer o){ observers.add(o);}
 	
 	/**
@@ -1554,16 +1558,13 @@ public class VisGraph extends Observable implements Runnable{
 	 * @param observerType
 	 */
 
-	public void updateObservers(int observerType){
-		for (Observer ob : observers){
-			if ((observerType == VisConstants.PROGRESSBAROBSERVER) && (ob instanceof ProgressBarDialogThread)){
-			    ob.update(this, null);
-			}
-			else if  ((observerType  == VisConstants.GENERALOBSERVER) && (ob instanceof VisGraphObserver)) {
+	public void updateObservers(int observerType) {
+		for (Observer ob : observers) {
+			if ((observerType == VisConstants.PROGRESSBAROBSERVER) && (ob instanceof ProgressBarDialogThread)) {
+				ob.update(this, null);
+			} else if ((observerType == VisConstants.GENERALOBSERVER) && (ob instanceof VisGraphObserver)) {
 				ob.update(this, null);
 			}
 		}
 	}
-
-
 }

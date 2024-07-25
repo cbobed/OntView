@@ -228,6 +228,10 @@ public class PaintFrame extends Canvas implements Runnable{
 	public  void createReasonedGraph(HashSet<OWLClassExpression> set,boolean check) {
 		latch = new CountDownLatch(1);
 
+		if (visGraph != null) {
+			visGraph.clearShapeMap();
+		}
+
 		rVisGraph = new VisGraph(this);
 
 		visGraph = rVisGraph;
