@@ -9,6 +9,7 @@ import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import org.semanticweb.owlapi.search.EntitySearcher;
 import sid.OntView2.utils.ExpressionManager;
 
 import java.util.ArrayList;
@@ -65,9 +66,10 @@ public class VisDataProperty extends VisProperty {
 
 		textFont = Font.font("Dialog", FontWeight.NORMAL, 10);
 		circleFont  = Font.font("Dialog", FontWeight.BOLD, 10);
-		connectionPoints = new ArrayList<Point2D>();
-		if (dPropExp.isFunctional(ontology)) isFunctional = true;
-	
+		connectionPoints = new ArrayList<>();
+
+		if (EntitySearcher.isFunctional(dPropExp.asOWLDataProperty(), ontology)) isFunctional = true;
+
 	}
 	
 	public void add(VisConnectorPropProp pparent){

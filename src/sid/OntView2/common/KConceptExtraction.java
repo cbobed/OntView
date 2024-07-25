@@ -5,17 +5,31 @@ import it.essepuntato.taxonomy.HTaxonomy;
 import org.semanticweb.owlapi.model.OWLOntology;
 import sid.OntView2.utils.OWLAPITaxonomyMakerExtended;
 
+import java.util.Map;
 import java.util.Set;
 
 public class KConceptExtraction extends AbstractConceptExtractor {
+
+	public void hideNonKeyConcepts(OWLOntology activeOntology, VisGraph graph, int limitResultSize) {
+		// Retrieve Key Concepts
+		Map<String, Shape> shapeMap = graph.getShapeMap();
+		Set<String> conceptSet = retrieveKeyConcepts(activeOntology, limitResultSize);
+
+		for (Map.Entry<String, Shape> entry : shapeMap.entrySet()) {
+			Shape shape = entry.getValue();
+			if (isNonKeyConcept(entry.getKey(), conceptSet, shapeMap)) {
+				shape.hide();
+			}
+		}
+		graph.addDashedConnectors();
+	}
 
 	/**
 	 * Replaced by overloaded version
 	 * Retrieves a set of Key Concepts to be shown by using KCE Api
 	 * @param activeOntology
 	 */
-	@Override
-	public Set<String> retrieveKeyConcepts(OWLOntology activeOntology, int limitResultSize) {
+		public Set<String> retrieveKeyConcepts(OWLOntology activeOntology, int limitResultSize) {
 		boolean considerImportedOntologies = true; /* True if you want t*/
 
 		if (activeOntology != null) {

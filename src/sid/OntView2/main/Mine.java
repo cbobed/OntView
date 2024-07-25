@@ -23,6 +23,7 @@ import javafx.stage.Stage;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 
+import openllet.owlapi.OpenlletReasonerFactory;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClassExpression;
@@ -35,16 +36,12 @@ import org.semanticweb.owlapi.reasoner.OWLReasonerConfiguration;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
 
-import com.clarkparsia.pellet.owlapiv3.PelletReasonerFactory;
-import org.semanticweb.HermiT.Reasoner.ReasonerFactory;
-
 import sid.OntView2.common.Embedable;
 import sid.OntView2.common.PaintFrame;
 import sid.OntView2.common.VisGraph;
 import sid.OntView2.common.VisPositionConfig;
 import sid.OntView2.expressionNaming.SIDClassExpressionNamer;
 import sid.OntView2.utils.ExpressionManager;
-import uk.ac.manchester.cs.jfact.JFactFactory;
 
 
 public class Mine extends Application implements Embedable{
@@ -228,15 +225,12 @@ public class Mine extends Application implements Embedable{
 
 	private OWLReasonerFactory getReasonerFactory(String r){
 		OWLReasonerFactory reasonerFactory = null;
-		if (r.equalsIgnoreCase("Pellet")) {
-			reasonerFactory = new PelletReasonerFactory();
+		if (r.equalsIgnoreCase("Openllet")) {
+			reasonerFactory = new OpenlletReasonerFactory();
 		}
-		else if (r.equalsIgnoreCase("JFact")) {
-			reasonerFactory = new JFactFactory();
-		}
-		else if (r.equalsIgnoreCase("HermiT")) {
-			reasonerFactory = new ReasonerFactory();
-		}
+//		else if (r.equalsIgnoreCase("JFact")) {
+//			reasonerFactory = new JFactFactory();
+//		}
 //    	else if (r.equalsIgnoreCase("Elk")) {
 //    		reasonerFactory = new ElkReasonerFactory();
 //    	}

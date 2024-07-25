@@ -8,6 +8,7 @@ import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import org.semanticweb.owlapi.search.EntitySearcher;
 import sid.OntView2.utils.ExpressionManager;
 
 import javafx.scene.text.Font;
@@ -134,19 +135,19 @@ public class VisObjectProperty extends VisProperty {
 		textFont    = Font.font("Dialog", FontWeight.NORMAL, FontPosture.REGULAR, 11);
 		circleFont  = Font.font("Dialog", FontWeight.BOLD, 10);
 
-		connectionPoints = new ArrayList<Point2D>();
+		connectionPoints = new ArrayList<>();
 		if (getDomain() != range) {
 			rangeConnector = new VisConnectorPropertyRange(ppbox, pbox.vclass , range, this);
-		}	
-		if (oPropExp.isFunctional(ontology)) isFunctional = true;
-		if (oPropExp.isTransitive(ontology)) isTransitive = true;
-		if (oPropExp.isSymmetric(ontology )) isSymmetric  = true;
+		}
+		if (EntitySearcher.isFunctional(oPropExp, ontology)) isFunctional = true;
+		if (EntitySearcher.isTransitive(oPropExp, ontology)) isTransitive = true;
+		if (EntitySearcher.isSymmetric(oPropExp, ontology)) isSymmetric  = true;
 		inverseOf  = getReasoner().getInverseObjectProperties(po);
 		hasInverse = ((inverseOf !=null)&&(inverseOf.getEntities().size())>0);
-		if (oPropExp.isReflexive(ontology)) isReflexive =true;
-		if (oPropExp.isAsymmetric(ontology)) isAsymmetric = true;
-		if (oPropExp.isIrreflexive(ontology)) isIrreflexive = true;
-		if (oPropExp.isInverseFunctional(ontology))	isInverseFunctional = true;
+		if (EntitySearcher.isReflexive(oPropExp, ontology)) isReflexive =true;
+		if (EntitySearcher.isAsymmetric(oPropExp, ontology)) isAsymmetric = true;
+		if (EntitySearcher.isIrreflexive(oPropExp, ontology)) isIrreflexive = true;
+		if (EntitySearcher.isInverseFunctional(oPropExp, ontology))	isInverseFunctional = true;
 		if (pbox.vclass.graph.chainPropertiesMap!=null)
 			propertyChainAxiom = pbox.vclass.graph.chainPropertiesMap.get(getKey (oPropExp));
 	}

@@ -17,7 +17,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 
 import sid.OntView.utils.PageRankScoreComparator;
 
-public abstract class RDFRankConceptExtraction {
+public class RDFRankConceptExtraction {
 		
 	public final static boolean RDFRankDebug = true; 
 	

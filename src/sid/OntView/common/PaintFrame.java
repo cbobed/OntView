@@ -681,31 +681,35 @@ public class PaintFrame extends JPanel implements MouseListener,Runnable,MouseMo
 	 * Action done when changing kce Combo 
 	 */
 	public void doKceOptionAction() {
-		
-		if (getKceOption().equals(VisConstants.KCECOMBOOPTION1)){ //"None"
-			getVisGraph().showAll();
-		} else if (getKceOption().equals(VisConstants.KCECOMBOOPTION2)){ //"KCE10"
-			getVisGraph().showAll();
-			KConceptExtraction.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 10);
-		} else if (getKceOption().equals(VisConstants.KCECOMBOOPTION3)){ //"KCE20"
-			getVisGraph().showAll();
-			KConceptExtraction.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20);
-		} else if (getKceOption().equals(VisConstants.PAGERANKCOMBOOPTION1)) {
-			getVisGraph().showAll();
-			RDFRankConceptExtraction.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 10, false);
-		}
-		else if (getKceOption().equals(VisConstants.PAGERANKCOMBOOPTION2)) {
-			getVisGraph().showAll();
-			RDFRankConceptExtraction.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20, false);
-		}
-		else if (getKceOption().equals(VisConstants.RDFRANKCOMBOOPTION1)) {
-			getVisGraph().showAll();
-			RDFRankConceptExtraction.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 10, true);
-		}
-		else if (getKceOption().equals(VisConstants.RDFRANKCOMBOOPTION2)) {
-			getVisGraph().showAll();
-			RDFRankConceptExtraction.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20, true);
-		}
+
+        switch (getKceOption()) {
+            case VisConstants.KCECOMBOOPTION1 ->  //"None"
+                    getVisGraph().showAll();
+            case VisConstants.KCECOMBOOPTION2 -> {  //"KCE10"
+                getVisGraph().showAll();
+                KConceptExtraction.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 10);
+            }
+            case VisConstants.KCECOMBOOPTION3 -> {  //"KCE20"
+                getVisGraph().showAll();
+                KConceptExtraction.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20);
+            }
+            case VisConstants.PAGERANKCOMBOOPTION1 -> {
+                getVisGraph().showAll();
+                RDFRankConceptExtraction.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 10, false);
+            }
+            case VisConstants.PAGERANKCOMBOOPTION2 -> {
+                getVisGraph().showAll();
+                RDFRankConceptExtraction.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20, false);
+            }
+            case VisConstants.RDFRANKCOMBOOPTION1 -> {
+                getVisGraph().showAll();
+                RDFRankConceptExtraction.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 10, true);
+            }
+            case VisConstants.RDFRANKCOMBOOPTION2 -> {
+                getVisGraph().showAll();
+                RDFRankConceptExtraction.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20, true);
+            }
+        }
 		
 	}
 	

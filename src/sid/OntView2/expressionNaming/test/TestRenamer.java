@@ -1,16 +1,20 @@
 package sid.OntView2.expressionNaming.test;
 
-import com.clarkparsia.pellet.owlapiv3.PelletReasoner;
-import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.io.OWLXMLOntologyFormat;
-import org.semanticweb.owlapi.model.*;
-import org.semanticweb.owlapi.reasoner.BufferingMode;
-import org.semanticweb.owlapi.reasoner.OWLReasoner;
-import sid.OntView2.expressionNaming.Explanation;
-import sid.OntView2.expressionNaming.SIDClassExpressionNamer;
-
 import java.io.File;
 import java.io.IOException;
+
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLOntologyStorageException;
+import org.semanticweb.owlapi.reasoner.OWLReasoner;
+
+import openllet.owlapi.OpenlletReasonerFactory;
+import sid.OntView2.expressionNaming.Explanation;
+import sid.OntView2.expressionNaming.SIDClassExpressionNamer;
 
 
 public class TestRenamer {
@@ -27,10 +31,11 @@ public class TestRenamer {
 		boolean direct = true;
 		
 		OWLOntology onto = load(ontoFile, direct, manager);
-
-		reasoner = new PelletReasoner(onto, BufferingMode.BUFFERING); 
 		
-		SIDClassExpressionNamer renamer = new SIDClassExpressionNamer(onto, reasoner);
+		reasoner = (new OpenlletReasonerFactory()).createReasoner(onto); 
+		
+		
+		SIDClassExpressionNamer renamer = new SIDClassExpressionNamer(onto, reasoner); 
 		
 		long start = System.nanoTime();
 		renamer.applyNaming(true); 
@@ -74,19 +79,19 @@ public class TestRenamer {
 		// loaded. In this case the ontology was loaded from an rdf/xml file We
 		// can get information about the format of an ontology from its manager
 
-		OWLOntologyFormat format = manager.getOntologyFormat(onto);
-		// We can save the ontology in a different format Lets save the ontology
-		// in owl/xml format
-		OWLXMLOntologyFormat owlxmlFormat = new OWLXMLOntologyFormat();
-		// Some ontology formats support prefix names and prefix IRIs. In our
-		// case we loaded the pizza ontology from an rdf/xml format, which
-		// supports prefixes. When we save the ontology in the new format we
-		// will copy the prefixes over so that we have nicely abbreviated IRIs
-		// in the new ontology document
-		if (format.isPrefixOWLOntologyFormat()) {
-			owlxmlFormat.copyPrefixesFrom(format.asPrefixOWLOntologyFormat());
-		}
-		manager.saveOntology(onto, owlxmlFormat, IRI.create(file.toURI()));
+//		OWLDocumentFormat format = manager.getOntologyFormat(onto);
+//		// We can save the ontology in a different format Lets save the ontology
+//		// in owl/xml format
+//		OWLXMLDocumentFormat owlxmlFormat = new OWLXMLDocumentFormat();
+//		// Some ontology formats support prefix names and prefix IRIs. In our
+//		// case we loaded the pizza ontology from an rdf/xml format, which
+//		// supports prefixes. When we save the ontology in the new format we
+//		// will copy the prefixes over so that we have nicely abbreviated IRIs
+//		// in the new ontology document
+//		if (format.isPrefixOWLOntologyFormat()) {
+//			owlxmlFormat.copyPrefixesFrom(format.asPrefixOWLOntologyFormat());
+//		}
+//		manager.saveOntology(onto, owlxmlFormat, IRI.create(file.toURI()));
 	}
 	
 	

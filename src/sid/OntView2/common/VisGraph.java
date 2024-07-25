@@ -7,6 +7,7 @@ import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import org.semanticweb.owlapi.search.EntitySearcher;
 import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 import org.xml.sax.SAXException;
 import sid.OntView2.utils.ExpressionManager;
@@ -28,6 +29,9 @@ import java.util.Set;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
+
+import static sid.OntView2.utils.ExpressionManager.qualifyLabel;
+import static sid.OntView2.utils.ExpressionManager.replaceString;
 
 public class VisGraph extends Observable implements Runnable{
 
@@ -297,36 +301,39 @@ public class VisGraph extends Observable implements Runnable{
 	 */
 	private void linkDefinitionsToDefinedClasses(OWLOntology activeOntology,OWLReasoner reasoner) {
 
-		for ( Entry<String,Shape> entry : shapeMap.entrySet()){
+		for ( Entry<String, Shape> entry : shapeMap.entrySet()){
 			Shape shape = entry.getValue();
 
 			if ((shape instanceof VisClass) && (shape.asVisClass().isDefined)){
 				VisClass defClassShape = entry.getValue().asVisClass();
 				if (defClassShape.getLinkedClassExpression() instanceof OWLClass){
-					for (OWLClassExpression definition : defClassShape.getLinkedClassExpression().asOWLClass().getEquivalentClasses(activeOntology)){
-						if (definition.isAnonymous()) {
-							shape.asVisClass().addDefinition(definition);
-							// <CBL 25/9/13>
-							// We also add the definition to the aliases handling
-							definitionsMap.put(Shape.getKey(definition), shape); // CONCURRENCIA
-							// <CBL 24/9/13> 
-							// the definitions are now displayed along with the name
-							// in the same shape 
-							// we don't need to create this connector any longer 
-//							Shape definitionShape =  shapeMap.get(definition.toString()); 
-//							connect(definitionShape,defClassShape);
-//							((VisClass) definitionShape).addSon((VisClass)defClassShape);
-//							defClassShape.addParent((VisClass)definitionShape);
-//							</CBL>
-						}	
-					}	
+
+					EntitySearcher.getEquivalentClasses(defClassShape.getLinkedClassExpression().asOWLClass(), activeOntology).forEach(
+						definition -> {
+							if (definition.isAnonymous()) {
+								shape.asVisClass().addDefinition(definition);
+								// <CBL 25/9/13>
+								// We also add the definition to the aliases handling
+								definitionsMap.put(Shape.getKey(definition), shape);
+								// <CBL 24/9/13>
+								// the definitions are now displayed along with the name
+								// in the same shape
+								// we don't need to create this connector any longer
+								//									Shape definitionShape =  shapeMap.get(definition.toString());
+								//									connect(definitionShape,defClassShape);
+								//									((VisClass) definitionShape).addSon((VisClass)defClassShape);
+								//									defClassShape.addParent((VisClass)definitionShape);
+								//									</CBL>
+							}
+						}
+					);
 				}
 				// <CBL 25/9/13> 
 				// if we have added definitions
 				// we have to update the width of the shape
-				shape.asVisClass().setWidth(shape.asVisClass().calculateWidth()); 
-				shape.asVisClass().setHeight(shape.asVisClass().calculateHeight()); 
-				
+				shape.asVisClass().setWidth(shape.asVisClass().calculateWidth());
+				shape.asVisClass().setHeight(shape.asVisClass().calculateHeight());
+
 			}
 		}
 	}
@@ -438,31 +445,31 @@ public class VisGraph extends Observable implements Runnable{
 			}
 		}
 	}
-	
+
 	private void placeDataProperties(OWLOntology activeOntology,OWLReasoner reasoner, HashSet<OWLClassExpression> set) {
-		VisClass c;	
-		
+		VisClass c;
+
 		//getting datatype properties,their domains and ranges
 		Set<OWLDataProperty> dataPropertySet = activeOntology.getDataPropertiesInSignature();
 		String dRange ="unknown";
 		for (OWLDataProperty dataProperty : dataPropertySet){
-			
-			for (OWLDataRange z : dataProperty.getRanges(activeOntology)) //one range
+
+			for (OWLDataRange z : EntitySearcher.getRanges(dataProperty, activeOntology).toList()) //one range
 			{
 				dRange = removePrefix(z.toString(),":");
 			}
-			
+
 			NodeSet<OWLClass> propertyDomainNodeSet = reasoner.getDataPropertyDomains(dataProperty, true);
-			
+
 			if (propertyDomainNodeSet.getNodes().size()>1){
 				// VisObjectProperty.addDomain(this,propertyDomainNodeSet,property,reasoner,activeOntology,range);
-				VisDataProperty.addDomain(this, propertyDomainNodeSet, dataProperty, reasoner, activeOntology, dRange); 
+				VisDataProperty.addDomain(this, propertyDomainNodeSet, dataProperty, reasoner, activeOntology, dRange);
 			}
 			else {
 				for (Node<OWLClass> o : propertyDomainNodeSet ){
 					for (OWLClass oclass : o.getEntities()){
 					    c =	(VisClass) getShapeFromOWLClassExpression(oclass);
-						if (c.getPropertyBox() == null) 
+						if (c.getPropertyBox() == null)
 							c.createPropertyBox();
 	//					CBL::Changing the keys
 	//					if (dPropertyMap.get(ExpressionManager.reduceDataPropertyName(dataProperty))!=null)
@@ -478,18 +485,18 @@ public class VisGraph extends Observable implements Runnable{
 					}
 				}
 			}
-			
-			// <CBL 25/9/13> 
+
+			// <CBL 25/9/13>
 			// we currently do not handle dataProperties hierarchies
 			// TO_DO: update sortProperties and buildConnections to handle the dataproperties as well
 			//
 			//	VisPropertyBox.sortProperties(this);
 			//	VisPropertyBox.buildConnections(this);
-			
-		}		
+
+		}
 	}
-	
-	
+
+
 	/**
 	 * Traversal of the reasoned graph 
 	*/
@@ -591,8 +598,8 @@ public class VisGraph extends Observable implements Runnable{
 			 else{
 				 o.setVisLevel(newl);
 			 }
-			 
-		     for (OWLClassExpression exp : e.getEquivalentClasses(activeOntology)){
+
+			for (OWLClassExpression exp : EntitySearcher.getEquivalentClasses(e, activeOntology).toList()){
 		    	 if (!(exp instanceof OWLClass) && (shapeMap.get(exp.toString())==null)){
 		    		addVisClass(exp.toString(), maxLevel+1, exp, activeOntology,reasoner); 
 		    	 }
@@ -740,21 +747,20 @@ public class VisGraph extends Observable implements Runnable{
 	       //actual add of the visclass to both the graph and the level
 	       VisClass vis = new VisClass(depthlevel,e,label,this);
 	       if (e instanceof OWLClass){
-	    	   for (OWLAnnotation  an : e.asOWLClass().getAnnotations(activeOntology)){
-	    		   if (an.getProperty().toString().equals("rdfs:label")){
-	    			   vis.explicitLabel = an.getValue().toString();
-	    			   vis.explicitLabel.replaceAll("\"", "");
-	    			   vis.explicitLabel = ExpressionManager.replaceString(vis.explicitLabel); 
-	    			   auxQLabel = ExpressionManager.qualifyLabel (activeOntology.getOntologyID().getOntologyIRI(),
-  								e.asOWLClass(), vis.explicitLabel); 
-	    			   if (auxQLabel != null && !"null".equalsIgnoreCase(auxQLabel)) {
-	    				   vis.explicitQualifiedLabel = auxQLabel; 
-	    			   }   
-	    			   else { 
-	    				   vis.explicitQualifiedLabel = vis.explicitLabel; 
-	    			   }   
-	    		   }
-	       		}
+			   for (OWLAnnotation  an : EntitySearcher.getAnnotations(e.asOWLClass(), activeOntology).toList() ){
+				   if (an.getProperty().toString().equals("rdfs:label")){
+					   vis.explicitLabel = an.getValue().toString();
+					   vis.explicitLabel.replaceAll("\"", "");
+					   vis.explicitLabel = replaceString(vis.explicitLabel);
+					   auxQLabel = qualifyLabel(e.asOWLClass(), vis.explicitLabel);
+					   if (auxQLabel != null && !"null".equalsIgnoreCase(auxQLabel)) {
+						   vis.explicitQualifiedLabel = auxQLabel;
+					   }
+					   else {
+						   vis.explicitQualifiedLabel = vis.explicitLabel;
+					   }
+				   }
+			   }
 	       }
 	       
 	       // CBL: label is the IRI of the element, not to  
@@ -771,9 +777,11 @@ public class VisGraph extends Observable implements Runnable{
 		   vlevel.addShape(vis);
 		   vis.setVisLevel(vlevel);
 		   if (e.isAnonymous()) {
-	           vis.isAnonymous = true;}
-	       if ((e instanceof OWLClass) && (e.asOWLClass().isDefined(activeOntology))) {
-	           vis.isDefined = true;}   
+	           vis.isAnonymous = true;
+		   }
+		   if ((e instanceof OWLClass) && (EntitySearcher.isDefined(e.asOWLClass(), activeOntology) )) {
+	           vis.isDefined = true;
+		   }
 	       if (reasoner != null){
 	    	   Node<OWLClass> equivClasses = reasoner.getEquivalentClasses(e);
 	    	   for (OWLClass entity : equivClasses.getEntities())

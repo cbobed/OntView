@@ -323,7 +323,11 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			ObservableList<String> items = FXCollections.observableArrayList(
 					VisConstants.KCECOMBOOPTION1,
 					VisConstants.KCECOMBOOPTION2,
-					VisConstants.KCECOMBOOPTION3);
+					VisConstants.KCECOMBOOPTION3,
+					VisConstants.PAGERANKCOMBOOPTION1,
+					VisConstants.PAGERANKCOMBOOPTION2,
+					VisConstants.RDFRANKCOMBOOPTION1,
+					VisConstants.RDFRANKCOMBOOPTION2);
 			kceComboBox.setItems(items);
 
 			HBox.setHgrow(kceComboBox, Priority.ALWAYS);
@@ -541,7 +545,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			loadReasonerCombo = new ComboBox<>();
 			loadReasonerCombo.setEditable(true);
 			loadReasonerCombo.setPromptText("Select reasoner");
-			ObservableList <String> items = FXCollections.observableArrayList("HermiT", "Pellet", "JFact");
+			ObservableList <String> items = FXCollections.observableArrayList("Openllet");
 			loadReasonerCombo.setItems(items);
 
 			if (!items.isEmpty()) {

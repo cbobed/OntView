@@ -800,24 +800,45 @@ public class PaintFrame extends Canvas implements Runnable{
 	 * Action done when changing kce Combo 
 	 */
 	public void doKceOptionAction() {
-		AbstractConceptExtractor extractor = null;
+		KConceptExtraction extractorKCE = new KConceptExtraction();
+		RDFRankConceptExtraction extractorRDFRank = new RDFRankConceptExtraction();
 
-		if (getKceOption().equals(VisConstants.KCECOMBOOPTION1)){ //"None"
-			getVisGraph().showAll();
-			draw();
-		}
-		if (getKceOption().equals(VisConstants.KCECOMBOOPTION2)){ //"KCE10"
-			getVisGraph().showAll();
-			extractor = new KConceptExtraction();
-			extractor.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 10);
-			draw();
-		}
-		if (getKceOption().equals(VisConstants.KCECOMBOOPTION3)){ //"KCE20"
-			getVisGraph().showAll();
-			extractor = new KConceptExtraction();
-			extractor.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20);
-			draw();
-		}
+        switch (getKceOption()) {
+            case VisConstants.KCECOMBOOPTION1 -> {  //"None"
+                getVisGraph().showAll();
+                draw();
+            }
+            case VisConstants.KCECOMBOOPTION2 -> {  //"KCE10"
+                getVisGraph().showAll();
+				extractorKCE.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 10);
+                draw();
+            }
+            case VisConstants.KCECOMBOOPTION3 -> {  //"KCE20"
+                getVisGraph().showAll();
+				extractorKCE.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20);
+                draw();
+            }
+            case sid.OntView.common.VisConstants.PAGERANKCOMBOOPTION1 -> {
+                getVisGraph().showAll();
+				extractorRDFRank.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 10, false);
+				draw();
+            }
+            case sid.OntView.common.VisConstants.PAGERANKCOMBOOPTION2 -> {
+                getVisGraph().showAll();
+				extractorRDFRank.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20, false);
+				draw();
+            }
+            case sid.OntView.common.VisConstants.RDFRANKCOMBOOPTION1 -> {
+                getVisGraph().showAll();
+				extractorRDFRank.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 10, true);
+				draw();
+            }
+            case sid.OntView.common.VisConstants.RDFRANKCOMBOOPTION2 -> {
+                getVisGraph().showAll();
+				extractorRDFRank.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20, true);
+				draw();
+            }
+        }
 	}
 
 

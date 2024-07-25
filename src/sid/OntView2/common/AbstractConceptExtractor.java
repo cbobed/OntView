@@ -6,22 +6,6 @@ import java.util.Set;
 
 public abstract class AbstractConceptExtractor {
 
-    public abstract Set<String> retrieveKeyConcepts(OWLOntology activeOntology, int limitResultSize);
-
-    public void hideNonKeyConcepts(OWLOntology activeOntology, VisGraph graph, int limitResultSize) {
-        // Retrieve Key Concepts
-        Map<String, Shape> shapeMap = graph.getShapeMap();
-        Set<String> conceptSet = retrieveKeyConcepts(activeOntology, limitResultSize);
-
-        for (Map.Entry<String, Shape> entry : shapeMap.entrySet()) {
-            Shape shape = entry.getValue();
-            if (isNonKeyConcept(entry.getKey(), conceptSet, shapeMap)) {
-                shape.hide();
-            }
-        }
-        graph.addDashedConnectors();
-    }
-
     /**
      * Expanded condition. "concept" is a key concept if it's contained in keyConcepts,
      * or it's a definition of its contents.
