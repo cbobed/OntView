@@ -2,7 +2,7 @@ package sid.OntView.expressionNaming;
 
 import org.semanticweb.owlapi.model.OWLClassExpression;
 
-import uk.ac.manchester.cs.owlapi.dlsyntax.DLSyntaxObjectRenderer;
+import org.semanticweb.owlapi.dlsyntax.renderer.DLSyntaxObjectRenderer;
 
 
 

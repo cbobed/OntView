@@ -17,9 +17,10 @@ import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.parameters.Imports;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
-import uk.ac.manchester.cs.owlapi.dlsyntax.DLSyntaxObjectRenderer;
+import org.semanticweb.owlapi.dlsyntax.renderer.DLSyntaxObjectRenderer;
 
 public class SIDClassExpressionNamer {
 	
@@ -55,7 +56,7 @@ public class SIDClassExpressionNamer {
 		
 		// we apply the reduction in this module to all the 
 		// import closure
-		for (OWLAxiom axiom: ontology.getTBoxAxioms(true)) {
+		for (OWLAxiom axiom: ontology.getTBoxAxioms(Imports.INCLUDED)) {
 			 axiom.accept(axiomVisitor); 
 		}
 		classesToAdd = axiomVisitor.getHarvestedClasses(); 
@@ -105,7 +106,7 @@ public class SIDClassExpressionNamer {
 		OWLClass auxiliarClass = null; 
 		
 		axiomsToAdd.clear();  
-		String baseIRI = ontology.getOntologyID().getOntologyIRI().toString(); 
+		String baseIRI = ontology.getOntologyID().getOntologyIRI().get().toString(); 
 		
 		if (baseIRI.endsWith(".owl")) {
 			baseIRI += "#"; 

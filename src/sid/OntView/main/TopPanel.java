@@ -293,7 +293,10 @@ public class TopPanel extends JPanel implements ControlPanelInterface {
 		getKceComboBox().addItem(VisConstants.KCECOMBOOPTION1);
 		getKceComboBox().addItem(VisConstants.KCECOMBOOPTION2);
 		getKceComboBox().addItem(VisConstants.KCECOMBOOPTION3);
-
+		getKceComboBox().addItem(VisConstants.PAGERANKCOMBOOPTION1);
+		getKceComboBox().addItem(VisConstants.PAGERANKCOMBOOPTION2);
+		getKceComboBox().addItem(VisConstants.RDFRANKCOMBOOPTION1);
+		getKceComboBox().addItem(VisConstants.RDFRANKCOMBOOPTION2);
 	}
 	
 	protected void kceItemItemStateChanged(ItemEvent event) {
@@ -475,7 +478,7 @@ public class TopPanel extends JPanel implements ControlPanelInterface {
 		if (loadReasonerCombo == null) {
 			loadReasonerCombo = new JComboBox();
 			loadReasonerCombo.setFont(new Font("Dialog", Font.PLAIN, 10));
-			loadReasonerCombo.setModel(new DefaultComboBoxModel(new Object[] { "Pellet", "JFact", "Elk", "Jcel" }));
+			loadReasonerCombo.setModel(new DefaultComboBoxModel(new Object[] { "Openllet"}));
 			loadReasonerCombo.setDoubleBuffered(false);
 			loadReasonerCombo.setBorder(null);
 			loadReasonerCombo.setEnabled(false);

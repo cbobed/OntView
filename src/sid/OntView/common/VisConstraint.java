@@ -10,7 +10,6 @@ import java.io.UTFDataFormatException;
 import java.lang.Character.UnicodeBlock;
 import java.util.ArrayList;
 
-import org.coode.owlapi.rdfxml.parser.ObjectOneOfTranslator;
 import org.semanticweb.owlapi.model.ClassExpressionType;
 import org.semanticweb.owlapi.model.DataRangeType;
 import org.semanticweb.owlapi.model.OWLClass;

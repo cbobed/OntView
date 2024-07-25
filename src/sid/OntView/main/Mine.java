@@ -36,7 +36,7 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.reasoner.*;
 
-import com.clarkparsia.pellet.owlapiv3.PelletReasonerFactory;
+import openllet.owlapi.OpenlletReasonerFactory;
 
 //import org.jdesktop.swingx.autocomplete.*;
 
@@ -46,7 +46,6 @@ import sid.OntView.common.VisGraph;
 import sid.OntView.common.VisPositionConfig;
 import sid.OntView.expressionNaming.SIDClassExpressionNamer;
 import sid.OntView.utils.ExpressionManager;
-import uk.ac.manchester.cs.jfact.JFactFactory;
 
 import java.security.*;
 
@@ -322,12 +321,12 @@ public class Mine extends JPanel implements Embedable{
     
     private OWLReasonerFactory getReasonerFactory(String r){
     	OWLReasonerFactory reasonerFactory = null;
-    	if (r.equalsIgnoreCase("Pellet")) {
-    		reasonerFactory = new PelletReasonerFactory();
+    	if (r.equalsIgnoreCase("Openllet")) {
+    		reasonerFactory = new OpenlletReasonerFactory();
     	}
-    	else if (r.equalsIgnoreCase("JFact")) {
-    		reasonerFactory = new JFactFactory();
-    	}
+//    	else if (r.equalsIgnoreCase("JFact")) {
+//    		reasonerFactory = new JFactFactory();
+//    	}
 //    	else if (r.equalsIgnoreCase("Elk")) {
 //    		reasonerFactory = new ElkReasonerFactory(); 
 //    	}

@@ -2,7 +2,11 @@ package sid.OntView.utils;
 
 import java.util.Set;
 
-import org.coode.xml.OWLOntologyXMLNamespaceManager;
+import org.semanticweb.owlapi.rdf.rdfxml.renderer.OWLOntologyXMLNamespaceManager;
+import org.semanticweb.owlapi.util.OWLDocumentFormatFactoryImpl;
+
+import org.semanticweb.owlapi.formats.OWLXMLDocumentFormat;
+import org.semanticweb.owlapi.formats.OWLXMLDocumentFormatFactory;
 import org.semanticweb.owlapi.model.ClassExpressionType;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
@@ -22,6 +26,7 @@ import org.semanticweb.owlapi.model.OWLDataSomeValuesFrom;
 import org.semanticweb.owlapi.model.OWLDataUnionOf;
 import org.semanticweb.owlapi.model.OWLDatatype;
 import org.semanticweb.owlapi.model.OWLDatatypeRestriction;
+import org.semanticweb.owlapi.model.OWLDocumentFormat;
 import org.semanticweb.owlapi.model.OWLFacetRestriction;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLLiteral;
@@ -49,7 +54,7 @@ public class ExpressionManager {
 	public static String currentOntologyIRI = null; 
 	
 	public static void setNamespaceManager (OWLOntologyManager om, OWLOntology o) {
-		manager = new OWLOntologyXMLNamespaceManager(om, o); 
+		manager = new OWLOntologyXMLNamespaceManager(o, om.getOntologyFormat(o)); 
 		currentOntologyIRI = o.getOntologyID().getOntologyIRI().toString(); 
 	}
 	
@@ -619,7 +624,7 @@ public class ExpressionManager {
 	}
 
 
-	public static String qualifyLabel(IRI ontologyIRI, OWLClass c, String label) {
+	public static String qualifyLabel(OWLClass c, String label) {
 	
 		String result = label; 
 		

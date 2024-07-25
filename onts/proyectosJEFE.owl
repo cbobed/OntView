@@ -1,0 +1,261 @@
+<?xml version="1.0"?>
+
+
+<!DOCTYPE rdf:RDF [
+    <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY owl2xml "http://www.w3.org/2006/12/owl2-xml#" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+    <!ENTITY proyectos "http://sid.cps.unizar.es/ontology/proyectos.owl#" >
+]>
+
+
+<rdf:RDF xmlns="http://sid.cps.unizar.es/ontology/proyectos.owl#"
+     xml:base="http://sid.cps.unizar.es/ontology/proyectos.owl"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:proyectos="http://sid.cps.unizar.es/ontology/proyectos.owl#"
+     xmlns:owl2xml="http://www.w3.org/2006/12/owl2-xml#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+    <owl:Ontology rdf:about=""/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://sid.cps.unizar.es/ontology/proyectos.owl#jefe -->
+
+    <owl:ObjectProperty rdf:about="#jefe">
+        <rdfs:range rdf:resource="#jefes"/>
+        <rdfs:domain rdf:resource="#superpro"/>
+        <rdfs:subPropertyOf rdf:resource="#miembros"/>
+    </owl:ObjectProperty>
+    
+    <owl:ObjectProperty rdf:about="#currante">
+        <rdfs:subPropertyOf rdf:resource="#miembros"/>
+		</owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#tocapelotas">
+        <rdfs:subPropertyOf rdf:resource="#miembros"/>
+		</owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#supercurrante">
+		<rdfs:domain rdf:resource="#superpro"/>
+        <rdfs:subPropertyOf rdf:resource="#currante"/>
+		</owl:ObjectProperty>
+    <!-- http://sid.cps.unizar.es/ontology/proyectos.owl#miembros -->
+
+    <owl:ObjectProperty rdf:about="#miembros">
+        <rdfs:range rdf:resource="#personas"/>
+        <rdfs:domain rdf:resource="#proyectos"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Data properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://sid.cps.unizar.es/ontology/proyectos.owl#nombre -->
+
+    <owl:DatatypeProperty rdf:about="#nombre">
+        <rdfs:domain rdf:resource="#personas"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://sid.cps.unizar.es/ontology/proyectos.owl#ocupacion -->
+
+    <owl:DatatypeProperty rdf:about="#ocupacion">
+        <rdfs:domain rdf:resource="#personas"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://sid.cps.unizar.es/ontology/proyectos.owl#titulo -->
+
+    <owl:DatatypeProperty rdf:about="#titulo">
+        <rdfs:domain rdf:resource="#proyectos"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://sid.cps.unizar.es/ontology/proyectos.owl#jefes -->
+
+    <owl:Class rdf:about="#jefes">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#personas"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="#ocupacion"/>
+                        <owl:hasValue>jefe</owl:hasValue>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- http://sid.cps.unizar.es/ontology/proyectos.owl#personas -->
+
+    <owl:Class rdf:about="#personas"/>
+    
+
+
+    <!-- http://sid.cps.unizar.es/ontology/proyectos.owl#proyectos -->
+
+    <owl:Class rdf:about="#proyectos"/>
+    
+
+
+    <!-- http://sid.cps.unizar.es/ontology/proyectos.owl#superpro -->
+
+    <owl:Class rdf:about="#superpro">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#proyectos"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="#miembros"/>
+                        <owl:onClass rdf:resource="#personas"/>
+                        <owl:minQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">3</owl:minQualifiedCardinality>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://sid.cps.unizar.es/ontology/proyectos.owl#aims -->
+
+    <owl:Thing rdf:about="#aims">
+        <rdf:type rdf:resource="#proyectos"/>
+        <titulo rdf:datatype="&xsd;string">aims</titulo>
+        <miembros rdf:resource="#edu"/>
+        <miembros rdf:resource="#josemi"/>
+        <miembros rdf:resource="#josito"/>
+    </owl:Thing>
+    
+
+
+    <!-- http://sid.cps.unizar.es/ontology/proyectos.owl#edu -->
+
+    <owl:Thing rdf:about="#edu">
+        <rdf:type rdf:resource="#personas"/>
+        <nombre rdf:datatype="&xsd;string">edu</nombre>
+        <ocupacion rdf:datatype="&xsd;string">jefe</ocupacion>
+    </owl:Thing>
+    
+
+
+    <!-- http://sid.cps.unizar.es/ontology/proyectos.owl#jonni -->
+
+    <owl:Thing rdf:about="#jonni">
+        <rdf:type rdf:resource="#personas"/>
+        <ocupacion rdf:datatype="&xsd;string">currito</ocupacion>
+        <nombre rdf:datatype="&xsd;string">jonni</nombre>
+    </owl:Thing>
+    
+
+
+    <!-- http://sid.cps.unizar.es/ontology/proyectos.owl#josemi -->
+
+    <personas rdf:about="#josemi">
+        <rdf:type rdf:resource="&owl;Thing"/>
+        <nombre rdf:datatype="&xsd;string">josemi</nombre>
+        <ocupacion rdf:datatype="&xsd;string">tirano</ocupacion>
+    </personas>
+    
+
+
+    <!-- http://sid.cps.unizar.es/ontology/proyectos.owl#josito -->
+
+    <owl:Thing rdf:about="#josito">
+        <rdf:type rdf:resource="#personas"/>
+        <ocupacion rdf:datatype="&xsd;string">currito</ocupacion>
+        <nombre rdf:datatype="&xsd;string">josito</nombre>
+    </owl:Thing>
+    
+
+
+    <!-- http://sid.cps.unizar.es/ontology/proyectos.owl#nestor -->
+
+    <owl:Thing rdf:about="#nestor">
+        <rdf:type rdf:resource="#personas"/>
+        <ocupacion rdf:datatype="&xsd;string">especialista</ocupacion>
+        <nombre rdf:datatype="&xsd;string">nestor</nombre>
+    </owl:Thing>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // General axioms
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;AllDifferent"/>
+        <owl:distinctMembers rdf:parseType="Collection">
+            <rdf:Description rdf:about="#josemi"/>
+            <rdf:Description rdf:about="#josito"/>
+            <rdf:Description rdf:about="#jonni"/>
+            <rdf:Description rdf:about="#nestor"/>
+            <rdf:Description rdf:about="#aims"/>
+            <rdf:Description rdf:about="#edu"/>
+        </owl:distinctMembers>
+    </rdf:Description>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 2.2.1.1138) http://owlapi.sourceforge.net -->
+
