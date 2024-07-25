@@ -8,7 +8,6 @@ public abstract class AbstractConceptExtractor {
 
     public abstract Set<String> retrieveKeyConcepts(OWLOntology activeOntology, int limitResultSize);
 
-
     public void hideNonKeyConcepts(OWLOntology activeOntology, VisGraph graph, int limitResultSize) {
         // Retrieve Key Concepts
         Map<String, Shape> shapeMap = graph.getShapeMap();

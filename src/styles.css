@@ -88,4 +88,44 @@
     -fx-text-fill: black;
 }
 
+.dialog-pane {
+    -fx-background-color: #f0f0f0;
+    -fx-border-color: rgb(128, 128, 128);
+    -fx-border-width: 1px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
 
+/* Styling for the header text */
+.dialog-pane .header-panel .label {
+    -fx-text-fill: blue;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+/* Styling for the content text */
+.dialog-pane .content-panel .label {
+    -fx-text-fill: black;
+    -fx-font-size: 14px;
+}
+
+/* Styling for the buttons */
+.dialog-pane .button-bar .button {
+    -fx-text-fill: blue;
+    -fx-background-color: linear-gradient(to bottom, #f0f8ff, #d3e3f1);
+    -fx-border-color: #8186d0;
+    -fx-border-width: 1px;
+    -fx-background-radius: 3px;
+    -fx-border-radius: 3px;
+    -fx-padding: 5 10 5 10;
+    -fx-font-size: 12px;
+    -fx-cursor: hand;
+}
+
+.dialog-pane .button-bar .button:hover {
+    -fx-background-color: linear-gradient(to bottom, #d3e3f1, #b0c4de);
+}
+
+.dialog-pane .button-bar .button:pressed {
+    -fx-background-color: linear-gradient(to bottom, #b0c4de, #a2b9cc);
+}

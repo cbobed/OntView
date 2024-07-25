@@ -6,7 +6,6 @@ import java.util.*;
 import javax.imageio.ImageIO;
 
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.geometry.Rectangle2D;
@@ -159,6 +158,7 @@ public class Mine extends Application implements Embedable{
 		} catch (OWLOntologyCreationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			showErrorDialog("Error", "Failed to load ontology.", e.getMessage());
 			artPanel.setCursor(Cursor.DEFAULT);
 			activeOntology = null;
 			manager = null;
@@ -204,13 +204,20 @@ public class Mine extends Application implements Embedable{
 			// the configuration, and different reasoners may accept their own defined parameters this way.
 			OWLReasonerConfiguration config = new SimpleConfiguration(progressMonitor);
 
-			// Create a reasoner that will reason over our ontology and its imports closure.  Pass in the configuration.
-			reasoner = getReasonerFactory(reasonerString).createReasoner(activeOntology,config);
+			try {
+				// Create a reasoner that will reason over our ontology and its imports closure.  Pass in the configuration.
+				reasoner = getReasonerFactory(reasonerString).createReasoner(activeOntology, config);
 
-			// between creating and precomputing
-			applyRenaming();
-			reasoner.precomputeInferences();
-			artPanel.setReasoner(reasoner);
+				// between creating and precomputing
+				applyRenaming();
+				reasoner.precomputeInferences();
+				artPanel.setReasoner(reasoner);
+			} catch (Exception e) {
+				e.printStackTrace();
+				showErrorDialog("Error", "Failed to load reasoner.", e.getMessage());
+			}
+		} else {
+			showErrorDialog("Error", "No active ontology.", "Please load an ontology before loading a reasoner.");
 		}
 	}
 
@@ -379,6 +386,15 @@ public class Mine extends Application implements Embedable{
 		// TODO Auto-generated method stub
 		nTopPanel.loadSearchCombo();
 	}
+
+	private void showErrorDialog(String title, String header, String content) {
+		Alert alert = new Alert(Alert.AlertType.ERROR);
+		alert.setTitle(title);
+		alert.setHeaderText(header);
+		alert.setContentText(content);
+		alert.showAndWait();
+	}
+
 
 }
  

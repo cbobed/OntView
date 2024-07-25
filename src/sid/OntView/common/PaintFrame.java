@@ -456,7 +456,7 @@ public class PaintFrame extends JPanel implements MouseListener,Runnable,MouseMo
 	  while (relaxer == me) {
 	    relax();
 	    try {
-	      Thread.sleep(stable ? 500 : 300);
+	      Thread.sleep(stable ? 10000 : 300);
 	      while (pressedShape!=null){
 	    	  Thread.sleep(400);
 	      }
@@ -515,7 +515,7 @@ public class PaintFrame extends JPanel implements MouseListener,Runnable,MouseMo
 				    	 		  //si estaba cerrado el nodo [+] abrirlo
 				  	              shape.open();
 				  	              refreshDashedConnectors();
-									repaint();
+				  	              repaint();
 				  	          }
 				        }
 				    	//Click on the close symbol
@@ -524,7 +524,6 @@ public class PaintFrame extends JPanel implements MouseListener,Runnable,MouseMo
 				    			  //if [-] clicked, close the node
 				  	              shape.close();     
 				  	              refreshDashedConnectors();
-									repaint();
 				  	          }
 				  	     }
 				    	else { // pressed elsewhere on the shape

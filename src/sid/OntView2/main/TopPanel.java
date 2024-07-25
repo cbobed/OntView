@@ -23,6 +23,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
+import org.semanticweb.owlapi.io.OWLOntologyCreationIOException;
 import org.semanticweb.owlapi.model.IRI;
 import sid.OntView2.common.*;
 
@@ -604,6 +605,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		}
 	}
 
+
 	private void saveImageButtonActionActionPerformed(ActionEvent event) {
 		parent.createImage(parent.artPanel);
 	}
@@ -760,7 +762,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 	private void zoomSliderChangeStateChanged(Number newValue) {
 		if (parent.artPanel != null) {
-			double factor = (0.5+(double)newValue/10.0);
+			double factor = (0.5 + (double) newValue / 10.0);
 			factor = Math.round(factor * 100.0) / 100.0;
 			if (size == null) {
 				size = new Dimension2D(parent.artPanel.getWidth(), parent.artPanel.getHeight());

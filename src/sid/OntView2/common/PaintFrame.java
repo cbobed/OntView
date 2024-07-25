@@ -1,13 +1,8 @@
 package sid.OntView2.common;
 
-import java.io.IOException;
 import java.util.*;
-import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.CountDownLatch;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathExpressionException;
 
 import javafx.animation.PauseTransition;
 import javafx.beans.property.BooleanProperty;
@@ -29,7 +24,6 @@ import javafx.util.Duration;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
-import org.xml.sax.SAXException;
 
 import reducer.StructuralReducer;
 import sid.OntView2.utils.ProgressBarDialogThread;
@@ -93,7 +87,6 @@ public class PaintFrame extends Canvas implements Runnable{
 			prevSize = new Dimension2D(getWidth(), getHeight());
 			VisConfig.getInstance().setConstants();
 			//visGraph = new VisGraph(this);
-			latch = new CountDownLatch(1);
 			addEventHandlers();
 
 		}
@@ -157,6 +150,7 @@ public class PaintFrame extends Canvas implements Runnable{
 			}
 		}
 	}
+
 
 	public void draw() {
 		if (this.getScene() != null && !this.isDisabled() && this.isVisible() && this.getGraphicsContext2D() != null) {
@@ -232,6 +226,8 @@ public class PaintFrame extends Canvas implements Runnable{
 
 
 	public  void createReasonedGraph(HashSet<OWLClassExpression> set,boolean check) {
+		latch = new CountDownLatch(1);
+
 		rVisGraph = new VisGraph(this);
 
 		visGraph = rVisGraph;
@@ -432,7 +428,7 @@ public class PaintFrame extends Canvas implements Runnable{
 			direction = ((draggedY > 0) ?  DOWN : UP);
 			pressedShape.setPosY(pressedShape.getPosY()+ draggedY);
 			stateChanged.set(true);
-			shapeRepulsion (pressedShape,direction);
+			shapeRepulsion(pressedShape,direction);
 			mouseLastX = (int)p.getX();
 			mouseLastY = (int)p.getY();
 			draw();
@@ -597,7 +593,6 @@ public class PaintFrame extends Canvas implements Runnable{
 		draw();
 	}
 
-
 	private boolean clickedOnShape(int x, int y,MouseEvent e){
 		if (visGraph == null) {
 			return false;
@@ -621,7 +616,7 @@ public class PaintFrame extends Canvas implements Runnable{
 			else {
 				switch (e.getButton()) {
 
-					//if right click on the figure
+					//if right-click on the figure
 					case SECONDARY :
 						if (menuVisShapeContext != null){ closeContextMenu(menuVisShapeContext); }
 						if (menuVisGeneralContext != null){ closeContextMenu(menuVisGeneralContext); }
