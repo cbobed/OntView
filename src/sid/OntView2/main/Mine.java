@@ -36,10 +36,7 @@ import org.semanticweb.owlapi.reasoner.OWLReasonerConfiguration;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
 
-import sid.OntView2.common.Embedable;
-import sid.OntView2.common.PaintFrame;
-import sid.OntView2.common.VisGraph;
-import sid.OntView2.common.VisPositionConfig;
+import sid.OntView2.common.*;
 import sid.OntView2.expressionNaming.SIDClassExpressionNamer;
 import sid.OntView2.utils.ExpressionManager;
 
@@ -273,6 +270,7 @@ public class Mine extends Application implements Embedable{
 				}
 				VisPositionConfig.restoreState(path, artPanel.getVisGraph());
 			}
+			VisLevel.adjustWidthAndPos(artPanel.getVisGraph().getLevelSet());
 		}
 	}
 
