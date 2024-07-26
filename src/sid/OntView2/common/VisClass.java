@@ -848,8 +848,8 @@ public class VisClass extends Shape {
 
 	public boolean onCloseBox(int x,int y){
 		int px,py;
-		px = getPosX()-getWidth()/2;
-		py = getPosY()+getHeight()/2;
+		px = getPosX() - getWidth()/2;
+		py = getPosY() + getHeight()/2;
 		return ((x>= px)&&(x<=px+getWidth()) &&(y>=py) &&(y<=py+6));
 	}
 	

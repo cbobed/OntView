@@ -12,7 +12,7 @@ public abstract class KConceptExtractor {
      * @param activeOntology
      * @param shapeMap
      * @param limitResultSize
-     * @return
+     * @return Set<String>
      */
     public abstract Set<String> retrieveKeyConcepts(OWLOntology activeOntology, Map<String, Shape> shapeMap,
                                            int limitResultSize);

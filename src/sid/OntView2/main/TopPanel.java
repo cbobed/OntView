@@ -171,6 +171,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		if (parent.artPanel != null) {
 			parent.artPanel.qualifiedNames = !parent.artPanel.qualifiedNames;
 			parent.artPanel.getVisGraph().changeRenderMethod(parent.artPanel.renderLabel, parent.artPanel.qualifiedNames);
+			parent.artPanel.draw();
 		}
 	}
 
@@ -187,6 +188,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		if (parent.artPanel != null) {
 			parent.artPanel.renderLabel = !parent.artPanel.renderLabel;
 			parent.artPanel.getVisGraph().changeRenderMethod(parent.artPanel.renderLabel, parent.artPanel.qualifiedNames);
+			parent.artPanel.draw();
 		}
 	}
 
@@ -712,6 +714,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 				}
 			}
 		}
+		parent.artPanel.draw();
 	}
 
 	private void reduceActionActionPerformed(ActionEvent event) {

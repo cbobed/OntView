@@ -568,7 +568,7 @@ public class PaintFrame extends Canvas implements Runnable{
 		int x = (int) p.getX();
 		int y = (int) p.getY();
 		if (clickedOnShape(x, y,e))          return;
-		if (clickedOnClosePropertyBox(x, y)) return;
+		if (clickedOnClosePropertyBox(x+5, y)) return;
 		if (e.getButton()==MouseButton.SECONDARY){
 			if (menuVisGeneralContext != null){
 				closeContextMenu(menuVisGeneralContext);
@@ -658,6 +658,7 @@ public class PaintFrame extends Canvas implements Runnable{
 				if (shape.asVisClass().onCloseBox(x, y)){
 					boolean b = shape.asVisClass().propertyBox.visible;
 					shape.asVisClass().propertyBox.setVisible(!b);
+					draw();
 					return true;
 				}
 			}
