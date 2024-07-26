@@ -1,10 +1,21 @@
 package sid.OntView2.common;
 
 import org.semanticweb.owlapi.model.OWLOntology;
+
 import java.util.Map;
 import java.util.Set;
 
-public abstract class AbstractConceptExtractor {
+public abstract class KConceptExtractor {
+
+    /**
+     * Hides non-key concepts in the graph
+     * @param activeOntology
+     * @param shapeMap
+     * @param limitResultSize
+     * @return
+     */
+    public abstract Set<String> retrieveKeyConcepts(OWLOntology activeOntology, Map<String, Shape> shapeMap,
+                                           int limitResultSize);
 
     /**
      * Expanded condition. "concept" is a key concept if it's contained in keyConcepts,

@@ -1,5 +1,8 @@
 package sid.OntView2.common;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import org.semanticweb.owlapi.apibinding.OWLManager;
@@ -16,20 +19,13 @@ import sid.OntView2.utils.ProgressBarDialogThread;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Observable;
-import java.util.Observer;
-import java.util.Set;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 
+import static sid.OntView2.common.PaintFrame.BORDER_PANEL;
+import static sid.OntView2.common.PaintFrame.MIN_SPACE;
 import static sid.OntView2.utils.ExpressionManager.qualifyLabel;
 import static sid.OntView2.utils.ExpressionManager.replaceString;
 
@@ -42,7 +38,7 @@ public class VisGraph extends Observable implements Runnable{
     ArrayList<VisConnector> connectorList;
 	ArrayList<VisConnector> dashedConnectorList;
 	
-    final public Map<String, Shape>    shapeMap;
+    final public Map<String, Shape>    shapeMap, shapeMapOriginal;
 	HashMap<String, Shape>           tempMap;
 	HashMap<String, VisObjectProperty>     propertyMap;
 	HashMap<String, VisDataProperty> dPropertyMap;
@@ -69,6 +65,7 @@ public class VisGraph extends Observable implements Runnable{
     public int getZoomLevel(){return zoomLevel;}
     public void setZoomLevel(int z){zoomLevel=z;}
     public Map<String,Shape> getShapeMap() {return shapeMap;}
+	public Map<String,Shape> getShapeMapOriginal() {return shapeMapOriginal;}
     public PaintFrame getPaintFrame(){return paintframe;}
     public HashSet<VisLevel> getLevelSet(){return levelSet;}
 	public void setActiveOntology(OWLOntology pactiveOntology) {activeOntology = pactiveOntology;}
@@ -94,6 +91,7 @@ public class VisGraph extends Observable implements Runnable{
 	 */
     public  VisGraph(PaintFrame pframe) {
 		shapeMap     = new ConcurrentHashMap<>();
+		shapeMapOriginal = new ConcurrentHashMap<>();
 		definitionsMap = new HashMap<>();
 		tempMap      = new HashMap<>();
 		propertyMap  = new HashMap<>();
@@ -111,6 +109,7 @@ public class VisGraph extends Observable implements Runnable{
 	 */
 	public void clearShapeMap() {
 		shapeMap.clear();
+		shapeMapOriginal.clear();
 		definitionsMap.clear();
 		tempMap.clear();
 		propertyMap.clear();
@@ -240,13 +239,15 @@ public class VisGraph extends Observable implements Runnable{
     	adjustPanelSize((float) 1.0);
     	updateProgressBarObserver(90);
     	clearDashedConnectorList();
-    	paintframe.doKceOptionAction();
-    	
+		shapeMapOriginal.putAll(shapeMap);
+
+		paintframe.doKceOptionAction();
+
     	VisLevel.adjustWidthAndPos(getLevelSet());
     	paintframe.getParentFrame().loadSearchCombo();
     	updateProgressBarObserver(100);
     	paintframe.stateChanged.set(true);
-    	
+
 	}
 	
 	
@@ -538,43 +539,30 @@ public class VisGraph extends Observable implements Runnable{
             value = vis;
             // Mix into a set, both reasoned subclasses for the current owlclass expression
   	        // and explicit subclasses
-            HashSet<OWLClassExpression> subSet   = new HashSet<OWLClassExpression>();
-            HashSet<OWLClassExpression> equivSet = new HashSet<OWLClassExpression>();
+            HashSet<OWLClassExpression> subSet   = new HashSet<>();
+            HashSet<OWLClassExpression> equivSet = new HashSet<>();
             
             // <CBL>: 
             // At first sight, we do not need the superClasses taken from the ontology anymore
             // but we need the superClasses to establish the connections in the graph
-            HashSet<OWLClassExpression> superSet = new HashSet<OWLClassExpression>();
-            
-            // <CBL>: 
-            // We do not need to access the ontology as all the anonymous classes have been 
-            // named
-//            if (loop_owlclassExp instanceof OWLClass) {
-//  	        	for (OWLClassExpression d : loop_owlclassExp.asOWLClass().getSubClasses(activeOntology)){
-//  	        		if (reasoner.isSatisfiable(d))
-//  	        			subSet.add(d);
-//  	        	}
-//  	            for (OWLClassExpression d : loop_owlclassExp.asOWLClass().getEquivalentClasses(activeOntology)) {equivSet.add(d);}
-//  	            for (OWLClassExpression d : loop_owlclassExp.asOWLClass().getSuperClasses(activeOntology)) {superSet.add(d);}
-//  	        }
-            // </CBL>
+            HashSet<OWLClassExpression> superSet = new HashSet<>();
             
   	        //esto probablemente me lo lleve afuera para descargar el codigo
   	        for( Node<OWLClass> loop_node : reasoner.getSubClasses(loop_owlclassExp, true).getNodes()) {
   	  	        for( OWLClass loop_var2 : loop_node.getEntities()) {
-  	  	        	if (!loop_node.isBottomNode())
-                        subSet.add(loop_var2);
+  	  	        	if (!loop_node.isBottomNode()) {
+						subSet.add(loop_var2);
+					}
   	  	        }
   	  	    }
-  	      
 
   	        for( Node<OWLClass> loop_node : reasoner.getSuperClasses(loop_owlclassExp, true).getNodes()) {
   	  	        for( OWLClass loop_var2 : loop_node.getEntities()) {
-  	  	        	if (!loop_node.isBottomNode())
-                        superSet.add(loop_var2);
+  	  	        	if (!loop_node.isBottomNode()) {
+						superSet.add(loop_var2);
+					}
   	  	        }
   	  	    }
-  	        
 
   	        reasonedDepthTraversal(activeOntology,reasoner,subSet, depthlevel+1);
   	        
@@ -588,7 +576,6 @@ public class VisGraph extends Observable implements Runnable{
   	        }
   	        else {
 	        	if (getTopClass(activeOntology)!= null && !(vis.getLinkedClassExpression().isTopEntity())) {
-	        		
 	        		connect(vis,(VisClass) shapeMap.get(OWLRDFVocabulary.OWL_THING.getIRI().toString()),connectorList);
 	        	}
   	        }
@@ -832,12 +819,12 @@ public class VisGraph extends Observable implements Runnable{
 	public void addDashedConnectors(){
 		 dashedConnectorList.clear();
 		 for (Entry<String,Shape> entry : shapeMap.entrySet()) {
-    		Shape s = entry.getValue();
+			Shape s = entry.getValue();
 			if (((s.getState()==Shape.CLOSED) || (s.getState()==Shape.PARTIALLY_CLOSED)) && (s.visible))  {
 				 dashLink(s, s);
-			 }	 
+			 }
 		 }
-	 }
+	}
 	 
 	/**
      * Searchs sublevels for nodes that are still visible/referenced
@@ -1523,48 +1510,56 @@ public class VisGraph extends Observable implements Runnable{
 	 * Graph Observer methods
 	 *
 	 ****************************************************************************************/
-	
-	/**
-	 * Updates progress bar observer
-	 * @param percent
+
+	private final BooleanProperty progressBarObserver = new SimpleBooleanProperty();
+	private final BooleanProperty generalObserver = new SimpleBooleanProperty();
+
+	/** Adds a listener to the progress bar observer.
+	 * The listener will be notified whenever the progress bar observer changes.
 	 */
-	
-	private void updateProgressBarObserver(int percent){
+	public void addProgressBarObserver(ChangeListener<Boolean> listener) {
+		progressBarObserver.addListener(listener);
+	}
+
+	/**
+	 * Adds a listener to the general observer.
+	 * The listener will be notified whenever the general observer changes.
+	 */
+	public void addGeneralObserver(ChangeListener<Boolean> listener) {
+		generalObserver.addListener(listener);
+	}
+
+	/**
+	 * Updates the progress bar observer with the given progress percentage.
+	 * This method sets the progress value and triggers the progress bar observer.
+	 */
+	private void updateProgressBarObserver(int percent) {
 		setProgress(percent);
-		for (Observer o: observers){
-			if (o instanceof ProgressBarDialogThread){
-				o.update(this, null);
-			}
+		progressBarObserver.set(!progressBarObserver.get());
+	}
+
+	/**
+	 * Updates the appropriate observer based on the specified observer type.
+	 * This method triggers either the progress bar observer or the general observer.
+	 */
+	public void updateObservers(int observerType) {
+		if (observerType == VisConstants.PROGRESSBAROBSERVER) {
+			progressBarObserver.set(!progressBarObserver.get());
+		} else if (observerType == VisConstants.GENERALOBSERVER) {
+			generalObserver.set(!generalObserver.get());
 		}
 	}
 
 	/**
-	 * Calculate progress from 0-70 upon number of shape classes created
+	 * Calculates the progress from the number of shapes in the shape map.
+	 * The progress is calculated as a percentage of the total number of classes in the active ontology.
+	 * This method then updates the progress bar observer with the calculated progress.
 	 */
-	
-    private void setProgressFromShapeNumber(){
-        int prev = (int) ( 70.0f * ((float)getShapeMap().size()/
-        		                 (float)getActiveOntology().getClassesInSignature(true).size()));
-    	int progress = prev > 70 ? 70 : prev;
-    	setProgress(progress);
-    	updateProgressBarObserver(progress);
-    }
-
-	public void addObserver(Observer o){ observers.add(o);}
-	
-	/**
-	 * Updates Observers added to the graph. In order to not waste performance, Observer type must be specified.
-	 * (e.g. PROGRESSBAROBSERVER)
-	 * @param observerType
-	 */
-
-	public void updateObservers(int observerType) {
-		for (Observer ob : observers) {
-			if ((observerType == VisConstants.PROGRESSBAROBSERVER) && (ob instanceof ProgressBarDialogThread)) {
-				ob.update(this, null);
-			} else if ((observerType == VisConstants.GENERALOBSERVER) && (ob instanceof VisGraphObserver)) {
-				ob.update(this, null);
-			}
-		}
+	private void setProgressFromShapeNumber() {
+		int prev = (int) (70.0f * ((float) getShapeMap().size() /
+				(float) getActiveOntology().getClassesInSignature(true).size()));
+		int progress = Math.min(prev, 70);
+		setProgress(progress);
+		updateProgressBarObserver(progress);
 	}
 }

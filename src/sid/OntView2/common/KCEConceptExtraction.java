@@ -8,12 +8,12 @@ import sid.OntView2.utils.OWLAPITaxonomyMakerExtended;
 import java.util.Map;
 import java.util.Set;
 
-public class KConceptExtraction extends AbstractConceptExtractor {
+public class KCEConceptExtraction extends KConceptExtractor {
 
 	public void hideNonKeyConcepts(OWLOntology activeOntology, VisGraph graph, int limitResultSize) {
 		// Retrieve Key Concepts
 		Map<String, Shape> shapeMap = graph.getShapeMap();
-		Set<String> conceptSet = retrieveKeyConcepts(activeOntology, limitResultSize);
+		Set<String> conceptSet = retrieveKeyConcepts(activeOntology, shapeMap, limitResultSize);
 
 		for (Map.Entry<String, Shape> entry : shapeMap.entrySet()) {
 			Shape shape = entry.getValue();
@@ -29,7 +29,8 @@ public class KConceptExtraction extends AbstractConceptExtractor {
 	 * Retrieves a set of Key Concepts to be shown by using KCE Api
 	 * @param activeOntology
 	 */
-		public Set<String> retrieveKeyConcepts(OWLOntology activeOntology, int limitResultSize) {
+	@Override
+	public Set<String> retrieveKeyConcepts(OWLOntology activeOntology, Map<String, Shape> shapeMap, int limitResultSize) {
 		boolean considerImportedOntologies = true; /* True if you want t*/
 
 		if (activeOntology != null) {

@@ -10,7 +10,7 @@ import javafx.stage.Stage;
 import sid.OntView2.common.PaintFrame;
 import sid.OntView2.common.VisGraphObserver;
 
-public class ProgressBarDialogThread extends VisGraphObserver {
+public class ProgressBarDialogThread {
 
 	Stage progressDialog;
 	ProgressBar progressBar;
@@ -23,7 +23,6 @@ public class ProgressBarDialogThread extends VisGraphObserver {
 	final static int DIALOGHEIGHT = 100;
 
 	public ProgressBarDialogThread(PaintFrame ppaintframe){
-		super(ppaintframe.getVisGraph());
 		paintframe = ppaintframe;
 		progressDialog = new Stage();
 		progressDialog.setTitle("Progress");
@@ -41,13 +40,14 @@ public class ProgressBarDialogThread extends VisGraphObserver {
 		Scene scene = new Scene(vbox, DIALOGWIDTH, DIALOGHEIGHT);
 		progressDialog.setScene(scene);
 		progressDialog.show();
+
+		paintframe.getVisGraph().addProgressBarObserver((observable, oldValue, newValue) -> update());
 	}
 
 	private int getProgress() {
 		return paintframe.getVisGraph() == null ? 0 :  paintframe.getVisGraph().getProgress();
 	}
 
-	@Override
 	public void update() {
 		int progress = getProgress();
 		Platform.runLater(() -> {

@@ -1583,7 +1583,7 @@ public class VisGraph extends Observable implements Runnable{
 	 
 	 /**
 	 * looks up for the shape or creates if not found
-	 * @param owlclassexpression
+	 * @param e
 	 * @return
 	 */
 	 public Shape lookUpOrCreate(OWLClassExpression e){

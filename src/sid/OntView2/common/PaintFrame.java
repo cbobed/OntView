@@ -151,7 +151,6 @@ public class PaintFrame extends Canvas implements Runnable{
 		}
 	}
 
-
 	public void draw() {
 		if (this.getScene() != null && !this.isDisabled() && this.isVisible() && this.getGraphicsContext2D() != null) {
 			GraphicsContext g = this.getGraphicsContext2D();
@@ -187,22 +186,6 @@ public class PaintFrame extends Canvas implements Runnable{
 
 				for (Entry<String, Shape> entry : visGraph.shapeMap.entrySet()) {
 					entry.getValue().drawShape(g);
-				}
-			}
-		}
-	}
-
-	public void drawConnectors(){
-		if (this.getScene() != null && !this.isDisabled() && this.isVisible() && this.getGraphicsContext2D() != null) {
-			GraphicsContext g = this.getGraphicsContext2D();
-
-			if (visGraph != null) {
-				for (VisConnector c : visGraph.connectorList) {
-					c.draw(g);
-				}
-
-				for (VisConnector c : visGraph.dashedConnectorList) {
-					c.draw(g);
 				}
 			}
 		}
@@ -246,13 +229,11 @@ public class PaintFrame extends Canvas implements Runnable{
 		new Thread(visGraph).start();
 		paintFrame.setCursor(Cursor.WAIT);
 
-		visGraph.addObserver(new ProgressBarDialogThread(this));
-
-		//visGraph.buildReasonedGraph(activeOntology, reasoner, set,check);
+		ProgressBarDialogThread progressBarObserver = new ProgressBarDialogThread(this);
+		visGraph.addProgressBarObserver((observable, oldValue, newValue) -> progressBarObserver.update());
 
 		VisGraphObserver graphObserver = new VisGraphObserver(this.getVisGraph());
-//	   graphObserver.start();
-		visGraph.addObserver(graphObserver);
+		visGraph.addGeneralObserver((observable, oldValue, newValue) -> graphObserver.update());
 
 //
 		stable       = true;
@@ -316,7 +297,7 @@ public class PaintFrame extends Canvas implements Runnable{
 						shape_j = e_j.getValue();
 
 						if(s_i.getVisLevel() == shape_j.getVisLevel()) {
-							if ((s_i != shape_j) && (s_i.visible)) {
+							if ((s_i != shape_j) && (s_i.visible) && (shape_j.visible)) {
 								/*if (s_i.asVisClass().getPropertyBox() != null) {
 									PROPETY_BOX_HEIGHT = s_i.asVisClass().getHeight();
 								} else {
@@ -633,6 +614,7 @@ public class PaintFrame extends Canvas implements Runnable{
 								//si estaba cerrado el nodo [+] abrirlo
 								shape.open();
 								refreshDashedConnectors();
+								VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
 								draw();
 							}
 						}
@@ -642,6 +624,7 @@ public class PaintFrame extends Canvas implements Runnable{
 								//if [-] clicked, close the node
 								shape.close();
 								refreshDashedConnectors();
+								VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
 								draw();
 							}
 						}
@@ -758,7 +741,7 @@ public class PaintFrame extends Canvas implements Runnable{
 		return null;
 	}
 
-		private void shapeRepulsion(Shape repellingShape, int direction){
+	private void shapeRepulsion(Shape repellingShape, int direction){
 		if (repulsion){
 			VisLevel currentLevel = repellingShape.getVisLevel();
 			ArrayList<Shape> orderedList = currentLevel.orderedList();
@@ -784,7 +767,7 @@ public class PaintFrame extends Canvas implements Runnable{
 				case DOWN:
 					if (repellingIndex < orderedList.size()-1) {
 						Shape lowerShape = getLowerShape(repellingIndex, orderedList);
-						if (lowerShape ==null) //it's the visible upper shape 
+						if (lowerShape ==null) //it's the visible upper shape
 							return;
 
 						int z = repellingShape.getHeight();
@@ -804,46 +787,96 @@ public class PaintFrame extends Canvas implements Runnable{
 	 * Action done when changing kce Combo 
 	 */
 	public void doKceOptionAction() {
-		KConceptExtraction extractorKCE = new KConceptExtraction();
+		KCEConceptExtraction extractorKCE = new KCEConceptExtraction();
 		RDFRankConceptExtraction extractorRDFRank = new RDFRankConceptExtraction();
+		PageRankConceptExtraction extractorPageRank = new PageRankConceptExtraction();
 
         switch (getKceOption()) {
             case VisConstants.KCECOMBOOPTION1 -> {  //"None"
                 getVisGraph().showAll();
-                draw();
             }
             case VisConstants.KCECOMBOOPTION2 -> {  //"KCE10"
                 getVisGraph().showAll();
 				extractorKCE.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 10);
-                draw();
             }
             case VisConstants.KCECOMBOOPTION3 -> {  //"KCE20"
                 getVisGraph().showAll();
 				extractorKCE.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20);
-                draw();
             }
-            case sid.OntView.common.VisConstants.PAGERANKCOMBOOPTION1 -> {
+            case sid.OntView.common.VisConstants.PAGERANKCOMBOOPTION1 -> { //"PageRank10"
                 getVisGraph().showAll();
-				extractorRDFRank.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 10, false);
-				draw();
+				extractorPageRank.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 10);
             }
-            case sid.OntView.common.VisConstants.PAGERANKCOMBOOPTION2 -> {
+            case sid.OntView.common.VisConstants.PAGERANKCOMBOOPTION2 -> { //"PageRank20"
                 getVisGraph().showAll();
-				extractorRDFRank.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20, false);
-				draw();
+				extractorPageRank.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20);
             }
-            case sid.OntView.common.VisConstants.RDFRANKCOMBOOPTION1 -> {
+            case sid.OntView.common.VisConstants.RDFRANKCOMBOOPTION1 -> { //"RDFRank10"
                 getVisGraph().showAll();
-				extractorRDFRank.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 10, true);
-				draw();
+				extractorRDFRank.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 10);
             }
-            case sid.OntView.common.VisConstants.RDFRANKCOMBOOPTION2 -> {
+            case sid.OntView.common.VisConstants.RDFRANKCOMBOOPTION2 -> { //"RDFRank20"
                 getVisGraph().showAll();
-				extractorRDFRank.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20, true);
-				draw();
+				extractorRDFRank.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20);
             }
         }
+		VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
+		draw();
+		//compactAndRepaint();
+		//stateChanged.set(true);
+		//relax();
+
 	}
+
+
+	private void compactAndRepaint() {
+
+		Map<String, Shape> shapeMap = visGraph.getShapeMap();
+		Map<String, Shape> originalShapeMap = visGraph.getShapeMapOriginal();
+
+		shapeMap.clear();
+		shapeMap.putAll(originalShapeMap);
+
+		// Remove invisible shapes directly from the original shape map
+		shapeMap.entrySet().removeIf(entry -> !entry.getValue().isVisible());
+
+		System.out.println("------------------------------------");
+		for (Map.Entry<String, Shape> entry : shapeMap.entrySet()) {
+			Shape shape = entry.getValue();
+			System.out.println("Compact and repaint:" + shape.getLabel());
+		}
+		System.out.println("------------------------------------");
+		System.out.println(" ");
+
+		// Adjust positions to maintain the graph's logical structure
+		// Iterate over the levels and reposition shapes within each level
+		/*int currentY = BORDER_PANEL;
+		for (VisLevel level : visGraph.getLevelSet()) {
+			int levelHeight = MIN_SPACE;
+
+			// Filter visible shapes in the current level
+			List<Shape> visibleShapes = new ArrayList<>();
+			for (Shape shape : shapeMap.values()) {
+				if (shape.getVisLevel() == level) {
+					visibleShapes.add(shape);
+				}
+			}
+
+			// Reposition shapes within the current level
+			for (Shape shape : visibleShapes) {
+				shape.setPosY(currentY);
+				currentY += shape.getHeight() + levelHeight;
+			}
+
+			// Adjust the x position of the level if needed
+			level.setXpos(level.getXpos() + levelHeight);
+		}*/
+
+		// Notify observers to update the layout and repaint
+		//visGraph.updateObservers(VisConstants.GENERALOBSERVER);
+		//draw();
+	}
+
 
 
 

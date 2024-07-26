@@ -18,7 +18,7 @@ public class GraphReorder {
 		vgraph = v;
 	}
 
-	public  void visualReorder(){
+	public void visualReorder(){
 		Graph graph = new Graph();
 		cloneGraph(graph, vgraph);
 

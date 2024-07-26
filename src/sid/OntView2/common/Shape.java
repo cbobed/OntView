@@ -48,7 +48,7 @@ public abstract class Shape{
 	public int  getTotalHeight(){return height*getZoomLevel();}
 	public int  getWidth(){return width;}
 	public void setPosX(int x) {posx = x;}
-	public void setPosY(int x) {posy = x;}
+	public void setPosY(int y) {posy = y;}
 	public void setHeight(int x) {height = x;}
 	public void setWidth(int x) {width = x;}
 	public VisClass asVisClass(){return (VisClass)this;}
