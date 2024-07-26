@@ -657,7 +657,6 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private void expandCheckBoxActionActionPerformed(ActionEvent event) {
 		if (!getExpandCheckBox().isSelected()) {
 			parent.check = true;
-			parent.createButtonAction();
 		} else {
 			parent.check = false;
 			parent.createButtonAction();
