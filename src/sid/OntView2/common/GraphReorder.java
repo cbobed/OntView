@@ -52,7 +52,7 @@ public class GraphReorder {
 			if (key instanceof String){
 				String key2 = key.toString();
 				Shape shape = vgraph.shapeMap.get(key2);
-				if (shape !=null){
+				if (shape !=null && shape.isVisible()){
 					shape.setPosY(translateRelativePos(nodeView.getPosX(), minY, maxY));
 
 				}
@@ -71,7 +71,7 @@ public class GraphReorder {
 		return (int) (vgraphHeight * perOne);
 	}
 
-	public static void cloneGraph(Graph graph, VisGraph vgraph){
+	public static void cloneGraph2(Graph graph, VisGraph vgraph){
 		for (Entry<String, Shape> entry : vgraph.shapeMap.entrySet()){
 			if (!(entry.getValue().outConnectors.isEmpty()) ||(!(entry.getValue().inConnectors.isEmpty()))){
 				Node n = new Node(entry.getKey());
@@ -86,6 +86,31 @@ public class GraphReorder {
 					Node dst = graph.getNode(Shape.getKey(c.to.getLinkedClassExpression()));
 					dst.setIdDad(or.getId());
 					graph.addEdge(new Edge(or,dst));
+				}
+			}
+		}
+	}
+
+	public static void cloneGraph(Graph graph, VisGraph vgraph){
+		for (Entry<String, Shape> entry : vgraph.shapeMap.entrySet()){
+			if (entry.getValue().isVisible() &&
+					(!(entry.getValue().outConnectors.isEmpty()) || !(entry.getValue().inConnectors.isEmpty()))){
+				Node n = new Node(entry.getKey());
+				graph.addNode(n);
+			}
+		}
+		for (Entry<String, Shape> entry : vgraph.shapeMap.entrySet()){
+			Shape shape = entry.getValue();
+			if (shape.isVisible()) {
+				for (VisConnector c : shape.outConnectors){
+					if (!c.isRedundant()){
+						Node or  = graph.getNode(entry.getKey());
+						Node dst = graph.getNode(Shape.getKey(c.to.getLinkedClassExpression()));
+						if (dst != null) {
+							dst.setIdDad(or.getId());
+							graph.addEdge(new Edge(or, dst));
+						}
+					}
 				}
 			}
 		}

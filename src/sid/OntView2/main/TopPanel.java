@@ -61,6 +61,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private CheckBox reduceCheckBox;
 	private Label reduceLabel;
 	private VBox mainPane;
+	PaintFrame paintFrame;
 
 	public TopPanel(Mine pparent) {
 		parent = pparent;
@@ -713,7 +714,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 				}
 			}
 		}
-		parent.artPanel.draw();
+		parent.artPanel.setStateChanged(true);
+		parent.artPanel.relax();
 	}
 
 	private void reduceActionActionPerformed(ActionEvent event) {

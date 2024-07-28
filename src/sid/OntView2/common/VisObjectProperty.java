@@ -51,9 +51,8 @@ public class VisObjectProperty extends VisProperty {
 	boolean hasInverse    =  false;
 	boolean isIrreflexive =  false;
 	boolean isInverseFunctional = false;
-	OWLSubPropertyChainOfAxiom propertyChainAxiom = null; 
-	
-	String  description  =  "";
+	OWLSubPropertyChainOfAxiom propertyChainAxiom = null;
+
 	public int getPosX(){return getDomain().getPosX()-(getDomain().getWidth()/2)+2;}
 	public int getPosY(){return 10+getDomain().getPosY()+(getDomain().getHeight())+getLabelHeight()*voffset;}
 	private OWLReasoner getReasoner(){return pbox.vclass.graph.paintframe.getReasoner();}

@@ -4,6 +4,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import org.apache.jena.base.Sys;
 
 import java.util.Map.Entry;
 import java.util.Set;
@@ -70,7 +71,8 @@ public class VisGeneralContext extends ContextMenu {
 		    	}
 		    }
 	    }
-		parent.draw();
+		parent.setStateChanged(true);
+		parent.relax();
 		updateMenuItemTexts();
 
 	}

@@ -38,7 +38,7 @@ public class VisGraph extends Observable implements Runnable{
     ArrayList<VisConnector> connectorList;
 	ArrayList<VisConnector> dashedConnectorList;
 	
-    final public Map<String, Shape>    shapeMap, shapeMapOriginal;
+    final public Map<String, Shape>    shapeMap;
 	HashMap<String, Shape>           tempMap;
 	HashMap<String, VisObjectProperty>     propertyMap;
 	HashMap<String, VisDataProperty> dPropertyMap;
@@ -65,7 +65,6 @@ public class VisGraph extends Observable implements Runnable{
     public int getZoomLevel(){return zoomLevel;}
     public void setZoomLevel(int z){zoomLevel=z;}
     public Map<String,Shape> getShapeMap() {return shapeMap;}
-	public Map<String,Shape> getShapeMapOriginal() {return shapeMapOriginal;}
     public PaintFrame getPaintFrame(){return paintframe;}
     public HashSet<VisLevel> getLevelSet(){return levelSet;}
 	public void setActiveOntology(OWLOntology pactiveOntology) {activeOntology = pactiveOntology;}
@@ -91,7 +90,6 @@ public class VisGraph extends Observable implements Runnable{
 	 */
     public  VisGraph(PaintFrame pframe) {
 		shapeMap     = new ConcurrentHashMap<>();
-		shapeMapOriginal = new ConcurrentHashMap<>();
 		definitionsMap = new HashMap<>();
 		tempMap      = new HashMap<>();
 		propertyMap  = new HashMap<>();
@@ -109,7 +107,6 @@ public class VisGraph extends Observable implements Runnable{
 	 */
 	public void clearShapeMap() {
 		shapeMap.clear();
-		shapeMapOriginal.clear();
 		definitionsMap.clear();
 		tempMap.clear();
 		propertyMap.clear();
@@ -239,14 +236,14 @@ public class VisGraph extends Observable implements Runnable{
     	adjustPanelSize((float) 1.0);
     	updateProgressBarObserver(90);
     	clearDashedConnectorList();
-		shapeMapOriginal.putAll(shapeMap);
 
-		paintframe.doKceOptionAction();
+		//paintframe.doKceOptionAction();
+		showAll();
 
     	VisLevel.adjustWidthAndPos(getLevelSet());
     	paintframe.getParentFrame().loadSearchCombo();
     	updateProgressBarObserver(100);
-    	paintframe.stateChanged.set(true);
+    	paintframe.setStateChanged(true);
 
 	}
 	

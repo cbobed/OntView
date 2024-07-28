@@ -263,8 +263,9 @@ public class PaintFrame extends Canvas implements Runnable{
 		return eraseConnector;
 	}
 
-	BooleanProperty stateChanged = new SimpleBooleanProperty(true);
+	private BooleanProperty stateChanged = new SimpleBooleanProperty(true);
 	public BooleanProperty stableChangeProperty() { return stateChanged; }
+	public void setStateChanged(boolean value) { stateChanged.set(value); }
 
 	/**
 	 * Updates node positions
@@ -272,7 +273,7 @@ public class PaintFrame extends Canvas implements Runnable{
 	 * updates y coord until there's no overlap
 	 **/
 
-	synchronized void relax() {
+	public synchronized void relax() {
 		if (visGraph == null) {
 			System.err.println("visGraph is null in relax method.");
 			return;
@@ -821,11 +822,13 @@ public class PaintFrame extends Canvas implements Runnable{
 				extractorRDFRank.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20);
             }
         }
-		VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
-		draw();
+		GraphReorder reorder = new GraphReorder(visGraph);
+		reorder.visualReorder();
+		//draw();
 		//compactAndRepaint();
-		//stateChanged.set(true);
-		//relax();
+		VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
+		stateChanged.set(true);
+		relax();
 
 	}
 
@@ -833,25 +836,10 @@ public class PaintFrame extends Canvas implements Runnable{
 	private void compactAndRepaint() {
 
 		Map<String, Shape> shapeMap = visGraph.getShapeMap();
-		Map<String, Shape> originalShapeMap = visGraph.getShapeMapOriginal();
-
-		shapeMap.clear();
-		shapeMap.putAll(originalShapeMap);
-
-		// Remove invisible shapes directly from the original shape map
-		shapeMap.entrySet().removeIf(entry -> !entry.getValue().isVisible());
-
-		System.out.println("------------------------------------");
-		for (Map.Entry<String, Shape> entry : shapeMap.entrySet()) {
-			Shape shape = entry.getValue();
-			System.out.println("Compact and repaint:" + shape.getLabel());
-		}
-		System.out.println("------------------------------------");
-		System.out.println(" ");
 
 		// Adjust positions to maintain the graph's logical structure
 		// Iterate over the levels and reposition shapes within each level
-		/*int currentY = BORDER_PANEL;
+		int currentY = BORDER_PANEL;
 		for (VisLevel level : visGraph.getLevelSet()) {
 			int levelHeight = MIN_SPACE;
 
@@ -871,7 +859,7 @@ public class PaintFrame extends Canvas implements Runnable{
 
 			// Adjust the x position of the level if needed
 			level.setXpos(level.getXpos() + levelHeight);
-		}*/
+		}
 
 		// Notify observers to update the layout and repaint
 		//visGraph.updateObservers(VisConstants.GENERALOBSERVER);
