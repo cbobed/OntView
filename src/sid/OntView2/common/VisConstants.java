@@ -2,9 +2,9 @@ package sid.OntView2.common;
 
 public class VisConstants {
 
-	public static final String KCECOMBOOPTION1 = "None";
-	public static final String KCECOMBOOPTION2 = "KCE 10";
-	public static final String KCECOMBOOPTION3 = "KCE 20";
+	public static final String NONECOMBOOPTION = "None";
+	public static final String KCECOMBOOPTION1 = "KCE 10";
+	public static final String KCECOMBOOPTION2 = "KCE 20";
 	public static final String PAGERANKCOMBOOPTION1 = "PageRank 10";
 	public static final String PAGERANKCOMBOOPTION2 = "PageRank 20";
 

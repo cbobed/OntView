@@ -14,7 +14,7 @@ public class GraphReorder {
 
 	VisGraph vgraph;
 	int vgraphHeight;
-	public GraphReorder(VisGraph v ){
+	public GraphReorder(VisGraph v){
 		vgraph = v;
 	}
 

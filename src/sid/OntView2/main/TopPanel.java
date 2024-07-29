@@ -40,7 +40,6 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private ComboBox<String> loadReasonerCombo;
 	private Button loadReasonerButton;
 	private VBox panelLoad;
-	private CheckBox expandCheckBox;
 	private VBox panelCheckBox;
 	private Button saveViewButton;
 	private Button restoreViewButton;
@@ -54,14 +53,12 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private VBox connectorPanel;
 	private ToggleButton toggleSwitch;
 	private Mine parent;
-	static String RESOURCE_BASE;
 	private CheckBox Properties;
 	private Button fileSystemButton;
 	private Slider zoomSlider;
 	private CheckBox reduceCheckBox;
 	private Label reduceLabel;
 	private VBox mainPane;
-	PaintFrame paintFrame;
 
 	public TopPanel(Mine pparent) {
 		parent = pparent;
@@ -79,8 +76,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private void initComponents() {
 		mainPane = new VBox(10);
 		mainPane.setPadding(new Insets(10));
-		//mainPane.setStyle("-fx-border-color: #404472; -fx-background-color: #f9f9f9; -fx-border-width: 1; -fx-border-style: solid;");
-		//mainPane.setStyle("-fx-border-style: solid;");
+		mainPane.setStyle("-fx-border-color: #404472; -fx-background-color: #f9f9f9; -fx-border-width: 1; -fx-border-style: solid;");
+		mainPane.setStyle("-fx-border-style: solid;");
 
 		VBox loadOntologyRow = createLoadOntologyRow();
 		HBox otherComponentsRow = createOtherComponentsRow();
@@ -272,9 +269,9 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			toggleSwitch = new ToggleButton("Show");
 			toggleSwitch.getStyleClass().add("button");
 
-			/*if (!parent.artPanel.isStable()) {
+			if (!parent.artPanel.isStable()) {
 				toggleSwitch.setDisable(true);
-			}*/
+			}
 
 			toggleSwitch.disableProperty().bind(parent.artPanel.stableChangeProperty());
 
@@ -324,9 +321,9 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			kceComboBox.getStyleClass().add("custom-combo-box");
 
 			ObservableList<String> items = FXCollections.observableArrayList(
+					VisConstants.NONECOMBOOPTION,
 					VisConstants.KCECOMBOOPTION1,
 					VisConstants.KCECOMBOOPTION2,
-					VisConstants.KCECOMBOOPTION3,
 					VisConstants.PAGERANKCOMBOOPTION1,
 					VisConstants.PAGERANKCOMBOOPTION2,
 					VisConstants.RDFRANKCOMBOOPTION1,
@@ -369,15 +366,6 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		return label0;
 	}
 
-	private CheckBox getExpandCheckBox() {
-		if (expandCheckBox == null) {
-			expandCheckBox = new CheckBox("expand");
-			expandCheckBox.setCursor(Cursor.HAND);
-			expandCheckBox.setOnAction(this::expandCheckBoxActionActionPerformed);
-		}
-		return expandCheckBox;
-	}
-
 	public Button getLoadReasonerButton() {
 		if (loadReasonerButton == null) {
 			loadReasonerButton = new Button("Sync");
@@ -390,14 +378,6 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		return loadReasonerButton;
 	}
 
-	public Label getReduceLabel() {
-		if (reduceLabel == null) {
-			reduceLabel = new Label("reduce");
-			reduceLabel.setFont(Font.font("Dialog", FontWeight.NORMAL, 9));
-		}
-		return reduceLabel;
-	}
-
 	private VBox createLoadOntologyOptions() {
 		if (panelLoad == null) {
 			ComboBox<String> reasonerComboBox = getReasonerCombo();
@@ -406,7 +386,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 			HBox row1 = createRow(reasonerComboBox, kceComboBox, syncButton);
 
-			StackPane titlePane = createTitlePane("Reasoner & KCE");
+			StackPane titlePane = createTitlePane("Reasoner & KConcept Extraction");
 
 			panelLoad = createContainer(true, titlePane, row1);
 			panelLoad.setMinWidth(200);
@@ -522,7 +502,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			panelCheckBox = new VBox();
 
 			StackPane titlePane = createTitlePane("Options");
-			HBox row = createRow(getPropertiesCheckBox(), getRenderLabel(), getExpandCheckBox(), getQualifiedNames());
+			HBox row = createRow(getPropertiesCheckBox(), getRenderLabel(), getQualifiedNames());
 			row.setAlignment(Pos.CENTER);
 
 			panelCheckBox = createContainer(true, titlePane, row);
@@ -654,16 +634,6 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			}
 		}
 	}
-
-	private void expandCheckBoxActionActionPerformed(ActionEvent event) {
-		if (!getExpandCheckBox().isSelected()) {
-			parent.check = true;
-		} else {
-			parent.check = false;
-			parent.createButtonAction();
-		}
-	}
-
 	private void createButtonActionActionPerformed(ActionEvent event) {
 		parent.createButtonAction();
 	}

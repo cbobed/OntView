@@ -8,6 +8,8 @@ import javafx.scene.shape.*;
 public class VisConnectorIsA extends VisConnector {
 
 	Color isaColor = null;
+
+	Color backgroundColor = Color.web("#f9f9f9");
 	
 	private static double PATH_OFFSET = 5.0;
 	
@@ -53,8 +55,8 @@ public class VisConnectorIsA extends VisConnector {
 						g.setLineWidth(minWidth);
 					}
 			    } else if (erase != null) {
-					g.setStroke(Color.WHITE);
-					g.setFill(Color.WHITE);
+					g.setStroke(backgroundColor);
+					g.setFill(backgroundColor);
 				}
 			    else {
 					double lineWidth = (redundant ? minWidth : width);
@@ -70,14 +72,22 @@ public class VisConnectorIsA extends VisConnector {
 			   
 			    this.drawArrow(g, 5, PATH_OFFSET, fromPoint.getX(), fromPoint.getY());
 
+				System.out.println("Color used " + g.getFill().toString() + ". Stroke used " + g.getStroke().toString());
+
+
 				g.setStroke(prevColor);
 				g.setFill(prevColor);
 				g.setLineWidth(prevLineWidth);
 				g.setLineCap(prevCap);
 				g.setLineJoin(prevJoin);
+
+				System.out.println("Color used " + prevColor.toString());
+				System.out.println(" ");
+
 			}
 		}	
 	}
+
 	
 	@Override
 	protected void drawCurve(GraphicsContext g2d,int method){

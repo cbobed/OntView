@@ -19,6 +19,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.Cursor;
 
+import javafx.scene.shape.StrokeLineCap;
+import javafx.scene.shape.StrokeLineJoin;
 import javafx.scene.text.Font;
 import javafx.util.Duration;
 import org.semanticweb.owlapi.model.OWLClassExpression;
@@ -48,7 +50,7 @@ public class PaintFrame extends Canvas implements Runnable{
 
 	// CBL: added the qualified names rendering
 	public boolean qualifiedNames = false;
-	private String kceOption      = VisConstants.KCECOMBOOPTION1;
+	private String kceOption      = VisConstants.NONECOMBOOPTION;
 
 	Thread         relaxer;
 	Dimension2D	   prevSize;
@@ -148,6 +150,8 @@ public class PaintFrame extends Canvas implements Runnable{
 					}
 				}
 			}
+
+
 		}
 	}
 
@@ -235,10 +239,8 @@ public class PaintFrame extends Canvas implements Runnable{
 		VisGraphObserver graphObserver = new VisGraphObserver(this.getVisGraph());
 		visGraph.addGeneralObserver((observable, oldValue, newValue) -> graphObserver.update());
 
-//
 		stable       = true;
 		stateChanged.set(true);
-//	   relax();
 		factor = 1.0;
 		paintFrame.setCursor(Cursor.DEFAULT);
 		// scroll.getVerticalScrollBar().setUnitIncrement(15);
@@ -383,6 +385,7 @@ public class PaintFrame extends Canvas implements Runnable{
 			Point2D p = translatePoint(new Point2D(e.getX(), e.getY()));
 			eraseConnector = visGraph.findShape(p);
 			drawConnectorShape(eraseConnector);
+			eraseConnector = null;
 		}
 		pressedShape=null;
 		repulsion = true;
@@ -794,41 +797,43 @@ public class PaintFrame extends Canvas implements Runnable{
 		PageRankConceptExtraction extractorPageRank = new PageRankConceptExtraction();
 
         switch (getKceOption()) {
-            case VisConstants.KCECOMBOOPTION1 -> {  //"None"
+            case VisConstants.NONECOMBOOPTION -> { //"None"
                 getVisGraph().showAll();
             }
-            case VisConstants.KCECOMBOOPTION2 -> {  //"KCE10"
+            case VisConstants.KCECOMBOOPTION1 -> { //"KCE10"
                 getVisGraph().showAll();
 				extractorKCE.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 10);
             }
-            case VisConstants.KCECOMBOOPTION3 -> {  //"KCE20"
+            case VisConstants.KCECOMBOOPTION2 -> { //"KCE20"
                 getVisGraph().showAll();
 				extractorKCE.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20);
             }
-            case sid.OntView.common.VisConstants.PAGERANKCOMBOOPTION1 -> { //"PageRank10"
+            case VisConstants.PAGERANKCOMBOOPTION1 -> { //"PageRank10"
                 getVisGraph().showAll();
 				extractorPageRank.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 10);
             }
-            case sid.OntView.common.VisConstants.PAGERANKCOMBOOPTION2 -> { //"PageRank20"
+            case VisConstants.PAGERANKCOMBOOPTION2 -> { //"PageRank20"
                 getVisGraph().showAll();
 				extractorPageRank.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20);
             }
-            case sid.OntView.common.VisConstants.RDFRANKCOMBOOPTION1 -> { //"RDFRank10"
+            case VisConstants.RDFRANKCOMBOOPTION1 -> { //"RDFRank10"
                 getVisGraph().showAll();
 				extractorRDFRank.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 10);
             }
-            case sid.OntView.common.VisConstants.RDFRANKCOMBOOPTION2 -> { //"RDFRank20"
+            case VisConstants.RDFRANKCOMBOOPTION2 -> { //"RDFRank20"
                 getVisGraph().showAll();
 				extractorRDFRank.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20);
             }
         }
 		GraphReorder reorder = new GraphReorder(visGraph);
 		reorder.visualReorder();
+		visGraph.adjustPanelSize((float) 1.0);
+		VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
+		getParentFrame().loadSearchCombo();
+		setStateChanged(true);
+		relax();
 		//draw();
 		//compactAndRepaint();
-		VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
-		stateChanged.set(true);
-		relax();
 
 	}
 
@@ -843,16 +848,8 @@ public class PaintFrame extends Canvas implements Runnable{
 		for (VisLevel level : visGraph.getLevelSet()) {
 			int levelHeight = MIN_SPACE;
 
-			// Filter visible shapes in the current level
-			List<Shape> visibleShapes = new ArrayList<>();
-			for (Shape shape : shapeMap.values()) {
-				if (shape.getVisLevel() == level) {
-					visibleShapes.add(shape);
-				}
-			}
-
 			// Reposition shapes within the current level
-			for (Shape shape : visibleShapes) {
+			for (Shape shape : shapeMap.values()) {
 				shape.setPosY(currentY);
 				currentY += shape.getHeight() + levelHeight;
 			}

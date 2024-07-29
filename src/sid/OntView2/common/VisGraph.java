@@ -29,11 +29,10 @@ import static sid.OntView2.common.PaintFrame.MIN_SPACE;
 import static sid.OntView2.utils.ExpressionManager.qualifyLabel;
 import static sid.OntView2.utils.ExpressionManager.replaceString;
 
-public class VisGraph extends Observable implements Runnable{
+public class VisGraph implements Runnable{
 
 	private int progress = 0;
-    
-    
+
     HashSet<VisLevel>       levelSet;
     ArrayList<VisConnector> connectorList;
 	ArrayList<VisConnector> dashedConnectorList;
@@ -1496,9 +1495,7 @@ public class VisGraph extends Observable implements Runnable{
 				s.open();
 			}
 			s.setVisible(true);
-			
 		}
-		
 	}
 	
 	
