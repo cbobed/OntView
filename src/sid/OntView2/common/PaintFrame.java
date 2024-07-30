@@ -825,6 +825,7 @@ public class PaintFrame extends Canvas implements Runnable{
 				extractorRDFRank.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20);
             }
         }
+		VisLevel.adjustWidthAndPos(visGraph.levelSet);
 		GraphReorder reorder = new GraphReorder(visGraph);
 		reorder.visualReorder();
 		visGraph.adjustPanelSize((float) 1.0);

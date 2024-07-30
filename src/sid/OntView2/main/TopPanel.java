@@ -1,6 +1,7 @@
 package sid.OntView2.main;
 
 import javafx.animation.PauseTransition;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -167,7 +168,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 	public void qualifiedNamesActionActionPerformed(ActionEvent event) {
 		if (parent.artPanel != null) {
-			parent.artPanel.qualifiedNames = !parent.artPanel.qualifiedNames;
+			parent.artPanel.qualifiedNames = getQualifiedNames().isSelected();
 			parent.artPanel.getVisGraph().changeRenderMethod(parent.artPanel.renderLabel, parent.artPanel.qualifiedNames);
 			parent.artPanel.draw();
 		}
@@ -184,7 +185,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 	public void renderLabelActionActionPerformed(ActionEvent event) {
 		if (parent.artPanel != null) {
-			parent.artPanel.renderLabel = !parent.artPanel.renderLabel;
+			parent.artPanel.renderLabel = getRenderLabel().isSelected();
 			parent.artPanel.getVisGraph().changeRenderMethod(parent.artPanel.renderLabel, parent.artPanel.qualifiedNames);
 			parent.artPanel.draw();
 		}
@@ -238,7 +239,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		if (Properties == null) {
 			Properties = new CheckBox("properties");
 			Properties.setCursor(Cursor.HAND);
-			Properties.setOnAction(this::PropertiesActionActionPerformed);
+			Properties.setOnAction(this::propertiesActionActionPerformed);
 		}
 		return Properties;
 	}
@@ -389,7 +390,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			StackPane titlePane = createTitlePane("Reasoner & KConcept Extraction");
 
 			panelLoad = createContainer(true, titlePane, row1);
-			panelLoad.setMinWidth(200);
+			panelLoad.setMinWidth(250);
 		}
 		return panelLoad;
 	}
@@ -503,10 +504,11 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 			StackPane titlePane = createTitlePane("Options");
 			HBox row = createRow(getPropertiesCheckBox(), getRenderLabel(), getQualifiedNames());
+			row.setSpacing(10);
 			row.setAlignment(Pos.CENTER);
 
 			panelCheckBox = createContainer(true, titlePane, row);
-			panelCheckBox.setMinWidth(400);
+			panelCheckBox.setMinWidth(325);
 		}
 		return panelCheckBox;
 	}
@@ -601,6 +603,20 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		parent.createImageFromVisibleRect(parent.artPanel);
 	}
 
+	private void applyCheckBoxFunctions(ActionEvent e) {
+		if (getPropertiesCheckBox().isSelected()) {
+			propertiesActionActionPerformed(e);
+		}
+
+		if (getRenderLabel().isSelected()) {
+			renderLabelActionActionPerformed(e);
+		}
+
+		if (getQualifiedNames().isSelected()) {
+			qualifiedNamesActionActionPerformed(e);
+		}
+	}
+
 	private void loadReasonerButtonActionActionPerformed(ActionEvent event) {
 		String x = (String) getReasonerCombo().getValue();
 		parent.artPanel.setShowConnectors(false);
@@ -629,11 +645,18 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 				}
 				pstream.flush();
 				pstream.close();
+
+				// Needed to solve concurrency issue
+				PauseTransition pause = new PauseTransition(Duration.millis(100));
+				pause.setOnFinished(e -> Platform.runLater(() -> applyCheckBoxFunctions(event)));
+				pause.play();
+				
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 	}
+
 	private void createButtonActionActionPerformed(ActionEvent event) {
 		parent.createButtonAction();
 	}
@@ -668,7 +691,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		getComboBox0().getItems().addAll(temp);
 	}
 
-	private void PropertiesActionActionPerformed(ActionEvent event) {
+	private void propertiesActionActionPerformed(ActionEvent event) {
 		Set<Entry<String,Shape>> classesInGraph = parent.artPanel.getVisGraph().getClassesInGraph();
 		if (!getPropertiesCheckBox().isSelected()) {
 			for (Entry<String,Shape> entry : classesInGraph) {
@@ -713,8 +736,15 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 	private void fileSystemButtonActionActionPerformed(ActionEvent event) {
 		FileChooser selector = new FileChooser();
+		selector.setInitialDirectory(new File(System.getProperty("user.dir")));
 		selector.getExtensionFilters().add(new FileChooser.ExtensionFilter("OWL Files", "*.owl"));
 		File selectedFile = selector.showOpenDialog(parent.getPrimaryStage());
+
+		// Cancel option
+		if (selectedFile == null) {
+			return;
+		}
+
 		String x = null;
 		try {
 			x = selectedFile.toURI().toURL().toString();

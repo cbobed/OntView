@@ -245,10 +245,6 @@ public class VisGraph implements Runnable{
     	paintframe.setStateChanged(true);
 
 	}
-	
-	
-	
-
 	public void changeRenderMethod(Boolean labelRendering, Boolean qualifiedRendering ){
 		
 		for (Entry<String,Shape> entry : shapeMap.entrySet()){
