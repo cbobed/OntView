@@ -650,7 +650,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 				PauseTransition pause = new PauseTransition(Duration.millis(100));
 				pause.setOnFinished(e -> Platform.runLater(() -> applyCheckBoxFunctions(event)));
 				pause.play();
-				
+
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

@@ -488,10 +488,9 @@ public class PaintFrame extends Canvas implements Runnable{
 	 */
 	private String formatToolTipText(String html) {
 		tooltip.setFont(new Font("Dialog", 12));
-		tooltip.setMaxHeight(200);
 		//tooltip.setStyle("-fx-background-color: #cedef7; -fx-text-fill: #000000;");
 
-		return html.replaceAll("<html>", "")
+		String formattedText = html.replaceAll("<html>", "")
 				.replaceAll("</html>", "")
 				.replaceAll("<b>", "")
 				.replaceAll("</b>", "")
@@ -500,6 +499,10 @@ public class PaintFrame extends Canvas implements Runnable{
 				.replaceAll("</ul>", "")
 				.replaceAll("<li>", "\u2022 ")
 				.replaceAll("</li>", "\n");
+
+		formattedText = formattedText.replaceAll("(?m)^.*SIDClass_.*\n\n?", "");
+
+		return formattedText;
 	}
 
 	/**
