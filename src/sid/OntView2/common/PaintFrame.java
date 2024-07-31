@@ -23,6 +23,7 @@ import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeLineJoin;
 import javafx.scene.text.Font;
 import javafx.util.Duration;
+import org.apache.jena.base.Sys;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
@@ -145,6 +146,11 @@ public class PaintFrame extends Canvas implements Runnable{
 
 			if (visGraph != null) {
 				for (VisConnector c : visGraph.connectorList) {
+					if (c.from == shape || c.to == shape) {
+						c.draw(g);
+					}
+				}
+				for (VisConnector c : visGraph.dashedConnectorList) {
 					if (c.from == shape || c.to == shape) {
 						c.draw(g);
 					}
@@ -574,8 +580,8 @@ public class PaintFrame extends Canvas implements Runnable{
 		Point2D p = translatePoint(new Point2D(e.getX(), e.getY()));
 		int x = (int) p.getX();
 		int y = (int) p.getY();
-		if (clickedOnShape(x, y,e))          return;
-		if (clickedOnClosePropertyBox(x+5, y)) return;
+		if (clickedOnClosePropertyBox(x, y)) {return;}
+		if (clickedOnShape(x, y, e))          return;
 		if (e.getButton()==MouseButton.SECONDARY){
 			if (menuVisGeneralContext != null){
 				closeContextMenu(menuVisGeneralContext);
@@ -665,7 +671,8 @@ public class PaintFrame extends Canvas implements Runnable{
 				if (shape.asVisClass().onCloseBox(x, y)){
 					boolean b = shape.asVisClass().propertyBox.visible;
 					shape.asVisClass().propertyBox.setVisible(!b);
-					draw();
+					setStateChanged(true);
+					relax();
 					return true;
 				}
 			}
@@ -828,15 +835,15 @@ public class PaintFrame extends Canvas implements Runnable{
 				extractorRDFRank.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20);
             }
         }
-		VisLevel.adjustWidthAndPos(visGraph.levelSet);
+		/*VisLevel.adjustWidthAndPos(visGraph.levelSet);
 		GraphReorder reorder = new GraphReorder(visGraph);
 		reorder.visualReorder();
 		visGraph.adjustPanelSize((float) 1.0);
 		VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
 		getParentFrame().loadSearchCombo();
 		setStateChanged(true);
-		relax();
-		//draw();
+		relax();*/
+		draw();
 		//compactAndRepaint();
 
 	}

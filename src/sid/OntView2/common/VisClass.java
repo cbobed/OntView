@@ -8,6 +8,7 @@ import javafx.scene.text.Font;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.text.Text;
 
+import org.apache.jena.base.Sys;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.NodeSet;
@@ -213,29 +214,13 @@ public class VisClass extends Shape {
 		return boldFont;
 	}
 
-
-	public void layoutChildren() {
-		int childX = posx - ((children.size() - 1) * (getWidth() / 2));
-		int verticalSpacing = 80;
-		int childY = posy + currentHeight + verticalSpacing;
-		for (Shape child : children) {
-			child.setPosition(childX, childY);
-			int horizontalSpacing = 20;
-			childX += child.getWidth() + horizontalSpacing;
-		}
-	}
-
 	public void drawShape(GraphicsContext g) {
 		if (g == null){
 			return;
 		}
 		int x, y;
 		int roundCornerValue = 10;
-		if (Objects.equals(graph.paintframe.positionGraph, "LEFT")) {
-			x = posx + 1;
-        } else {
-			x = posx;
-        }
+		x = posx + 1;
         y = posy;
 
         Font oldFont=g.getFont();
@@ -259,16 +244,20 @@ public class VisClass extends Shape {
 	    		currentHeight = calculateHeight();
 	    	}
 	    }
-	    
+
 	    if (visible){
 
 			Color mini = Color.rgb(224, 224, 224);
 			Color lightgray = Color.rgb(234, 234, 234);
 			Color lightBlue = Color.rgb(212, 238, 247);
+			Color lightGreen = Color.rgb(212, 247, 212);
+			Color lightOrange = Color.rgb(255, 216, 126);
+
+			int propertySpace = (propertyBox != null) ? 20 : 0;
 
 	    	if (!isDefined) {
 	    		// CBL if it is not defined, we use the previous representation
-		    	if (!isAnonymous) 
+		    	if (!isAnonymous)
 		    		g.setFill(lightgray);
 		    	else
 		    		g.setFill(Color.WHITE);
@@ -286,6 +275,10 @@ public class VisClass extends Shape {
 				 * añadir + 5 en posición letra
 				 */
 
+				if (!getDisjointConnectors().isEmpty() || propertyBox != null) {
+					setWidth(calculateWidth());
+				}
+
 				g.fillRoundRect(x - (double) getWidth()/2, y - (double) currentHeight/2, getWidth(), currentHeight+10, roundCornerValue, roundCornerValue);
 			    g.setStroke(Color.BLACK);
 			    if (isBottom) {
@@ -293,43 +286,35 @@ public class VisClass extends Shape {
 			    }	
 		 
 			    //rectangle
-				g.strokeRoundRect(x -  (double) getWidth()/2, y - (double) currentHeight/2,  getWidth()-1, currentHeight+9, roundCornerValue, roundCornerValue);
+				g.strokeRoundRect(x - (double) getWidth()/2, y - (double) currentHeight/2,  getWidth()-1, currentHeight+9, roundCornerValue, roundCornerValue);
 			    g.setFill(Color.BLACK);
-			    if (propertyBox!=null){
-					g.setFill(Color.LIGHTBLUE);
-					g.fillRoundRect(x -  (double) getWidth() /2, y + (double) currentHeight /2 + 3, getWidth()-1, 6, 5, 5);
-			    	g.setStroke(Color.BLACK);
-			    	g.strokeRoundRect(x -  (double) getWidth() /2, y + (double) currentHeight /2 + 3,getWidth()-1, 6, 5, 5);
-	
-			    }	
+				// Square for properties
+				if (propertyBox != null) {
+					propertyDraw(g, x, y, roundCornerValue, lightBlue);
+				}
 			    g.setFill(Color.BLACK);
 	
-	//    		g.drawString(label, x -(getWidth()-10)/2, (y - (oldHeight-4)/2) + fm.getAscent());
 			    if (!isAnonymous) {
-					g.fillText(visibleLabel, x - (double) (getWidth()) / 2+10, (y -(double) (currentHeight - 4) / 2) + ascent);
+					g.fillText(visibleLabel, x - (double) (getWidth())/2 + 10 + propertySpace, (y -(double) (currentHeight - 4) / 2) + ascent);
 			    }
 			    else {
-					drawFormattedString(g, visibleLabel, x - (getWidth() - 10) / 2,  (int) ((y - (currentHeight - 4) / 2) + ascent), (int) fontHeight);
-					//g.drawString(removeFormatInformation(visibleLabel), x -(getWidth()-10)/2, (y - (currentHeight-4)/2) + fm.getAscent());
+					drawFormattedString(g, visibleLabel, x - (getWidth() - 10)/2,  (int) ((y - (currentHeight - 4) / 2) + ascent), (int) fontHeight);
 			    }
 	    	}
 	    	else {
 	    		
 	    		if (!label.startsWith(SIDClassExpressionNamer.className)) {
-		    		// CBL: the new definitions representation 
-		    		// a Background white rectangle for the definition
-		    		// a grey for the
-					//g.setFill(Color.WHITE);
-		    		g.setFill(lightBlue);
-		    		g.fillRect(x - (double) getWidth() /2, y- (double) currentHeight /2+5, getWidth(), currentHeight+10);
+		    		// CBL: the new definitions representation
+		    		g.setFill(lightGreen);
+		    		g.fillRect(x - (double) getWidth()/2, y- (double) currentHeight /2+5, getWidth(), currentHeight+10);
 					g.setStroke(isBottom ? Color.RED : Color.BLACK);
-		    		g.strokeRect(x - (double) getWidth() /2, y - (double) currentHeight /2+5, getWidth()-1, currentHeight+10);
+		    		g.strokeRect(x - (double) getWidth()/2, y - (double) currentHeight /2+5, getWidth()-1, currentHeight+10);
 		    		
 		    		// now => the rectangle for the name of the concept
-		    		g.setFill(mini);
-		    		g.fillRect(x - (double) getWidth() /2+5, y- (double) currentHeight /2, getWidth()-10, fontHeight+15);
+		    		g.setFill(lightgray);
+		    		g.fillRect(x - (double) getWidth()/2+5, y- (double) currentHeight /2, getWidth()-10, fontHeight+15);
 					g.setStroke(isBottom ? Color.RED : Color.BLACK);
-		    		g.strokeRect(x -  (double) getWidth() /2+5, y - (double) currentHeight /2,  getWidth()-10, fontHeight+14);
+		    		g.strokeRect(x - (double) getWidth()/2+5, y - (double) currentHeight /2,  getWidth()-10, fontHeight+14);
 
 		    		// this is the name of the concept
 					g.setFill(Color.BLACK);
@@ -349,22 +334,21 @@ public class VisClass extends Shape {
 	    			// CBL: it is an auxiliar definition 
 	    			// CBL if it is not defined, we use the previous representation
 
+					setWidth(calculateWidth());
+
 					g.setFill(Color.WHITE);
-				    g.fillRoundRect(x - (double) getWidth() /2, y - (double) currentHeight /2, getWidth(), currentHeight+10, roundCornerValue, roundCornerValue);
+				    g.fillRoundRect(x - (double) getWidth()/2, y - (double) currentHeight /2, getWidth(), currentHeight+10, roundCornerValue, roundCornerValue);
 				    g.setStroke(Color.BLACK);
 				    if (isBottom) {
 				    	g.setStroke(Color.RED);
 				    }	
 			 
 				    //rectangle
-				    g.strokeRoundRect(x - (double) getWidth() /2, y - (double) currentHeight /2,  getWidth()-1, currentHeight+9, roundCornerValue, roundCornerValue);
+				    g.strokeRoundRect(x - (double) getWidth()/2, y - (double) currentHeight /2,  getWidth()-1, currentHeight+9, roundCornerValue, roundCornerValue);
 				    g.setFill(Color.BLACK);
 				    if (propertyBox!=null){
-						g.setFill(Color.LIGHTGRAY);
-				    	g.fillRoundRect(x -  (double) getWidth() /2, y + (double) currentHeight/2+3, getWidth()-1, 6, 5, 5);
-				    	g.setStroke(Color.BLACK);
-				    	g.strokeRoundRect(x -  (double) getWidth() /2, y + (double) currentHeight/2+3,getWidth()-1, 6, 5, 5);
-		
+						propertyDraw(g, x, y, roundCornerValue, lightBlue);
+						propertySpace += 5;
 				    }
 
 				    g.setStroke(Color.BLACK);
@@ -373,54 +357,55 @@ public class VisClass extends Shape {
 		    		if (visibleDefinitionLabels != null) {
 		    			for (String auxDefString: visibleDefinitionLabels) {
 							g.setFill(Color.BLACK);
-							drawFormattedString(g, auxDefString, x - (getWidth() - 10) / 2, (int) (auxY + ascent)-1, (int) fontHeight);
+							drawFormattedString(g, auxDefString, x - (getWidth() - 10) / 2 + propertySpace, (int) (auxY + ascent)-1, (int) fontHeight);
 							auxY += (countLines(auxDefString)*fontHeight) + 5;
 		    			}
 		    		}
 	    		}
 	    	}
-		    
-	    	//test
-			if (Objects.equals(graph.paintframe.positionGraph, "UP")) {
-				layoutChildren();
-				for (Shape child : children) {
-					child.drawShape(g);
-				}
+
+			// Square for disjoint classes
+			if (!getDisjointConnectors().isEmpty()) {
+				g.setFill(Color.LIGHTYELLOW);
+				g.fillRoundRect(x + (double) getWidth() / 2 - 20, y - (double) currentHeight / 2 + 6, 14, 14, roundCornerValue, roundCornerValue);
+				g.setFill(Color.BLACK);
+				g.strokeRoundRect(x + (double) getWidth() / 2 - 20, y - (double) currentHeight / 2 + 6, 14, 14, roundCornerValue, roundCornerValue);
+				g.fillText("D", x + (double) getWidth() / 2 - 17, y - (double) currentHeight / 2 + 17);
 			}
 
-		    if (children.size() > 0 && (outConnectors!=null) &&(outConnectors.size()>0)){
+		    if (!children.isEmpty() && (outConnectors!=null) &&(!outConnectors.isEmpty())){
 		    	switch (this.getState()) {
 		    	
 		    	   case Shape.PARTIALLY_CLOSED :
 		    		   g.setFill(mini);
-		   	           g.fillRect(x + (double) getWidth() /2, y - 10, 10, 10);
+		   	           g.fillRect(x + (double) getWidth()/2, y - 10, 10, 10);
 		   	           g.setStroke(Color.BLACK);
-		   	           g.strokeRect(x + (double) getWidth() /2, y - 10, 10, 10);
-		   	           g.strokeLine(x + (double) getWidth() /2 + 2, y - 5, x + (double) getWidth() /2 + 8, y - 5);
-		   	           g.strokeLine(x + (double) getWidth() /2 + 5, y - 8, x + (double) getWidth() /2 + 5, y - 3);
+		   	           g.strokeRect(x + (double) getWidth()/2, y - 10, 10, 10);
+		   	           g.strokeLine(x + (double) getWidth()/2 + 2, y - 5, x + (double) getWidth()/2 + 8, y - 5);
+		   	           g.strokeLine(x + (double) getWidth()/2 + 5, y - 8, x + (double) getWidth()/2 + 5, y - 3);
 		   	           // open
 		   	           g.setFill(mini);
-		   	           g.fillRect(x + (double) getWidth() /2, y, 10, 10);
+		   	           g.fillRect(x + (double) getWidth()/2, y, 10, 10);
 		   	           g.setStroke(Color.BLACK);
-		   	           g.strokeRect(x + (double) getWidth() /2, y, 10, 10);
-		   	           g.strokeLine(x + (double) getWidth() /2 + 2, y + 5, x + (double) getWidth() /2 + 8, y + 5);
+		   	           g.strokeRect(x + (double) getWidth()/2, y, 10, 10);
+		   	           g.strokeLine(x + (double) getWidth()/2 + 2, y + 5, x + (double) getWidth()/2 + 8, y + 5);
 		    		   break;
 		    		   
 		    	   case CLOSED : 
 		    		   g.setFill(mini);
-		 	           g.fillRect(x + (double) getWidth() /2, y - 10, 10, 10);
+		 	           g.fillRect(x + (double) getWidth()/2, y - 10, 10, 10);
 		 	           g.setStroke(Color.BLACK);
-		 	           g.strokeRect(x + (double) getWidth() /2, y - 10, 10, 10);
-		 	           g.strokeLine(x + (double) getWidth() /2 + 2, y - 5, x + (double) getWidth() /2 + 8, y - 5);
-		 	           g.strokeLine(x + (double) getWidth() /2 + 5, y - 8, x + (double) getWidth() /2 + 5, y - 3);
+		 	           g.strokeRect(x + (double) getWidth()/2, y - 10, 10, 10);
+		 	           g.strokeLine(x + (double) getWidth()/2 + 2, y - 5, x + (double) getWidth()/2 + 8, y - 5);
+		 	           g.strokeLine(x + (double) getWidth()/2 + 5, y - 8, x + (double) getWidth()/2 + 5, y - 3);
 		    		   break;
 	
 		    	   case  Shape.OPEN :
 		    		   g.setFill(mini);
-		 	           g.fillRect(x + (double) getWidth() /2, y, 10, 10);
+		 	           g.fillRect(x + (double) getWidth()/2, y, 10, 10);
 		 	           g.setStroke(Color.BLACK);
-		 	           g.strokeRect(x + (double) getWidth() /2, y, 10, 10);
-		 	           g.strokeLine(x + (double) getWidth() /2 + 2, y + 5, x + (double) getWidth() /2 + 8, y + 5);
+		 	           g.strokeRect(x + (double) getWidth()/2, y, 10, 10);
+		 	           g.strokeLine(x + (double) getWidth()/2 + 2, y + 5, x + (double) getWidth()/2 + 8, y + 5);
 		    		   break;
 		    		   
 		    	   default :
@@ -428,14 +413,22 @@ public class VisClass extends Shape {
 		       }
 	     }
 
-		  for (VisConnectorDisjoint disj :  getDisjointConnectors()){
-			  //disj.draw(g);
+		  /*for (VisConnectorDisjoint disj :  getDisjointConnectors()){
+			  disj.draw(g);
 		  }
 		  for (VisConnectorEquiv equ: getEquivConnectors()){
-			  //equ.draw(g);
-		  }
- 	  }
-      g.setFont(oldFont);
+			  equ.draw(g);
+		  }*/
+		}
+		g.setFont(oldFont);
+	}
+
+	private void propertyDraw(GraphicsContext g, int x, int y, int roundCornerValue, Color lightBlue) {
+		g.setFill(lightBlue);
+		g.fillRoundRect(x - (double) getWidth()/2 + 5, y - (double) currentHeight / 2 + 6, 19, 14, roundCornerValue, roundCornerValue);
+		g.setFill(Color.BLACK);
+		g.strokeRoundRect(x - (double) getWidth()/2 + 5, y - (double) currentHeight / 2 + 6, 19, 14, roundCornerValue, roundCornerValue);
+		g.fillText("P▼", x - (double) getWidth()/2 + 7, y - (double) currentHeight / 2 + 17);
 	}
 
 	public void swapLabel(Boolean labelRendering, Boolean qualifiedRendering){
@@ -519,11 +512,11 @@ public class VisClass extends Shape {
 	public Point2D getConnectionPoint(Point2D p,boolean left) {
 	//return Closest conection point	
 		if (left){
-			connectionPointsL = new Point2D(getPosX() - (double) getWidth() /2, getPosY());
+			connectionPointsL = new Point2D(getPosX() - (double) getWidth()/2, getPosY());
 			return connectionPointsL;
 		}
      	else {
-			connectionPointsR = new Point2D(getPosX() + (double) getWidth() /2, getPosY());
+			connectionPointsR = new Point2D(getPosX() + (double) getWidth()/2, getPosY());
 		    return connectionPointsR;
 		}
 	}
@@ -699,7 +692,7 @@ public class VisClass extends Shape {
 		return RELATIVE_POS;
 	}
 	
-	public int calculateWidth () {
+	public int calculateWidth() {
 		GraphicsContext g = graph.paintframe.getGraphicsContext2D();
 	    int max = 0;
 	    Font prevFont = g.getFont();
@@ -756,6 +749,12 @@ public class VisClass extends Shape {
 						max = candidate;
 					}
 				}
+			}
+			if (!getDisjointConnectors().isEmpty()) {
+				max += 10;
+			}
+			if (propertyBox != null) {
+				max += 20;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -847,10 +846,12 @@ public class VisClass extends Shape {
 	}
 
 	public boolean onCloseBox(int x,int y){
-		int px,py;
-		px = getPosX() - getWidth()/2;
-		py = getPosY() + getHeight()/2;
-		return ((x>= px)&&(x<=px+getWidth()) &&(y>=py) &&(y<=py+6));
+		int px = getPosX() - getWidth() / 2 + 5;
+		int py = getPosY() - getHeight() / 2 + 6;
+		int pWidth = 19;
+		int pHeight = 14;
+
+		return (x >= px && x <= px + pWidth) && (y >= py && y <= py + pHeight);
 	}
 	
 	public NodeSet<OWLNamedIndividual> getInstances(){

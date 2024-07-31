@@ -72,18 +72,11 @@ public class VisConnectorIsA extends VisConnector {
 			   
 			    this.drawArrow(g, 5, PATH_OFFSET, fromPoint.getX(), fromPoint.getY());
 
-				System.out.println("Color used " + g.getFill().toString() + ". Stroke used " + g.getStroke().toString());
-
-
 				g.setStroke(prevColor);
 				g.setFill(prevColor);
 				g.setLineWidth(prevLineWidth);
 				g.setLineCap(prevCap);
 				g.setLineJoin(prevJoin);
-
-				System.out.println("Color used " + prevColor.toString());
-				System.out.println(" ");
-
 			}
 		}	
 	}
