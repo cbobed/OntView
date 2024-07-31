@@ -18,6 +18,16 @@ public class VisConnectorEquiv extends VisConnector {
 		
 	}
 
+	public Shape getOtherEnd(Shape shape) {
+		if (shape.equals(from)) {
+			return to;
+		} else if (shape.equals(to)) {
+			return from;
+		} else {
+			throw new IllegalArgumentException("Shape is not part of this connector.");
+		}
+	}
+
 	@Override
 	public void draw(GraphicsContext g){
 		if (g == null){

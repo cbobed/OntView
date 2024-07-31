@@ -214,6 +214,7 @@ public class VisClass extends Shape {
 		return boldFont;
 	}
 
+
 	public void drawShape(GraphicsContext g) {
 		if (g == null){
 			return;

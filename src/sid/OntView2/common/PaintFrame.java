@@ -24,6 +24,7 @@ import javafx.scene.shape.StrokeLineJoin;
 import javafx.scene.text.Font;
 import javafx.util.Duration;
 import org.apache.jena.base.Sys;
+import org.checkerframework.checker.units.qual.C;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
@@ -194,11 +195,47 @@ public class PaintFrame extends Canvas implements Runnable{
 				g.setStroke(Color.BLACK);
 				drawPropertyBoxes(g);
 
+				//drawSuperNodes(g);
+
 				for (Entry<String, Shape> entry : visGraph.shapeMap.entrySet()) {
 					entry.getValue().drawShape(g);
 				}
 			}
 		}
+	}
+	private void drawSuperNodes(GraphicsContext g) {
+		Color prevColor = (Color) g.getFill();
+		Color prevStroke = (Color) g.getStroke();
+		g.setStroke(Color.CYAN);
+		g.setLineWidth(2);
+
+		for (Entry<String, Shape> entry : visGraph.shapeMap.entrySet()) {
+			Shape shape = entry.getValue();
+			if (shape instanceof VisClass visClass) {
+				for (VisConnectorEquiv equiv : visClass.getEquivConnectors()) {
+					Shape other = equiv.getOtherEnd(visClass);
+					if (other instanceof VisClass otherVisClass) {
+
+						// Bounding box
+						int minX = Math.min(visClass.getPosX() - visClass.getWidth() / 2, otherVisClass.getPosX() - otherVisClass.getWidth() / 2);
+						int maxX = Math.max(visClass.getPosX() + visClass.getWidth() / 2, otherVisClass.getPosX() + otherVisClass.getWidth() / 2);
+						int minY = Math.min(visClass.getPosY() - visClass.getHeight() / 2, otherVisClass.getPosY() - otherVisClass.getHeight() / 2);
+						int maxY = Math.max(visClass.getPosY() + visClass.getHeight() / 2, otherVisClass.getPosY() + otherVisClass.getHeight() / 2);
+
+						int width = maxX - minX + 20;
+						int height = maxY - minY + 30;
+
+						// Transparent cyan
+						g.setFill(Color.rgb(0, 255, 255, 0.3));
+						g.fillRect(minX - 10, minY - 10, width, height);
+						g.strokeRect(minX - 10, minY - 10, width, height);
+					}
+				}
+			}
+		}
+		g.setLineWidth(1);
+		g.setFill(prevColor);
+		g.setStroke(prevStroke);
 	}
 
 	private void drawPropertyBoxes(GraphicsContext g2d){
@@ -216,7 +253,6 @@ public class PaintFrame extends Canvas implements Runnable{
 			}
 		}
 	}
-
 
 	public  void createReasonedGraph(HashSet<OWLClassExpression> set,boolean check) {
 		latch = new CountDownLatch(1);
