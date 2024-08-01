@@ -1,5 +1,5 @@
-file:/home/carlota/Downloads/ontology_subniveles.owl
 https://protege.stanford.edu/ontologies/pizza/pizza.owl
+file:/home/carlota/Downloads/ontology_subniveles.owl
 file:/home/carlota/Desktop/OntView/onts/dbpedia_3.8.owl
 file:/home/carlota/Downloads/ontology--DEV_type=orig.owl
 http://horus.cps.unizar.es:18080/ontology/support.owl

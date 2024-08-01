@@ -146,7 +146,7 @@ public class VisClass extends Shape {
 		if (getDisJointClassesAxioms()!=null){
 			for (OWLDisjointClassesAxiom axiom: getDisJointClassesAxioms()){
 				for (OWLClassExpression e : axiom.getClassExpressions()){
-					if(e != this.getLinkedClassExpression()){ //CAMBIAR
+					if(e != this.getLinkedClassExpression()){
 						if (graph.getVisualExtension(e)!=null)
 							addDisjointConnector(graph.getVisualExtension(e));
 					}
@@ -906,6 +906,14 @@ public class VisClass extends Shape {
 			currentY += VisProperty.stringHeight(font, g)+6;
 		}
 	}
+
+	public List<VisObjectProperty> getProperties() {
+		if (propertyBox == null) {
+			return Collections.emptyList();
+		}
+		return propertyBox.getProperties();
+	}
+
 
 }
 

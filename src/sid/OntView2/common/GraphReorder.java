@@ -7,6 +7,7 @@ import pedviz.graph.Graph;
 import pedviz.graph.LayoutedGraph;
 import pedviz.graph.Node;
 
+import java.util.HashMap;
 import java.util.Map.Entry;
 
 
@@ -58,6 +59,8 @@ public class GraphReorder {
 				}
 			}
 		}
+
+		repositionParents();
 	}
 
 	/**
@@ -71,7 +74,7 @@ public class GraphReorder {
 		return (int) (vgraphHeight * perOne);
 	}
 
-	public static void cloneGraph2(Graph graph, VisGraph vgraph){
+	public static void cloneGraph(Graph graph, VisGraph vgraph){
 		for (Entry<String, Shape> entry : vgraph.shapeMap.entrySet()){
 			if (!(entry.getValue().outConnectors.isEmpty()) ||(!(entry.getValue().inConnectors.isEmpty()))){
 				Node n = new Node(entry.getKey());
@@ -91,7 +94,30 @@ public class GraphReorder {
 		}
 	}
 
-	public static void cloneGraph(Graph graph, VisGraph vgraph){
+	private void repositionParents() {
+		for (Entry<String, Shape> entry : vgraph.shapeMap.entrySet()) {
+			Shape shape = entry.getValue();
+			if (shape.isVisible() && shape instanceof VisClass) {
+				VisClass visClass = (VisClass) shape;
+				if (!visClass.children.isEmpty()) {
+					int sumY = 0;
+					int count = 0;
+					for (Shape child : visClass.children) {
+						if (child.isVisible()) {
+							sumY += child.getPosY();
+							count++;
+						}
+					}
+					if (count > 0) {
+						int averageY = sumY / count;
+						visClass.setPosY(averageY);
+					}
+				}
+			}
+		}
+	}
+
+	public static void cloneGraphWithVisibility(Graph graph, VisGraph vgraph){
 		for (Entry<String, Shape> entry : vgraph.shapeMap.entrySet()){
 			if (entry.getValue().isVisible() &&
 					(!(entry.getValue().outConnectors.isEmpty()) || !(entry.getValue().inConnectors.isEmpty()))){

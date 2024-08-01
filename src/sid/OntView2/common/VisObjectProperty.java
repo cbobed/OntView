@@ -55,7 +55,7 @@ public class VisObjectProperty extends VisProperty {
 
 	public int getPosX(){return getDomain().getPosX()-(getDomain().getWidth()/2)+2;}
 	public int getPosY(){return 10+getDomain().getPosY()+(getDomain().getHeight())+getLabelHeight()*voffset;}
-	private OWLReasoner getReasoner(){return pbox.vclass.graph.paintframe.getReasoner();}
+	public OWLReasoner getReasoner(){return pbox.vclass.graph.paintframe.getReasoner();}
 	
 	public boolean onProperty(Point2D p){
 		return ((p.getX() >= getPosX()-20)&&(p.getX() <= getPosX())&& (p.getY() >= getPosY()-10)&&(p.getY() <= getPosY()));
@@ -398,8 +398,6 @@ public class VisObjectProperty extends VisProperty {
 			visibleLabel = label; 
 		
 	}
-	
-
 }
 	
 

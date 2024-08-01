@@ -25,7 +25,9 @@ import javafx.scene.text.Font;
 import javafx.util.Duration;
 import org.apache.jena.base.Sys;
 import org.checkerframework.checker.units.qual.C;
+import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
@@ -203,6 +205,7 @@ public class PaintFrame extends Canvas implements Runnable{
 			}
 		}
 	}
+
 	private void drawSuperNodes(GraphicsContext g) {
 		Color prevColor = (Color) g.getFill();
 		Color prevStroke = (Color) g.getStroke();
@@ -215,6 +218,8 @@ public class PaintFrame extends Canvas implements Runnable{
 				for (VisConnectorEquiv equiv : visClass.getEquivConnectors()) {
 					Shape other = equiv.getOtherEnd(visClass);
 					if (other instanceof VisClass otherVisClass) {
+
+
 
 						// Bounding box
 						int minX = Math.min(visClass.getPosX() - visClass.getWidth() / 2, otherVisClass.getPosX() - otherVisClass.getWidth() / 2);
@@ -707,6 +712,7 @@ public class PaintFrame extends Canvas implements Runnable{
 				if (shape.asVisClass().onCloseBox(x, y)){
 					boolean b = shape.asVisClass().propertyBox.visible;
 					shape.asVisClass().propertyBox.setVisible(!b);
+					showRelatedProperties(shape.asVisClass(), visGraph, !b);
 					setStateChanged(true);
 					relax();
 					return true;
@@ -714,6 +720,50 @@ public class PaintFrame extends Canvas implements Runnable{
 			}
 		}
 		return false;
+	}
+
+	private void showRelatedProperties(VisClass visClass, VisGraph visGraph, boolean visibility) {
+		for (VisObjectProperty property : visClass.getPropertyBox().getProperties()) {
+			for (Entry<String, Shape> entry : visGraph.shapeMap.entrySet()) {
+				Shape relatedShape = entry.getValue();
+				if (relatedShape instanceof VisClass && relatedShape != visClass) {
+					VisClass relatedVisClass = relatedShape.asVisClass();
+					if (relatedVisClass.getPropertyBox() != null) {
+						for (VisObjectProperty relatedProperty : relatedVisClass.getPropertyBox().getProperties()) {
+							if (isRelated(property, relatedProperty)) {
+								relatedVisClass.getPropertyBox().setVisible(visibility);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private boolean isRelated(VisObjectProperty property, VisObjectProperty relatedProperty) {
+		OWLReasoner reasoner = property.getReasoner();
+		OWLDataFactory dataFactory = OWLManager.getOWLDataFactory();
+		return reasoner.isEntailed(dataFactory.getOWLSubObjectPropertyOfAxiom(property.oPropExp, relatedProperty.oPropExp)) ||
+				reasoner.isEntailed(dataFactory.getOWLSubObjectPropertyOfAxiom(relatedProperty.oPropExp, property.oPropExp));
+	}
+
+	private void expandRelatedProperties(VisClass visClass, boolean visibility) {
+		for (VisConnector connector : visClass.outConnectors) {
+			Shape relatedShape = connector.to;
+			if (relatedShape instanceof VisClass relatedVisClass) {
+				if (relatedVisClass.propertyBox != null) {
+					relatedVisClass.propertyBox.setVisible(visibility);
+				}
+			}
+		}
+		for (VisConnector connector : visClass.inConnectors) {
+			Shape relatedShape = connector.from;
+			if (relatedShape instanceof VisClass relatedVisClass) {
+				if (relatedVisClass.propertyBox != null) {
+					relatedVisClass.propertyBox.setVisible(visibility);
+				}
+			}
+		}
 	}
 
 	public void focusOnShape(String shapeKey,Shape pshape) {

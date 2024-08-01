@@ -11,10 +11,7 @@ import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class VisPropertyBox {
 	int maxWidth=0;
@@ -54,16 +51,16 @@ public class VisPropertyBox {
 		return reasoner;
 	}
 	public VisPropertyBox(VisClass c){
-		propertyList = new ArrayList<VisObjectProperty>();
-		objectPropertyMap = new HashMap<OWLObjectProperty, Shape>();
-		dataPropertyMap   = new HashMap<OWLDataProperty, String>();
-		objectPropertySet = new HashSet<OWLObjectProperty>();
-		orderedObjectProperties = new ArrayList<OWLObjectProperty>();
-		visClassSet   = new HashSet<VisClass>();
-		dPropertyList = new ArrayList<VisDataProperty>();
+		propertyList = new ArrayList<>();
+		objectPropertyMap = new HashMap<>();
+		dataPropertyMap   = new HashMap<>();
+		objectPropertySet = new HashSet<>();
+		orderedObjectProperties = new ArrayList<>();
+		visClassSet   = new HashSet<>();
+		dPropertyList = new ArrayList<>();
 		vclass = c;
 		posy = vclass.currentHeight;
-		propRangeConnectorList = new ArrayList<VisConnectorPropertyRange>();
+		propRangeConnectorList = new ArrayList<>();
 	}
 
 	// REVISAR
@@ -234,6 +231,9 @@ public class VisPropertyBox {
 		}
 		
 	}
-		
+
+	public ArrayList<VisObjectProperty> getProperties() {
+		return propertyList;
+	}
 	
 }
