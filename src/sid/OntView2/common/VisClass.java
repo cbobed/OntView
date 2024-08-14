@@ -67,8 +67,8 @@ public class VisClass extends Shape {
 	ArrayList<String> explicitQualifiedDefinitionLabels;
 	// </CBL>
     
-    String visibleLabel =""; 
-    
+    String visibleLabel ="";
+
 	boolean qualifiedRendering = false; 
 	boolean labelRendering = false; 
 	
@@ -252,7 +252,6 @@ public class VisClass extends Shape {
 			Color lightgray = Color.rgb(234, 234, 234);
 			Color lightBlue = Color.rgb(212, 238, 247);
 			Color lightGreen = Color.rgb(212, 247, 212);
-			Color lightOrange = Color.rgb(255, 216, 126);
 
 			int propertySpace = (propertyBox != null) ? 20 : 0;
 

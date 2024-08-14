@@ -139,9 +139,8 @@ public class Mine extends Application implements Embedable{
 				}
 			}
 			nTopPanel.restoreSliderValue();
+			artPanel.start();
 		}
-
-		artPanel.start();
 	}
 
 	protected void loadActiveOntology(IRI source){
@@ -211,6 +210,7 @@ public class Mine extends Application implements Embedable{
 				showErrorDialog("Error", "Failed to load reasoner.", e.getMessage());
 			}
 		} else {
+			artPanel.stop();
 			showErrorDialog("Error", "No active ontology.", "Please load an ontology before loading a reasoner.");
 		}
 	}
@@ -260,6 +260,7 @@ public class Mine extends Application implements Embedable{
 		// TODO Auto-generated method stub
 		if (artPanel.getVisGraph()!= null){
 			FileChooser selector = new FileChooser();
+			selector.setInitialDirectory(new File(System.getProperty("user.dir")));
 			File file = selector.showOpenDialog(primaryStage);
 			if (file != null) {
 				String path = null;
@@ -379,7 +380,7 @@ public class Mine extends Application implements Embedable{
 		nTopPanel.loadSearchCombo();
 	}
 
-	private void showErrorDialog(String title, String header, String content) {
+	void showErrorDialog(String title, String header, String content) {
 		Alert alert = new Alert(Alert.AlertType.ERROR);
 		alert.setTitle(title);
 		alert.setHeaderText(header);

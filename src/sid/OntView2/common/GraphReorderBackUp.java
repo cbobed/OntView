@@ -7,101 +7,139 @@ import pedviz.graph.Graph;
 import pedviz.graph.LayoutedGraph;
 import pedviz.graph.Node;
 
+import java.util.HashMap;
 import java.util.Map.Entry;
+
 
 public class GraphReorderBackUp {
 
 	VisGraph vgraph;
-	int vgraphWidth;
 	int vgraphHeight;
-
-	public GraphReorderBackUp(VisGraph v) {
+	public GraphReorderBackUp(VisGraph v){
 		vgraph = v;
 	}
 
-	public void visualReorder() {
+	public void visualReorder(){
 		Graph graph = new Graph();
 		cloneGraph(graph, vgraph);
 
-		//
-		float minX = Float.MAX_VALUE;
-		float maxX = Float.MIN_VALUE;
-		float minY = Float.MAX_VALUE;
-		float maxY = Float.MIN_VALUE;
-
-		vgraphWidth = vgraph.getWidth();
-		vgraphHeight = vgraph.getHeight();  //
-
+		float minY = 0;
+		float maxY = 0;
+		vgraphHeight = vgraph.getHeight();
+		//Step 2
 		Sugiyama s = new Sugiyama(graph);
 		s.getLayoutedGraph();
 		s.run();
+		@SuppressWarnings("rawtypes")
 		LayoutedGraph layoutedGraph = s.getLayoutedGraph();
 		SugiyamaNodeView nodeView;
 		Object key;
 		vgraph.paintframe.stable = true;
 
-		for (Object entry : layoutedGraph.getAllNodes().entrySet()) {
-			Entry<String, SugiyamaNodeView> entryCast = (Entry<String, SugiyamaNodeView>) entry;
+		for(Object entry: layoutedGraph.getAllNodes().entrySet()){
+			@SuppressWarnings("unchecked")
+			Entry<String,SugiyamaNodeView> entryCast = (Entry<String,SugiyamaNodeView>) entry;
 			nodeView = entryCast.getValue();
-			if (nodeView.getPosX() < minX) {
-				minX = nodeView.getPosX();
-			}
-			if (nodeView.getPosX() > maxX) {
-				maxX = nodeView.getPosX();
-			}
-			if (nodeView.getPosY() < minY) {
-				minY = nodeView.getPosY();
-			}
-			if (nodeView.getPosY() > maxY) {
-				maxY = nodeView.getPosY();
-			}
+			if (nodeView.getPosX()< minY) {minY = nodeView.getPosX();}
+			if (nodeView.getPosX()> maxY) {maxY = nodeView.getPosX();}
 		}
 
-		for (Object entry : layoutedGraph.getAllNodes().entrySet()) {
-			Entry<String, SugiyamaNodeView> entryCast = (Entry<String, SugiyamaNodeView>) entry;
+		for(Object entry: layoutedGraph.getAllNodes().entrySet()){
+			@SuppressWarnings("unchecked")
+
+			Entry<String,SugiyamaNodeView> entryCast = (Entry<String,SugiyamaNodeView>) entry;
 			nodeView = entryCast.getValue();
 			key = entryCast.getKey();
-			if (key instanceof String) {
+			if (key instanceof String){
 				String key2 = key.toString();
 				Shape shape = vgraph.shapeMap.get(key2);
-				if (shape != null) {
-					shape.setPosX(translateRelativePosX(nodeView.getPosX(), minX, maxX));
-					shape.setPosY(translateRelativePosY(nodeView.getPosY(), minY, maxY));
+				if (shape !=null && shape.isVisible()){
+					shape.setPosY(translateRelativePos(nodeView.getPosX(), minY, maxY));
+
 				}
 			}
 		}
+
+		repositionParents();
 	}
 
-	public int translateRelativePosX(float in, float low, float high) {
-		float total = high - low;
-		float perOne = (in - low) / total;
-		return (int) (vgraphWidth * perOne);
-	}
+	/**
+	 * gets the relative equivalent point in visgraph
+	 */
+	public int translateRelativePos(float in, float low,float high){
 
-	public int translateRelativePosY(float in, float low, float high) {
-		float total = high - low;
-		float perOne = (in - low) / total;
+		float total = high-low;
+		float perOne = (in-low)/total;
+
 		return (int) (vgraphHeight * perOne);
 	}
 
-	public static void cloneGraph(Graph graph, VisGraph vgraph) {
-		for (Entry<String, Shape> entry : vgraph.shapeMap.entrySet()) {
-			if (!(entry.getValue().outConnectors.isEmpty()) || (!(entry.getValue().inConnectors.isEmpty()))) {
+	public static void cloneGraph(Graph graph, VisGraph vgraph){
+		for (Entry<String, Shape> entry : vgraph.shapeMap.entrySet()){
+			Shape shape = entry.getValue();
+			if (!(shape.outConnectors.isEmpty()) ||(!(shape.inConnectors.isEmpty()))){
 				Node n = new Node(entry.getKey());
 				graph.addNode(n);
 			}
 		}
-		for (Entry<String, Shape> entry : vgraph.shapeMap.entrySet()) {
+		for (Entry<String, Shape> entry : vgraph.shapeMap.entrySet()){
 			Shape shape = entry.getValue();
-			for (VisConnector c : shape.outConnectors) {
-				if (!c.isRedundant()) {
-					Node or = graph.getNode(entry.getKey());
+			for (VisConnector c : shape.outConnectors){
+				if (!c.isRedundant()){
+					Node or  = graph.getNode(entry.getKey());
 					Node dst = graph.getNode(Shape.getKey(c.to.getLinkedClassExpression()));
 					dst.setIdDad(or.getId());
-					graph.addEdge(new Edge(or, dst));
+					graph.addEdge(new Edge(or,dst));
 				}
 			}
 		}
+	}
 
+	private void repositionParents() {
+		for (Entry<String, Shape> entry : vgraph.shapeMap.entrySet()) {
+			Shape shape = entry.getValue();
+			if (shape.isVisible() && shape instanceof VisClass) {
+				VisClass visClass = (VisClass) shape;
+				if (!visClass.children.isEmpty()) {
+					int sumY = 0;
+					int count = 0;
+					for (Shape child : visClass.children) {
+						if (child.isVisible()) {
+							sumY += child.getPosY();
+							count++;
+						}
+					}
+					if (count > 0) {
+						int averageY = sumY / count;
+						visClass.setPosY(averageY);
+					}
+				}
+			}
+		}
+	}
+
+	public static void cloneGraphWithVisibility(Graph graph, VisGraph vgraph){
+		for (Entry<String, Shape> entry : vgraph.shapeMap.entrySet()){
+			if (entry.getValue().isVisible() &&
+					(!(entry.getValue().outConnectors.isEmpty()) || !(entry.getValue().inConnectors.isEmpty()))){
+				Node n = new Node(entry.getKey());
+				graph.addNode(n);
+			}
+		}
+		for (Entry<String, Shape> entry : vgraph.shapeMap.entrySet()){
+			Shape shape = entry.getValue();
+			if (shape.isVisible()) {
+				for (VisConnector c : shape.outConnectors){
+					if (!c.isRedundant()){
+						Node or  = graph.getNode(entry.getKey());
+						Node dst = graph.getNode(Shape.getKey(c.to.getLinkedClassExpression()));
+						if (dst != null) {
+							dst.setIdDad(or.getId());
+							graph.addEdge(new Edge(or, dst));
+						}
+					}
+				}
+			}
+		}
 	}
 }

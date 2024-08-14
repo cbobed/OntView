@@ -23,6 +23,7 @@ import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
+import javafx.stage.Popup;
 import javafx.util.Duration;
 import org.semanticweb.owlapi.io.OWLOntologyCreationIOException;
 import org.semanticweb.owlapi.model.IRI;
@@ -60,6 +61,9 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private CheckBox reduceCheckBox;
 	private Label reduceLabel;
 	private VBox mainPane;
+	private VBox helpPanel;
+	private Button helpButton;
+	private Popup helpPopup;
 
 	public TopPanel(Mine pparent) {
 		parent = pparent;
@@ -113,7 +117,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 				getViewPanel(),
 				getSnapshotPanel(),
 				getPanel0(),
-				getConnectorsSwitch());
+				getConnectorsSwitch(),
+				createHelpButton());
 		row.setAlignment(Pos.CENTER);
 
 		return row;
@@ -557,6 +562,81 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		}
 		return loadOntologyCombo;
 	}
+/*
+	private VBox getConnectorsSwitch() {
+		if (connectorPanel == null) {
+			connectorPanel = new VBox();
+			connectorPanel.setPadding(new Insets(5));
+			connectorPanel.setSpacing(5);
+
+			StackPane titlePane = createTitlePane("Connectors");
+			toggleSwitch = new ToggleButton("Show");
+			toggleSwitch.getStyleClass().add("button");
+
+			if (!parent.artPanel.isStable()) {
+				toggleSwitch.setDisable(true);
+			}
+
+			toggleSwitch.disableProperty().bind(parent.artPanel.stableChangeProperty());
+
+			// Add a listener to handle the switch state
+			toggleSwitch.selectedProperty().addListener((observable, oldValue, newValue) -> {
+				if (newValue) {
+					toggleSwitch.setText("Hide");
+					parent.artPanel.setShowConnectors(true);
+					parent.artPanel.draw();
+				} else {
+					toggleSwitch.setText("Show");
+					parent.artPanel.setShowConnectors(false);
+					parent.artPanel.draw();
+
+				}
+			});
+			connectorPanel = createContainer(true, titlePane, toggleSwitch);
+
+		}
+		return connectorPanel;
+	}
+*/
+	private VBox createHelpButton() {
+		if (helpPanel == null) {
+			helpPanel = new VBox();
+			helpPanel.setPadding(new Insets(5));
+			helpPanel.setSpacing(5);
+
+
+			StackPane titlePane = createTitlePane("Help");
+			helpButton = new Button("?");
+			helpButton.getStyleClass().add("button");
+			helpButton.setStyle(
+							"-fx-shape: 'M 0 50 a 50 50 0 1 1 100 0 a 50 50 0 1 1 -100 0'; " +
+							"-fx-background-radius: 50%;"
+			);
+
+			Label helpContent = new Label("Esta es una leyenda de ayuda.\nExplicación detallada aquí.");
+			helpContent.setStyle("-fx-background-color: white; -fx-border-color: black; -fx-padding: 10px;");
+
+			helpPopup = new Popup();
+			helpPopup.getContent().add(helpContent);
+			helpPopup.setAutoHide(true);
+
+			// Añadir evento al botón para mostrar el popup
+			helpButton.setOnMouseClicked(event -> {
+				if (helpPopup.isShowing()) {
+					helpPopup.hide();
+				} else {
+					helpPopup.show(helpButton, event.getScreenX(), event.getScreenY() + 10);
+				}
+			});
+
+			helpPanel = createContainer(true, titlePane, helpButton);
+
+
+		}
+		return helpPanel;
+	}
+
+
 
 	private void loadRecent() {
 		try {
@@ -591,6 +671,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			parent.loadActiveOntology(IRI.create(x));
 			loadReasonerButton.setDisable(false);
 			getReasonerCombo().setDisable(false);
+		} else {
+			parent.showErrorDialog("Error", "No ontology selected.", "Please select an ontology first.");
 		}
 	}
 

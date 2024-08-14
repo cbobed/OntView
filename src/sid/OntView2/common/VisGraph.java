@@ -198,29 +198,19 @@ public class VisGraph implements Runnable{
 		VisLevel.adjustWidthAndPos(levelSet);
 		
 		addBottomNode(reasoner,activeOntology);
-		
-		for (Entry<String,Shape> entry : shapeMap.entrySet()){
+
+		for (Entry<String, Shape> entry : shapeMap.entrySet()){
 			Shape shape = entry.getValue();
 			if (shape instanceof VisClass) {
 				
-//				// <CBL 25/9/13> 
-//				// we do not add the disjoint connectors of Bottom as, by definition, it is 
-//				// disjoint with anything
-//				// the same reasoning is applied to the classes equivalent to bottom
-//				if (reasoner.isSatisfiable(shape.asVisClass().getLinkedClassExpression()))
-//					shape.asVisClass().addReasonedDisjointConnectors();
-				// independently of its satisfiability 
-				// we add the disjointness axioms to top and bottom
-				
-				// NOTE: The use of reasoned disjoint connectors introduces a lot of noise in the graph: 
-				// while the equivalence could be treated looking for accessibility paths 
-				// to create clusters, disjointness cannot be treated in that way
-				// the reasoned information is given in the tooltip 
-				
-				shape.asVisClass().addAssertedDisjointConnectors(); 
+				shape.asVisClass().addAssertedDisjointConnectors();
 				shape.asVisClass().addEquivalentConnectors();
-			}	
+			}
 		}
+
+		//processSuperNodes();
+
+
 		updateProgressBarObserver(80);
 		placeProperties(activeOntology,reasoner,set);
     	arrangePos();
@@ -236,15 +226,63 @@ public class VisGraph implements Runnable{
     	updateProgressBarObserver(90);
     	clearDashedConnectorList();
 
-		//paintframe.doKceOptionAction();
-		showAll();
+		paintframe.doKceOptionAction();
+		//showAll();
 
     	VisLevel.adjustWidthAndPos(getLevelSet());
     	paintframe.getParentFrame().loadSearchCombo();
     	updateProgressBarObserver(100);
     	paintframe.setStateChanged(true);
-
 	}
+
+	/**
+	 * Processes the supernodes in the reasoned graph.
+	 * This method identifies and groups equivalent nodes into supernodes.
+	 * Supernodes are created and assigned levels based on the levels of their subnodes.
+	 * Then, the supernodes are added to the shape map (`shapeMap`).
+	 */
+	private void processSuperNodes() {
+		Map<VisClass, SuperNode> superNodesMap = new HashMap<>();
+		for (Entry<String,Shape> entry : shapeMap.entrySet()){
+			Shape shape = entry.getValue();
+			if (shape instanceof VisClass visClass) {
+				shape.asVisClass().addAssertedDisjointConnectors();
+				shape.asVisClass().addEquivalentConnectors();
+
+				for (VisConnectorEquiv equiv : visClass.getEquivConnectors()) {
+					Shape other = equiv.getOtherEnd(visClass);
+					if (other instanceof VisClass otherVisClass) {
+						SuperNode superNode = superNodesMap.get(visClass);
+						if (superNode == null) {
+							superNode = new SuperNode();
+							superNodesMap.put(visClass, superNode);
+						}
+						superNode.addSubNode(visClass);
+
+						if (!superNode.getSubNodes().contains(otherVisClass)) {
+							superNode.addSubNode(otherVisClass);
+							superNodesMap.put(otherVisClass, superNode);
+						}
+					}
+				}
+			}
+		}
+
+		for (SuperNode superNode : superNodesMap.values()) {
+			int minLevelId = superNode.getSubNodes().stream()
+					.mapToInt(subNode -> subNode.getVisLevel().getID())
+					.min()
+					.orElse(0);
+
+			VisLevel superNodeLevel = VisLevel.getLevelFromID(levelSet, minLevelId);
+
+			assert superNodeLevel != null;
+			superNode.setVisLevel(superNodeLevel);
+
+			shapeMap.put("SuperNode_" + superNode.hashCode(), superNode);
+		}
+	}
+
 	public void changeRenderMethod(Boolean labelRendering, Boolean qualifiedRendering ){
 		
 		for (Entry<String,Shape> entry : shapeMap.entrySet()){
