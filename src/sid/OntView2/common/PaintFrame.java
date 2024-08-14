@@ -671,7 +671,7 @@ public class PaintFrame extends Canvas implements Runnable {
 				e.consume();
 				if (shape instanceof VisClass visClass) {
 					OWLClassExpression classExpression = visClass.getLinkedClassExpression();
-					if (classExpression != null && classExpression.isOWLThing()) {
+					if (classExpression != null && (classExpression.isOWLThing() || classExpression.isOWLNothing())) {
 						return false;
 					}
 				}
