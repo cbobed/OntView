@@ -817,6 +817,10 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	}
 
 	public void restoreSliderValue() {
+		if(size != null) {
+			parent.artPanel.setFactor(1.0);
+			parent.artPanel.scale(1.0, size);
+		}
 		getZoomSlider().setValue(5);
 	}
 
