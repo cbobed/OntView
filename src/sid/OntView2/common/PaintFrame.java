@@ -179,6 +179,17 @@ public class PaintFrame extends Canvas implements Runnable {
 	}
 
 	/*-*************************************************************/
+	public void drawDisjointShape(VisClass visClass) {
+		if (this.getScene() != null && !this.isDisabled() && this.isVisible() && this.getGraphicsContext2D() != null) {
+			GraphicsContext g = this.getGraphicsContext2D();
+
+			if (visGraph != null) {
+				for (VisConnectorDisjoint disjoint : visClass.getDisjointConnectors()) {
+					disjoint.draw(g);
+				}
+			}
+		}
+	}
 
 	public void drawConnectorShape(Shape shape) {
 		if (this.getScene() != null && !this.isDisabled() && this.isVisible() && this.getGraphicsContext2D() != null) {
@@ -448,6 +459,11 @@ public class PaintFrame extends Canvas implements Runnable {
 			return;
 		}
 		Point2D p = translatePoint(new Point2D(e.getX(), e.getY()));
+		if (isInsidePropertyBox((int) p.getX(), (int) p.getY())) {
+			pressedShape = null;
+			return;
+		}
+
 		pressedShape = visGraph.findShape(p);
 
 		if (pressedShape != null) {
@@ -465,12 +481,12 @@ public class PaintFrame extends Canvas implements Runnable {
 		if (visGraph == null) {
 			return;
 		}
-		if (!showConnectors) {
+		/*if (!showConnectors) {
 			Point2D p = translatePoint(new Point2D(e.getX(), e.getY()));
 			eraseConnector = visGraph.findShape(p);
 			drawConnectorShape(eraseConnector);
 			eraseConnector = null;
-		}
+		}*/
 		pressedShape = null;
 		repulsion = true;
 		mouseLastY = 0;
@@ -484,6 +500,10 @@ public class PaintFrame extends Canvas implements Runnable {
 	 */
 
 	public void handleMouseDragged(MouseEvent e) {
+		if (pressedShape == null) {
+			return;
+		}
+
 		int draggedY, draggedX;
 		int direction;
 		repulsion = (e.getButton() != MouseButton.SECONDARY);
@@ -655,6 +675,9 @@ public class PaintFrame extends Canvas implements Runnable {
 		if (clickedOnClosePropertyBox(x, y)) {
 			return;
 		}
+		if (clickedOnCloseDisjointBox(x, y)) {
+			return;
+		}
 		if (clickedOnShape(x, y, e))
 			return;
 		if (e.getButton() == MouseButton.SECONDARY) {
@@ -743,6 +766,26 @@ public class PaintFrame extends Canvas implements Runnable {
 		return false;
 	}
 
+	private boolean isInsidePropertyBox(int x, int y) {
+		if (visGraph == null) {
+			return false;
+		}
+		for (Entry<String, Shape> entry : visGraph.shapeMap.entrySet()) {
+			Shape shape = entry.getValue();
+			if ((shape instanceof VisClass) && (shape.asVisClass().propertyBox != null)) {
+				if (shape.asVisClass().onCloseBox(x, y)) {
+					return true;
+				}
+			}
+			if ((shape instanceof VisClass) && (shape.asVisClass().getDisjointConnectors() != null)) {
+				if (shape.asVisClass().onCloseDisjoints(x, y)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	private boolean clickedOnClosePropertyBox(int x, int y) {
 		if (visGraph == null) {
 			return false;
@@ -763,7 +806,25 @@ public class PaintFrame extends Canvas implements Runnable {
 		return false;
 	}
 
-	private void showRelatedProperties(VisClass visClass, VisGraph visGraph, boolean visibility) {
+	private boolean clickedOnCloseDisjointBox(int x, int y) {
+		if (visGraph == null) {
+			return false;
+		}
+		for (Entry<String, Shape> entry : visGraph.shapeMap.entrySet()) {
+			Shape shape = entry.getValue();
+			if (shape instanceof VisClass visClass) {
+				if (visClass.getDisjointConnectors() != null && shape.asVisClass().onCloseDisjoints(x, y)) {
+					drawDisjointShape(visClass);
+					//setStateChanged(true);
+					//relax();
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+		private void showRelatedProperties(VisClass visClass, VisGraph visGraph, boolean visibility) {
 		for (VisObjectProperty property : visClass.getPropertyBox().getProperties()) {
 			for (Entry<String, Shape> entry : visGraph.shapeMap.entrySet()) {
 				Shape relatedShape = entry.getValue();
@@ -786,27 +847,7 @@ public class PaintFrame extends Canvas implements Runnable {
 		OWLDataFactory dataFactory = OWLManager.getOWLDataFactory();
 		return reasoner
 				.isEntailed(dataFactory.getOWLSubObjectPropertyOfAxiom(property.oPropExp, relatedProperty.oPropExp))
-				|| reasoner.isEntailed(
-						dataFactory.getOWLSubObjectPropertyOfAxiom(relatedProperty.oPropExp, property.oPropExp));
-	}
-
-	private void expandRelatedProperties(VisClass visClass, boolean visibility) {
-		for (VisConnector connector : visClass.outConnectors) {
-			Shape relatedShape = connector.to;
-			if (relatedShape instanceof VisClass relatedVisClass) {
-				if (relatedVisClass.propertyBox != null) {
-					relatedVisClass.propertyBox.setVisible(visibility);
-				}
-			}
-		}
-		for (VisConnector connector : visClass.inConnectors) {
-			Shape relatedShape = connector.from;
-			if (relatedShape instanceof VisClass relatedVisClass) {
-				if (relatedVisClass.propertyBox != null) {
-					relatedVisClass.propertyBox.setVisible(visibility);
-				}
-			}
-		}
+				|| reasoner.isEntailed(dataFactory.getOWLSubObjectPropertyOfAxiom(relatedProperty.oPropExp, property.oPropExp));
 	}
 
 	public void focusOnShape(String shapeKey, Shape pshape) {

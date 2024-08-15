@@ -6,7 +6,7 @@ import javafx.scene.paint.Color;
 
 public class VisConnectorDisjoint extends VisConnectorEquiv {
 
-	Color color= Color.GRAY;
+	Color color= Color.RED;
 	
 	public VisConnectorDisjoint(Shape par_from, Shape par_to) {
 		super(par_from, par_to);

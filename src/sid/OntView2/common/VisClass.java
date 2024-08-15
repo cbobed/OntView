@@ -111,7 +111,7 @@ public class VisClass extends Shape {
 	@Override
 	public String getLabel() { return label; }
 	
-	private ArrayList<VisConnectorDisjoint> getDisjointConnectors(){
+	ArrayList<VisConnectorDisjoint> getDisjointConnectors(){
 		if (disjointList==null) {
 			disjointList = new ArrayList<VisConnectorDisjoint>();
 		}	
@@ -853,7 +853,18 @@ public class VisClass extends Shape {
 
 		return (x >= px && x <= px + pWidth) && (y >= py && y <= py + pHeight);
 	}
-	
+
+	public boolean onCloseDisjoints(int x, int y) {
+		int disjointX = getPosX() + getWidth() / 2 - 20;
+		int disjointY = getPosY() - getHeight() / 2 + 6;
+		int disjointWidth = 14;
+		int disjointHeight = 14;
+
+		return (x >= disjointX && x <= disjointX + disjointWidth) &&
+				(y >= disjointY && y <= disjointY + disjointHeight);
+	}
+
+
 	public NodeSet<OWLNamedIndividual> getInstances(){
 		OWLReasoner reasoner = graph.paintframe.getReasoner();
 		return reasoner.getInstances(this.getLinkedClassExpression(), false);
