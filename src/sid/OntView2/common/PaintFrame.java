@@ -937,6 +937,7 @@ public class PaintFrame extends Canvas implements Runnable {
 
 		switch (getKceOption()) {
 		case VisConstants.NONECOMBOOPTION -> { // "None"
+			getVisGraph().dashedConnectorList.clear();
 			getVisGraph().showAll();
 		}
 		case VisConstants.KCECOMBOOPTION1 -> { // "KCE10"
