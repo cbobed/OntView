@@ -1,6 +1,6 @@
+https://protege.stanford.edu/ontologies/pizza/pizza.owl
 file:/home/carlota/Downloads/ontology_subniveles.owl
 file:/home/carlota/Desktop/OntView/onts/dbpedia_3.8.owl
-https://protege.stanford.edu/ontologies/pizza/pizza.owl
 file:/home/carlota/Downloads/anonima.owl
 https://w3id.org/example
 file:/home/carlota/Downloads/ontology--DEV_type=orig.owl

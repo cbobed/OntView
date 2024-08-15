@@ -483,6 +483,12 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			restoreViewButton.getStyleClass().add("button");
 			restoreViewButton.setMinWidth(70);
 			restoreViewButton.setCursor(Cursor.HAND);
+
+			if (!parent.artPanel.isStable()) {
+				restoreViewButton.setDisable(true);
+			}
+			restoreViewButton.disableProperty().bind(parent.artPanel.stableChangeProperty());
+
 			restoreViewButton.setOnAction(this::restoreViewButtonActionActionPerformed);
 
 			tooltipInfo(restoreViewButton, "Restore view from xml file");
@@ -496,6 +502,12 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			saveViewButton.getStyleClass().add("button");
 			saveViewButton.setMinWidth(70);
 			saveViewButton.setCursor(Cursor.HAND);
+
+			if (!parent.artPanel.isStable()) {
+				saveViewButton.setDisable(true);
+			}
+			saveViewButton.disableProperty().bind(parent.artPanel.stableChangeProperty());
+
 			saveViewButton.setOnAction(this::saveViewButtonActionActionPerformed);
 
 			tooltipInfo(saveViewButton, "Save current view as xml file");
@@ -562,42 +574,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		}
 		return loadOntologyCombo;
 	}
-/*
-	private VBox getConnectorsSwitch() {
-		if (connectorPanel == null) {
-			connectorPanel = new VBox();
-			connectorPanel.setPadding(new Insets(5));
-			connectorPanel.setSpacing(5);
 
-			StackPane titlePane = createTitlePane("Connectors");
-			toggleSwitch = new ToggleButton("Show");
-			toggleSwitch.getStyleClass().add("button");
-
-			if (!parent.artPanel.isStable()) {
-				toggleSwitch.setDisable(true);
-			}
-
-			toggleSwitch.disableProperty().bind(parent.artPanel.stableChangeProperty());
-
-			// Add a listener to handle the switch state
-			toggleSwitch.selectedProperty().addListener((observable, oldValue, newValue) -> {
-				if (newValue) {
-					toggleSwitch.setText("Hide");
-					parent.artPanel.setShowConnectors(true);
-					parent.artPanel.draw();
-				} else {
-					toggleSwitch.setText("Show");
-					parent.artPanel.setShowConnectors(false);
-					parent.artPanel.draw();
-
-				}
-			});
-			connectorPanel = createContainer(true, titlePane, toggleSwitch);
-
-		}
-		return connectorPanel;
-	}
-*/
 	private VBox createHelpButton() {
 		if (helpPanel == null) {
 			helpPanel = new VBox();
@@ -608,12 +585,10 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			StackPane titlePane = createTitlePane("Help");
 			helpButton = new Button("?");
 			helpButton.getStyleClass().add("button");
-			helpButton.setStyle(
-							"-fx-shape: 'M 0 50 a 50 50 0 1 1 100 0 a 50 50 0 1 1 -100 0'; " +
-							"-fx-background-radius: 50%;"
-			);
+			helpButton.setStyle("-fx-shape:'M 0 50 a 50 50 0 1 1 100 0 a 50 50 0 1 1 -100 0'; -fx-background-radius: 50%;");
 
-			Label helpContent = new Label("Esta es una leyenda de ayuda.\nExplicación detallada aquí.");
+			Label helpContent = new Label("Esta es una leyenda de ayuda.\nPara poder restaurar una ontología, has de cargar previamente" +
+					" dicha ontologia.");
 			helpContent.setStyle("-fx-background-color: white; -fx-border-color: black; -fx-padding: 10px;");
 
 			helpPopup = new Popup();
@@ -860,7 +835,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			}
 			parent.artPanel.getVisGraph().setZoomLevel((int) getZoomSlider().getValue());
 			parent.artPanel.setFactor(factor);
-			parent.artPanel.scale(factor);
+			parent.artPanel.scale(factor, size);
 		}
 	}
 }

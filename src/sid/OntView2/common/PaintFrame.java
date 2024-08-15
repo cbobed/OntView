@@ -148,9 +148,7 @@ public class PaintFrame extends Canvas implements Runnable {
 	 * 
 	 * @param d d
 	 */
-	public void setFactor(double d) {
-		factor = d;
-	}
+	public void setFactor(double d) { factor = d; }
 
 	public void setOriginalSize(Dimension2D in) {
 		oSize = in;
@@ -162,7 +160,14 @@ public class PaintFrame extends Canvas implements Runnable {
 	 * @param factor
 	 */
 
-	public void scale(double factor) {
+	public void scale(double factor, Dimension2D size) {
+		double newWidth = size.getWidth() * factor;
+		double newHeight = size.getHeight() * factor;
+
+		// Set the new canvas size
+		setWidth(newWidth);
+		setHeight(newHeight);
+
 		GraphicsContext gc = this.getGraphicsContext2D();
 		if (gc != null) {
 			gc.restore();
@@ -368,7 +373,7 @@ public class PaintFrame extends Canvas implements Runnable {
 
 		if (stable) {
 			while (stateChanged.get()) {
-				System.out.println("relax");
+				//System.out.println("relax");
 				stateChanged.set(false);
 
 				/*
@@ -404,6 +409,7 @@ public class PaintFrame extends Canvas implements Runnable {
 					visGraph.adjustPanelSize((float) factor);
 					recentChange = true;
 				}
+				
 			}
 			if (recentChange) {
 				draw();
