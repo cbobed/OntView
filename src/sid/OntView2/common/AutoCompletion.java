@@ -35,11 +35,8 @@ public class AutoCompletion {
         this.editor = comboBox.getEditor();
         this.comboBox.setEditable(true);
 
-        this.comboBox.valueProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observableValue, String oldValue, String newValue) {
-                if (!selecting) highlightCompletedText(0);
-            }
+        this.comboBox.valueProperty().addListener((observableValue, oldValue, newValue) -> {
+            if (!selecting) highlightCompletedText(0);
         });
 
         /*editor.addEventFilter(KeyEvent.KEY_PRESSED, e -> {

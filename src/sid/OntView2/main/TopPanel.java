@@ -25,6 +25,7 @@ import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Popup;
 import javafx.util.Duration;
+import org.apache.jena.base.Sys;
 import org.semanticweb.owlapi.io.OWLOntologyCreationIOException;
 import org.semanticweb.owlapi.model.IRI;
 import sid.OntView2.common.*;
@@ -741,7 +742,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		temp = new ArrayList<>();
 
 		for (Entry<String, String> s : parent.artPanel.getVisGraph().getQualifiedLabelMap().entrySet()) {
-			temp.add(s.getKey());
+			if (!s.getValue().contains("SIDClass_"))
+				temp.add(s.getKey());
 		}
 
 		Collections.sort(temp);
