@@ -791,6 +791,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		}
 		parent.artPanel.setStateChanged(true);
 		parent.artPanel.relax();
+		Platform.runLater(parent.artPanel.getRelaxerRunnable()); 
 	}
 
 	private void reduceActionActionPerformed(ActionEvent event) {

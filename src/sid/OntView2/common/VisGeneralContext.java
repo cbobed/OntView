@@ -1,5 +1,6 @@
 package sid.OntView2.common;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
@@ -72,7 +73,7 @@ public class VisGeneralContext extends ContextMenu {
 		    }
 	    }
 		parent.setStateChanged(true);
-		parent.relax();
+		Platform.runLater(parent.relaxerRunnable);
 		updateMenuItemTexts();
 
 	}

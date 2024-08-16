@@ -49,7 +49,7 @@ public class VisShapeContext extends ContextMenu {
 			shape.asVisClass().getPropertyBox().setVisible(!b);
 			hideProperties.setText(b ? "Hide Properties" : "Show Properties");
 			parent.setStateChanged(true);
-			parent.relax();
+			Platform.runLater(parent.relaxerRunnable);
 		});
 		
 		hideItem = new MenuItem("Hide");

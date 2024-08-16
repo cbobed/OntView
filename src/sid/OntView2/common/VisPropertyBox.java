@@ -35,7 +35,14 @@ public class VisPropertyBox {
 	
 	ArrayList<String> rep;
 	public void setVisible(boolean b){visible=b;}
-	public int getHeight(){return height;}
+	public int getHeight(){
+		if (visible) {
+			return height;
+		}
+		else {
+			return 0; 
+		}
+	}
 	public void setHeight(int x){height =x;}
 	
 	private HashMap<String, VisObjectProperty> getVisPropertiesInGraph(){

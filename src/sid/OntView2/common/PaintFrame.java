@@ -5,6 +5,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.CountDownLatch;
 
 import javafx.animation.PauseTransition;
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.concurrent.Task;
@@ -32,14 +33,14 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import reducer.StructuralReducer;
 import sid.OntView2.utils.ProgressBarDialogThread;
 
-public class PaintFrame extends Canvas implements Runnable {
+public class PaintFrame extends Canvas {
 
 	private CountDownLatch latch;
 	private static final long serialVersionUID = 1L;
 	public ScrollPane scroll;
 	static final int BORDER_PANEL = 50;
 	static final int MIN_SPACE = 20;
-	static int PROPETY_BOX_HEIGHT = 0;
+	static int PROPERTY_BOX_HEIGHT = 0;
 	static final int MIN_Y_SEP = 3;
 	static final int SEP = 200;
 	private static final int DOWN = 0;
@@ -47,22 +48,18 @@ public class PaintFrame extends Canvas implements Runnable {
 	boolean stable = false;
 	boolean repulsion = true;
 	public boolean renderLabel = false;
-//	private boolean kceEnabled = false;
 
 	// CBL: added the qualified names rendering
 	public boolean qualifiedNames = false;
 	private String kceOption = VisConstants.NONECOMBOOPTION;
 
-	Thread relaxer;
 	Dimension2D prevSize;
 	PaintFrame paintFrame = this;
 	OWLOntology activeOntology;
 	private String activeOntologySource;
-//    boolean        reduceCheck = false;
 
 	OWLReasoner reasoner;
 	VisGraph visGraph, oVisGraph, rVisGraph; // visGraph will handle both depending on which is currently selected
-//    public boolean reduceChecked = false;
 
 	String positionGraph = "LEFT";
 	private VisShapeContext menuVisShapeContext = null;
@@ -154,6 +151,18 @@ public class PaintFrame extends Canvas implements Runnable {
 
 	public void setOriginalSize(Dimension2D in) {
 		oSize = in;
+	}
+	
+	public class Relaxer implements Runnable {
+		public void run() {
+			relax(); 
+		}
+	}
+	
+	Relaxer relaxerRunnable = null; 
+	
+	public Relaxer getRelaxerRunnable() {
+		return relaxerRunnable; 
 	}
 
 	/**
@@ -362,47 +371,42 @@ public class PaintFrame extends Canvas implements Runnable {
 			return;
 		}
 
-		// repulsion and atraction between nodes
-		Shape shape_j, s_i;
 		boolean recentChange = false;
 
 		if (stable) {
 			while (stateChanged.get()) {
 				System.out.println("relax");
 				stateChanged.set(false);
+				
+				// Faster version
+				for (VisLevel level: visGraph.levelSet) {
+					for (Shape s_i: level.getShapeSet()) {
+						for (Shape shape_j: level.getShapeSet()) {
+							if (s_i.getVisLevel() == shape_j.getVisLevel()) {
+								if ((s_i != shape_j) && (s_i.visible) && (shape_j.visible)) {
+									/*
+									 * if (s_i.asVisClass().getPropertyBox() != null) { PROPETY_BOX_HEIGHT =
+									 * s_i.asVisClass().getHeight(); } else { PROPETY_BOX_HEIGHT = 0; }
+									 */
 
-				/*
-				 * HashMap<String, Shape> shapeMapCopy; synchronized (visGraph.shapeMap) {
-				 * shapeMapCopy = new HashMap<>(visGraph.shapeMap); }
-				 */
-				for (Entry<String, Shape> e_i : visGraph.shapeMap.entrySet()) {
-					for (Entry<String, Shape> e_j : visGraph.shapeMap.entrySet()) {
-						s_i = e_i.getValue();
-						shape_j = e_j.getValue();
-
-						if (s_i.getVisLevel() == shape_j.getVisLevel()) {
-							if ((s_i != shape_j) && (s_i.visible) && (shape_j.visible)) {
-								/*
-								 * if (s_i.asVisClass().getPropertyBox() != null) { PROPETY_BOX_HEIGHT =
-								 * s_i.asVisClass().getHeight(); } else { PROPETY_BOX_HEIGHT = 0; }
-								 */
-
-								if ((s_i.getPosY() < shape_j.getPosY()) && (s_i.getPosY() + s_i.getTotalHeight()
-										+ MIN_SPACE + PROPETY_BOX_HEIGHT) >= shape_j.getPosY()) {
-									stateChanged.set(true);
-									shapeRepulsion(s_i, DOWN);
+									if ((s_i.getPosY() < shape_j.getPosY()) && 
+											(shape_j.getPosY() < (s_i.getPosY() + s_i.getTotalHeight() + MIN_SPACE )) ) {
+										System.out.println("s_i:"+s_i.getPosY()+" "+s_i.getTotalHeight()+ " "+ (s_i.getPosY() + s_i.getTotalHeight() + MIN_SPACE )); 
+										System.out.println("shape_j:"+shape_j.getPosY()); 
+										stateChanged.set(true);
+										shapeRepulsion(s_i, DOWN);
+									}
 								}
 							}
 						}
+						if (s_i.getPosY() < BORDER_PANEL) {
+							s_i.setPosY(BORDER_PANEL + MIN_SPACE);
+							stateChanged.set(true);
+							shapeRepulsion(s_i, DOWN);
+						}
+						visGraph.adjustPanelSize((float) factor);
+						recentChange = true;
 					}
-					s_i = e_i.getValue();
-					if (s_i.getPosY() < BORDER_PANEL) {
-						s_i.setPosY(BORDER_PANEL + MIN_SPACE);
-						stateChanged.set(true);
-						shapeRepulsion(s_i, DOWN);
-					}
-					visGraph.adjustPanelSize((float) factor);
-					recentChange = true;
 				}
 			}
 			if (recentChange) {
@@ -612,34 +616,16 @@ public class PaintFrame extends Canvas implements Runnable {
 		return null;
 	}
 
-	/*
-	 * RUNNABLE METHODS
-	 */
-
-	public void run() {
-		Thread me = Thread.currentThread();
-		while (relaxer == me) {
-			relax();
-			try {
-				Thread.sleep(stable ? 1000 : 800);
-				while (pressedShape != null) {
-					Thread.sleep(400);
-				}
-			} catch (InterruptedException e) {
-				break;
-			}
-		}
-	}
-
 	public void start() {
-		relaxer = new Thread(this);
+		relaxerRunnable = new Relaxer();
 		System.out.println("start");
-		relaxer.start();
+		Platform.runLater(relaxerRunnable); 
+		
 	}
 
 	public void stop() {
 		System.out.println("stop");
-		relaxer = null;
+		relaxerRunnable = null;
 	}
 
 	public void handleMouseClicked(MouseEvent e) {
@@ -678,7 +664,7 @@ public class PaintFrame extends Canvas implements Runnable {
 				if (shape.allSubHidden()) {
 					shape.hide();
 					setStateChanged(true);
-					relax();
+					Platform.runLater(relaxerRunnable);
 					return true;
 				}
 			} else {
@@ -749,7 +735,7 @@ public class PaintFrame extends Canvas implements Runnable {
 					shape.asVisClass().propertyBox.setVisible(!b);
 					showRelatedProperties(shape.asVisClass(), visGraph, !b);
 					setStateChanged(true);
-					relax();
+					Platform.runLater(relaxerRunnable);
 					return true;
 				}
 			}
