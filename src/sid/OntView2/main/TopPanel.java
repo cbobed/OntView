@@ -701,7 +701,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 	private void loadReasonerButtonActionActionPerformed(ActionEvent event) {
 		String x = (String) getReasonerCombo().getValue();
-		parent.artPanel.setShowConnectors(false);
+		parent.artPanel.setShowConnectors(true);
 		if(toggleSwitch != null)
 			toggleSwitch.setSelected(false);
 

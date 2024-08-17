@@ -268,19 +268,19 @@ public class VisGraph implements Runnable{
 			}
 		}
 
-		for (SuperNode superNode : superNodesMap.values()) {
-			int minLevelId = superNode.getSubNodes().stream()
-					.mapToInt(subNode -> subNode.getVisLevel().getID())
-					.min()
-					.orElse(0);
-
-			VisLevel superNodeLevel = VisLevel.getLevelFromID(levelSet, minLevelId);
-
-			assert superNodeLevel != null;
-			superNode.setVisLevel(superNodeLevel);
-
-			shapeMap.put("SuperNode_" + superNode.hashCode(), superNode);
-		}
+//		for (SuperNode superNode : superNodesMap.values()) {
+//			int minLevelId = superNode.getSubNodes().stream()
+//					.mapToInt(subNode -> subNode.getVisLevel().getID())
+//					.min()
+//					.orElse(0);
+//
+//			VisLevel superNodeLevel = VisLevel.getLevelFromID(levelSet, minLevelId);
+//
+//			assert superNodeLevel != null;
+//			superNode.setVisLevel(superNodeLevel);
+//
+//			shapeMap.put("SuperNode_" + superNode.hashCode(), superNode);
+//		}
 	}
 
 	public void changeRenderMethod(Boolean labelRendering, Boolean qualifiedRendering ){
