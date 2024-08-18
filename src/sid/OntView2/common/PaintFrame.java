@@ -145,7 +145,7 @@ public class PaintFrame extends Canvas implements Runnable {
 
 	/**
 	 * sets scaling/zoom factor
-	 * 
+	 *
 	 * @param d d
 	 */
 	public void setFactor(double d) { factor = d; }
@@ -156,7 +156,7 @@ public class PaintFrame extends Canvas implements Runnable {
 
 	/**
 	 * scales by factor and adjusts panel size
-	 * 
+	 *
 	 * @param factor
 	 */
 
@@ -234,6 +234,10 @@ public class PaintFrame extends Canvas implements Runnable {
 					}
 				}
 
+				if (!selectedShapes.isEmpty()){
+					drawConnectorsForSelectedShapes();
+				}
+
 				g.setStroke(Color.LIGHTGRAY);
 				for (VisLevel lvl : visGraph.levelSet) {
 					(g).strokeLine(lvl.getXpos(), 0, lvl.getXpos(), (int) (getHeight() / factor));
@@ -258,6 +262,12 @@ public class PaintFrame extends Canvas implements Runnable {
 				}
 				drawPropertyBoxes(g);
 			}
+		}
+	}
+
+	private void drawConnectorsForSelectedShapes() {
+		for (Shape shape : selectedShapes) {
+			drawConnectorShape(shape);
 		}
 	}
 
@@ -346,7 +356,7 @@ public class PaintFrame extends Canvas implements Runnable {
 
 	/**
 	 * returns pressed shape
-	 * 
+	 *
 	 * @return Shape
 	 */
 	public Shape getPressedShape() {
@@ -420,7 +430,7 @@ public class PaintFrame extends Canvas implements Runnable {
 					visGraph.adjustPanelSize((float) factor);
 					recentChange = true;
 				}
-				
+
 			}
 			if (recentChange) {
 				draw();
@@ -439,6 +449,7 @@ public class PaintFrame extends Canvas implements Runnable {
 	int mouseLastY = 0;
 	int mouseLastX = 0;
 	Shape pressedShape = null;
+	List<Shape> selectedShapes = new ArrayList<>();
 	Shape drawConnector = null;
 	Shape eraseConnector = null;
 	Cursor cursorState = Cursor.DEFAULT;
@@ -473,26 +484,17 @@ public class PaintFrame extends Canvas implements Runnable {
 			mouseLastY = (int) p.getY();
 			setCursor(Cursor.MOVE);
 		}
-		// draw();
-		drawConnectorShape(pressedShape);
 	}
 
 	public void handleMouseReleased(MouseEvent e) {
 		if (visGraph == null) {
 			return;
 		}
-		/*if (!showConnectors) {
-			Point2D p = translatePoint(new Point2D(e.getX(), e.getY()));
-			eraseConnector = visGraph.findShape(p);
-			drawConnectorShape(eraseConnector);
-			eraseConnector = null;
-		}*/
 		pressedShape = null;
 		repulsion = true;
 		mouseLastY = 0;
 		mouseLastX = 0;
 		setCursor(Cursor.DEFAULT);
-
 	}
 
 	/*
@@ -581,9 +583,111 @@ public class PaintFrame extends Canvas implements Runnable {
 		}
 	}
 
+	public void handleMouseClicked(MouseEvent e) {
+		Point2D p = translatePoint(new Point2D(e.getX(), e.getY()));
+		int x = (int) p.getX();
+		int y = (int) p.getY();
+		if (clickedOnClosePropertyBox(x, y) || clickedOnCloseDisjointBox(x, y)) {
+			return;
+		}
+		if (clickedOnShape(x, y, e))
+			return;
+		if (e.getButton() == MouseButton.SECONDARY) {
+			if (menuVisGeneralContext != null) {
+				closeContextMenu(menuVisGeneralContext);
+			}
+			showContextMenu((int) e.getScreenX(), (int) e.getScreenY());
+		}
+		//draw();
+	}
+
+	private boolean clickedOnShape(int x, int y, MouseEvent e) {
+		if (visGraph == null) {
+			return false;
+		}
+		Shape shape = visGraph.findShape(new Point2D(x, y));
+		if (shape != null) {
+			if (e.getClickCount() == 2 && !e.isConsumed() && e.getButton() == MouseButton.PRIMARY) {
+				// double click
+				e.consume();
+				if (shape instanceof VisClass visClass) {
+					OWLClassExpression classExpression = visClass.getLinkedClassExpression();
+					if (classExpression != null && (classExpression.isOWLThing() || classExpression.isOWLNothing())) {
+						return false;
+					}
+				}
+				if (shape.allSubHidden()) {
+					shape.hide();
+					setStateChanged(true);
+					relax();
+					return true;
+				}
+			} else {
+				switch (e.getButton()) {
+
+					// if right-click on the figure
+					case SECONDARY:
+						if (menuVisShapeContext != null) {
+							closeContextMenu(menuVisShapeContext);
+						}
+						if (menuVisGeneralContext != null) {
+							closeContextMenu(menuVisGeneralContext);
+						}
+						showContextMenu(shape, e);
+						break;
+					case PRIMARY:
+						// Click on the open symbol
+						if (pressedOpen(shape, x, y, e)) {
+							if (shape.getState() == Shape.CLOSED || shape.getState() == Shape.PARTIALLY_CLOSED) {
+								// si estaba cerrado el nodo [+] abrirlo
+								shape.open();
+								refreshDashedConnectors();
+								VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
+								draw();
+							}
+						}
+						// Click on the close symbol
+						else if (pressedClose(shape, x, y, e)) {
+							if (shape.getState() == Shape.OPEN || shape.getState() == Shape.PARTIALLY_CLOSED) {
+								// if [-] clicked, close the node
+								shape.close();
+								refreshDashedConnectors();
+								VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
+								draw();
+							}
+						} else { // pressed elsewhere on the shape
+							if (selectedShapes.contains(shape)) {
+								selectedShapes.remove(shape);
+							} else {
+								selectedShapes.add(shape);
+							}
+							draw();
+
+							paintFrame.focusOnShape(null, shape);
+							break;
+						}
+				}
+				// notify graphObserver
+				getVisGraph().updateObservers(VisConstants.GENERALOBSERVER);
+				return true;
+			}
+		} else {
+			if (menuVisShapeContext != null) {
+				closeContextMenu(menuVisShapeContext);
+			}
+			if (menuVisGeneralContext != null) {
+				closeContextMenu(menuVisGeneralContext);
+			}
+		}
+
+		// notify graphObserver
+		getVisGraph().updateObservers(VisConstants.GENERALOBSERVER);
+		return false;
+	}
+
 	/**
 	 * method to convert HTML-like content into JavaFX Tooltip styled text
-	 * 
+	 *
 	 * @param html
 	 * @return String
 	 */
@@ -601,22 +705,8 @@ public class PaintFrame extends Canvas implements Runnable {
 	}
 
 	/**
-	 * method to check if the mouse is inside a rectangle
-	 * 
-	 * @param mouseX
-	 * @param mouseY
-	 * @param rectX
-	 * @param rectY
-	 * @return boolean
-	 */
-	private boolean isInsideRect(double mouseX, double mouseY, double rectX, double rectY) {
-		return mouseX >= rectX - (rectX / 2) && mouseX <= rectX + (rectX / 2) && mouseY >= rectY - (rectY / 2)
-				&& mouseY <= rectY + (rectY / 2);
-	}
-
-	/**
 	 * translates point to current zoom factor
-	 * 
+	 *
 	 * @param p
 	 * @return Point
 	 */
@@ -668,104 +758,6 @@ public class PaintFrame extends Canvas implements Runnable {
 		relaxer = null;
 	}
 
-	public void handleMouseClicked(MouseEvent e) {
-		Point2D p = translatePoint(new Point2D(e.getX(), e.getY()));
-		int x = (int) p.getX();
-		int y = (int) p.getY();
-		if (clickedOnClosePropertyBox(x, y)) {
-			return;
-		}
-		if (clickedOnCloseDisjointBox(x, y)) {
-			return;
-		}
-		if (clickedOnShape(x, y, e))
-			return;
-		if (e.getButton() == MouseButton.SECONDARY) {
-			if (menuVisGeneralContext != null) {
-				closeContextMenu(menuVisGeneralContext);
-			}
-			showContextMenu((int) e.getScreenX(), (int) e.getScreenY());
-		}
-		draw();
-	}
-
-	private boolean clickedOnShape(int x, int y, MouseEvent e) {
-		if (visGraph == null) {
-			return false;
-		}
-		Shape shape = visGraph.findShape(new Point2D(x, y));
-		if (shape != null) {
-			if (e.getClickCount() == 2 && !e.isConsumed() && e.getButton() == MouseButton.PRIMARY) {
-				// double click
-				e.consume();
-				if (shape instanceof VisClass visClass) {
-					OWLClassExpression classExpression = visClass.getLinkedClassExpression();
-					if (classExpression != null && (classExpression.isOWLThing() || classExpression.isOWLNothing())) {
-						return false;
-					}
-				}
-				if (shape.allSubHidden()) {
-					shape.hide();
-					setStateChanged(true);
-					relax();
-					return true;
-				}
-			} else {
-				switch (e.getButton()) {
-
-				// if right-click on the figure
-				case SECONDARY:
-					if (menuVisShapeContext != null) {
-						closeContextMenu(menuVisShapeContext);
-					}
-					if (menuVisGeneralContext != null) {
-						closeContextMenu(menuVisGeneralContext);
-					}
-					showContextMenu(shape, e);
-					break;
-				case PRIMARY:
-					// Click on the open symbol
-					if (pressedOpen(shape, x, y, e)) {
-						if (shape.getState() == Shape.CLOSED || shape.getState() == Shape.PARTIALLY_CLOSED) {
-							// si estaba cerrado el nodo [+] abrirlo
-							shape.open();
-							refreshDashedConnectors();
-							VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
-							draw();
-						}
-					}
-					// Click on the close symbol
-					else if (pressedClose(shape, x, y, e)) {
-						if (shape.getState() == Shape.OPEN || shape.getState() == Shape.PARTIALLY_CLOSED) {
-							// if [-] clicked, close the node
-							shape.close();
-							refreshDashedConnectors();
-							VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
-							draw();
-						}
-					} else { // pressed elsewhere on the shape
-						paintFrame.focusOnShape(null, shape);
-						break;
-					}
-				}
-				// notify graphObserver
-				getVisGraph().updateObservers(VisConstants.GENERALOBSERVER);
-				return true;
-			}
-		} else {
-			if (menuVisShapeContext != null) {
-				closeContextMenu(menuVisShapeContext);
-			}
-			if (menuVisGeneralContext != null) {
-				closeContextMenu(menuVisGeneralContext);
-			}
-		}
-
-		// notify graphObserver
-		getVisGraph().updateObservers(VisConstants.GENERALOBSERVER);
-		return false;
-	}
-
 	private boolean isInsidePropertyBox(int x, int y) {
 		if (visGraph == null) {
 			return false;
@@ -815,8 +807,6 @@ public class PaintFrame extends Canvas implements Runnable {
 			if (shape instanceof VisClass visClass) {
 				if (visClass.getDisjointConnectors() != null && shape.asVisClass().onCloseDisjoints(x, y)) {
 					drawDisjointShape(visClass);
-					//setStateChanged(true);
-					//relax();
 					return true;
 				}
 			}
@@ -824,7 +814,7 @@ public class PaintFrame extends Canvas implements Runnable {
 		return false;
 	}
 
-		private void showRelatedProperties(VisClass visClass, VisGraph visGraph, boolean visibility) {
+	private void showRelatedProperties(VisClass visClass, VisGraph visGraph, boolean visibility) {
 		for (VisObjectProperty property : visClass.getPropertyBox().getProperties()) {
 			for (Entry<String, Shape> entry : visGraph.shapeMap.entrySet()) {
 				Shape relatedShape = entry.getValue();
@@ -933,37 +923,37 @@ public class PaintFrame extends Canvas implements Runnable {
 			ArrayList<Shape> orderedList = currentLevel.orderedList();
 			int repellingIndex = orderedList.indexOf(repellingShape);
 			switch (direction) {
-			case UP:
-				if (repellingIndex > 0) {
-					Shape upperShape = getUpperShape(repellingIndex, orderedList);
-					if (upperShape == null) // it's the visible upper shape
-						return;
+				case UP:
+					if (repellingIndex > 0) {
+						Shape upperShape = getUpperShape(repellingIndex, orderedList);
+						if (upperShape == null) // it's the visible upper shape
+							return;
 
-					int upperShapeHeight = upperShape.getHeight();
-					if ((upperShape instanceof VisClass) && (upperShape.asVisClass().propertyBox != null))
-						upperShapeHeight += upperShape.asVisClass().getTotalHeight();
-					if (repellingShape.getPosY() < (upperShape.getPosY() + upperShapeHeight + MIN_Y_SEP)) {
-						upperShape.setPosY(upperShape.getPosY() - upperShape.getHeight() / 2);
+						int upperShapeHeight = upperShape.getHeight();
+						if ((upperShape instanceof VisClass) && (upperShape.asVisClass().propertyBox != null))
+							upperShapeHeight += upperShape.asVisClass().getTotalHeight();
+						if (repellingShape.getPosY() < (upperShape.getPosY() + upperShapeHeight + MIN_Y_SEP)) {
+							upperShape.setPosY(upperShape.getPosY() - upperShape.getHeight() / 2);
+						}
+						shapeRepulsion(upperShape, direction);
 					}
-					shapeRepulsion(upperShape, direction);
-				}
-				break;
+					break;
 
-			case DOWN:
-				if (repellingIndex < orderedList.size() - 1) {
-					Shape lowerShape = getLowerShape(repellingIndex, orderedList);
-					if (lowerShape == null) // it's the visible upper shape
-						return;
+				case DOWN:
+					if (repellingIndex < orderedList.size() - 1) {
+						Shape lowerShape = getLowerShape(repellingIndex, orderedList);
+						if (lowerShape == null) // it's the visible upper shape
+							return;
 
-					int z = repellingShape.getHeight();
-					if ((repellingShape instanceof VisClass) && (repellingShape.asVisClass().propertyBox != null))
-						z = repellingShape.asVisClass().getTotalHeight();
-					if (repellingShape.getPosY() + z > lowerShape.getPosY() - lowerShape.getHeight() - MIN_Y_SEP) {
-						lowerShape.setPosY(lowerShape.getPosY() + lowerShape.getHeight() / 2);
+						int z = repellingShape.getHeight();
+						if ((repellingShape instanceof VisClass) && (repellingShape.asVisClass().propertyBox != null))
+							z = repellingShape.asVisClass().getTotalHeight();
+						if (repellingShape.getPosY() + z > lowerShape.getPosY() - lowerShape.getHeight() - MIN_Y_SEP) {
+							lowerShape.setPosY(lowerShape.getPosY() + lowerShape.getHeight() / 2);
+						}
+						shapeRepulsion(lowerShape, direction);
 					}
-					shapeRepulsion(lowerShape, direction);
-				}
-				break;
+					break;
 			}
 		}
 	}
@@ -977,34 +967,34 @@ public class PaintFrame extends Canvas implements Runnable {
 		PageRankConceptExtraction extractorPageRank = new PageRankConceptExtraction();
 
 		switch (getKceOption()) {
-		case VisConstants.NONECOMBOOPTION -> { // "None"
-			getVisGraph().dashedConnectorList.clear();
-			getVisGraph().showAll();
-		}
-		case VisConstants.KCECOMBOOPTION1 -> { // "KCE10"
-			getVisGraph().showAll();
-			extractorKCE.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 10);
-		}
-		case VisConstants.KCECOMBOOPTION2 -> { // "KCE20"
-			getVisGraph().showAll();
-			extractorKCE.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20);
-		}
-		case VisConstants.PAGERANKCOMBOOPTION1 -> { // "PageRank10"
-			getVisGraph().showAll();
-			extractorPageRank.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 10);
-		}
-		case VisConstants.PAGERANKCOMBOOPTION2 -> { // "PageRank20"
-			getVisGraph().showAll();
-			extractorPageRank.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20);
-		}
-		case VisConstants.RDFRANKCOMBOOPTION1 -> { // "RDFRank10"
-			getVisGraph().showAll();
-			extractorRDFRank.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 10);
-		}
-		case VisConstants.RDFRANKCOMBOOPTION2 -> { // "RDFRank20"
-			getVisGraph().showAll();
-			extractorRDFRank.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20);
-		}
+			case VisConstants.NONECOMBOOPTION -> { // "None"
+				getVisGraph().dashedConnectorList.clear();
+				getVisGraph().showAll();
+			}
+			case VisConstants.KCECOMBOOPTION1 -> { // "KCE10"
+				getVisGraph().showAll();
+				extractorKCE.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 10);
+			}
+			case VisConstants.KCECOMBOOPTION2 -> { // "KCE20"
+				getVisGraph().showAll();
+				extractorKCE.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20);
+			}
+			case VisConstants.PAGERANKCOMBOOPTION1 -> { // "PageRank10"
+				getVisGraph().showAll();
+				extractorPageRank.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 10);
+			}
+			case VisConstants.PAGERANKCOMBOOPTION2 -> { // "PageRank20"
+				getVisGraph().showAll();
+				extractorPageRank.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20);
+			}
+			case VisConstants.RDFRANKCOMBOOPTION1 -> { // "RDFRank10"
+				getVisGraph().showAll();
+				extractorRDFRank.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 10);
+			}
+			case VisConstants.RDFRANKCOMBOOPTION2 -> { // "RDFRank20"
+				getVisGraph().showAll();
+				extractorRDFRank.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20);
+			}
 		}
 		/*
 		 * VisLevel.adjustWidthAndPos(visGraph.levelSet); GraphReorder reorder = new
