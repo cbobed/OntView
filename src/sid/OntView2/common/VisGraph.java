@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.Node;
@@ -24,8 +25,6 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 
-import static sid.OntView2.common.PaintFrame.BORDER_PANEL;
-import static sid.OntView2.common.PaintFrame.MIN_SPACE;
 import static sid.OntView2.utils.ExpressionManager.qualifyLabel;
 import static sid.OntView2.utils.ExpressionManager.replaceString;
 
@@ -734,23 +733,24 @@ public class VisGraph implements Runnable{
 	 *  @return shape or null if not found
 	 */
 	public Shape findShape(Point2D p) {
-		for(Iterator<Entry<String,Shape>> it = shapeMap.entrySet().iterator(); it.hasNext();) {
-            Entry<String,Shape> e = (Entry<String, Shape>)it.next();
-	        int x = e.getValue().getPosX();
-	        int y = e.getValue().getPosY();
-	        int w = e.getValue().getWidth();
-	        int h = e.getValue().getHeight();
-	        
-	         if (isInShape(x,y,w,h,p) && e.getValue().visible){
-	            return e.getValue();
-	         }       
-	     }
-	    return null;
-	 }
+		GraphicsContext g = paintframe.getGraphicsContext2D();
+        for (Entry<String, Shape> e : shapeMap.entrySet()) {
+            int x = e.getValue().getPosX();
+            int y = e.getValue().getPosY();
+            int w = e.getValue().getWidth();
+            int h = e.getValue().getHeight();
 
-	private boolean isInShape(int x,int y,int w, int h,Point2D p) {
-		return ((p.getX() >= x- (double) w /2)  && (p.getX() <= x+ (double) w /2+ (double) h /2)
-        		&& (p.getY() >=y - (double) h /2)  && (p.getY() <= y+ (double) h /2));
+            if (isInShape(x,y,w,h,p) && e.getValue().visible){
+	            return e.getValue();
+			}
+        }
+	    return null;
+	}
+
+	private boolean isInShape(int x, int y, int w, int h, Point2D p) {
+		int buttomShowHideSize= 10; // Take into account the size of the button
+		return (p.getX() >= x - (double) w / 2) && (p.getX() <= x + (double) w / 2 + buttomShowHideSize) &&
+				(p.getY() >= y - (double) h / 2) && (p.getY() <= y + (double) h / 2);
 	}
 	
 	/**

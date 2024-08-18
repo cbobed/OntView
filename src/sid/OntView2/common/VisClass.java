@@ -279,14 +279,14 @@ public class VisClass extends Shape {
 					setWidth(calculateWidth());
 				}
 
-				g.fillRoundRect(x - (double) getWidth()/2, y - (double) currentHeight/2, getWidth(), currentHeight+10, roundCornerValue, roundCornerValue);
+				g.fillRoundRect(x - (double) getWidth()/2, y - (double) currentHeight/2, getWidth(), currentHeight, roundCornerValue, roundCornerValue);
 			    g.setStroke(Color.BLACK);
 			    if (isBottom) {
 			    	g.setStroke(Color.RED);
 			    }	
 		 
 			    //rectangle
-				g.strokeRoundRect(x - (double) getWidth()/2, y - (double) currentHeight/2,  getWidth()-1, currentHeight+9, roundCornerValue, roundCornerValue);
+				g.strokeRoundRect(x - (double) getWidth()/2, y - (double) currentHeight/2,  getWidth()-1, currentHeight-1, roundCornerValue, roundCornerValue);
 			    g.setFill(Color.BLACK);
 				// Square for properties
 				if (propertyBox != null) {
@@ -306,9 +306,9 @@ public class VisClass extends Shape {
 	    		if (!label.startsWith(SIDClassExpressionNamer.className)) {
 		    		// CBL: the new definitions representation
 		    		g.setFill(lightGreen);
-		    		g.fillRect(x - (double) getWidth()/2, y- (double) currentHeight /2+5, getWidth(), currentHeight+10);
+		    		g.fillRect(x - (double) getWidth()/2, y- (double) currentHeight /2, getWidth(), currentHeight+10);
 					g.setStroke(isBottom ? Color.RED : Color.BLACK);
-		    		g.strokeRect(x - (double) getWidth()/2, y - (double) currentHeight /2+5, getWidth()-1, currentHeight+10);
+		    		g.strokeRect(x - (double) getWidth()/2, y - (double) currentHeight /2, getWidth()-1, currentHeight+10);
 		    		
 		    		// now => the rectangle for the name of the concept
 		    		g.setFill(lightgray);
@@ -337,14 +337,14 @@ public class VisClass extends Shape {
 					setWidth(calculateWidth());
 
 					g.setFill(Color.WHITE);
-				    g.fillRoundRect(x - (double) getWidth()/2, y - (double) currentHeight /2, getWidth(), currentHeight+10, roundCornerValue, roundCornerValue);
+				    g.fillRoundRect(x - (double) getWidth()/2, y - (double) currentHeight /2, getWidth(), currentHeight, roundCornerValue, roundCornerValue);
 				    g.setStroke(Color.BLACK);
 				    if (isBottom) {
 				    	g.setStroke(Color.RED);
 				    }	
 			 
 				    //rectangle
-				    g.strokeRoundRect(x - (double) getWidth()/2, y - (double) currentHeight /2,  getWidth()-1, currentHeight+9, roundCornerValue, roundCornerValue);
+				    g.strokeRoundRect(x - (double) getWidth()/2, y - (double) currentHeight /2,  getWidth()-1, currentHeight-1, roundCornerValue, roundCornerValue);
 				    g.setFill(Color.BLACK);
 				    if (propertyBox!=null){
 						propertyDraw(g, x, y, roundCornerValue, lightBlue);
@@ -787,11 +787,9 @@ public class VisClass extends Shape {
 		textNode.setFont(g.getFont());
 
 		int fontHeight = (int) textNode.getFont().getSize();
-		//System.out.println("Font Height: " + fontHeight);
-	    
+
 	    int result = 0;
 	    if (isAnonymous) {
-	    	//result += (countLines(label) * fontHeight) + 5;
 			result += calculateTextHeight(label);
 	    }
 	    else {
@@ -825,7 +823,7 @@ public class VisClass extends Shape {
 		/*if (propertyBox != null) {
 			result += getPropertyBox().getHeight();
 		}*/
-		return result;
+		return result + 10;
 	}
 
 	private int calculateTextHeight(String text) {
