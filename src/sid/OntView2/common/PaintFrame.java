@@ -153,18 +153,51 @@ public class PaintFrame extends Canvas {
 		oSize = in;
 	}
 	
+	
+	
+	/*** 
+	 * Runnables required to push the drawing to the javaFx application thread using Platform.runLater()
+	 */
+	
+	
 	public class Relaxer implements Runnable {
 		public void run() {
 			relax(); 
 		}
 	}
 	
-	Relaxer relaxerRunnable = null; 
+	public class ConnectorDrawer implements Runnable {
+		Shape s = null; 
+		public ConnectorDrawer (Shape s) {
+			this.s = s; 
+		}
+		public void run() {
+			drawConnectorShape(s);
+		}
+	}
+	
+	public class GlobalDrawer implements Runnable {
+		public void run() {
+			draw(); 
+		}
+	}
+	
+	public class Compacter implements Runnable {
+		public void run() {
+			compactGraph();
+		}
+	}
+	
+	Relaxer relaxerRunnable = new Relaxer();
+	GlobalDrawer drawerRunnable = new GlobalDrawer();
 	
 	public Relaxer getRelaxerRunnable() {
 		return relaxerRunnable; 
 	}
-
+	
+	public GlobalDrawer getDrawerRunnable() {
+		return drawerRunnable; 
+	}
 	
 	/**
 	 * scales by factor and adjusts panel size
@@ -179,22 +212,11 @@ public class PaintFrame extends Canvas {
 			gc.save();
 			gc.clearRect(0, 0, getWidth(), getHeight());
 			gc.scale(factor, factor);
-			draw();
+			Platform.runLater(drawerRunnable);
 		}
 	}
 
 	/*-*************************************************************/
-
-	public class ConnectorDrawer implements Runnable {
-		Shape s = null; 
-		public ConnectorDrawer (Shape s) {
-			this.s = s; 
-		}
-		public void run() {
-			drawConnectorShape(s);
-		}
-	}
-	
 	
 	public void drawConnectorShape(Shape shape) {
 		if (this.getScene() != null && !this.isDisabled() && this.isVisible() && this.getGraphicsContext2D() != null) {
@@ -378,6 +400,9 @@ public class PaintFrame extends Canvas {
 	 * coord until there's no overlap
 	 **/
 
+	// Relax is already encapsulated in the relaxerRunnable so all the calls should already be done 
+	// properly according to javaFX requirements 
+	
 	public synchronized void relax() {
 		if (visGraph == null) {
 			System.err.println("visGraph is null in relax method.");
@@ -460,9 +485,10 @@ public class PaintFrame extends Canvas {
 			mouseLastX = (int) p.getX();
 			mouseLastY = (int) p.getY();
 			setCursor(Cursor.MOVE);
+			Platform.runLater(new ConnectorDrawer(pressedShape));
 		}
 		// draw();
-		Platform.runLater(new ConnectorDrawer(pressedShape));
+		
 	}
 
 	public void handleMouseReleased(MouseEvent e) {
@@ -488,6 +514,7 @@ public class PaintFrame extends Canvas {
 	 */
 
 	public void handleMouseDragged(MouseEvent e) {
+
 		int draggedY, draggedX;
 		int direction;
 		repulsion = (e.getButton() != MouseButton.SECONDARY);
@@ -499,7 +526,6 @@ public class PaintFrame extends Canvas {
 			draggedY = (int) p.getY() - mouseLastY;
 			draggedX = (int) p.getX() - mouseLastX;
 		}
-
 		if (pressedShape != null) {
 			direction = ((draggedY > 0) ? DOWN : UP);
 			pressedShape.setPosY(pressedShape.getPosY() + draggedY);
@@ -507,7 +533,7 @@ public class PaintFrame extends Canvas {
 			shapeRepulsion(pressedShape, direction);
 			mouseLastX = (int) p.getX();
 			mouseLastY = (int) p.getY();
-			draw();
+			Platform.runLater(drawerRunnable);
 			Platform.runLater(new ConnectorDrawer(pressedShape));
 		} else {
 			double scrollHValue, scrollVValue;
@@ -522,7 +548,6 @@ public class PaintFrame extends Canvas {
 
 			scroll.setHvalue(scrollHValue);
 			scroll.setVvalue(scrollVValue);
-
 		}
 	}
 
@@ -623,15 +648,12 @@ public class PaintFrame extends Canvas {
 	}
 
 	public void start() {
-		relaxerRunnable = new Relaxer();
 		System.out.println("start");
 		Platform.runLater(relaxerRunnable); 
-		
 	}
 
 	public void stop() {
-		System.out.println("stop");
-		relaxerRunnable = null;
+		System.out.println("stop"); 
 	}
 
 	public void handleMouseClicked(MouseEvent e) {
@@ -649,7 +671,7 @@ public class PaintFrame extends Canvas {
 			}
 			showContextMenu((int) e.getScreenX(), (int) e.getScreenY());
 		}
-		draw();
+		Platform.runLater(drawerRunnable);
 	}
 
 	private boolean clickedOnShape(int x, int y, MouseEvent e) {
@@ -694,7 +716,7 @@ public class PaintFrame extends Canvas {
 							shape.open();
 							refreshDashedConnectors();
 							VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
-							draw();
+							Platform.runLater(drawerRunnable);
 						}
 					}
 					// Click on the close symbol
@@ -704,7 +726,7 @@ public class PaintFrame extends Canvas {
 							shape.close();
 							refreshDashedConnectors();
 							VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
-							draw();
+							Platform.runLater(drawerRunnable);
 						}
 					} else { // pressed elsewhere on the shape
 						paintFrame.focusOnShape(null, shape);
@@ -957,34 +979,26 @@ public class PaintFrame extends Canvas {
 		 * VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
 		 * getParentFrame().loadSearchCombo(); setStateChanged(true); relax();
 		 */
-		draw();
-		// compactAndRepaint();
+
+		Platform.runLater(drawerRunnable);
 
 	}
 
-	private void compactAndRepaint() {
-
+	private void compactGraph() {
 		Map<String, Shape> shapeMap = visGraph.getShapeMap();
-
 		// Adjust positions to maintain the graph's logical structure
 		// Iterate over the levels and reposition shapes within each level
 		int currentY = BORDER_PANEL;
 		for (VisLevel level : visGraph.getLevelSet()) {
 			int levelHeight = MIN_SPACE;
-
 			// Reposition shapes within the current level
 			for (Shape shape : shapeMap.values()) {
 				shape.setPosY(currentY);
 				currentY += shape.getHeight() + levelHeight;
 			}
-
 			// Adjust the x position of the level if needed
 			level.setXpos(level.getXpos() + levelHeight);
 		}
-
-		// Notify observers to update the layout and repaint
-		// visGraph.updateObservers(VisConstants.GENERALOBSERVER);
-		// draw();
 	}
 
 	public void applyStructuralReduction() {

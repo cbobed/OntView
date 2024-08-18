@@ -7,6 +7,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
+import org.semanticweb.owlapi.model.parameters.Imports;
 import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
@@ -402,19 +403,7 @@ public class VisGraph implements Runnable{
 
 			NodeSet<OWLClass> propertyDomainNodeSet = reasoner.getObjectPropertyDomains(property, true);
 			NodeSet<OWLClass> propertyRangeNodeSet = reasoner.getObjectPropertyRanges(property, true); 
-			
-//			for (Node<OWLClass> z : reasoner.getObjectPropertyRanges(property,true)){
-//				for (OWLClassExpression ran : z.getEntities()){
-//					range = lookUpOrCreate(ran);
-//					break;
-//				}
-//			}
-//			
-			
-//			System.out.println(property);
-//			System.out.println("domain: "+propertyDomainNodeSet);
-//			System.out.println("range: "+propertyRangeNodeSet);
-			
+						
 			// CBL: 
 			// changed the way the range shape is added and handled
 			if (propertyRangeNodeSet.getNodes().size()>1) {
@@ -428,68 +417,35 @@ public class VisGraph implements Runnable{
 				range = lookUpOrCreate (propertyRangeNodeSet.getNodes().iterator().next().getRepresentativeElement()); 
 			}
 			
-			
 			if (propertyDomainNodeSet.getNodes().size()>1){
 				VisObjectProperty.addDomain(this,propertyDomainNodeSet,property,reasoner,activeOntology,range);
 			}
 			else { //common case 
 				for (Node<OWLClass> o : propertyDomainNodeSet ){
-					
-					for (OWLClass oclass : o.getEntities()){
-						
-//			System.out.println("searching "+oclass.toString());
+					for (OWLClass oclass : o.getEntities()){	
 						c =	(VisClass) getShapeFromOWLClassExpression(oclass);
-//			System.out.println("c is  "+c);
-//			dumpShapeMap();
-//						CBL :: changing the keys of the visual objects
-//						c.properties.add(property.getIRI().getFragment());
-
 						c.properties.add(property.getIRI().toString());
 						if (c.getPropertyBox() == null) 
 							c.createPropertyBox();
-						
-//						CBL :: changing the keys of the visual objects
-//						if (propertyMap.get(ExpressionManager.reduceObjectPropertyName(property))!=null)
-//							continue;
-						
 						if (propertyMap.get(VisObjectProperty.getKey(property))!=null)
 							continue;
 						
 					    VisObjectProperty v = c.getPropertyBox().add(property,range,activeOntology);	
 					    if (v!=null){
-//							CBL :: changing the keys of the visual objects
-//					    	propertyMap.put(ExpressionManager.reduceObjectPropertyName(property), v);
 					    	propertyMap.put(VisObjectProperty.getKey(property), v);
 					    }
 					}
 				}
 			}
-			
-			VisPropertyBox.sortProperties(this);
-			VisPropertyBox.buildConnections(this);
-//			for (Entry<String,Shape> entry : shapeMap.entrySet()){
-//				Shape shape = entry.getValue();
-//				if ((shape instanceof VisClass) && (shape.asVisClass().getPropertyBox()!=null)){
-//					shape.asVisClass().getPropertyBox().sortProperties();
-//				}
-//			}
-			
 		}
-		
-//		for (Entry<String,Shape> entry: shapeMap.entrySet() ){
-//			if ((entry.getValue() instanceof VisClass) && (entry.getValue().asVisClass().getPropertyBox()!=null))
-//				entry.getValue().asVisClass().getPropertyBox().buildConnections();
-//		}
+		VisPropertyBox.sortProperties(this);
+		VisPropertyBox.buildConnections(this);
 	}	
 	
 	private void placeChainProperties(OWLOntology activeOntology,OWLReasoner reasoner, HashSet<OWLClassExpression> set) {
-		
-		for ( OWLAxiom  axiom:  activeOntology.getAxioms()){
-			if (axiom.getAxiomType() == AxiomType.SUB_PROPERTY_CHAIN_OF){
-				OWLSubPropertyChainOfAxiom chain_axiom = (OWLSubPropertyChainOfAxiom) axiom;
-//				CBL changing the keys
-				this.addChainProperty(VisObjectProperty.getKey(chain_axiom.getSuperProperty()),chain_axiom);
-			}
+		for ( OWLAxiom axiom: activeOntology.getAxioms(AxiomType.SUB_PROPERTY_CHAIN_OF, Imports.INCLUDED) ){
+			OWLSubPropertyChainOfAxiom chain_axiom = (OWLSubPropertyChainOfAxiom) axiom;
+			this.addChainProperty(VisObjectProperty.getKey(chain_axiom.getSuperProperty()),chain_axiom);
 		}
 	}
 
@@ -500,7 +456,6 @@ public class VisGraph implements Runnable{
 		Set<OWLDataProperty> dataPropertySet = activeOntology.getDataPropertiesInSignature();
 		String dRange ="unknown";
 		for (OWLDataProperty dataProperty : dataPropertySet){
-
 			for (OWLDataRange z : EntitySearcher.getRanges(dataProperty, activeOntology).toList()) //one range
 			{
 				dRange = removePrefix(z.toString(),":");
