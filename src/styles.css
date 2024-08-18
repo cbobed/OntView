@@ -129,3 +129,36 @@
 .dialog-pane .button-bar .button:pressed {
     -fx-background-color: linear-gradient(to bottom, #b0c4de, #a2b9cc);
 }
+
+/* styles.css */
+
+.tab-pane {
+    -fx-background-color: white;
+    -fx-border-color: blue;
+    -fx-border-width: 1px;
+    -fx-cursor: hand;
+}
+
+.tab-pane .tab {
+    -fx-background-color: rgba(224, 224, 249);
+    -fx-border-color: blue;
+    -fx-border-width: 1px;
+}
+
+.tab-pane .tab:selected {
+    -fx-background-color: white;
+}
+
+.tab-header-background {
+    -fx-background-color: rgba(0, 0, 255, 0.2);
+    -fx-border-color: transparent transparent blue transparent;
+    -fx-border-width: 0 0 1px 0;
+}
+
+.tab {
+    -fx-background-color: white;
+}
+
+.tab:selected {
+    -fx-background-color: white;
+}

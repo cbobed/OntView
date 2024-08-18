@@ -18,10 +18,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontPosture;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
+import javafx.scene.text.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Popup;
 import javafx.util.Duration;
@@ -588,30 +585,78 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			helpButton.getStyleClass().add("button");
 			helpButton.setStyle("-fx-shape:'M 0 50 a 50 50 0 1 1 100 0 a 50 50 0 1 1 -100 0'; -fx-background-radius: 50%;");
 
-			Label helpContent = new Label("Esta es una leyenda de ayuda.\nPara poder restaurar una ontología, has de cargar previamente" +
-					" dicha ontologia.");
-			helpContent.setStyle("-fx-background-color: white; -fx-border-color: black; -fx-padding: 10px;");
+			TabPane tabPane = createHelpTabPane();
 
 			helpPopup = new Popup();
-			helpPopup.getContent().add(helpContent);
+			helpPopup.getContent().add(tabPane);
 			helpPopup.setAutoHide(true);
 
-			// Añadir evento al botón para mostrar el popup
 			helpButton.setOnMouseClicked(event -> {
 				if (helpPopup.isShowing()) {
 					helpPopup.hide();
 				} else {
-					helpPopup.show(helpButton, event.getScreenX(), event.getScreenY() + 10);
+					helpPopup.show(helpButton, event.getScreenX(), event.getScreenY() + 15);
 				}
 			});
 
 			helpPanel = createContainer(true, titlePane, helpButton);
-
-
 		}
 		return helpPanel;
 	}
 
+	private TabPane createHelpTabPane() {
+		TabPane tabPane = new TabPane();
+
+		Tab helpTab = new Tab("Help");
+		helpTab.setClosable(false);
+		TextFlow helpContent = createHelpContent();
+		helpTab.setContent(helpContent);
+
+		Tab elementsInfoTab = new Tab("Legend");
+		elementsInfoTab.setClosable(false);
+		TextFlow elementsInfoContent = createElementsInfoContent();
+		elementsInfoTab.setContent(elementsInfoContent);
+
+		tabPane.getTabs().addAll(helpTab, elementsInfoTab);
+
+		return tabPane;
+	}
+
+	private TextFlow createHelpContent() {
+		Text title = new Text("How to use the application:\n");
+		title.setFill(Color.BLUE);
+		title.setStyle("-fx-font-weight: bold;");
+
+		Text step1 = new Text("1. Load an ontology and click the 'Load Ont' button.\n");
+		Text step2 = new Text("2. Select a reasoner, then choose the 'KConceptExtractor', and finally click the 'Sync' button.\n");
+		Text step3 = new Text("3. You are now ready to use the rest of the functionalities.");
+
+		TextFlow helpContent = new TextFlow(title, step1, step2, step3);
+		helpContent.setPadding(new Insets(10));
+
+		helpContent.setLineSpacing(5);
+		return helpContent;
+	}
+	private TextFlow createElementsInfoContent() {
+		Text elementsInfoTitle = new Text("Legend:\n");
+		elementsInfoTitle.setFill(Color.BLUE);
+		elementsInfoTitle.setStyle("-fx-font-weight: bold;");
+
+		Text elementsInfoText = new Text(
+				"P: Indicates that this specific node has properties associated with it.\n" +
+						"D: Indicates that the class is disjoint with other classes.\n" +
+						"Named Classes: Gray\n" +
+						"Defined Classes: Light Green\n" +
+						"Anonymous Classes: White\n"
+		);
+
+		TextFlow elementsInfoContent = new TextFlow(elementsInfoTitle, elementsInfoText);
+		elementsInfoContent.setPadding(new Insets(10));
+
+		elementsInfoContent.setLineSpacing(5);
+
+		return elementsInfoContent;
+	}
 
 
 	private void loadRecent() {
