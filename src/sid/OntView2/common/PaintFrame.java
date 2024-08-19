@@ -251,7 +251,7 @@ public class PaintFrame extends Canvas {
 				}
 			}
 			if (visGraph != null) {
-
+				
 				// draw connectors
 				if (showConnectors) {
 					for (VisConnector c : visGraph.connectorList) {
@@ -972,33 +972,61 @@ public class PaintFrame extends Canvas {
 			extractorRDFRank.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20);
 		}
 		}
-		/*
-		 * VisLevel.adjustWidthAndPos(visGraph.levelSet); GraphReorder reorder = new
-		 * GraphReorder(visGraph); reorder.visualReorder();
-		 * visGraph.adjustPanelSize((float) 1.0);
-		 * VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
-		 * getParentFrame().loadSearchCombo(); setStateChanged(true); relax();
-		 */
-
+		
+//		  VisLevel.adjustWidthAndPos(visGraph.levelSet); 
+//		  GraphReorder reorder = new GraphReorder(visGraph); 
+//		  reorder.visualReorder();
+//		  visGraph.adjustPanelSize((float) 1.0);
+//		  VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
+//		  getParentFrame().loadSearchCombo(); 
+//		  setStateChanged(true); 
+		compactGraph();  
 		Platform.runLater(drawerRunnable);
-
 	}
 
 	private void compactGraph() {
-		Map<String, Shape> shapeMap = visGraph.getShapeMap();
-		// Adjust positions to maintain the graph's logical structure
-		// Iterate over the levels and reposition shapes within each level
+		
+		// TODO: To be fixed -- but this is the way
 		int currentY = BORDER_PANEL;
+		int minY = -1; 
+		int maxY = -1; 
+		int span = -1; 
+		Map<Integer, ArrayList<Shape>> visibleShapesPerLevel = new HashMap<>(); 
 		for (VisLevel level : visGraph.getLevelSet()) {
+			currentY = BORDER_PANEL;
+			ArrayList<Shape> orderedShapeList = level.orderedList();
 			int levelHeight = MIN_SPACE;
-			// Reposition shapes within the current level
-			for (Shape shape : shapeMap.values()) {
-				shape.setPosY(currentY);
-				currentY += shape.getHeight() + levelHeight;
+			visibleShapesPerLevel.put(level.id, new ArrayList<Shape>()); 
+			minY = Integer.MAX_VALUE;
+			maxY = Integer.MIN_VALUE; 
+			for (Shape shape : orderedShapeList) {
+				if (shape.isVisible()) {
+					minY = (minY>currentY?currentY:minY); 
+					maxY = (maxY<currentY?currentY:maxY); 
+					shape.setPosY(currentY);
+					visibleShapesPerLevel.get(level.id).add(shape); 
+					currentY += shape.getHeight() + levelHeight;
+				}
 			}
 			// Adjust the x position of the level if needed
 			level.setXpos(level.getXpos() + levelHeight);
 		}
+		
+		System.out.println("maxY: "+maxY+ " minY: "+minY+ " span: "+(maxY-minY)); 
+		span = maxY - minY; // this is the maximum level height we have witnessed
+		// TODO: This must be refined to take into account the size of the intermediate boxes as well (getHeight)
+		for (VisLevel level : visGraph.getLevelSet()) {
+			System.out.println("-Level-"+level.id); 
+			int currentLevelPad = span / (visibleShapesPerLevel.get(level.id).size()+1);
+			System.out.println("span: "+span+" currentPad: "+currentLevelPad+" #shapes: "+visibleShapesPerLevel.get(level.id).size()); 
+			currentY = BORDER_PANEL + currentLevelPad;
+			for (Shape shape : visibleShapesPerLevel.get(level.id)) {
+				shape.setPosY(currentY);
+				System.out.println(shape.getLabel()+" "+currentY); 
+				currentY += shape.getHeight() + currentLevelPad;
+			}
+		}
+		relax(); 
 	}
 
 	public void applyStructuralReduction() {

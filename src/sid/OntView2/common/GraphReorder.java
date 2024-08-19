@@ -66,7 +66,7 @@ public class GraphReorder {
 			}
 		}
 
-		//repositionParents();
+		repositionParents();
 	}
 
 	/**
