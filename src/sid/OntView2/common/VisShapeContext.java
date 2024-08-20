@@ -40,7 +40,6 @@ public class VisShapeContext extends ContextMenu {
        
 		hideProperties = getMenuHideProperties();
 		
-		
 		if ((!visc) || (visc && shape.asVisClass().getPropertyBox() ==null))
 			hideProperties.setDisable(true);
 
@@ -53,8 +52,7 @@ public class VisShapeContext extends ContextMenu {
 		});
 		
 		hideItem = new MenuItem("Hide");
-		
-		
+	
 		if (!shape.asVisClass().allSubHidden()) {
 			hideItem.setDisable(true);
 		}
@@ -78,8 +76,13 @@ public class VisShapeContext extends ContextMenu {
 	private MenuItem getMenuHideProperties(){
 		if (hideProperties==null) {
 			hideProperties = new MenuItem();
-			boolean b =shape.asVisClass().getPropertyBox().visible;
-			hideProperties.setText(b ? "Hide Properties" : "Show Properties");
+			if (shape.asVisClass().getPropertyBox() != null) {
+				boolean b =shape.asVisClass().getPropertyBox().visible;
+				hideProperties.setText(b ? "Hide Properties" : "Show Properties");
+			}
+			else {
+				hideProperties.setText("No Properties"); 
+			}
 		}
 		return hideProperties;
 	}

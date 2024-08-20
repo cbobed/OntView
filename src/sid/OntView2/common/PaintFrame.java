@@ -243,7 +243,6 @@ public class PaintFrame extends Canvas {
 		if (this.getScene() != null && !this.isDisabled() && this.isVisible() && this.getGraphicsContext2D() != null) {
 			GraphicsContext g = this.getGraphicsContext2D();
 			g.clearRect(0, 0, getWidth(), getHeight());
-
 			if (prevFactor != factor) {
 				prevFactor = factor;
 				if ((factor >= 1.0) && (getWidth() != prevSize.getWidth() || getHeight() != prevSize.getHeight())) {
@@ -973,64 +972,49 @@ public class PaintFrame extends Canvas {
 		}
 		}
 		
-//		  VisLevel.adjustWidthAndPos(visGraph.levelSet); 
-//		  GraphReorder reorder = new GraphReorder(visGraph); 
-//		  reorder.visualReorder();
-//		  visGraph.adjustPanelSize((float) 1.0);
-//		  VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
-//		  getParentFrame().loadSearchCombo(); 
-//		  setStateChanged(true); 
 		compactGraph();  
 		Platform.runLater(drawerRunnable);
 	}
 
 	private void compactGraph() {
-		
-		// TODO: To be fixed -- but this is the way
 		int currentY = BORDER_PANEL;
 		int minY = -1; 
 		int maxY = -1; 
 		int span = -1; 
+		int levelHeight = MIN_SPACE; 
 		Map<Integer, ArrayList<Shape>> visibleShapesPerLevel = new HashMap<>(); 
+		Map<Integer, Integer> ySpanPerLevel = new HashMap<>(); 
+		maxY = Integer.MIN_VALUE; 
 		for (VisLevel level : visGraph.getLevelSet()) {
 			currentY = BORDER_PANEL;
 			ArrayList<Shape> orderedShapeList = level.orderedList();
-			int levelHeight = MIN_SPACE;
 			visibleShapesPerLevel.put(level.id, new ArrayList<Shape>()); 
-			minY = Integer.MAX_VALUE;
-			maxY = Integer.MIN_VALUE; 
+			minY = BORDER_PANEL; 	
 			for (Shape shape : orderedShapeList) {
-				if (shape.isVisible()) {
-					minY = (minY>currentY?currentY:minY); 
-					maxY = (maxY<currentY?currentY:maxY); 
+				if (shape.isVisible()) { 
 					shape.setPosY(currentY);
 					visibleShapesPerLevel.get(level.id).add(shape); 
 					currentY += shape.getHeight() + levelHeight;
+					maxY = (maxY<currentY?currentY:maxY); 
 				}
 			}
+			ySpanPerLevel.put(level.id, currentY-minY); 
 			// Adjust the x position of the level if needed
 			level.setXpos(level.getXpos() + levelHeight);
 		}
-		
-		System.out.println("maxY: "+maxY+ " minY: "+minY+ " span: "+(maxY-minY)); 
 		span = maxY - minY; // this is the maximum level height we have witnessed
 		// TODO: This must be refined to take into account the size of the intermediate boxes as well (getHeight)
 		for (VisLevel level : visGraph.getLevelSet()) {
-			System.out.println("-Level-"+level.id); 
-			int currentLevelPad = span / (visibleShapesPerLevel.get(level.id).size()+1);
-			System.out.println("span: "+span+" currentPad: "+currentLevelPad+" #shapes: "+visibleShapesPerLevel.get(level.id).size()); 
-			currentY = BORDER_PANEL + currentLevelPad;
+			currentY = BORDER_PANEL + (span - ySpanPerLevel.get(level.id))/ 2; 
 			for (Shape shape : visibleShapesPerLevel.get(level.id)) {
 				shape.setPosY(currentY);
-				System.out.println(shape.getLabel()+" "+currentY); 
-				currentY += shape.getHeight() + currentLevelPad;
+				currentY += shape.getHeight() + levelHeight;
 			}
 		}
-		relax(); 
+		Platform.runLater(relaxerRunnable); 
 	}
 
 	public void applyStructuralReduction() {
-//		StructuralReducer.customApplyStructuralReduction(getOntology(),getVisGraph().getShapeMap());
 		StructuralReducer.applyStructuralReduction(getOntology());
 	}
 
