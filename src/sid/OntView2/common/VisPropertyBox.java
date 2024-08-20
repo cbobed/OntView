@@ -35,7 +35,14 @@ public class VisPropertyBox {
 	
 	ArrayList<String> rep;
 	public void setVisible(boolean b){visible=b;}
-	public int getHeight(){return height;}
+	public int getHeight(){
+		if (visible) {
+			return height;
+		}
+		else {
+			return 0; 
+		}
+	}
 	public void setHeight(int x){height =x;}
 	
 	private HashMap<String, VisObjectProperty> getVisPropertiesInGraph(){
@@ -95,13 +102,9 @@ public class VisPropertyBox {
 		HashSet<OWLObjectProperty> rootProperties = rootProperties();
 		ArrayList<VisObjectProperty> ordered = new ArrayList<VisObjectProperty>();
 		for (OWLObjectProperty parent : rootProperties){
-//			CBL::Changing the keys
-//			VisObjectProperty vparent = getVisPropertiesInGraph().get(ExpressionManager.reduceObjectPropertyName(parent));
 			VisObjectProperty vparent = getVisPropertiesInGraph().get(VisObjectProperty.getKey(parent));
-			
 			ordered.add(vparent);
 			for(VisObjectProperty prop : propertyList){
-
 				if ((prop!= vparent) && (!ordered.contains(prop)) && (isSubProperty(prop.oPropExp, vparent.oPropExp)))
 					ordered.add(prop);
 			}
@@ -123,7 +126,6 @@ public class VisPropertyBox {
 	    else {
 	    	return false;
 	    }	
-		
 	}
 
 	public VisObjectProperty add(OWLObjectProperty objProp, Shape range, OWLOntology ontology){
@@ -131,8 +133,6 @@ public class VisPropertyBox {
 		if (!VisObjectProperty.contains(propertyList, objProp)){
 			v = new VisObjectProperty(this,objProp,propertyList.size(),range,ontology);
 			propertyList.add(v);		
-//			CBL::changing the keys
-//			vclass.graph.propertyMap.put(ExpressionManager.reduceObjectPropertyName(objProp),v);
 			vclass.graph.propertyMap.put(VisObjectProperty.getKey(objProp),v);
 		}
 		calculateHeight();

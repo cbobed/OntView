@@ -31,6 +31,7 @@ import org.semanticweb.owlapi.model.OWLObjectExactCardinality;
 import org.semanticweb.owlapi.model.OWLObjectHasSelf;
 import org.semanticweb.owlapi.model.OWLObjectHasValue;
 import org.semanticweb.owlapi.model.OWLObjectIntersectionOf;
+import org.semanticweb.owlapi.model.OWLObjectInverseOf;
 import org.semanticweb.owlapi.model.OWLObjectMaxCardinality;
 import org.semanticweb.owlapi.model.OWLObjectMinCardinality;
 import org.semanticweb.owlapi.model.OWLObjectOneOf;
@@ -462,8 +463,6 @@ public class ExpressionManager {
 	}
 
 
-
-
 	public static String getReducedDataRange(OWLDataRange o){
 		int i =1;
 		String reduced="";
@@ -533,17 +532,27 @@ public class ExpressionManager {
 	}
 
 	public static String getReducedObjectPropertyExpression(OWLObjectPropertyExpression o){
+		
 		if (o instanceof OWLObjectProperty) {
 			return obtainEntityNameFromIRI(o.asOWLObjectProperty().getIRI());
 		}
-		else {
+		else if (o instanceof OWLObjectInverseOf) {
+			OWLObjectPropertyExpression invProp = ((OWLObjectInverseOf) o).getInverseProperty(); 
+			return "inverseOf ("+getReducedObjectPropertyExpression(invProp)+")"; 
+		}
+		else 
+		{
 			return o.toString();
 		}
 	}
 
 	public static String getReducedQualifiedObjectPropertyExpression (OWLObjectPropertyExpression e){
 		if (e instanceof OWLObjectProperty) {
-			return obtainQualifiedEntityNameFromIRI(e.asOWLObjectProperty().getIRI());
+			return obtainQualifiedEntityNameFromIRI(e.asOWLObjectProperty().getIRI()); 
+		}
+		else if (e instanceof OWLObjectInverseOf) {
+			OWLObjectPropertyExpression invProp = ((OWLObjectInverseOf) e).getInverseProperty(); 
+			return "inverseOf ("+getReducedQualifiedObjectPropertyExpression(invProp)+")"; 
 		}
 		else
 			return e.toString();

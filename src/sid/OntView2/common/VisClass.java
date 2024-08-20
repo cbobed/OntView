@@ -412,7 +412,6 @@ public class VisClass extends Shape {
 		    		   break;
 		       }
 	     }
-
 		  /*for (VisConnectorDisjoint disj :  getDisjointConnectors()){
 			  disj.draw(g);
 		  }

@@ -74,12 +74,12 @@ public class VisObjectProperty extends VisProperty {
 					}				}
 				description.append("<br></ul>");
 			}
-			description.append("<b>Domain:</b> ").append(getDomain().visibleLabel).append("<br>");
-			description.append("<b>Range     : </b>");
+			description.append("<b>Domain: </b> ").append(getDomain().visibleLabel).append("<br>");
+			description.append("<b>Range: </b>");
 			description.append(qualifiedRendering ?
                     ExpressionManager.getReducedQualifiedClassExpression(range.getLinkedClassExpression()) :
                     ExpressionManager.getReducedClassExpression(range.getLinkedClassExpression())).append("<br><br>");
-			description.append("<b>Property Description</b><br>");
+			description.append("<b>Property Description</b><br><ul>");
 
 			if (isTransitive)
 				description.append("<li>Transitive</li>");
@@ -90,13 +90,15 @@ public class VisObjectProperty extends VisProperty {
 			if (isSymmetric)
 				description.append("<li>Symmetric</li>");
 			if (hasInverse){
-				description.append("<li> inverse of <b>");
+				description.append("Inverse of <b> <br><ul>");
 				for (OWLObjectPropertyExpression inv : inverseOf.getEntitiesMinusTop()){
-					description.append(qualifiedRendering ?
-                            ExpressionManager.getReducedQualifiedObjectPropertyExpression(inv) :
-                            ExpressionManager.getReducedObjectPropertyExpression(inv)).append(" ");
+					if (inv instanceof OWLObjectProperty) {
+						description.append("<li>").append(qualifiedRendering ?
+		                        ExpressionManager.getReducedQualifiedObjectPropertyExpression(inv) :
+		                        ExpressionManager.getReducedObjectPropertyExpression(inv)).append("</li>");
+					}
 				}
-				description.append("</b></li>");
+				description.append("</b></ul>");
 			}
 			if (propertyChainAxiom != null) {
 				description.append("<b>Chain Property</b><ul>");
@@ -108,7 +110,7 @@ public class VisObjectProperty extends VisProperty {
 				description.append("</ul>");
 			}
 			
-			description.append("</html>");
+			description.append("</ul></html>");
 		}
 		return description.toString();
 		

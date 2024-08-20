@@ -173,7 +173,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		if (parent.artPanel != null) {
 			parent.artPanel.qualifiedNames = getQualifiedNames().isSelected();
 			parent.artPanel.getVisGraph().changeRenderMethod(parent.artPanel.renderLabel, parent.artPanel.qualifiedNames);
-			parent.artPanel.draw();
+			Platform.runLater(parent.artPanel.getDrawerRunnable());
 		}
 	}
 
@@ -190,7 +190,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		if (parent.artPanel != null) {
 			parent.artPanel.renderLabel = getRenderLabel().isSelected();
 			parent.artPanel.getVisGraph().changeRenderMethod(parent.artPanel.renderLabel, parent.artPanel.qualifiedNames);
-			parent.artPanel.draw();
+			Platform.runLater(parent.artPanel.getDrawerRunnable());
 		}
 	}
 
@@ -284,11 +284,11 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 				if (newValue) {
 					toggleSwitch.setText("Hide");
 					parent.artPanel.setShowConnectors(true);
-					parent.artPanel.draw();
+					Platform.runLater(parent.artPanel.getDrawerRunnable());
 				} else {
 					toggleSwitch.setText("Show");
 					parent.artPanel.setShowConnectors(false);
-					parent.artPanel.draw();
+					Platform.runLater(parent.artPanel.getDrawerRunnable());
 
 				}
 			});
@@ -712,7 +712,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 	private void loadReasonerButtonActionActionPerformed(ActionEvent event) {
 		String x = (String) getReasonerCombo().getValue();
-		parent.artPanel.setShowConnectors(false);
+		parent.artPanel.setShowConnectors(true);
 		if(toggleSwitch != null)
 			toggleSwitch.setSelected(false);
 
@@ -756,7 +756,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 	private void restoreViewButtonActionActionPerformed(ActionEvent event) {
 		parent.restoreViewButtonAction(event);
-		parent.artPanel.draw();
+		Platform.runLater(parent.artPanel.getDrawerRunnable());
 	}
 
 	private void comboBox0ItemItemStateChanged(String selectedItem) {
@@ -802,7 +802,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			}
 		}
 		parent.artPanel.setStateChanged(true);
-		parent.artPanel.relax();
+		Platform.runLater(parent.artPanel.getRelaxerRunnable()); 
 	}
 
 	private void reduceActionActionPerformed(ActionEvent event) {
