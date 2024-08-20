@@ -267,6 +267,9 @@ public class Mine extends Application implements Embedable{
 				try {
 					path = file.getCanonicalFile().toString();
 				} catch (IOException e) {
+					showErrorDialog("Error", "Failed to load view.", "Remember to load the exact" +
+							" same ontology and reasoner as when the view was saved. Follow the instructions ont the " +
+							"help buttom.");
 					e.printStackTrace();
 				}
 				VisPositionConfig.restoreState(path, artPanel.getVisGraph());

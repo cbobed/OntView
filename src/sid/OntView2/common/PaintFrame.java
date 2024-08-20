@@ -691,6 +691,7 @@ public class PaintFrame extends Canvas implements Runnable {
 	 * @param html
 	 * @return String
 	 */
+	// web engine
 	private String formatToolTipText(String html) {
 		tooltip.setFont(new Font("Dialog", 12));
 		// tooltip.setStyle("-fx-background-color: #cedef7; -fx-text-fill: #000000;");

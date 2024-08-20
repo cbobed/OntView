@@ -482,11 +482,6 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			restoreViewButton.setMinWidth(70);
 			restoreViewButton.setCursor(Cursor.HAND);
 
-			if (!parent.artPanel.isStable()) {
-				restoreViewButton.setDisable(true);
-			}
-			restoreViewButton.disableProperty().bind(parent.artPanel.stableChangeProperty());
-
 			restoreViewButton.setOnAction(this::restoreViewButtonActionActionPerformed);
 
 			tooltipInfo(restoreViewButton, "Restore view from xml file");
@@ -500,11 +495,6 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			saveViewButton.getStyleClass().add("button");
 			saveViewButton.setMinWidth(70);
 			saveViewButton.setCursor(Cursor.HAND);
-
-			if (!parent.artPanel.isStable()) {
-				saveViewButton.setDisable(true);
-			}
-			saveViewButton.disableProperty().bind(parent.artPanel.stableChangeProperty());
 
 			saveViewButton.setOnAction(this::saveViewButtonActionActionPerformed);
 

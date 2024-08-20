@@ -33,7 +33,6 @@ public class VisPositionConfig {
 			doc = builder.parse(path);
 		  } 
 	      catch (Exception e) {
-
 	    	  e.printStackTrace();
 		  }	
 
@@ -64,33 +63,33 @@ public class VisPositionConfig {
 	
 	public void recoverVisInfo(VisGraph graph) throws XPathExpressionException{
 
-		for (Entry<String, Shape> entry : graph.shapeMap.entrySet()){
+		for (Entry<String, Shape> entry : graph.shapeMap.entrySet()) {
 			Shape shape = entry.getValue();
 //				String key = escapeXML(entry.getKey());
-				String key = entry.getKey();
+			String key = entry.getKey();
 
-				recoverShapePos(shape,key);
-				recoverShapeState(shape, key);
-				recoverShapeVisibility(shape, key);
+			recoverShapePos(shape, key);
+			recoverShapeState(shape, key);
+			recoverShapeVisibility(shape, key);
 		}
-		for ( VisConnector connector : graph.connectorList){
+		for (VisConnector connector : graph.connectorList) {
 //			recoverConnectorVisibility(connector);
 			connector.visible = (connector.from.visible && connector.to.visible);
 		}
-        graph.clearDashedConnectorList();
-        graph.addDashedConnectors();
-        
+		graph.clearDashedConnectorList();
+		graph.addDashedConnectors();
 	}
 	
-	public void recoverShapePos(Shape shape, String key) throws XPathExpressionException{
+	public void recoverShapePos(Shape shape, String key) throws XPathExpressionException{ // AQUI
+
 		String search;
 		if ((shape instanceof VisConstraint)|| (shape instanceof VisClass)&&(shape.asVisClass().isAnonymous)) {
 			search = "Anon[@id=\'"+key+"\']";
 		}
 		else {
 			search = "Named[@id='"+key+"']";
-		}		
-		
+		}
+
 		String s="//"+search+"/posy/text()";
 		XPathExpression expr = xpath.compile(s);
         Object result = expr.evaluate(doc, XPathConstants.STRING);
