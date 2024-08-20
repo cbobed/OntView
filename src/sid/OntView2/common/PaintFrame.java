@@ -658,12 +658,12 @@ public class PaintFrame extends Canvas {
 			if (!orderedShapeList.isEmpty()) {
 				// Get the last shape in the list
 				Shape lastShape = orderedShapeList.get(orderedShapeList.size() - 1);
-				double shapeMaxY = lastShape.getPosY() + lastShape.getHeight();
+				double shapeMaxY = lastShape.getPosY() * factor + lastShape.getHeight() * factor;
 				if (shapeMaxY > maxY) { maxY = shapeMaxY; }
 
 				// Get the first shape in the list
 				Shape firstShape = orderedShapeList.get(0);
-				double shapeMinY = firstShape.getPosY();
+				double shapeMinY = firstShape.getPosY() * factor;
 				if (shapeMinY < minY) { minY = shapeMinY; }
 			}
 		}
@@ -682,7 +682,7 @@ public class PaintFrame extends Canvas {
 			for (VisLevel level : visGraph.getLevelSet()) {
 				ArrayList<Shape> orderedShapeList = level.orderedList();
 				for (Shape shape : orderedShapeList) {
-					shape.setPosY((int) (shape.getPosY() - minY + BORDER_PANEL));
+					shape.setPosY((int) ((shape.getPosY() * factor - minY + BORDER_PANEL) / factor));
 				}
 			}
 			needsResize = true;
