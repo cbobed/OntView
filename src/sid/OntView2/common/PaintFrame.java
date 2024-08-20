@@ -39,7 +39,7 @@ public class PaintFrame extends Canvas {
 	private static final long serialVersionUID = 1L;
 	public ScrollPane scroll;
 	static final int BORDER_PANEL = 50;
-	static final int MIN_SPACE = 20;
+	static final int MIN_SPACE = 30;
 	static int PROPERTY_BOX_HEIGHT = 0;
 	static final int MIN_Y_SEP = 3;
 	static final int SEP = 200;
@@ -101,7 +101,7 @@ public class PaintFrame extends Canvas {
 		kceOption = itemAt;
 	}
 
-	private boolean showConnectors = true;
+	private boolean showConnectors = false;
 
 	public void setShowConnectors(boolean b) {
 		showConnectors = b;
@@ -233,6 +233,7 @@ public class PaintFrame extends Canvas {
 			}
 		}
 	}
+
 	public void drawConnectorShape(Shape shape) {
 		if (this.getScene() != null && !this.isDisabled() && this.isVisible() && this.getGraphicsContext2D() != null) {
 			GraphicsContext g = this.getGraphicsContext2D();
@@ -379,8 +380,8 @@ public class PaintFrame extends Canvas {
 		Task<Void> task = new Task<>() {
 			@Override
 			protected Void call() {
-				visGraph.run();
-				return null;
+			visGraph.run();
+			return null;
 			}
 		};
 
@@ -415,6 +416,7 @@ public class PaintFrame extends Canvas {
 		return stateChanged;
 	}
 
+
 	public void setStateChanged(boolean value) {
 		stateChanged.set(value);
 	}
@@ -433,11 +435,13 @@ public class PaintFrame extends Canvas {
 			return;
 		}
 
+		System.out.println("relax entrada: " + stateChanged.get());
+
 		boolean recentChange = false;
 
 		if (stable) {
 			while (stateChanged.get()) {
-				//System.out.println("relax");
+				System.out.println("relax");
 				stateChanged.set(false);
 				
 				// Faster version
@@ -469,6 +473,10 @@ public class PaintFrame extends Canvas {
 				draw();
 			}
 		}
+
+		System.out.println("stable: " + stable);
+		System.out.println("relax salida: " + stateChanged.get() + "\n");
+
 	}
 
 	/**
@@ -525,13 +533,6 @@ public class PaintFrame extends Canvas {
 			return;
 		}
 
-		/*if (!showConnectors) {
-			Point2D p = translatePoint(new Point2D(e.getX(), e.getY()));
-			eraseConnector = visGraph.findShape(p);
-			Platform.runLater(new ConnectorDrawer(eraseConnector));
-			eraseConnector = null;
-		}*/
-		
 		pressedShape = null;
 		repulsion = true;
 		mouseLastY = 0;
@@ -566,6 +567,9 @@ public class PaintFrame extends Canvas {
 			shapeRepulsion(pressedShape, direction);
 			mouseLastX = (int) p.getX();
 			mouseLastY = (int) p.getY();
+
+			checkAndResizeCanvas();
+
 			Platform.runLater(drawerRunnable);
 			Platform.runLater(new ConnectorDrawer(pressedShape));
 		} else {
@@ -595,7 +599,7 @@ public class PaintFrame extends Canvas {
 		Shape shape = visGraph.findShape(p);
 		String tip;
 
-		PauseTransition pause = new PauseTransition(Duration.seconds(4));
+		PauseTransition pause = new PauseTransition(Duration.seconds(2));
 
 		if (shape != null) {
 			tip = shape.getToolTipInfo();
@@ -640,7 +644,54 @@ public class PaintFrame extends Canvas {
 		}
 		Platform.runLater(drawerRunnable);
 	}
-	
+
+	/**
+	 * Method to check if it needs to expand the canvas size
+	 */
+	public void checkAndResizeCanvas() {
+		double maxY = Double.MIN_VALUE;
+		double minY = Double.MAX_VALUE;
+
+		for (VisLevel level : visGraph.getLevelSet()) {
+			ArrayList<Shape> orderedShapeList = level.orderedList();
+
+			if (!orderedShapeList.isEmpty()) {
+				// Get the last shape in the list
+				Shape lastShape = orderedShapeList.get(orderedShapeList.size() - 1);
+				double shapeMaxY = lastShape.getPosY() + lastShape.getHeight();
+				if (shapeMaxY > maxY) { maxY = shapeMaxY; }
+
+				// Get the first shape in the list
+				Shape firstShape = orderedShapeList.get(0);
+				double shapeMinY = firstShape.getPosY();
+				if (shapeMinY < minY) { minY = shapeMinY; }
+			}
+		}
+
+		boolean needsResize = false;
+		double newHeight = getHeight();
+
+		if (maxY > getHeight()) {
+			newHeight = maxY + BORDER_PANEL;
+			needsResize = true;
+		}
+
+		if (minY < 0) {
+			newHeight = getHeight() - minY + BORDER_PANEL;
+			// Adjust the shape position
+			for (VisLevel level : visGraph.getLevelSet()) {
+				ArrayList<Shape> orderedShapeList = level.orderedList();
+				for (Shape shape : orderedShapeList) {
+					shape.setPosY((int) (shape.getPosY() - minY + BORDER_PANEL));
+				}
+			}
+			needsResize = true;
+		}
+
+		if (needsResize) {
+			setHeight(newHeight);
+		}
+	}
 
 	/**
 	 * method to convert HTML-like content into JavaFX Tooltip styled text
@@ -770,6 +821,13 @@ public class PaintFrame extends Canvas {
 							Platform.runLater(drawerRunnable);
 						}
 					} else { // pressed elsewhere on the shape
+						if (selectedShapes.contains(shape)) {
+							selectedShapes.remove(shape);
+						} else {
+							selectedShapes.add(shape);
+						}
+						Platform.runLater(drawerRunnable);
+
 						paintFrame.focusOnShape(null, shape);
 						break;
 					}
@@ -1014,7 +1072,7 @@ public class PaintFrame extends Canvas {
 		for (VisLevel level : visGraph.getLevelSet()) {
 			currentY = BORDER_PANEL;
 			ArrayList<Shape> orderedShapeList = level.orderedList();
-			visibleShapesPerLevel.put(level.id, new ArrayList<Shape>()); 
+			visibleShapesPerLevel.put(level.id, new ArrayList<>());
 			minY = BORDER_PANEL; 	
 			for (Shape shape : orderedShapeList) {
 				if (shape.isVisible()) { 
@@ -1037,6 +1095,7 @@ public class PaintFrame extends Canvas {
 				currentY += shape.getHeight() + levelHeight;
 			}
 		}
+		setStateChanged(true);
 		Platform.runLater(relaxerRunnable); 
 	}
 

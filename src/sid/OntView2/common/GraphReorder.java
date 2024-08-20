@@ -186,28 +186,4 @@ public class GraphReorder {
 			}
 		}
 	}
-
-	public static void cloneGraphWithVisibility(Graph graph, VisGraph vgraph) {
-		for (Entry<String, Shape> entry : vgraph.shapeMap.entrySet()) {
-			if (entry.getValue().isVisible() && (!(entry.getValue().outConnectors.isEmpty()) || !(entry.getValue().inConnectors.isEmpty()))) {
-				Node n = new Node(entry.getKey());
-				graph.addNode(n);
-			}
-		}
-		for (Entry<String, Shape> entry : vgraph.shapeMap.entrySet()) {
-			Shape shape = entry.getValue();
-			if (shape.isVisible()) {
-				for (VisConnector c : shape.outConnectors) {
-					if (!c.isRedundant()) {
-						Node or = graph.getNode(entry.getKey());
-						Node dst = graph.getNode(Shape.getKey(c.to.getLinkedClassExpression()));
-						if (dst != null) {
-							dst.setIdDad(or.getId());
-							graph.addEdge(new Edge(or, dst));
-						}
-					}
-				}
-			}
-		}
-	}
 }

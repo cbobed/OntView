@@ -273,9 +273,9 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			toggleSwitch = new ToggleButton("Show");
 			toggleSwitch.getStyleClass().add("button");
 
-			if (!parent.artPanel.isStable()) {
+			/*if (!parent.artPanel.isStable()) {
 				toggleSwitch.setDisable(true);
-			}
+			}*/
 
 			toggleSwitch.disableProperty().bind(parent.artPanel.stableChangeProperty());
 
@@ -712,7 +712,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 	private void loadReasonerButtonActionActionPerformed(ActionEvent event) {
 		String x = (String) getReasonerCombo().getValue();
-		parent.artPanel.setShowConnectors(true);
+		//parent.artPanel.setShowConnectors(true);
 		if(toggleSwitch != null)
 			toggleSwitch.setSelected(false);
 

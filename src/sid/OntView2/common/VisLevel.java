@@ -26,11 +26,11 @@ public class VisLevel {
 		posx= pposx;
 		id = pid;
 		graph = pgraph;
-		levelShapes = new HashSet<Shape>();
+		levelShapes = new HashSet<>();
 	}
  
 	public ArrayList<Shape> orderedList(){
-		ArrayList<Shape> list = new ArrayList<Shape>();
+		ArrayList<Shape> list = new ArrayList<>();
 		for (Shape shape : levelShapes){
 			list.add(shape);
 		}
