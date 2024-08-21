@@ -51,6 +51,8 @@ public abstract class Shape{
 	public void setPosY(int y) {posy = y;}
 	public void setHeight(int x) {height = x;}
 	public void setWidth(int x) {width = x;}
+	public int getTopCorner() { return posy - getHeight()/2; }
+	public int getBottomCorner() { return posy + getHeight()/2; }
 	public VisClass asVisClass(){return (VisClass)this;}
 	public void setState(int pstate){state= pstate;}
 	public int  getState() {return state;}

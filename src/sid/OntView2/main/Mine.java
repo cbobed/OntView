@@ -98,7 +98,7 @@ public class Mine extends Application implements Embedable{
 		viewer.artPanel.setStyle("-fx-background-color: white;");
 		viewer.nTopPanel.setStyle("-fx-border-color: black; -fx-border-width: 1;");
 
-		Scene scene = new Scene(root, 1300, 600);
+		Scene scene = new Scene(root, 1400, 600);
 		ClassLoader c = Thread.currentThread().getContextClassLoader();
 		scene.getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
 
@@ -122,6 +122,7 @@ public class Mine extends Application implements Embedable{
 				//set reasoner and ontology before creating
 				artPanel.createReasonedGraph(set,check);
 				artPanel.setCursor(Cursor.DEFAULT);
+				artPanel.cleanConnectors();
 
 			}
 			catch (Exception e1) {

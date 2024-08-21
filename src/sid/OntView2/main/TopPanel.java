@@ -286,12 +286,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		if (toggleSwitch == null) {
 			toggleSwitch = new ToggleButton("Show");
 			toggleSwitch.getStyleClass().add("button");
-
-			/*if (!parent.artPanel.isStable()) {
-				toggleSwitch.setDisable(true);
-			}*/
-
-			toggleSwitch.disableProperty().bind(parent.artPanel.stableChangeProperty());
+			toggleSwitch.setMinWidth(70);
 
 			// Add a listener to handle the switch state
 			toggleSwitch.selectedProperty().addListener((observable, oldValue, newValue) -> {
@@ -315,6 +310,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		if (cleanConnectorsButton == null) {
 			cleanConnectorsButton = new Button("Clean");
 			cleanConnectorsButton.getStyleClass().add("button");
+			cleanConnectorsButton.setMinWidth(70);
 			cleanConnectorsButton.setOnAction(this::cleanConnectorActionPerformed);
 		}
 
@@ -734,7 +730,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	}
 
 	private void loadReasonerButtonActionActionPerformed(ActionEvent event) {
-		String x = (String) getReasonerCombo().getValue();
+		String x = getReasonerCombo().getValue();
 		//parent.artPanel.setShowConnectors(true);
 		if(toggleSwitch != null)
 			toggleSwitch.setSelected(false);
@@ -813,23 +809,22 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	}
 
 	private void propertiesActionActionPerformed(ActionEvent event) {
-		Set<Entry<String,Shape>> classesInGraph = parent.artPanel.getVisGraph().getClassesInGraph();
+		Set<Entry<String, Shape>> classesInGraph = parent.artPanel.getVisGraph().getClassesInGraph();
 		if (!getPropertiesCheckBox().isSelected()) {
-			for (Entry<String,Shape> entry : classesInGraph) {
-				if ((entry.getValue() instanceof VisClass) && (entry.getValue().asVisClass().getPropertyBox()!=null)){
+			for (Entry<String, Shape> entry : classesInGraph) {
+				if ((entry.getValue() instanceof VisClass) && (entry.getValue().asVisClass().getPropertyBox() != null)) {
 					entry.getValue().asVisClass().getPropertyBox().setVisible(false);
 				}
 			}
-		}
-		else {
-			for (Entry<String,Shape> entry : classesInGraph) {
-				if ((entry.getValue() instanceof VisClass) && (entry.getValue().asVisClass().getPropertyBox()!=null)){
+		} else {
+			for (Entry<String, Shape> entry : classesInGraph) {
+				if ((entry.getValue() instanceof VisClass) && (entry.getValue().asVisClass().getPropertyBox() != null)) {
 					entry.getValue().asVisClass().getPropertyBox().setVisible(true);
 				}
 			}
 		}
 		parent.artPanel.setStateChanged(true);
-		Platform.runLater(parent.artPanel.getRelaxerRunnable()); 
+		Platform.runLater(parent.artPanel.getRelaxerRunnable());
 	}
 
 	private void reduceActionActionPerformed(ActionEvent event) {

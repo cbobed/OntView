@@ -43,7 +43,7 @@ public class PaintFrame extends Canvas {
 	private static final long serialVersionUID = 1L;
 	public ScrollPane scroll;
 	static final int BORDER_PANEL = 50;
-	static final int MIN_SPACE = 30;
+	static final int MIN_SPACE = 20;
 	static int PROPERTY_BOX_HEIGHT = 0;
 	static final int MIN_Y_SEP = 3;
 	static final int SEP = 200;
@@ -56,16 +56,12 @@ public class PaintFrame extends Canvas {
 	// CBL: added the qualified names rendering
 	public boolean qualifiedNames = false;
 	private String kceOption = VisConstants.NONECOMBOOPTION;
-
 	Dimension2D prevSize;
 	PaintFrame paintFrame = this;
 	OWLOntology activeOntology;
 	private String activeOntologySource;
-
 	OWLReasoner reasoner;
 	VisGraph visGraph, oVisGraph, rVisGraph; // visGraph will handle both depending on which is currently selected
-
-	String positionGraph = "LEFT";
 	private VisShapeContext menuVisShapeContext = null;
 	private VisGeneralContext menuVisGeneralContext = null;
 
@@ -151,17 +147,12 @@ public class PaintFrame extends Canvas {
 	 */
 	public void setFactor(double d) { factor = d; }
 
-	public void setOriginalSize(Dimension2D in) {
-		oSize = in;
-	}
-	
-	
+	public void setOriginalSize(Dimension2D in) { oSize = in; }
 	
 	/*** 
 	 * Runnables required to push the drawing to the javaFx application thread using Platform.runLater()
 	 */
-	
-	
+
 	public class Relaxer implements Runnable {
 		public void run() {
 			relax(); 
@@ -211,7 +202,6 @@ public class PaintFrame extends Canvas {
 		double newWidth = size.getWidth() * factor;
 		double newHeight = size.getHeight() * factor;
 
-		// Set the new canvas size
 		setWidth(newWidth);
 		setHeight(newHeight);
 
@@ -367,7 +357,7 @@ public class PaintFrame extends Canvas {
 		visGraph.addGeneralObserver((observable, oldValue, newValue) -> graphObserver.update());
 
 		stable = true;
-		stateChanged.set(true);
+		stateChanged = true;
 		factor = 1.0;
 		paintFrame.setCursor(Cursor.DEFAULT);
 		// scroll.getVerticalScrollBar().setUnitIncrement(15);
@@ -414,15 +404,10 @@ public class PaintFrame extends Canvas {
 		return eraseConnector;
 	}
 
-	private BooleanProperty stateChanged = new SimpleBooleanProperty(true);
-
-	public BooleanProperty stableChangeProperty() {
-		return stateChanged;
-	}
-
+	private boolean stateChanged = true;
 
 	public void setStateChanged(boolean value) {
-		stateChanged.set(value);
+		stateChanged = value;
 	}
 
 	/**
@@ -439,14 +424,14 @@ public class PaintFrame extends Canvas {
 			return;
 		}
 
-		System.out.println("relax entrada: " + stateChanged.get());
+		System.out.println("relax entrada: " + stateChanged);
 
 		boolean recentChange = false;
 
 		if (stable) {
-			while (stateChanged.get()) {
+			while (stateChanged) {
 				System.out.println("relax");
-				stateChanged.set(false);
+				stateChanged = false;
 				
 				// Faster version
 				for (VisLevel level: visGraph.levelSet) {
@@ -454,9 +439,9 @@ public class PaintFrame extends Canvas {
 						for (Shape shape_j: level.getShapeSet()) {
 							if (s_i.getVisLevel() == shape_j.getVisLevel()) {
 								if ((s_i != shape_j) && (s_i.visible) && (shape_j.visible)) {
-									if ((s_i.getPosY() < shape_j.getPosY()) &&
-											(shape_j.getPosY() < (s_i.getPosY() + s_i.getTotalHeight() + MIN_SPACE )) ) {
-										stateChanged.set(true);
+									if ((s_i.getTopCorner() < shape_j.getTopCorner()) &&
+											(shape_j.getTopCorner() < (s_i.getBottomCorner() + MIN_SPACE )) ) {
+										stateChanged = true;
 										shapeRepulsion(s_i, DOWN);
 									}
 								}
@@ -464,7 +449,7 @@ public class PaintFrame extends Canvas {
 						}
 						if (s_i.getPosY() < BORDER_PANEL) {
 							s_i.setPosY(BORDER_PANEL + MIN_SPACE);
-							stateChanged.set(true);
+							stateChanged = true;
 							shapeRepulsion(s_i, DOWN);
 						}
 						visGraph.adjustPanelSize((float) factor);
@@ -479,7 +464,7 @@ public class PaintFrame extends Canvas {
 		}
 
 		System.out.println("stable: " + stable);
-		System.out.println("relax salida: " + stateChanged.get() + "\n");
+		System.out.println("relax salida: " + stateChanged + "\n");
 
 	}
 
@@ -572,7 +557,7 @@ public class PaintFrame extends Canvas {
 		if (pressedShape != null) {
 			direction = ((draggedY > 0) ? DOWN : UP);
 			pressedShape.setPosY(pressedShape.getPosY() + draggedY);
-			stateChanged.set(true);
+			stateChanged = true;
 			shapeRepulsion(pressedShape, direction);
 			mouseLastX = (int) p.getX();
 			mouseLastY = (int) p.getY();
@@ -607,6 +592,8 @@ public class PaintFrame extends Canvas {
 		VisObjectProperty prop = null;
 		Shape shape = visGraph.findShape(p);
 		String tip;
+		WebView  web = new WebView();
+		WebEngine webEngine = web.getEngine();
 
 		PauseTransition pause = new PauseTransition(Duration.seconds(2));
 
@@ -615,12 +602,10 @@ public class PaintFrame extends Canvas {
 			tooltip.setText(formatToolTipText(tip));
 			Tooltip.install(this, tooltip);
 			pause.playFromStart();*/
-			String htmlContent = "<b>Classification</b>" + "<br><br>" + "<b>Disjoint</b>" + "<ul>" + "<br>" + "<li>Nothing</li>" + "</ul></ul>";
-
-			WebView  web = new WebView();
-			WebEngine webEngine = web.getEngine();
+			//String htmlContent = "<b>Classification</b>" + "<br><br>" + "<b>Disjoint</b>" + "<ul>" + "<br>" + "<li>Nothing</li>" + "</ul></ul>";
+			
 			tip = shape.getToolTipInfo();
-			webEngine.loadContent(htmlContent);
+			webEngine.loadContent(tip);
 			tooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
 			tooltip.setGraphic(web);
 			Tooltip.install(this, tooltip);
@@ -633,7 +618,9 @@ public class PaintFrame extends Canvas {
 			prop = movedOnVisPropertyDescription(x, y);
 			if (prop != null) {
 				tip = prop.getTooltipText();
-				tooltip.setText(formatToolTipText(tip));
+				webEngine.loadContent(tip);
+				tooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+				tooltip.setGraphic(web);
 				Tooltip.install(this, tooltip);
 				pause.playFromStart();
 			}
@@ -1005,6 +992,7 @@ public class PaintFrame extends Canvas {
 		return null;
 	}
 
+
 	private void shapeRepulsion(Shape repellingShape, int direction) {
 		if (repulsion) {
 			VisLevel currentLevel = repellingShape.getVisLevel();
@@ -1017,13 +1005,19 @@ public class PaintFrame extends Canvas {
 						if (upperShape == null) // it's the visible upper shape
 							return;
 
+						GraphicsContext g = this.getGraphicsContext2D();
+
+
 						int upperShapeHeight = upperShape.getHeight();
-						if ((upperShape instanceof VisClass) && (upperShape.asVisClass().propertyBox != null))
+						if ((upperShape instanceof VisClass) && (upperShape.asVisClass().propertyBox != null) && (upperShape.asVisClass().propertyBox.visible))
 							upperShapeHeight += upperShape.asVisClass().getTotalHeight();
-						if (repellingShape.getPosY() < (upperShape.getPosY() + upperShapeHeight + MIN_Y_SEP)) {
-							upperShape.setPosY(upperShape.getPosY() - upperShape.getHeight() / 2);
+
+						if (repellingShape.getTopCorner() < (upperShape.getPosY() + upperShapeHeight/2 + MIN_SPACE)) {
+							upperShape.setPosY(upperShape.getPosY() - upperShape.getHeight() / 2 );
 						}
+
 						shapeRepulsion(upperShape, direction);
+
 					}
 					break;
 
@@ -1033,10 +1027,10 @@ public class PaintFrame extends Canvas {
 						if (lowerShape == null) // it's the visible upper shape
 							return;
 
-						int z = repellingShape.getHeight();
-						if ((repellingShape instanceof VisClass) && (repellingShape.asVisClass().propertyBox != null))
-							z = repellingShape.asVisClass().getTotalHeight();
-						if (repellingShape.getPosY() + z > lowerShape.getPosY() - lowerShape.getHeight() - MIN_Y_SEP) {
+						int lowerShapeHeight = repellingShape.getHeight();
+						if ((repellingShape instanceof VisClass) && (repellingShape.asVisClass().propertyBox != null) && (repellingShape.asVisClass().propertyBox.visible))
+							lowerShapeHeight = repellingShape.asVisClass().getTotalHeight();
+						if (repellingShape.getPosY() + lowerShapeHeight/2 > lowerShape.getTopCorner() - MIN_SPACE) {
 							lowerShape.setPosY(lowerShape.getPosY() + lowerShape.getHeight() / 2);
 						}
 						shapeRepulsion(lowerShape, direction);

@@ -422,8 +422,8 @@ public class VisClass extends Shape {
 		g.setFont(oldFont);
 	}
 
-	private void propertyDraw(GraphicsContext g, int x, int y, int roundCornerValue, Color lightBlue) {
-		g.setFill(lightBlue);
+	private void propertyDraw(GraphicsContext g, int x, int y, int roundCornerValue, Color colorP) {
+		g.setFill(colorP);
 		g.fillRoundRect(x - (double) getWidth()/2 + 5, y - (double) currentHeight / 2 + 6, 19, 14, roundCornerValue, roundCornerValue);
 		g.setFill(Color.BLACK);
 		g.strokeRoundRect(x - (double) getWidth()/2 + 5, y - (double) currentHeight / 2 + 6, 19, 14, roundCornerValue, roundCornerValue);

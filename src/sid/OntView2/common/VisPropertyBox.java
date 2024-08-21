@@ -70,7 +70,6 @@ public class VisPropertyBox {
 		propRangeConnectorList = new ArrayList<>();
 	}
 
-	// REVISAR
 	public void calculateHeight(){
 		GraphicsContext context = vclass.graph.paintframe.getGraphicsContext2D();
 		Text f = new Text();
@@ -89,8 +88,8 @@ public class VisPropertyBox {
 		g.setFont(font);
 	    for (VisObjectProperty p: propertyList){
 	    	if (p.visible){
-	    	p.draw(g);
-	    	p.drawConnectors(g);
+				p.draw(g);
+				p.drawConnectors(g);
 	    	}
 	    }
 	    for (VisDataProperty p: dPropertyList){
