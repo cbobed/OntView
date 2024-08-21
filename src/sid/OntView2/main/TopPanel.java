@@ -51,7 +51,9 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private ComboBox<String> kceComboBox;
 	private VBox panel0;
 	private VBox connectorPanel;
+	private VBox cleanConnectorPanel;
 	private ToggleButton toggleSwitch;
+	private Button cleanConnectorsButton;
 	private Mine parent;
 	private CheckBox Properties;
 	private Button fileSystemButton;
@@ -115,7 +117,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 				getViewPanel(),
 				getSnapshotPanel(),
 				getPanel0(),
-				getConnectorsSwitch(),
+				getConnectorsActions(),
 				createHelpButton());
 		row.setAlignment(Pos.CENTER);
 
@@ -263,13 +265,25 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		return panel0;
 	}
 
-	private VBox getConnectorsSwitch() {
+	private VBox getConnectorsActions() {
 		if (connectorPanel == null) {
 			connectorPanel = new VBox();
 			connectorPanel.setPadding(new Insets(5));
 			connectorPanel.setSpacing(5);
 
 			StackPane titlePane = createTitlePane("Connectors");
+			HBox row = createRow(getConnectorsSwitch(), createCleanConnectorsButton());
+			row.setAlignment(Pos.CENTER);
+
+			connectorPanel = createContainer(true, titlePane, row);
+
+		}
+
+		return connectorPanel;
+	}
+
+	private ToggleButton getConnectorsSwitch() {
+		if (toggleSwitch == null) {
 			toggleSwitch = new ToggleButton("Show");
 			toggleSwitch.getStyleClass().add("button");
 
@@ -292,10 +306,19 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 				}
 			});
-			connectorPanel = createContainer(true, titlePane, toggleSwitch);
 
 		}
-		return connectorPanel;
+		return toggleSwitch;
+	}
+
+	private Button createCleanConnectorsButton() {
+		if (cleanConnectorsButton == null) {
+			cleanConnectorsButton = new Button("Clean");
+			cleanConnectorsButton.getStyleClass().add("button");
+			cleanConnectorsButton.setOnAction(this::cleanConnectorActionPerformed);
+		}
+
+		return cleanConnectorsButton;
 	}
 
 	private ComboBox<String> getComboBox0() {
@@ -748,6 +771,10 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	private void cleanConnectorActionPerformed(ActionEvent event) {
+		parent.artPanel.cleanConnectors();
 	}
 
 	private void createButtonActionActionPerformed(ActionEvent event) {

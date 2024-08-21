@@ -704,6 +704,7 @@ public class VisGraph implements Runnable{
 
 	private boolean isInShape(int x, int y, int w, int h, Point2D p) {
 		int buttomShowHideSize= 10; // Take into account the size of the button
+
 		return (p.getX() >= x - (double) w / 2) && (p.getX() <= x + (double) w / 2 + buttomShowHideSize) &&
 				(p.getY() >= y - (double) h / 2) && (p.getY() <= y + (double) h / 2);
 	}

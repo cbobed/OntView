@@ -11,8 +11,10 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.concurrent.Task;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Point2D;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tooltip;
@@ -22,6 +24,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.Cursor;
 
 import javafx.scene.text.Font;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import javafx.util.Duration;
 import org.apache.jena.base.Sys;
 import org.semanticweb.owlapi.apibinding.OWLManager;
@@ -450,7 +454,7 @@ public class PaintFrame extends Canvas {
 						for (Shape shape_j: level.getShapeSet()) {
 							if (s_i.getVisLevel() == shape_j.getVisLevel()) {
 								if ((s_i != shape_j) && (s_i.visible) && (shape_j.visible)) {
-									if ((s_i.getPosY() < shape_j.getPosY()) && 
+									if ((s_i.getPosY() < shape_j.getPosY()) &&
 											(shape_j.getPosY() < (s_i.getPosY() + s_i.getTotalHeight() + MIN_SPACE )) ) {
 										stateChanged.set(true);
 										shapeRepulsion(s_i, DOWN);
@@ -497,6 +501,11 @@ public class PaintFrame extends Canvas {
 	public boolean hideRange = false;
 	private Embedable parentframe;
 	private final Tooltip tooltip = new Tooltip();
+
+	public void cleanConnectors() {
+		selectedShapes.clear();
+		Platform.runLater(drawerRunnable);
+	}
 
 	public void handleMouseEntered(MouseEvent e) {
 		setCursor(Cursor.DEFAULT);
@@ -602,10 +611,21 @@ public class PaintFrame extends Canvas {
 		PauseTransition pause = new PauseTransition(Duration.seconds(2));
 
 		if (shape != null) {
-			tip = shape.getToolTipInfo();
+			/*tip = shape.getToolTipInfo();
 			tooltip.setText(formatToolTipText(tip));
 			Tooltip.install(this, tooltip);
+			pause.playFromStart();*/
+			String htmlContent = "<b>Classification</b>" + "<br><br>" + "<b>Disjoint</b>" + "<ul>" + "<br>" + "<li>Nothing</li>" + "</ul></ul>";
+
+			WebView  web = new WebView();
+			WebEngine webEngine = web.getEngine();
+			tip = shape.getToolTipInfo();
+			webEngine.loadContent(htmlContent);
+			tooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+			tooltip.setGraphic(web);
+			Tooltip.install(this, tooltip);
 			pause.playFromStart();
+
 		} else {
 			tooltip.hide();
 			pause.stop();
@@ -833,7 +853,16 @@ public class PaintFrame extends Canvas {
 					}
 				}
 			}
+		} else {
+			if (menuVisShapeContext != null) {
+				closeContextMenu(menuVisShapeContext);
+			}
+			if (menuVisGeneralContext != null) {
+				closeContextMenu(menuVisGeneralContext);
+			}
 		}
+
+		getVisGraph().updateObservers(VisConstants.GENERALOBSERVER);
 		return false;
 	}
 
