@@ -216,13 +216,17 @@ public class PaintFrame extends Canvas {
 	}
 
 	/*-*************************************************************/
-	public void drawDisjointShape(VisClass visClass) {
+	public void drawDisjointShape() {
 		if (this.getScene() != null && !this.isDisabled() && this.isVisible() && this.getGraphicsContext2D() != null) {
 			GraphicsContext g = this.getGraphicsContext2D();
 
 			if (visGraph != null) {
-				for (VisConnectorDisjoint disjoint : visClass.getDisjointConnectors()) {
-					disjoint.draw(g);
+				for (Shape shape : selectedDisjoints) {
+					if (shape instanceof VisClass visClass) {
+						for (VisConnectorDisjoint disjoint : visClass.getDisjointConnectors()) {
+							disjoint.draw(g);
+						}
+					}
 				}
 			}
 		}
@@ -273,6 +277,10 @@ public class PaintFrame extends Canvas {
 
 				if (!selectedShapes.isEmpty()){
 					drawConnectorsForSelectedShapes();
+				}
+
+				if(!selectedDisjoints.isEmpty()){
+					drawDisjointShape();
 				}
 
 				g.setStroke(Color.LIGHTGRAY);
@@ -480,6 +488,7 @@ public class PaintFrame extends Canvas {
 	int mouseLastX = 0;
 	Shape pressedShape = null;
 	List<Shape> selectedShapes = new ArrayList<>();
+	List<Shape> selectedDisjoints = new ArrayList<>();
 	Shape drawConnector = null;
 	Shape eraseConnector = null;
 	Cursor cursorState = Cursor.DEFAULT;
@@ -881,7 +890,12 @@ public class PaintFrame extends Canvas {
 			Shape shape = entry.getValue();
 			if (shape instanceof VisClass visClass) {
 				if (visClass.getDisjointConnectors() != null && shape.asVisClass().onCloseDisjoints(x, y)) {
-					drawDisjointShape(visClass);
+					if (selectedDisjoints.contains(shape)) {
+						selectedDisjoints.remove(shape);
+					} else {
+						selectedDisjoints.add(shape);
+					}
+					Platform.runLater(drawerRunnable);
 					return true;
 				}
 			}
