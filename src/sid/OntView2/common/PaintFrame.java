@@ -943,7 +943,8 @@ public class PaintFrame extends Canvas {
 		PageRankConceptExtraction extractorPageRank = new PageRankConceptExtraction();
 
 		switch (getKceOption()) {
-		case VisConstants.NONECOMBOOPTION -> { // "None"
+		case VisConstants.NONECOMBOOPTION -> { // "None"	
+			getVisGraph().clearDashedConnectorList();
 			getVisGraph().showAll();
 		}
 		case VisConstants.KCECOMBOOPTION1 -> { // "KCE10"
