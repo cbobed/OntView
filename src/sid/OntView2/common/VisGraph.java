@@ -358,10 +358,13 @@ public class VisGraph implements Runnable{
 
 					EntitySearcher.getEquivalentClasses(defClassShape.getLinkedClassExpression().asOWLClass(), activeOntology).forEach(
 						definition -> {
+							// we add all the equivalences 
+							// CBL: 27/8/2024 => We can add all the equivalences here, though it would be the assertions, not the actual 
+							// 	equivalent classes -- OWLAPI considers any class with an equivalence as defined.
 							if (definition.isAnonymous()) {
-								shape.asVisClass().addDefinition(definition);
 								// <CBL 25/9/13>
 								// We also add the definition to the aliases handling
+								shape.asVisClass().addDefinition(definition);
 								definitionsMap.put(Shape.getKey(definition), shape);
 								// <CBL 24/9/13>
 								// the definitions are now displayed along with the name
