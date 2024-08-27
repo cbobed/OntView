@@ -16,6 +16,7 @@ import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Objects;
 
 public class VisObjectProperty extends VisProperty {
 
@@ -156,7 +157,7 @@ public class VisObjectProperty extends VisProperty {
 	public void add(VisObjectProperty pparent){
 		parents.add(pparent);
 		if (parentConnectors == null){
-			parentConnectors = new ArrayList<VisConnectorHeritance>();
+			parentConnectors = new ArrayList<>();
 			parentConnectors.add(new VisConnectorHeritance(this, pparent));
 		}
 		parentConnectors.add(new VisConnectorHeritance(this, pparent));
@@ -208,7 +209,7 @@ public class VisObjectProperty extends VisProperty {
 			g.setFont(textFont);
 			g.setFill(Color.BLACK);
 
-			if ((parents!=null)&&(!parents.isEmpty())) {
+			if ((parents!=null)&&(parents.size() > 0)) {
 				g.fillText(visibleLabel, getPosX(), getPosY());
 			}	
 			else {
@@ -261,6 +262,8 @@ public class VisObjectProperty extends VisProperty {
 					g.fillText(OntViewConstants.AND, getPosX()-14, getPosY()-2);
 				}
 				for (VisConnectorHeritance con : parentConnectors) {
+					g.setFill(Color.BLACK);
+					g.setStroke(Color.BLACK);
 					con.draw(g);
 				}	
 			}

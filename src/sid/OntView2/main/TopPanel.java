@@ -22,8 +22,6 @@ import javafx.scene.text.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Popup;
 import javafx.util.Duration;
-import org.apache.jena.base.Sys;
-import org.semanticweb.owlapi.io.OWLOntologyCreationIOException;
 import org.semanticweb.owlapi.model.IRI;
 import sid.OntView2.common.*;
 
@@ -200,7 +198,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		if (zoomSlider == null) {
 			zoomSlider = new Slider();
 			zoomSlider.setMin(0);
-			zoomSlider.setMax(10);
+			zoomSlider.setMax(20);
 			zoomSlider.setOrientation(Orientation.VERTICAL);
 			zoomSlider.setValue(1);
 
@@ -880,7 +878,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			parent.artPanel.setFactor(1.0);
 			parent.artPanel.scale(1.0, size);
 		}
-		getZoomSlider().setValue(5);
+		getZoomSlider().setValue(15);
 	}
 
 	Dimension2D size = null;

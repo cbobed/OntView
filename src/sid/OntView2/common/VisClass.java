@@ -312,14 +312,14 @@ public class VisClass extends Shape {
 		    		
 		    		// now => the rectangle for the name of the concept
 		    		g.setFill(lightgray);
-		    		g.fillRect(x - (double) getWidth()/2+5, y- (double) currentHeight /2, getWidth()-10, fontHeight+15);
+		    		g.fillRect(x - (double) getWidth()/2+5, y- (double) currentHeight /2 - 5, getWidth()-10, fontHeight+15);
 					g.setStroke(isBottom ? Color.RED : Color.BLACK);
-		    		g.strokeRect(x - (double) getWidth()/2+5, y - (double) currentHeight /2,  getWidth()-10, fontHeight+14);
+		    		g.strokeRect(x - (double) getWidth()/2+5, y - (double) currentHeight /2 - 5,  getWidth()-10, fontHeight+14);
 
 		    		// this is the name of the concept
 					g.setFill(Color.BLACK);
 		    		g.setFont(getDefinedClassFont()); 
-		    		g.fillText(visibleLabel, x - (double) (getWidth() - 16) /2 + 5, (y - (double) (currentHeight - 4) /2) + ascent);
+		    		g.fillText(visibleLabel, x - (double) (getWidth() - 16) /2 + 5, (y - (double) (currentHeight - 4) /2) - 6 + ascent);
 
 		    		g.setFont(getBoldFont());
 		    		double auxY = y - ((double) currentHeight /2) + (fontHeight +5) + 2;
@@ -569,11 +569,11 @@ public class VisClass extends Shape {
 		if (!isAnonymous){
 			getInheritedObjectProperties();
 			getInheritedDataProperties();
-			other = new StringBuilder("<html><b>"
+			other = new StringBuilder("<b>"
                     + (isAnonymous ? removeFormatInformation(this.visibleLabel) : this.visibleLabel)
                     + "</b><br><br>");
 			if ((getDisjointClasses() !=null)&& (getDisjointClasses().size()>0)) {
-				other.append("<b>Disjoint</b><ul><br>");
+				other.append("<b>Disjoint</b><ul>");
 				
 				VisClass auxVisClass = null;
 				ArrayList<OWLClassExpression> auxArray = null;
@@ -606,7 +606,7 @@ public class VisClass extends Shape {
 				}
 				other.append("</ul>");
 			}
-			other.append("</ul></html>");
+			other.append("</ul>");
 		}
 		return other.toString();
 	}

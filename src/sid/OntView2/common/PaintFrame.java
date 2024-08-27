@@ -432,8 +432,6 @@ public class PaintFrame extends Canvas {
 			return;
 		}
 
-		System.out.println("relax entrada: " + stateChanged);
-
 		boolean recentChange = false;
 
 		if (stable) {
@@ -471,9 +469,6 @@ public class PaintFrame extends Canvas {
 			}
 		}
 
-		System.out.println("stable: " + stable);
-		System.out.println("relax salida: " + stateChanged + "\n");
-
 	}
 
 	/**
@@ -495,6 +490,9 @@ public class PaintFrame extends Canvas {
 	public boolean hideRange = false;
 	private Embedable parentframe;
 	private final Tooltip tooltip = new Tooltip();
+	private WebView web = new WebView();
+	private WebEngine webEngine = web.getEngine();
+	PauseTransition pause = new PauseTransition(Duration.seconds(2));
 
 	public void cleanConnectors() {
 		selectedShapes.clear();
@@ -601,20 +599,27 @@ public class PaintFrame extends Canvas {
 		VisObjectProperty prop = null;
 		Shape shape = visGraph.findShape(p);
 		String tip;
-		WebView  web = new WebView();
-		WebEngine webEngine = web.getEngine();
-
-		PauseTransition pause = new PauseTransition(Duration.seconds(2));
 
 		if (shape != null) {
-			/*tip = shape.getToolTipInfo();
-			tooltip.setText(formatToolTipText(tip));
-			Tooltip.install(this, tooltip);
-			pause.playFromStart();*/
-			//String htmlContent = "<b>Classification</b>" + "<br><br>" + "<b>Disjoint</b>" + "<ul>" + "<br>" + "<li>Nothing</li>" + "</ul></ul>";
-			
-			tip = shape.getToolTipInfo();
-			webEngine.loadContent(tip);
+			tip  = shape.getToolTipInfo();
+			String styledContent = "<html><head><style>"
+					+ "body {"
+					+ "  font-size: 12px;"
+					+ "  background-color: rgba(0, 0, 0, 0.8);"
+					+ "  color: white;"
+					+ "  margin: 0;"
+					+ "  padding: 5px;"
+					+ "}"
+					+ "b {"
+					+ "  color: blue;"
+					+ "}"
+					+ "</style></head><body>"
+					+ tip
+					+ "</body></html>";
+
+
+
+			webEngine.loadContent(styledContent);
 			tooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
 			tooltip.setGraphic(web);
 			Tooltip.install(this, tooltip);

@@ -35,10 +35,9 @@ public class VisConnectorPropertyRange extends VisConnectorIsA {
 //				  	g2d.drawLine(fromPoint.x+2, fromPoint.y-2, toPoint.x, toPoint.y);
 					g.setStroke(Color.LIGHTBLUE);
 			  		drawCurve(g, VisConstants.NURB);
-					  g.setStroke(prevColor);
+					g.setStroke(prevColor);
 //			  		setPath(path,fromPoint.x+2, fromPoint.y-2, toPoint.x, toPoint.y);
 //			  		g2d.draw(path);
-
 				  	g.setFill(prevColor);
 				} 	
 			}
