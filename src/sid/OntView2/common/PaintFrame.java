@@ -11,13 +11,14 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.concurrent.Task;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Point2D;
-import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tooltip;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
@@ -35,6 +36,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 import reducer.StructuralReducer;
+import sid.OntView2.main.Mine;
 import sid.OntView2.utils.ProgressBarDialogThread;
 
 public class PaintFrame extends Canvas {
@@ -64,6 +66,8 @@ public class PaintFrame extends Canvas {
 	VisGraph visGraph, oVisGraph, rVisGraph; // visGraph will handle both depending on which is currently selected
 	private VisShapeContext menuVisShapeContext = null;
 	private VisGeneralContext menuVisGeneralContext = null;
+
+	private Mine mine;
 
 	public boolean isStable() {
 		return stable;
@@ -116,6 +120,7 @@ public class PaintFrame extends Canvas {
 			VisConfig.getInstance().setConstants();
 			// visGraph = new VisGraph(this);
 			addEventHandlers();
+			configureTooltipLockHandler();
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -589,6 +594,29 @@ public class PaintFrame extends Canvas {
 		}
 	}
 
+	private final BooleanProperty tooltipLocked = new SimpleBooleanProperty(false);
+
+	private void handleTooltipLockToggle(KeyEvent event) {
+		if (event.getEventType() == KeyEvent.KEY_PRESSED && event.isAltDown() && event.getCode() == KeyCode.S) {
+			tooltipLocked.set(true);
+			System.out.println("Tooltip locked (Alt + S pressed)");
+		} else if (event.getEventType() == KeyEvent.KEY_RELEASED && (event.getCode() == KeyCode.ALT || event.getCode() == KeyCode.S)) {
+			tooltipLocked.set(false); 
+			System.out.println("Tooltip unlocked (Alt or S released)");
+		}
+	}
+
+	private void configureTooltipLockHandler() {
+		this.sceneProperty().addListener((observable, oldScene, newScene) -> {
+			if (newScene != null) {
+				newScene.addEventHandler(KeyEvent.KEY_PRESSED, this::handleTooltipLockToggle);
+				newScene.addEventHandler(KeyEvent.KEY_RELEASED, this::handleTooltipLockToggle);
+			}
+		});
+	}
+
+
+
 	public void handleMouseMoved(MouseEvent e) {
 		if (visGraph == null) {
 			return;
@@ -601,42 +629,12 @@ public class PaintFrame extends Canvas {
 		String tip;
 
 		if (shape != null) {
-			tip  = shape.getToolTipInfo();
-			String styledContent = "<html><head><style>"
-					+ "body {"
-					+ "  font-size: 12px;"
-					+ "  background-color: rgba(0, 0, 0, 0.8);"
-					+ "  color: white;"
-					+ "  margin: 0;"
-					+ "  padding: 5px;"
-					+ "}"
-					+ "b {"
-					+ "  color: blue;"
-					+ "}"
-					+ "</style></head><body>"
-					+ tip
-					+ "</body></html>";
-
-
-
-			webEngine.loadContent(styledContent);
-			tooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-			tooltip.setGraphic(web);
-			Tooltip.install(this, tooltip);
-			pause.playFromStart();
-
+			configurationTooltip(shape.getToolTipInfo());
 		} else {
-			tooltip.hide();
-			pause.stop();
 			Tooltip.uninstall(this, tooltip);
 			prop = movedOnVisPropertyDescription(x, y);
 			if (prop != null) {
-				tip = prop.getTooltipText();
-				webEngine.loadContent(tip);
-				tooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-				tooltip.setGraphic(web);
-				Tooltip.install(this, tooltip);
-				pause.playFromStart();
+				configurationTooltip(prop.getTooltipText());
 			}
 		}
 		if ((shape != null) || (prop != null)) {
@@ -664,6 +662,47 @@ public class PaintFrame extends Canvas {
 			showContextMenu((int) e.getScreenX(), (int) e.getScreenY());
 		}
 		Platform.runLater(drawerRunnable);
+	}
+
+	private void configurationTooltip(String tip) {
+		String styledContent = "<html><head><style>"
+				+ "body {"
+				+ "  font-size: 13px;"
+				+ "  background-color: rgba(0, 0, 0, 0.9);"
+				+ "  color: white;"
+				+ "  margin: 0;"
+				+ "  padding: 5px;"
+				+ "}"
+				+ "b {"
+				+ "  color: lightblue;"
+				+ "  font-size: 14px;"
+				+ "}"
+				+ "</style></head><body>"
+				+ tip
+				+ "</body></html>";
+
+		webEngine.loadContent(styledContent);
+		tooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+		web.setPrefSize(1, 1);
+		webEngine.documentProperty().addListener((obs, oldDoc, newDoc) -> {
+			if (newDoc != null) {
+				webEngine.executeScript("document.body.style.width = 'auto'; document.body.style.height = 'auto';");
+				Object scrollWidth = webEngine.executeScript("document.body.scrollWidth");
+				Object scrollHeight = webEngine.executeScript("document.body.scrollHeight");
+
+
+				double width = ((Number) scrollWidth).doubleValue();
+				double height = ((Number) scrollHeight).doubleValue();
+
+				if (height > 600) {
+					web.setPrefSize(width, 600);
+				} else {
+					web.setPrefSize(width, height);
+				}
+			}
+		});
+		tooltip.setGraphic(web);
+		Tooltip.install(this, tooltip);
 	}
 
 	/**
