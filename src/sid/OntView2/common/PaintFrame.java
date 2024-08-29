@@ -4,10 +4,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.CountDownLatch;
 
-import javafx.animation.PauseTransition;
 import javafx.application.Platform;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.concurrent.Task;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Point2D;
@@ -17,8 +14,6 @@ import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tooltip;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
@@ -27,8 +22,6 @@ import javafx.scene.Cursor;
 import javafx.scene.text.Font;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
-import javafx.util.Duration;
-import org.apache.jena.base.Sys;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
@@ -46,9 +39,6 @@ public class PaintFrame extends Canvas {
 	public ScrollPane scroll;
 	static final int BORDER_PANEL = 50;
 	static final int MIN_SPACE = 20;
-	static int PROPERTY_BOX_HEIGHT = 0;
-	static final int MIN_Y_SEP = 3;
-	static final int SEP = 200;
 	private static final int DOWN = 0;
 	private static final int UP = -1;
 	boolean stable = false;
@@ -120,7 +110,6 @@ public class PaintFrame extends Canvas {
 			VisConfig.getInstance().setConstants();
 			// visGraph = new VisGraph(this);
 			addEventHandlers();
-			configureTooltipLockHandler();
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -135,6 +124,8 @@ public class PaintFrame extends Canvas {
 		this.addEventHandler(MouseEvent.MOUSE_CLICKED, this::handleMouseClicked);
 		this.addEventHandler(MouseEvent.MOUSE_ENTERED, this::handleMouseEntered);
 		this.addEventHandler(MouseEvent.MOUSE_EXITED, this::handleMouseExited);
+		//this.addEventHandler(KeyEvent.KEY_PRESSED, this::handleKeyPressed);
+
 	}
 
 	/*-*************************************************************
@@ -204,11 +195,19 @@ public class PaintFrame extends Canvas {
 	 */
 
 	public void scale(double factor, Dimension2D size) {
-		double newWidth = size.getWidth() * factor;
-		double newHeight = size.getHeight() * factor;
+		double newWidth = size.getWidth();
+		double newHeight = size.getHeight();
 
-		setWidth(newWidth);
-		setHeight(newHeight);
+		if (factor > 1.0){
+			setWidth(newWidth * factor);
+			setHeight(newHeight * factor);
+		} else {
+			setWidth(newWidth);
+			setHeight(newHeight);
+		}
+
+		System.out.println("NewWidth: " + newWidth + " newHeight: " + newHeight);
+
 
 		GraphicsContext gc = this.getGraphicsContext2D();
 		if (gc != null) {
@@ -264,10 +263,11 @@ public class PaintFrame extends Canvas {
 			g.clearRect(0, 0, getWidth(), getHeight());
 			if (prevFactor != factor) {
 				prevFactor = factor;
-				if ((factor >= 1.0) && (getWidth() != prevSize.getWidth() || getHeight() != prevSize.getHeight())) {
-					prevSize = new Dimension2D(oSize.getWidth() * factor, oSize.getHeight() * factor);
+				if ((getWidth() != prevSize.getWidth() || getHeight() != prevSize.getHeight())) {
+					prevSize = new Dimension2D(getWidth(), getHeight());
 				}
 			}
+
 			if (visGraph != null) {
 				
 				// draw connectors
@@ -441,9 +441,9 @@ public class PaintFrame extends Canvas {
 
 		if (stable) {
 			while (stateChanged) {
-				System.out.println("relax");
+				//System.out.println("relax");
 				stateChanged = false;
-				
+
 				// Faster version
 				for (VisLevel level: visGraph.levelSet) {
 					for (Shape s_i: level.getShapeSet()) {
@@ -497,7 +497,6 @@ public class PaintFrame extends Canvas {
 	private final Tooltip tooltip = new Tooltip();
 	private WebView web = new WebView();
 	private WebEngine webEngine = web.getEngine();
-	PauseTransition pause = new PauseTransition(Duration.seconds(2));
 
 	public void cleanConnectors() {
 		selectedShapes.clear();
@@ -594,28 +593,22 @@ public class PaintFrame extends Canvas {
 		}
 	}
 
-	private final BooleanProperty tooltipLocked = new SimpleBooleanProperty(false);
 
-	private void handleTooltipLockToggle(KeyEvent event) {
-		if (event.getEventType() == KeyEvent.KEY_PRESSED && event.isAltDown() && event.getCode() == KeyCode.S) {
-			tooltipLocked.set(true);
-			System.out.println("Tooltip locked (Alt + S pressed)");
-		} else if (event.getEventType() == KeyEvent.KEY_RELEASED && (event.getCode() == KeyCode.ALT || event.getCode() == KeyCode.S)) {
-			tooltipLocked.set(false); 
-			System.out.println("Tooltip unlocked (Alt or S released)");
-		}
-	}
-
-	private void configureTooltipLockHandler() {
+	/*private void configureTooltipLockHandler() {
 		this.sceneProperty().addListener((observable, oldScene, newScene) -> {
 			if (newScene != null) {
-				newScene.addEventHandler(KeyEvent.KEY_PRESSED, this::handleTooltipLockToggle);
-				newScene.addEventHandler(KeyEvent.KEY_RELEASED, this::handleTooltipLockToggle);
+				newScene.addEventHandler(KeyEvent.KEY_PRESSED, this::handleKeyPressed);
 			}
 		});
 	}
 
-
+	public void handleKeyPressed(KeyEvent event) {
+		if (event.getEventType() == KeyEvent.KEY_PRESSED && event.isAltDown() && event.getCode() == KeyCode.S) { // O Fn+F2 dependiendo del sistema
+			System.out.println("Alt + S pressed");
+			tooltipLocked = !tooltipLocked; // Cambiar el estado de bloqueo
+			System.out.println("Tooltip locked: " + tooltipLocked);
+		}
+	}*/
 
 	public void handleMouseMoved(MouseEvent e) {
 		if (visGraph == null) {
@@ -683,13 +676,12 @@ public class PaintFrame extends Canvas {
 
 		webEngine.loadContent(styledContent);
 		tooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-		web.setPrefSize(1, 1);
+		web.setPrefSize(0, 0);
 		webEngine.documentProperty().addListener((obs, oldDoc, newDoc) -> {
 			if (newDoc != null) {
 				webEngine.executeScript("document.body.style.width = 'auto'; document.body.style.height = 'auto';");
 				Object scrollWidth = webEngine.executeScript("document.body.scrollWidth");
 				Object scrollHeight = webEngine.executeScript("document.body.scrollHeight");
-
 
 				double width = ((Number) scrollWidth).doubleValue();
 				double height = ((Number) scrollHeight).doubleValue();
@@ -723,7 +715,7 @@ public class PaintFrame extends Canvas {
 
 				// Get the first shape in the list
 				Shape firstShape = orderedShapeList.get(0);
-				double shapeMinY = firstShape.getPosY() * factor;
+				double shapeMinY = firstShape.getPosY() * factor - firstShape.getHeight()/2.0 * factor;
 				if (shapeMinY < minY) { minY = shapeMinY; }
 			}
 		}
@@ -731,7 +723,7 @@ public class PaintFrame extends Canvas {
 		boolean needsResize = false;
 		double newHeight = getHeight();
 
-		if (maxY > getHeight()) {
+		if (maxY >= getHeight()) {
 			newHeight = maxY + BORDER_PANEL;
 			needsResize = true;
 		}
@@ -1065,7 +1057,6 @@ public class PaintFrame extends Canvas {
 
 						GraphicsContext g = this.getGraphicsContext2D();
 
-
 						int upperShapeHeight = upperShape.getHeight();
 						if ((upperShape instanceof VisClass) && (upperShape.asVisClass().propertyBox != null) && (upperShape.asVisClass().propertyBox.visible))
 							upperShapeHeight += upperShape.asVisClass().getTotalHeight();
@@ -1086,10 +1077,15 @@ public class PaintFrame extends Canvas {
 							return;
 
 						int lowerShapeHeight = repellingShape.getHeight();
-						if ((repellingShape instanceof VisClass) && (repellingShape.asVisClass().propertyBox != null) && (repellingShape.asVisClass().propertyBox.visible))
-							lowerShapeHeight = repellingShape.asVisClass().getTotalHeight();
-						if (repellingShape.getPosY() + lowerShapeHeight/2 > lowerShape.getTopCorner() - MIN_SPACE) {
-							lowerShape.setPosY(lowerShape.getPosY() + lowerShape.getHeight() / 2);
+						if ((repellingShape instanceof VisClass) && (repellingShape.asVisClass().propertyBox != null) && (repellingShape.asVisClass().propertyBox.visible)) {
+							if (repellingShape.getBottomCorner() > lowerShape.getTopCorner() - MIN_SPACE) {
+								lowerShape.setPosY(lowerShape.getPosY() + lowerShape.getTotalHeight() / 2);
+							}
+						}
+						else {
+							if (repellingShape.getBottomCorner() > lowerShape.getTopCorner() - MIN_SPACE) {
+								lowerShape.setPosY(lowerShape.getPosY() + lowerShape.getHeight() / 2);
+							}
 						}
 						shapeRepulsion(lowerShape, direction);
 					}

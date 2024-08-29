@@ -198,9 +198,9 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		if (zoomSlider == null) {
 			zoomSlider = new Slider();
 			zoomSlider.setMin(0);
-			zoomSlider.setMax(20);
+			zoomSlider.setMax(10);
 			zoomSlider.setOrientation(Orientation.VERTICAL);
-			zoomSlider.setValue(1);
+			zoomSlider.setValue(5);
 
 			zoomSlider.getStyleClass().add("zoom-slider");
 			zoomSlider.setPrefHeight(VisConstants.CONTAINER_SIZE);
@@ -878,7 +878,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			parent.artPanel.setFactor(1.0);
 			parent.artPanel.scale(1.0, size);
 		}
-		getZoomSlider().setValue(15);
+		getZoomSlider().setValue(5);
 	}
 
 	Dimension2D size = null;

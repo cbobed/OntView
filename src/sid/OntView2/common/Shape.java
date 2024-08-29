@@ -51,8 +51,28 @@ public abstract class Shape{
 	public void setPosY(int y) {posy = y;}
 	public void setHeight(int x) {height = x;}
 	public void setWidth(int x) {width = x;}
-	public int getTopCorner() { return posy - getHeight()/2; }
-	public int getBottomCorner() { return posy + getHeight()/2; }
+	public int getTopCorner() {
+			/*VisClass v_i = this.asVisClass();
+			if (v_i.getPropertyBox() != null && v_i.getPropertyBox().visible) {
+				System.out.println("getTopCorner " + this.getLabel());
+				return this.asVisClass().getTotalHeight();
+			}*/
+
+		return posy - getHeight()/2; }
+	public int getBottomCorner() {
+		VisClass v_i = this.asVisClass();
+		if (v_i.getPropertyBox() != null && v_i.getPropertyBox().visible) {
+			return posy + getHeight()/2 + v_i.getPropertyBox().getHeight();
+		}
+		return posy + getHeight()/2;
+	}
+	public int getBottomCornerWithProperties(){
+		VisClass v_i = this.asVisClass();
+		System.out.println("getBottomCorner " + this.getLabel());
+
+		return posy + getHeight()/2 + v_i.getPropertyBox().getHeight();
+
+	}
 	public VisClass asVisClass(){return (VisClass)this;}
 	public void setState(int pstate){state= pstate;}
 	public int  getState() {return state;}
