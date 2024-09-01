@@ -179,7 +179,7 @@ public class PaintFrame extends Canvas {
 	
 	Relaxer relaxerRunnable = new Relaxer();
 	GlobalDrawer drawerRunnable = new GlobalDrawer();
-	
+
 	public Relaxer getRelaxerRunnable() {
 		return relaxerRunnable; 
 	}
@@ -198,16 +198,14 @@ public class PaintFrame extends Canvas {
 		double newWidth = size.getWidth();
 		double newHeight = size.getHeight();
 
-		if (factor > 1.0){
+
+		if (factor >= 1.0){
 			setWidth(newWidth * factor);
 			setHeight(newHeight * factor);
 		} else {
-			setWidth(newWidth);
-			setHeight(newHeight);
+			setWidth(newWidth / factor);
+			setHeight(newHeight / factor);
 		}
-
-		System.out.println("NewWidth: " + newWidth + " newHeight: " + newHeight);
-
 
 		GraphicsContext gc = this.getGraphicsContext2D();
 		if (gc != null) {
@@ -217,6 +215,7 @@ public class PaintFrame extends Canvas {
 			gc.scale(factor, factor);
 			Platform.runLater(drawerRunnable);
 		}
+
 	}
 
 	/*-*************************************************************/
@@ -549,10 +548,6 @@ public class PaintFrame extends Canvas {
 	 */
 
 	public void handleMouseDragged(MouseEvent e) {
-		/*if (pressedShape == null) {
-			return;
-		}*/
-
 		int draggedY, draggedX;
 		int direction;
 		repulsion = (e.getButton() != MouseButton.SECONDARY);
@@ -695,25 +690,21 @@ public class PaintFrame extends Canvas {
 		Tooltip.install(this, tooltip);
 	}
 
+
+
 	/**
 	 * Method to check if it needs to expand the canvas size
 	 */
 	public void checkAndResizeCanvas() {
 		double maxY = Double.MIN_VALUE;
 		double minY = Double.MAX_VALUE;
-
+		
 		for (VisLevel level : visGraph.getLevelSet()) {
-			ArrayList<Shape> orderedShapeList = level.orderedList();
-
-			if (!orderedShapeList.isEmpty()) {
-				// Get the last shape in the list
-				Shape lastShape = orderedShapeList.get(orderedShapeList.size() - 1);
-				double shapeMaxY = lastShape.getPosY() * factor + lastShape.getHeight() * factor;
+			for (Shape shape : level.levelShapes) {
+				double shapeMaxY = shape.getPosY() * factor + shape.getHeight() * factor;
 				if (shapeMaxY > maxY) { maxY = shapeMaxY; }
 
-				// Get the first shape in the list
-				Shape firstShape = orderedShapeList.get(0);
-				double shapeMinY = firstShape.getPosY() * factor - firstShape.getHeight()/2.0 * factor;
+				double shapeMinY = shape.getPosY() * factor - shape.getHeight() / 2.0 * factor;
 				if (shapeMinY < minY) { minY = shapeMinY; }
 			}
 		}
