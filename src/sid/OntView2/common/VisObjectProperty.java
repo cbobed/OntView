@@ -63,7 +63,6 @@ public class VisObjectProperty extends VisProperty {
 	}
 	
 	public String getTooltipText(){
-	
 		StringBuilder description = new StringBuilder();
 		if (description.toString().isEmpty()){
 			description.append("<html><b>").append(visibleLabel).append("</b><br><br>");
@@ -75,7 +74,15 @@ public class VisObjectProperty extends VisProperty {
 					}				}
 				description.append("<br></ul>");
 			}
-			description.append("<b>Domain: </b> ").append(getDomain().visibleLabel).append("<br>");
+
+			if (!getDomain().getVisibleDefinitionLabels().isEmpty()) {
+				for (String defLabel : getDomain().getVisibleDefinitionLabels()) {
+					description.append("<b>Domain: </b> ").append(defLabel).append("<br>");
+				}
+			} else {
+				description.append("<b>Domain: </b> ").append(getDomain().visibleLabel).append("<br>");
+			}
+
 			description.append("<b>Range: </b>");
 			description.append(qualifiedRendering ?
                     ExpressionManager.getReducedQualifiedClassExpression(range.getLinkedClassExpression()) :

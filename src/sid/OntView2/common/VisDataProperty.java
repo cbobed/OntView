@@ -5,6 +5,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Font;
 
+import org.apache.jena.base.Sys;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.NodeSet;
@@ -170,26 +171,32 @@ public class VisDataProperty extends VisProperty {
 	
 	
 	public String getTooltipText(){
-	
-		String description ="";
-		if (description.equals("")){
-			description +="<html><b>"+(qualifiedRendering?
-										ExpressionManager.getReducedQualifiedDataPropertyExpression(dPropExp):
-										ExpressionManager.getReducedDataPropertyExpression(dPropExp))+"</b><br><br>";
+		StringBuilder description = new StringBuilder();
+		if (description.isEmpty()){
+			description.append("<html><b>").append(qualifiedRendering ?
+                    ExpressionManager.getReducedQualifiedDataPropertyExpression(dPropExp) :
+                    ExpressionManager.getReducedDataPropertyExpression(dPropExp)).append("</b><br><br>");
 			if ((parents != null)&&(parents.size()>1)){
-				description += "subclass of<ul>";
+				description.append("subclass of<ul>");
 
-				description+="</ul>";
+				description.append("</ul>");
 			}
-			description +="<b>Domain:</b> "+getDomain().visibleLabel+"<br>";
-			description +="<b>Range     : </b>"+range+"<br><br>";
-			description +="<b>Property Description</b><br><ul>";
+
+			if (!getDomain().getVisibleDefinitionLabels().isEmpty()) {
+				for (String defLabel : getDomain().getVisibleDefinitionLabels()) {
+					description.append("<b>Domain:</b> ").append(defLabel).append("<br>");
+				}
+			} else {
+				description.append("<b>Domain:</b> ").append(getDomain().visibleLabel).append("<br>");			}
+			description.append("<b>Domain:</b> ").append(getDomain().visibleLabel).append("<br>");
+			description.append("<b>Range     : </b>").append(range).append("<br><br>");
+			description.append("<b>Property Description</b><br><ul>");
 			if (isFunctional) {
-					description +="<li>Functional</li>";	
-			}	
-			description += "</ul></html>";
+					description.append("<li>Functional</li>");
+			}
+			description.append("</ul></html>");
 		}
-		return description;
+		return description.toString();
 		
 	}
 	

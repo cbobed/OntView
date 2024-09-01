@@ -98,12 +98,12 @@ public class VisClass extends Shape {
 		this.visibleLabel = plabel; 
 		connectionPointsL = new Point2D(posx,posy+5);
 		connectionPointsR = new Point2D(posx+getWidth(),posy+5);
-		children    = new ArrayList<Shape>();
-        parents     = new ArrayList<Shape>();
-        properties  = new ArrayList<String>();
+		children    = new ArrayList<>();
+        parents     = new ArrayList<>();
+        properties  = new ArrayList<>();
         
         //<CBL 24/9/13> Added the initialization in the constructor
-        definitions = new ArrayList<OWLClassExpression>(); 
+        definitions = new ArrayList<>();
         visibleDefinitionLabels = new ArrayList<String>(); 
       
 	}
@@ -549,8 +549,8 @@ public class VisClass extends Shape {
 		definitions.add(def);
 		
 		if (definitionLabels == null) {
-			definitionLabels = new ArrayList<String>(); 
-			qualifiedDefinitionLabels = new ArrayList<String> (); 
+			definitionLabels = new ArrayList<>();
+			qualifiedDefinitionLabels = new ArrayList<> ();
 			// <CBL> for the time being, we are not considering the rendering 
 			// of labels in the anonymous expressions, just qualified/nonQualified names of the 
 			// concepts 
@@ -560,8 +560,8 @@ public class VisClass extends Shape {
 			explicitQualifiedDefinitionLabels = qualifiedDefinitionLabels; 
 		}	
 		// CBL: we add the different labels
-		String label = ExpressionManager.getReducedClassExpression(def); 
-		definitionLabels.add(label); 
+		String label = ExpressionManager.getReducedClassExpression(def);
+		definitionLabels.add(label);
 		String auxQLabel = ExpressionManager.getReducedQualifiedClassExpression(def); 
        if (auxQLabel != null && !"null".equalsIgnoreCase(auxQLabel))
     	   qualifiedDefinitionLabels.add(auxQLabel); 
