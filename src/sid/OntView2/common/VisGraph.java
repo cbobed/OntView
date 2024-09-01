@@ -357,10 +357,13 @@ public class VisGraph implements Runnable{
 
 					EntitySearcher.getEquivalentClasses(defClassShape.getLinkedClassExpression().asOWLClass(), activeOntology).forEach(
 						definition -> {
+							// we add all the equivalences 
+							// CBL: 27/8/2024 => We can add all the equivalences here, though it would be the assertions, not the actual 
+							// 	equivalent classes -- OWLAPI considers any class with an equivalence as defined.
 							if (definition.isAnonymous()) {
-								shape.asVisClass().addDefinition(definition);
 								// <CBL 25/9/13>
 								// We also add the definition to the aliases handling
+								shape.asVisClass().addDefinition(definition);
 								definitionsMap.put(Shape.getKey(definition), shape);
 								// <CBL 24/9/13>
 								// the definitions are now displayed along with the name
@@ -807,7 +810,7 @@ public class VisGraph implements Runnable{
 		 for (Entry<String,Shape> entry : shapeMap.entrySet()) {
 			Shape s = entry.getValue();
 			if (((s.getState()==Shape.CLOSED) || (s.getState()==Shape.PARTIALLY_CLOSED)) && (s.visible))  {
-				 dashLink(s, s);
+				 dashLink(s, s, 1);
 			 }
 		 }
 	}
@@ -816,19 +819,19 @@ public class VisGraph implements Runnable{
      * Searchs sublevels for nodes that are still visible/referenced
      * and adds a dashedLine connecting them
      */
-	private void dashLink(Shape source,Shape current) {
-
+	private void dashLink(Shape source,Shape current, int pathLength) {
 		for (VisConnector c  : current.outConnectors){
 			Shape currentSon = c.to;
-			if ((currentSon.visible) && !c.visible) {
-				// not added if there's already one way
-				VisConnector prevAdded = VisConnector.getConnector(dashedConnectorList, source, currentSon);
-				if (prevAdded == null){
-					dashedConnectorList.add(new VisConnectorDashed(source, currentSon));
-				}
+			if (!currentSon.visible) {
+				dashLink(source, currentSon, pathLength+1); 
 			}
 			else {
-				dashLink(source,currentSon);
+				if (pathLength>1) {
+					VisConnector prevAdded = VisConnector.getConnector(dashedConnectorList, source, currentSon);
+					if (prevAdded == null){
+						dashedConnectorList.add(new VisConnectorDashed(source, currentSon));
+					}
+				}
 			}
 		}
 	}

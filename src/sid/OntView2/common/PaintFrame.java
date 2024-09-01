@@ -1104,7 +1104,7 @@ public class PaintFrame extends Canvas {
 
 		switch (getKceOption()) {
 			case VisConstants.NONECOMBOOPTION -> { // "None"
-				getVisGraph().dashedConnectorList.clear();
+				getVisGraph().clearDashedConnectorList();
 				getVisGraph().showAll();
 			}
 			case VisConstants.KCECOMBOOPTION1 -> { // "KCE10"
