@@ -292,6 +292,9 @@ public class VisClass extends Shape {
 				if (propertyBox != null) {
 					propertyDraw(g, x, y, roundCornerValue, lightBlue);
 				}
+				if (!getDisjointConnectors().isEmpty()) {
+					disjointDraw(g, x, y, roundCornerValue, Color.LIGHTYELLOW);
+				}
 			    g.setFill(Color.BLACK);
 	
 			    if (!isAnonymous) {
@@ -302,14 +305,16 @@ public class VisClass extends Shape {
 			    }
 	    	}
 	    	else {
-	    		
+				if (!getDisjointConnectors().isEmpty() || propertyBox != null) {
+					setWidth(calculateWidth());
+				}
 	    		if (!label.startsWith(SIDClassExpressionNamer.className)) {
 		    		// CBL: the new definitions representation
 		    		g.setFill(lightGreen);
 		    		g.fillRect(x - (double) getWidth()/2, y- (double) currentHeight /2, getWidth(), currentHeight+10);
 					g.setStroke(isBottom ? Color.RED : Color.BLACK);
 		    		g.strokeRect(x - (double) getWidth()/2, y - (double) currentHeight /2, getWidth()-1, currentHeight+10);
-		    		
+
 		    		// now => the rectangle for the name of the concept
 		    		g.setFill(lightgray);
 		    		g.fillRect(x - (double) getWidth()/2+5, y- (double) currentHeight /2 - 5, getWidth()-10, fontHeight+15);
@@ -319,7 +324,7 @@ public class VisClass extends Shape {
 		    		// this is the name of the concept
 					g.setFill(Color.BLACK);
 		    		g.setFont(getDefinedClassFont()); 
-		    		g.fillText(visibleLabel, x - (double) (getWidth() - 16) /2 + 5, (y - (double) (currentHeight - 4) /2) - 6 + ascent);
+		    		g.fillText(visibleLabel, x - (double) (getWidth() - 16) /2 + 5 + propertySpace, (y - (double) (currentHeight - 4) /2) - 6 + ascent);
 
 		    		g.setFont(getBoldFont());
 		    		double auxY = y - ((double) currentHeight /2) + (fontHeight +5) + 2;
@@ -329,6 +334,14 @@ public class VisClass extends Shape {
 							auxY += (countLines(auxDefString)*fontHeight) + 5;
 		    			}
 		    		}
+
+					if (propertyBox != null) {
+						propertyDraw(g, x + 5, y - 5, roundCornerValue, lightBlue);
+					}
+					if (!getDisjointConnectors().isEmpty()) {
+						disjointDraw(g, x, y - 5, roundCornerValue, Color.LIGHTYELLOW);
+					}
+					g.setFill(Color.BLACK);
 				}
 	    		else {
 	    			// CBL: it is an auxiliar definition 
@@ -350,6 +363,9 @@ public class VisClass extends Shape {
 						propertyDraw(g, x, y, roundCornerValue, lightBlue);
 						propertySpace += 5;
 				    }
+					if (!getDisjointConnectors().isEmpty()) {
+						disjointDraw(g, x, y, roundCornerValue, Color.LIGHTYELLOW);
+					}
 
 				    g.setStroke(Color.BLACK);
 				    g.setFont(getBoldFont()); 
@@ -363,15 +379,6 @@ public class VisClass extends Shape {
 		    		}
 	    		}
 	    	}
-
-			// Square for disjoint classes
-			if (!getDisjointConnectors().isEmpty()) {
-				g.setFill(Color.LIGHTYELLOW);
-				g.fillRoundRect(x + (double) getWidth() / 2 - 20, y - (double) currentHeight / 2 + 6, 14, 14, roundCornerValue, roundCornerValue);
-				g.setFill(Color.BLACK);
-				g.strokeRoundRect(x + (double) getWidth() / 2 - 20, y - (double) currentHeight / 2 + 6, 14, 14, roundCornerValue, roundCornerValue);
-				g.fillText("D", x + (double) getWidth() / 2 - 17, y - (double) currentHeight / 2 + 17);
-			}
 
 		    if (!children.isEmpty() && (outConnectors!=null) &&(!outConnectors.isEmpty())){
 		    	switch (this.getState()) {
@@ -411,13 +418,13 @@ public class VisClass extends Shape {
 		    	   default :
 		    		   break;
 		       }
-	     }
-		  /*for (VisConnectorDisjoint disj :  getDisjointConnectors()){
-			  disj.draw(g);
-		  }
-		  for (VisConnectorEquiv equ: getEquivConnectors()){
-			  equ.draw(g);
-		  }*/
+			}
+		    /*for (VisConnectorDisjoint disj :  getDisjointConnectors()){
+			    disj.draw(g);
+		    }
+		    for (VisConnectorEquiv equ: getEquivConnectors()){
+			    equ.draw(g);
+		    }*/
 		}
 		g.setFont(oldFont);
 	}
@@ -428,6 +435,15 @@ public class VisClass extends Shape {
 		g.setFill(Color.BLACK);
 		g.strokeRoundRect(x - (double) getWidth()/2 + 5, y - (double) currentHeight / 2 + 6, 19, 14, roundCornerValue, roundCornerValue);
 		g.fillText("P▼", x - (double) getWidth()/2 + 7, y - (double) currentHeight / 2 + 17);
+	}
+
+	private void disjointDraw(GraphicsContext g, int x, int y, int roundCornerValue, Color colorD) {
+		g.setFill(colorD);
+		g.fillRoundRect(x + (double) getWidth() / 2 - 20, y - (double) currentHeight / 2 + 6, 14, 14, roundCornerValue, roundCornerValue);
+		g.setFill(Color.BLACK);
+		g.strokeRoundRect(x + (double) getWidth() / 2 - 20, y - (double) currentHeight / 2 + 6, 14, 14, roundCornerValue, roundCornerValue);
+		g.fillText("D", x + (double) getWidth() / 2 - 17, y - (double) currentHeight / 2 + 17);
+
 	}
 
 	public void swapLabel(Boolean labelRendering, Boolean qualifiedRendering){
@@ -786,6 +802,7 @@ public class VisClass extends Shape {
 		textNode.setFont(g.getFont());
 
 		int fontHeight = (int) textNode.getFont().getSize();
+		int SPACE = 10;
 
 	    int result = 0;
 	    if (isAnonymous) {
@@ -819,10 +836,7 @@ public class VisClass extends Shape {
 	    	}
 	    	
 	    }
-		/*if (propertyBox != null) {
-			result += getPropertyBox().getHeight();
-		}*/
-		return result + 10;
+		return result + SPACE;
 	}
 
 	private int calculateTextHeight(String text) {
@@ -843,18 +857,24 @@ public class VisClass extends Shape {
 	}
 
 	public boolean onCloseBox(int x,int y){
-		int px = getPosX() - getWidth() / 2 + 5;
-		int py = getPosY() - getHeight() / 2 + 6;
-		int pWidth = 19;
-		int pHeight = 14;
+		int px, py, pWidth, pHeight;
+		if (!label.startsWith(SIDClassExpressionNamer.className)){
+			px = getPosX() - getWidth() / 2 + 10;
+			py = getPosY() - getHeight() / 2 + 1;
+        } else {
+			px = getPosX() - getWidth() / 2 + 5;
+			py = getPosY() - getHeight() / 2 + 6;
+        }
+        pWidth = 19;
+        pHeight = 14;
 
-		return (x >= px && x <= px + pWidth) && (y >= py && y <= py + pHeight);
+        return (x >= px && x <= px + pWidth) && (y >= py && y <= py + pHeight);
 	}
 
 	public boolean onCloseDisjoints(int x, int y) {
-		int disjointX = getPosX() + getWidth() / 2 - 20;
-		int disjointY = getPosY() - getHeight() / 2 + 6;
-		int disjointWidth = 14;
+        int disjointX = getPosX() + getWidth() / 2 - 20;
+        int disjointY = getPosY() - getHeight() / 2 + 6;
+        int disjointWidth = 14;
 		int disjointHeight = 14;
 
 		return (x >= disjointX && x <= disjointX + disjointWidth) &&

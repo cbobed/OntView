@@ -3,6 +3,7 @@ package sid.OntView2.common;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.CountDownLatch;
+import java.util.stream.Collectors;
 
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -39,6 +40,7 @@ public class PaintFrame extends Canvas {
 	public ScrollPane scroll;
 	static final int BORDER_PANEL = 50;
 	static final int MIN_SPACE = 20;
+	static final int MIN_INITIAL_SPACE = 40;
 	private static final int DOWN = 0;
 	private static final int UP = -1;
 	boolean stable = false;
@@ -124,8 +126,6 @@ public class PaintFrame extends Canvas {
 		this.addEventHandler(MouseEvent.MOUSE_CLICKED, this::handleMouseClicked);
 		this.addEventHandler(MouseEvent.MOUSE_ENTERED, this::handleMouseEntered);
 		this.addEventHandler(MouseEvent.MOUSE_EXITED, this::handleMouseExited);
-		//this.addEventHandler(KeyEvent.KEY_PRESSED, this::handleKeyPressed);
-
 	}
 
 	/*-*************************************************************
@@ -441,7 +441,7 @@ public class PaintFrame extends Canvas {
 
 		if (stable) {
 			while (stateChanged) {
-				//System.out.println("relax");
+				System.out.println("relax");
 				stateChanged = false;
 
 				// Faster version
@@ -467,7 +467,6 @@ public class PaintFrame extends Canvas {
 						recentChange = true;
 					}
 				}
-
 			}
 			if (recentChange) {
 				draw();
@@ -619,7 +618,6 @@ public class PaintFrame extends Canvas {
 		int y = (int) p.getY();
 		VisObjectProperty prop = null;
 		Shape shape = visGraph.findShape(p);
-		String tip;
 
 		if (shape != null) {
 			configurationTooltip(shape.getToolTipInfo());
@@ -1133,7 +1131,7 @@ public class PaintFrame extends Canvas {
 			}
 		}
 		
-		compactGraph();  
+		compactGraph();
 		Platform.runLater(drawerRunnable);
 	}
 
@@ -1142,7 +1140,7 @@ public class PaintFrame extends Canvas {
 		int minY = -1; 
 		int maxY = -1; 
 		int span = -1; 
-		int levelHeight = MIN_SPACE; 
+		int levelHeight = MIN_INITIAL_SPACE;
 		Map<Integer, ArrayList<Shape>> visibleShapesPerLevel = new HashMap<>(); 
 		Map<Integer, Integer> ySpanPerLevel = new HashMap<>(); 
 		maxY = Integer.MIN_VALUE; 
@@ -1163,6 +1161,7 @@ public class PaintFrame extends Canvas {
 			// Adjust the x position of the level if needed
 			level.setXpos(level.getXpos() + levelHeight);
 		}
+
 		span = maxY - minY; // this is the maximum level height we have witnessed
 		// TODO: This must be refined to take into account the size of the intermediate boxes as well (getHeight)
 		for (VisLevel level : visGraph.getLevelSet()) {

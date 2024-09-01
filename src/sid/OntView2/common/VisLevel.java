@@ -11,7 +11,7 @@ public class VisLevel {
 
 
    /***************************/
-	final static int MIN_WIDTH=30;
+	final static int MIN_WIDTH=80;
 	int id;
 	int width = MIN_WIDTH;
 	int shapeNo = 0;
@@ -212,8 +212,6 @@ public class VisLevel {
 		}
 		VisLevel lvl = VisLevel.getLevelFromID(set, 0);
 		lvl.setXpos(lvl.getXpos());
-		
-	
 		
 	}
 	
