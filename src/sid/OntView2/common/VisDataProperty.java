@@ -2,6 +2,7 @@ package sid.OntView2.common;
 
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Font;
 
@@ -47,7 +48,7 @@ public class VisDataProperty extends VisProperty {
 	boolean labelRendering = false; 
 
 	public int getPosX(){return getDomain().getPosX()-(getDomain().getWidth()/2)+2;}
-	public int getPosY(){return 10+getDomain().getPosY()+(getDomain().getHeight())+getLabelHeight()*voffset;}
+	public int getPosY(){return getDomain().getPosY()+(getDomain().getHeight())+getLabelHeight()*voffset;}
 	
 	
 	public VisDataProperty( VisPropertyBox ppbox, OWLDataPropertyExpression  dexp,int pvoffset,String prange,OWLOntology ontology) {
@@ -120,7 +121,7 @@ public class VisDataProperty extends VisProperty {
 		}
 		if ((pbox.visible)&&(visible)&&(pbox.vclass.visible)){
 			g.setFont(textFont);
-			if ((parents!=null)&&(parents.size() > 0)) {
+			if ((parents!=null)&&(!parents.isEmpty())) {
 				g.fillText(label, getPosX(), getPosY());
 			}	
 			else {
@@ -129,8 +130,8 @@ public class VisDataProperty extends VisProperty {
 			Point2D circlePos = new Point2D(getPosX()-16, getPosY()-10);
 			if (isFunctional){
 				g.setFont(circleFont);
-				g.fillOval(circlePos.getX(),circlePos.getY(), 10,10);
-				g.fillText("+", circlePos.getX()+1, getPosY()-1);
+				g.fillOval(circlePos.getX(),circlePos.getY()+5, 5,5);
+				//g.fillText("+", circlePos.getX()+1, getPosY()-1);
 				g.setFont(textFont);
 			}
 		}

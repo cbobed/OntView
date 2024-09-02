@@ -242,7 +242,7 @@ public class VisClass extends Shape {
 	    		currentHeight = getHeight();
 	    	}
 	    	else {
-	    		currentHeight = calculateHeight();
+				currentHeight = calculateHeight();
 	    	}
 	    }
 
@@ -311,9 +311,9 @@ public class VisClass extends Shape {
 	    		if (!label.startsWith(SIDClassExpressionNamer.className)) {
 		    		// CBL: the new definitions representation
 		    		g.setFill(lightGreen);
-		    		g.fillRect(x - (double) getWidth()/2, y- (double) currentHeight /2, getWidth(), currentHeight+10);
+		    		g.fillRect(x - (double) getWidth()/2, y- (double) currentHeight /2, getWidth(), currentHeight);
 					g.setStroke(isBottom ? Color.RED : Color.BLACK);
-		    		g.strokeRect(x - (double) getWidth()/2, y - (double) currentHeight /2, getWidth()-1, currentHeight+10);
+		    		g.strokeRect(x - (double) getWidth()/2, y - (double) currentHeight /2, getWidth()-1, currentHeight);
 
 		    		// now => the rectangle for the name of the concept
 		    		g.setFill(lightgray);
@@ -819,7 +819,7 @@ public class VisClass extends Shape {
 	    		// we have to check whether it is a special defined concept
 	    		if (!label.startsWith(SIDClassExpressionNamer.className)) {
 		    		// CBL: for the grey box
-		    		result += fontHeight+10;
+		    		result += fontHeight+15;
 		    		// CBL: for the underlying white box containing the definitions
 		    		for (String auxLabel: getVisibleDefinitionLabels()) {
 						result += calculateTextHeight(auxLabel);

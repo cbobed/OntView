@@ -260,6 +260,7 @@ public class PaintFrame extends Canvas {
 		if (this.getScene() != null && !this.isDisabled() && this.isVisible() && this.getGraphicsContext2D() != null) {
 			GraphicsContext g = this.getGraphicsContext2D();
 			g.clearRect(0, 0, getWidth(), getHeight());
+
 			if (prevFactor != factor) {
 				prevFactor = factor;
 				if ((getWidth() != prevSize.getWidth() || getHeight() != prevSize.getHeight())) {
