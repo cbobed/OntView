@@ -585,17 +585,24 @@ public class VisClass extends Shape {
 		if (!isAnonymous){
 			getInheritedObjectProperties();
 			getInheritedDataProperties();
-			other = new StringBuilder("<b>"
-                    + (isAnonymous ? removeFormatInformation(this.visibleLabel) : this.visibleLabel)
-                    + "</b><br><br>");
-			if ((getDisjointClasses() !=null)&& (getDisjointClasses().size()>0)) {
+
+			if (!getVisibleDefinitionLabels().isEmpty()) {
+				for (String defLabel : getVisibleDefinitionLabels()) {
+					other = new StringBuilder("<b>"
+							+ (isAnonymous ? removeFormatInformation(defLabel) : defLabel)
+							+ "</b><br><br>");
+				}
+			} else {
+				other = new StringBuilder("<b>"
+						+ (isAnonymous ? removeFormatInformation(this.visibleLabel) : this.visibleLabel)
+						+ "</b><br><br>");
+			}
+			if ((getDisjointClasses() !=null)&& (!getDisjointClasses().isEmpty())) {
 				other.append("<b>Disjoint</b><ul>");
 				
 				VisClass auxVisClass = null;
 				ArrayList<OWLClassExpression> auxArray = null;
-				int count = 0;
 				for (OWLClass cl: getDisjointClasses()) {
-
 					auxVisClass = graph.getVisualExtension(cl); 
 					if (auxVisClass != null) {
 						
@@ -606,7 +613,6 @@ public class VisClass extends Shape {
 									other.append("<li>").append(qualifiedRendering ?
                                             ExpressionManager.getReducedQualifiedClassExpression(ce) :
                                             ExpressionManager.getReducedClassExpression(ce)).append("</li>");
-
 								}
 							}
 						}
@@ -614,9 +620,6 @@ public class VisClass extends Shape {
 							other.append("<li>").append(qualifiedRendering ?
                                     ExpressionManager.getReducedQualifiedClassExpression(cl) :
                                     ExpressionManager.getReducedClassExpression(cl)).append("</li>");
-
-
-							
 						}
 					}
 				}
