@@ -59,8 +59,6 @@ public class PaintFrame extends Canvas {
 	private VisShapeContext menuVisShapeContext = null;
 	private VisGeneralContext menuVisGeneralContext = null;
 
-	private Mine mine;
-
 	public boolean isStable() {
 		return stable;
 	}
@@ -96,12 +94,9 @@ public class PaintFrame extends Canvas {
 	public void setKceOption(String itemAt) {
 		kceOption = itemAt;
 	}
-
 	private boolean showConnectors = false;
-
-	public void setShowConnectors(boolean b) {
-		showConnectors = b;
-	}
+	public void setShowConnectors(boolean b) { showConnectors = b; }
+	public boolean getShowConnectors() { return showConnectors; }
 
 	public PaintFrame() {
 		super();
@@ -863,12 +858,14 @@ public class PaintFrame extends Canvas {
 							Platform.runLater(drawerRunnable);
 						}
 					} else { // pressed elsewhere on the shape
-						if (selectedShapes.contains(shape)) {
-							selectedShapes.remove(shape);
-						} else {
-							selectedShapes.add(shape);
+						if (!getShowConnectors()) {
+							if (selectedShapes.contains(shape)) {
+								selectedShapes.remove(shape);
+							} else {
+								selectedShapes.add(shape);
+							}
+							Platform.runLater(drawerRunnable);
 						}
-						Platform.runLater(drawerRunnable);
 
 						paintFrame.focusOnShape(null, shape);
 						break;

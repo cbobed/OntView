@@ -168,9 +168,7 @@ public class VisDataProperty extends VisProperty {
 	public boolean onProperty(Point2D p){
 		return ((p.getX() >= getPosX()-20)&&(p.getX() <= getPosX())&& (p.getY() >= getPosY()-10)&&(p.getY() <= getPosY()));
 	}
-	
-	
-	
+
 	public String getTooltipText(){
 		StringBuilder description = new StringBuilder();
 		if (description.isEmpty()){
