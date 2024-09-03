@@ -26,8 +26,8 @@ import org.semanticweb.owlapi.model.OWLObjectOneOf;
 import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
 import org.semanticweb.owlapi.model.OWLObjectUnionOf;
 
-import sid.OntView.utils.Params;
-import sid.OntView.utils.Util;
+import sid.OntView2.utils.Params;
+import sid.OntView2.utils.Util;
 
 
 public class OWLClassExpressioneReducerVisitor implements

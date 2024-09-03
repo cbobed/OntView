@@ -26,8 +26,8 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.model.parameters.Imports;
 
-import sid.OntView.utils.Params;
-import sid.OntView.utils.Util;
+import sid.OntView2.utils.Params;
+import sid.OntView2.utils.Util;
 import uk.ac.manchester.cs.owl.owlapi.OWLDataPropertyDomainAxiomImpl;
 
 public class StructuralReducer {

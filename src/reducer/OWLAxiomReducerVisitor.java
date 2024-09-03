@@ -48,8 +48,8 @@ import org.semanticweb.owlapi.model.OWLSymmetricObjectPropertyAxiom;
 import org.semanticweb.owlapi.model.OWLTransitiveObjectPropertyAxiom;
 import org.semanticweb.owlapi.model.SWRLRule;
 
-import sid.OntView.utils.Params;
-import sid.OntView.utils.Util;
+import sid.OntView2.utils.Params;
+import sid.OntView2.utils.Util;
 
 
 public class OWLAxiomReducerVisitor implements OWLAxiomVisitor {
