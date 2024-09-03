@@ -15,6 +15,7 @@ import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -76,6 +77,9 @@ public class Mine extends Application implements Embedable{
 	public static void createAndShowGUI(Stage primaryStage) {
 		primaryStage.setTitle("Viewer");
 		primaryStage.setOnCloseRequest(event -> System.exit(0));
+		ClassLoader c = Thread.currentThread().getContextClassLoader();
+
+		primaryStage.getIcons().add(new Image(Objects.requireNonNull(c.getResource("icon.png")).toExternalForm()));
 
 		Mine viewer = new Mine();
 		viewer.self = viewer;
@@ -99,7 +103,7 @@ public class Mine extends Application implements Embedable{
 		viewer.nTopPanel.setStyle("-fx-border-color: black; -fx-border-width: 1;");
 
 		Scene scene = new Scene(root, 1400, 600);
-		ClassLoader c = Thread.currentThread().getContextClassLoader();
+		//ClassLoader c = Thread.currentThread().getContextClassLoader();
 		scene.getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
 
 		viewer.primaryStage.setScene(scene);
