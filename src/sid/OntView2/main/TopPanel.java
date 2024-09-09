@@ -867,9 +867,6 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		}
 		if ((x != null) && (!x.equals(""))) {
 			getOntologyCombo().setValue(x);
-			parent.loadActiveOntology(x);
-			loadReasonerButton.setDisable(false);
-			getReasonerCombo().setDisable(false);
 		}
 	}
 

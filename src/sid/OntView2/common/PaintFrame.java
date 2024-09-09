@@ -638,6 +638,7 @@ public class PaintFrame extends Canvas {
 		if (clickedOnShape(x, y, e))
 			return;
 		if (e.getButton() == MouseButton.SECONDARY) {
+			System.out.println("Right click");
 			if (menuVisGeneralContext != null) {
 				closeContextMenu(menuVisGeneralContext);
 			}
@@ -871,6 +872,8 @@ public class PaintFrame extends Canvas {
 						break;
 					}
 				}
+				getVisGraph().updateObservers(VisConstants.GENERALOBSERVER);
+				return true;
 			}
 		} else {
 			if (menuVisShapeContext != null) {

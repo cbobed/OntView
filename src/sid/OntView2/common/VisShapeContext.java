@@ -62,7 +62,6 @@ public class VisShapeContext extends ContextMenu {
 		this.getItems().add(getShowInstancesItem());
 		this.getItems().add(hideProperties);
 		this.getItems().add(hideItem);
-
 	}
 	
 	private MenuItem getShowInstancesItem(){
