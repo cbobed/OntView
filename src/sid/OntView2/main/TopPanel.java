@@ -2,6 +2,8 @@ package sid.OntView2.main;
 
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -15,6 +17,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -327,6 +330,9 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			HBox.setHgrow(comboBox, Priority.ALWAYS);
 			comboBox.setMaxWidth(Double.MAX_VALUE);
 			comboBox.valueProperty().addListener((options, oldValue, newValue) -> comboBox0ItemItemStateChanged(newValue));
+
+			TextField editor = comboBox.getEditor();
+			editor.addEventHandler(KeyEvent.KEY_RELEASED, event -> handleAutoComplete(editor.getText(), items));
 
 			tooltipInfo(comboBox, "Search for a class onces the ontology is loaded");
 		}
@@ -782,7 +788,29 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 	private void comboBox0ItemItemStateChanged(String selectedItem) {
 		String key = parent.artPanel.getVisGraph().getQualifiedLabelMap().get(selectedItem);
-		parent.artPanel.focusOnShape(key, null);
+		if (key != null)
+			parent.artPanel.focusOnShape(key, null);
+	}
+
+	private void handleAutoComplete(String input, ObservableList<String> dataList) {
+		ObservableList<String> filteredList = FXCollections.observableArrayList();
+
+		if (input.isEmpty()) {
+			comboBox.getSelectionModel().clearSelection();
+			comboBox.setItems(dataList);
+			comboBox.hide();
+		} else {
+			for (String item : dataList) {
+				if (item.toLowerCase().startsWith(input.toLowerCase())) {
+					filteredList.add(item);
+				}
+			}
+			comboBox.setItems(filteredList);
+
+			if (!filteredList.isEmpty()) {
+				comboBox.show();
+			}
+		}
 	}
 
 	private void saveViewButtonActionActionPerformed(ActionEvent event) {
