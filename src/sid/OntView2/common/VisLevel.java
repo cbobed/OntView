@@ -58,9 +58,8 @@ public class VisLevel {
 		posx=x;
 		//it requires the shape's in the level to be updated
 		for (Shape s : getShapeSet()){
-			s.setPosX(getXpos()+s.getWidth()/2);
+			s.setPosX(getXpos() + s.getWidth() / 2);
 		}
-
     }
 	
 	
@@ -97,8 +96,8 @@ public class VisLevel {
 		levelShapes.add(shape);
 	    shape.vdepthlevel=this;
 	    shape.depthlevel = this.getID();
-		shape.setPosX(posx+shape.getWidth()/2);
-		
+		shape.setPosX(posx + shape.getWidth()/2);
+
 	}
 	
 
@@ -197,10 +196,13 @@ public class VisLevel {
 		for (int i=firstLevel(set)+1;i<=maxLevel;i++){
 			VisLevel lvl = VisLevel.getLevelFromID(set, i);
 			VisLevel prevlvl = VisLevel.getLevelFromID(set, i-1);
-			lvl.setXpos(prevlvl.getXpos()+prevlvl.getWidth());
+            assert prevlvl != null;
+            assert lvl != null;
+            lvl.setXpos(prevlvl.getXpos()+prevlvl.getWidth());
 		}
 		VisLevel lvl = VisLevel.getLevelFromID(set, 0);
-		lvl.setXpos(lvl.getXpos());
+        assert lvl != null;
+        lvl.setXpos(lvl.getXpos());
 		
 	}
 	

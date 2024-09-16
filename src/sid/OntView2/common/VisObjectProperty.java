@@ -303,7 +303,7 @@ public class VisObjectProperty extends VisProperty {
 		OWLObjectIntersectionOf result = dFactory.getOWLObjectIntersectionOf(terms);
 		VisLevel l = VisLevel.getLevelFromID(v.levelSet,1);
 		VisClass intersection = new VisClass(1, result, ExpressionManager.getReducedClassExpression(result), v);
-		
+
 		l.addShape(intersection);
 		v.shapeMap.put(result.toString(), intersection);
 		intersection.isAnonymous = true;
@@ -352,7 +352,7 @@ public class VisObjectProperty extends VisProperty {
 		OWLObjectIntersectionOf result = dFactory.getOWLObjectIntersectionOf(terms);
 		VisLevel l = VisLevel.getLevelFromID(v.levelSet,1);
 		VisClass intersection = new VisClass(1, result, ExpressionManager.getReducedClassExpression(result), v);
-		
+
 		l.addShape(intersection);
 		v.shapeMap.put(result.toString(), intersection);
 		intersection.isAnonymous = true;

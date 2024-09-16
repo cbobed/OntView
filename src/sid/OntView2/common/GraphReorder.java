@@ -120,13 +120,13 @@ public class GraphReorder {
 					Node n = new Node(entry.getKey());
 					graph.addNode(n);
 
-					if (shape instanceof SuperNode superNode) {
+					/*if (shape instanceof SuperNode superNode) {
 						for (VisClass subNode : superNode.getSubNodes()) {
 							Node subNodeGraph = new Node(subNode.getKey(subNode.getLinkedClassExpression()));
 							graph.addNode(subNodeGraph);
 							graph.addEdge(new Edge(n, subNodeGraph));
 						}
-					}
+					}*/
 				}
 			}
 		}

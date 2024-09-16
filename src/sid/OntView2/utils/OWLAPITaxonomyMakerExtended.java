@@ -147,49 +147,44 @@ public class OWLAPITaxonomyMakerExtended implements ITaxonomyMaker{
 
 			/* I add all the categories acquired from the ontology to the constructed taxonomy 
 			 * using 'flat' structure first */
-			Iterator<OWLClass> classesIterator = classes.iterator();
-			while (classesIterator.hasNext()) {
-				t.addCategory(new Category(classesIterator.next().getIRI().toString()));
-			}
+            for (OWLClass aClass : classes) {
+                t.addCategory(new Category(aClass.getIRI().toString()));
+            }
 
 			/* If there are more than one root category, I add the proper relations from
 			 * my 'faked root' category to all the 'real root' categories */
 			if (!isOneRoot) {
-				Iterator<String> rootClassesIterator = rootClasses.iterator();
-				while (rootClassesIterator.hasNext()) {
-					String name = rootClassesIterator.next();
-					try {
-						Category category = t.getCategoryByName(name);
-						t.subCategoryOf(category, t.getRoot());
-					} catch (NoCategoryException ex) {
-						System.err.println("[TaxonomyMaker: makeTaxonomy] ERROR - The category '" + 
-								name + "' isn't in the taxonomy");
-						ex.printStackTrace();
-					} catch (RootException ex) {
-						System.err.println("[TaxonomyMaker: makeTaxonomy] ERROR - The category '" + 
-								name + "' isn't the root");
-						ex.printStackTrace();
-					}
-				}
+                for (String name : rootClasses) {
+                    try {
+                        Category category = t.getCategoryByName(name);
+                        t.subCategoryOf(category, t.getRoot());
+                    } catch (NoCategoryException ex) {
+                        System.err.println("[TaxonomyMaker: makeTaxonomy] ERROR - The category '" +
+                                name + "' isn't in the taxonomy");
+                        ex.printStackTrace();
+                    } catch (RootException ex) {
+                        System.err.println("[TaxonomyMaker: makeTaxonomy] ERROR - The category '" +
+                                name + "' isn't the root");
+                        ex.printStackTrace();
+                    }
+                }
 			}
 
 			/* Now, starting from each 'real root' category (at least one), we can generate 
 			 * all the proper relations for the taxonomy */
-			Iterator<String> rootClassesIterator = rootClasses.iterator();
-			while (rootClassesIterator.hasNext()) {
-				String rootClass = rootClassesIterator.next();
-				try {
-					Category curTopCat = t.getCategoryByName(rootClass);
-					t = this.makeTaxonomyStartingFrom(
-							t, this.owlAPIManager, subClasses, curTopCat, new ArrayList<Category>());
-				} catch (NoCategoryException e) {
-					System.err.println("[TaxonomyMaker: makeTaxonomy] ERROR - The category '" + 
-							rootClass + "' isn't in the taxonomy");
-					e.printStackTrace();
-				}
-			}
+            for (String rootClass : rootClasses) {
+                try {
+                    Category curTopCat = t.getCategoryByName(rootClass);
+                    t = this.makeTaxonomyStartingFrom(
+                            t, this.owlAPIManager, subClasses, curTopCat, new ArrayList<Category>());
+                } catch (NoCategoryException e) {
+                    System.err.println("[TaxonomyMaker: makeTaxonomy] ERROR - The category '" +
+                            rootClass + "' isn't in the taxonomy");
+                    e.printStackTrace();
+                }
+            }
 
-			this.nSize = new Integer(t.getAllCategories().size());
+			this.nSize = t.getAllCategories().size();
 			
 			/* Look for properties */
 			for (OWLClass curClass : classes) {

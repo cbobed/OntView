@@ -200,6 +200,7 @@ public class VisGraph implements Runnable{
 		
 		addBottomNode(reasoner,activeOntology);
 
+		// Comment if using processSuperNodes
 		for (Entry<String, Shape> entry : shapeMap.entrySet()){
 			Shape shape = entry.getValue();
 			if (shape instanceof VisClass) {
@@ -210,7 +211,6 @@ public class VisGraph implements Runnable{
 		}
 
 		//processSuperNodes();
-
 
 		updateProgressBarObserver(80);
 		placeProperties(activeOntology,reasoner,set);
@@ -269,19 +269,20 @@ public class VisGraph implements Runnable{
 			}
 		}
 
-//		for (SuperNode superNode : superNodesMap.values()) {
-//			int minLevelId = superNode.getSubNodes().stream()
-//					.mapToInt(subNode -> subNode.getVisLevel().getID())
-//					.min()
-//					.orElse(0);
-//
-//			VisLevel superNodeLevel = VisLevel.getLevelFromID(levelSet, minLevelId);
-//
-//			assert superNodeLevel != null;
-//			superNode.setVisLevel(superNodeLevel);
-//
-//			shapeMap.put("SuperNode_" + superNode.hashCode(), superNode);
-//		}
+		/* Supernode
+		for (SuperNode superNode : superNodesMap.values()) {
+			int minLevelId = superNode.getSubNodes().stream()
+					.mapToInt(subNode -> subNode.getVisLevel().getID())
+					.min()
+					.orElse(0);
+
+			VisLevel superNodeLevel = VisLevel.getLevelFromID(levelSet, minLevelId);
+
+			assert superNodeLevel != null;
+			superNode.setVisLevel(superNodeLevel);
+
+			shapeMap.put("SuperNode_" + superNode.hashCode(), superNode);
+		}*/
 	}
 
 	public void changeRenderMethod(Boolean labelRendering, Boolean qualifiedRendering ){
@@ -765,9 +766,9 @@ public class VisGraph implements Runnable{
 	       if (auxQLabel != null && !"null".equalsIgnoreCase(auxQLabel))
 	    	   vis.qualifiedLabel = auxQLabel; 
 	       else 
-	    	   vis.qualifiedLabel = vis.label; 
-	    
-		   vlevel.addShape(vis);
+	    	   vis.qualifiedLabel = vis.label;
+
+		vlevel.addShape(vis);
 		   vis.setVisLevel(vlevel);
 		   if (e.isAnonymous()) {
 	           vis.isAnonymous = true;

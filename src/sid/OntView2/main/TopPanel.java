@@ -2,8 +2,6 @@ package sid.OntView2.main;
 
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -52,7 +50,6 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private ComboBox<String> kceComboBox;
 	private VBox panel0;
 	private VBox connectorPanel;
-	private VBox cleanConnectorPanel;
 	private ToggleButton toggleSwitch;
 	private Button cleanConnectorsButton;
 	private Mine parent;
@@ -60,7 +57,6 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private Button fileSystemButton;
 	private Slider zoomSlider;
 	private CheckBox reduceCheckBox;
-	private Label reduceLabel;
 	private VBox mainPane;
 	private VBox helpPanel;
 	private Button helpButton;
@@ -106,7 +102,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		HBox row = createRow(urlComboBox, folderOntologyButton, loadOntologyButton);
 		row.setAlignment(Pos.CENTER);
 
-		return createContainer(true, titlePane, row);
+		return createContainer(titlePane, row);
 
 	}
 
@@ -135,7 +131,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			HBox row = createRow(getSaveImageButton(), getSaveImagePartialButton());
 			row.setAlignment(Pos.CENTER);
 
-			snapshotPanel = createContainer(true, titlePane, row);
+			snapshotPanel = createContainer(titlePane, row);
 		}
 		return snapshotPanel;
 	}
@@ -260,7 +256,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			StackPane titlePane = createTitlePane("Search");
 			HBox row = createRow(getLabel0(), getComboBox0());
 
-			panel0 = createContainer(true, titlePane, row);
+			panel0 = createContainer(titlePane, row);
 
 		}
 		return panel0;
@@ -276,7 +272,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			HBox row = createRow(getConnectorsSwitch(), createCleanConnectorsButton());
 			row.setAlignment(Pos.CENTER);
 
-			connectorPanel = createContainer(true, titlePane, row);
+			connectorPanel = createContainer(titlePane, row);
 
 		}
 
@@ -415,7 +411,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 			StackPane titlePane = createTitlePane("Reasoner & KConcept Extraction");
 
-			panelLoad = createContainer(true, titlePane, row1);
+			panelLoad = createContainer(titlePane, row1);
 			panelLoad.setMinWidth(250);
 		}
 		return panelLoad;
@@ -427,14 +423,12 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		return row;
 	}
 
-	private VBox createContainer(boolean applyStyle, Node... children) {
+	private VBox createContainer(Node... children) {
 		VBox container = new VBox(7);
 		container.getChildren().addAll(children);
 		container.setPadding(new Insets(10, 10, 10, 10));
-		if (applyStyle) {
-			container.getStyleClass().add("container");
-		}
-		container.setPrefHeight(VisConstants.CONTAINER_SIZE);
+        container.getStyleClass().add("container");
+        container.setPrefHeight(VisConstants.CONTAINER_SIZE);
 		container.setMinHeight(VisConstants.CONTAINER_SIZE);
 		container.setMaxHeight(VisConstants.CONTAINER_SIZE);
 		container.setAlignment(Pos.CENTER);
@@ -493,7 +487,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			HBox row = createRow(getSaveViewButton(), getRestoreViewButton());
 			row.setAlignment(Pos.CENTER);
 
-			viewPanel = createContainer(true, titlePane, row);
+			viewPanel = createContainer(titlePane, row);
 		}
 		return viewPanel;
 	}
@@ -535,7 +529,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			row.setSpacing(10);
 			row.setAlignment(Pos.CENTER);
 
-			panelCheckBox = createContainer(true, titlePane, row);
+			panelCheckBox = createContainer(titlePane, row);
 			panelCheckBox.setMinWidth(325);
 		}
 		return panelCheckBox;
@@ -612,7 +606,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 				}
 			});
 
-			helpPanel = createContainer(true, titlePane, helpButton);
+			helpPanel = createContainer(titlePane, helpButton);
 		}
 		return helpPanel;
 	}
@@ -656,11 +650,13 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		elementsInfoTitle.setStyle("-fx-font-weight: bold;");
 
 		Text elementsInfoText = new Text(
-				"P: Indicates that this specific node has properties associated with it.\n" +
-						"D: Indicates that the class is disjoint with other classes.\n" +
-						"Named Classes: Gray\n" +
-						"Defined Classes: Light Green\n" +
-						"Anonymous Classes: White\n"
+                """
+				P: Indicates that this specific node has properties associated with it.
+				D: Indicates that the class is disjoint with other classes.
+				Named Classes: Gray
+				Defined Classes: Light Green
+				Anonymous Classes: White
+				"""
 		);
 
 		TextFlow elementsInfoContent = new TextFlow(elementsInfoTitle, elementsInfoText);
@@ -686,7 +682,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			ObservableList<Object> items = FXCollections.observableArrayList();
 			while ((line != null) && (no < 15)) {
 				line = in.readLine();
-				if ((line != null) && (!line.equals(""))) {
+				if ((line != null) && (!line.isEmpty())) {
 					items.add(line);
 					no++;
 				}
@@ -701,7 +697,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private void OntologyButtonActionActionPerformed(ActionEvent event) {
 		parent.artPanel.stop();
 		String x = (String) getOntologyCombo().getValue();
-		if ((x != null) && (!x.equals(""))) {
+		if ((x != null) && (!x.isEmpty())) {
 			parent.loadActiveOntology(IRI.create(x));
 			loadReasonerButton.setDisable(false);
 			getReasonerCombo().setDisable(false);
@@ -739,7 +735,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		if(toggleSwitch != null)
 			toggleSwitch.setSelected(false);
 
-		if ((x != null) && (!x.equals(""))) {
+		if ((x != null) && (!x.isEmpty())) {
 			try {
 				parent.loadReasoner(x);
 				createButtonActionActionPerformed(event);
@@ -775,6 +771,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 	private void cleanConnectorActionPerformed(ActionEvent event) {
 		parent.artPanel.cleanConnectors();
+		Platform.runLater(parent.artPanel.getDrawerRunnable());
 	}
 
 	private void createButtonActionActionPerformed(ActionEvent event) {
@@ -849,6 +846,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 				}
 			}
 		}
+		parent.artPanel.checkAndResizeCanvas();
 		parent.artPanel.setStateChanged(true);
 		Platform.runLater(parent.artPanel.getRelaxerRunnable());
 	}
@@ -893,7 +891,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		if ((x != null) && (!x.equals(""))) {
+		if ((x != null) && (!x.isEmpty())) {
 			getOntologyCombo().setValue(x);
 		}
 	}

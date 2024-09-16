@@ -79,11 +79,6 @@ public abstract class Shape{
 		hiddenSubClasses = new ArrayList<>();
 	}
 
-	public void setPosition(int x, int y) {
-		this.posx = x;
-		this.posy = y;
-	}
-
 	/** 
 	 * Marks as closed and hides subLevels 
 	 * Then looks for those remaining visible nodes and adds a reference (dashed line)
@@ -234,7 +229,7 @@ public abstract class Shape{
 	}
 	
 	public void setVisLevel(VisLevel v){
-		
+		//System.out.println("\n setVisLevel");
 		v.addShape(this);
 		if (v.width <  width)
 			v.width = width + VisLevel.MIN_WIDTH;

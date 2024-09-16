@@ -47,6 +47,7 @@ public class VisClass extends Shape {
     boolean isDefined   = false;
     boolean isBottom    = false;
     int     currentHeight;
+
     int     propertyBoxWidth = 0;
     
     // 17-01-2013
@@ -243,8 +244,10 @@ public class VisClass extends Shape {
 	    	}
 	    	else {
 				currentHeight = calculateHeight();
-	    	}
-	    }
+			}
+			setWidth(calculateWidth());
+
+		}
 
 	    if (visible){
 
@@ -275,10 +278,6 @@ public class VisClass extends Shape {
 				 * añadir + 5 en posición letra
 				 */
 
-				if (!getDisjointConnectors().isEmpty() || propertyBox != null) {
-					setWidth(calculateWidth());
-				}
-
 				g.fillRoundRect(x - (double) getWidth()/2, y - (double) currentHeight/2, getWidth(), currentHeight, roundCornerValue, roundCornerValue);
 			    g.setStroke(Color.BLACK);
 			    if (isBottom) {
@@ -305,9 +304,6 @@ public class VisClass extends Shape {
 			    }
 	    	}
 	    	else {
-				if (!getDisjointConnectors().isEmpty() || propertyBox != null) {
-					setWidth(calculateWidth());
-				}
 	    		if (!label.startsWith(SIDClassExpressionNamer.className)) {
 		    		// CBL: the new definitions representation
 		    		g.setFill(lightGreen);
@@ -346,8 +342,6 @@ public class VisClass extends Shape {
 	    		else {
 	    			// CBL: it is an auxiliar definition 
 	    			// CBL if it is not defined, we use the previous representation
-
-					setWidth(calculateWidth());
 
 					g.setFill(Color.WHITE);
 				    g.fillRoundRect(x - (double) getWidth()/2, y - (double) currentHeight /2, getWidth(), currentHeight, roundCornerValue, roundCornerValue);

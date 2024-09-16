@@ -186,17 +186,36 @@ public abstract class VisConnector {
 		path.getElements().add(new MoveTo(fromPointX, fromPointY));
 		path.getElements().add(new LineTo(fromPointX, fromPointY));
 		path.getElements().add(new CubicCurveTo(
-				controlx1, controly1, controlx2, controly2, toPointX, toPointY
+				controlx1, controly1,
+				controlx2, controly2,
+				toPointX, toPointY
 		));
 		path.getElements().add(new LineTo(toPointX, toPointY));
 	}
+	/*protected void setPath2(Path path, double fromPointX, double fromPointY, double toPointX, double toPointY) {
+		path.getElements().clear();
+		calculateBezierPoints(fromPointX, fromPointY, toPointX, toPointY);
+
+		MoveTo moveTo = new MoveTo(fromPointX, fromPointY);
+		path.getElements().add(moveTo);
+
+		CubicCurveTo cubicCurveTo = new CubicCurveTo(
+				controlx1, controly1,
+				controlx2, controly2,
+				toPointX, toPointY
+		);
+		path.getElements().add(cubicCurveTo);
+		path.getElements().add(new MoveTo(toPointX, toPointY));
+	}*/
+
+
 
 	protected void drawCurve(GraphicsContext g2d, int method) {};
 
-	// REVISAR
+
 	protected void drawPath(GraphicsContext gc, Path path) {
 		gc.beginPath();
-		/*for (PathElement element : path.getElements()) {
+		for (PathElement element : path.getElements()) {
 			if (element instanceof MoveTo moveTo) {
 				gc.moveTo(moveTo.getX(), moveTo.getY());
 			} else if (element instanceof LineTo lineTo) {
@@ -207,8 +226,7 @@ public abstract class VisConnector {
 						cubicCurveTo.getControlX2(), cubicCurveTo.getControlY2(),
 						cubicCurveTo.getX(), cubicCurveTo.getY()
 				);
-			} else if (element instanceof QuadCurveTo) {
-				QuadCurveTo quadCurveTo = (QuadCurveTo) element;
+			} else if (element instanceof QuadCurveTo quadCurveTo) {
 				gc.quadraticCurveTo(
 						quadCurveTo.getControlX(), quadCurveTo.getControlY(),
 						quadCurveTo.getX(), quadCurveTo.getY()
@@ -216,7 +234,7 @@ public abstract class VisConnector {
 			} else if (element instanceof ClosePath) {
 				gc.closePath();
 			}
-		}*/
+		}
 		gc.stroke();
 	}
    

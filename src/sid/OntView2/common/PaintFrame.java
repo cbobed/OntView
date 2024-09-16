@@ -171,9 +171,16 @@ public class PaintFrame extends Canvas {
 			compactGraph();
 		}
 	}
-	
+	public class CanvasAdjuster implements Runnable {
+		public void run() {
+			checkAndResizeCanvas();
+		}
+	}
+
 	Relaxer relaxerRunnable = new Relaxer();
 	GlobalDrawer drawerRunnable = new GlobalDrawer();
+	CanvasAdjuster canvasAdjusterRunnable = new CanvasAdjuster();
+
 
 	public Relaxer getRelaxerRunnable() {
 		return relaxerRunnable; 
@@ -252,6 +259,7 @@ public class PaintFrame extends Canvas {
 	}
 
 	public void draw() {
+		//System.out.println("draw");
 		if (this.getScene() != null && !this.isDisabled() && this.isVisible() && this.getGraphicsContext2D() != null) {
 			GraphicsContext g = this.getGraphicsContext2D();
 			g.clearRect(0, 0, getWidth(), getHeight());
@@ -264,7 +272,6 @@ public class PaintFrame extends Canvas {
 			}
 
 			if (visGraph != null) {
-				
 				// draw connectors
 				if (showConnectors) {
 					for (VisConnector c : visGraph.connectorList) {
@@ -292,16 +299,23 @@ public class PaintFrame extends Canvas {
 				}
 				g.setStroke(Color.BLACK);
 
-				for (Entry<String, Shape> entry : visGraph.shapeMap.entrySet()) {
+				/*for (Entry<String, Shape> entry : visGraph.shapeMap.entrySet()) {
 					Shape shape = entry.getValue();
 					if (shape instanceof SuperNode) {
 						shape.drawShape(g);
 					}
-				}
+				}*/
 
 				for (Entry<String, Shape> entry : visGraph.shapeMap.entrySet()) {
 					Shape shape = entry.getValue();
 					if (!(shape instanceof SuperNode)) {
+						if (Objects.equals(shape.getLabel(), "Person")) {
+							System.out.println("Person x: " + shape.getPosX() + "y " + shape.getPosY());
+							for (VisObjectProperty p : shape.asVisClass().getPropertyBox().propertyList) {
+								System.out.println("Propiedad: " + p.visibleLabel);
+							}
+
+						}
 						shape.drawShape(g);
 					}
 				}
@@ -464,6 +478,7 @@ public class PaintFrame extends Canvas {
 				}
 			}
 			if (recentChange) {
+				Platform.runLater(canvasAdjusterRunnable);
 				draw();
 			}
 		}
@@ -494,7 +509,6 @@ public class PaintFrame extends Canvas {
 
 	public void cleanConnectors() {
 		selectedShapes.clear();
-		Platform.runLater(drawerRunnable);
 	}
 
 	public void handleMouseEntered(MouseEvent e) {
@@ -563,8 +577,7 @@ public class PaintFrame extends Canvas {
 			mouseLastX = (int) p.getX();
 			mouseLastY = (int) p.getY();
 
-			checkAndResizeCanvas();
-
+			Platform.runLater(canvasAdjusterRunnable);
 			Platform.runLater(drawerRunnable);
 			Platform.runLater(new ConnectorDrawer(pressedShape));
 		} else {
@@ -727,28 +740,9 @@ public class PaintFrame extends Canvas {
 		}
 
 		if (needsResize) {
+			System.out.println("Canvas " + newHeight);
 			setHeight(newHeight);
 		}
-	}
-
-	/**
-	 * method to convert HTML-like content into JavaFX Tooltip styled text
-	 *
-	 * @param html
-	 * @return String
-	 */
-	// web engine
-	private String formatToolTipText(String html) {
-		tooltip.setFont(new Font("Dialog", 12));
-		// tooltip.setStyle("-fx-background-color: #cedef7; -fx-text-fill: #000000;");
-
-		String formattedText = html.replaceAll("<html>", "").replaceAll("</html>", "").replaceAll("<b>", "")
-				.replaceAll("</b>", "").replaceAll("<br>", "\n").replaceAll("<ul>", "").replaceAll("</ul>", "")
-				.replaceAll("<li>", "\u2022 ").replaceAll("</li>", "\n");
-
-		formattedText = formattedText.replaceAll("(?m)^.*SIDClass_.*\n\n?", "");
-
-		return formattedText;
 	}
 
 	/**
@@ -777,7 +771,7 @@ public class PaintFrame extends Canvas {
 
 	public void start() {
 		System.out.println("start");
-		Platform.runLater(relaxerRunnable); 
+		//Platform.runLater(relaxerRunnable);
 	}
 
 	public void stop() {
@@ -1124,7 +1118,6 @@ public class PaintFrame extends Canvas {
 		}
 		
 		compactGraph();
-		Platform.runLater(drawerRunnable);
 	}
 
 	private void compactGraph() {
@@ -1164,7 +1157,7 @@ public class PaintFrame extends Canvas {
 			}
 		}
 		setStateChanged(true);
-		Platform.runLater(relaxerRunnable); 
+		Platform.runLater(relaxerRunnable);
 	}
 
 	public void applyStructuralReduction() {
