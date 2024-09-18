@@ -1082,6 +1082,9 @@ public class PaintFrame extends Canvas {
 	 * Action done when changing kce Combo
 	 */
 	public void doKceOptionAction() {
+		if (getVisGraph() == null) {
+			return;
+		}
 		KCEConceptExtraction extractorKCE = new KCEConceptExtraction();
 		RDFRankConceptExtraction extractorRDFRank = new RDFRankConceptExtraction();
 		PageRankConceptExtraction extractorPageRank = new PageRankConceptExtraction();

@@ -46,7 +46,7 @@ public class VisClass extends Shape {
 	boolean isAnonymous;
     boolean isDefined   = false;
     boolean isBottom    = false;
-    int     currentHeight;
+    int     currentHeight, currentWidth = 0;
 
     int     propertyBoxWidth = 0;
     
@@ -222,6 +222,7 @@ public class VisClass extends Shape {
 		}
 		int x, y;
 		int roundCornerValue = 10;
+
 		x = posx + 1;
         y = posy;
 
@@ -246,7 +247,6 @@ public class VisClass extends Shape {
 				currentHeight = calculateHeight();
 			}
 			setWidth(calculateWidth());
-
 		}
 
 	    if (visible){
@@ -264,19 +264,6 @@ public class VisClass extends Shape {
 		    		g.setFill(lightgray);
 		    	else
 		    		g.setFill(Color.WHITE);
-
-				/**
-				 * fillRect(coordenada x de la esquina superior izquierda del rectángulo,
-				 * 			coordenada y de la esquina superior izquierda del rectángulo,
-				 * 			Ancho del rectángulo,
-				 * 			Alto del rectángulo)
-				 */
-				/**
-				 * g.fillRoundRect(rectX, rectY, rectWidth, rectHeight, arcWidth, arcHeight);
-				 *
-				 * añadir + 10 en tamaño
-				 * añadir + 5 en posición letra
-				 */
 
 				g.fillRoundRect(x - (double) getWidth()/2, y - (double) currentHeight/2, getWidth(), currentHeight, roundCornerValue, roundCornerValue);
 			    g.setStroke(Color.BLACK);
