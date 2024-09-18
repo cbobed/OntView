@@ -309,13 +309,13 @@ public class PaintFrame extends Canvas {
 				for (Entry<String, Shape> entry : visGraph.shapeMap.entrySet()) {
 					Shape shape = entry.getValue();
 					if (!(shape instanceof SuperNode)) {
-						if (Objects.equals(shape.getLabel(), "Person")) {
+						/*if (Objects.equals(shape.getLabel(), "Person")) {
 							System.out.println("Person x: " + shape.getPosX() + "y " + shape.getPosY());
 							for (VisObjectProperty p : shape.asVisClass().getPropertyBox().propertyList) {
 								System.out.println("Propiedad: " + p.visibleLabel);
 							}
 
-						}
+						}*/
 						shape.drawShape(g);
 					}
 				}
