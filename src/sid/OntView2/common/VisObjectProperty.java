@@ -142,8 +142,8 @@ public class VisObjectProperty extends VisProperty {
 		range    = prange;
 		voffset  = pvoffset;
 
-		textFont    = Font.font("Arial", FontWeight.NORMAL, FontPosture.REGULAR, 11);
-		circleFont  = Font.font("Arial", FontWeight.BOLD, 10);
+		textFont    = Font.font("DejaVu Sans", FontWeight.NORMAL, FontPosture.REGULAR, 11);
+		circleFont  = Font.font("DejaVu Sans", FontWeight.BOLD, 10);
 
 		connectionPoints = new ArrayList<>();
 		if (getDomain() != range) {
@@ -174,7 +174,7 @@ public class VisObjectProperty extends VisProperty {
 	
 	public int getLabelHeight() {
 		if (height ==0) {
-			Font font = Font.font("Arial", FontWeight.NORMAL, 9);
+			Font font = Font.font("DejaVu Sans", FontWeight.NORMAL, 9);
 			height = VisProperty.stringHeight(font, getDomain().graph.paintframe.getGraphicsContext2D()) + 8;
 		}	
 		return height;
@@ -182,7 +182,7 @@ public class VisObjectProperty extends VisProperty {
 	
 	public int getLabelWidth(){
 		if (width ==0){
-			Font font = Font.font("Arial", FontWeight.NORMAL, 11);
+			Font font = Font.font("DejaVu Sans", FontWeight.NORMAL, 11);
 			width = VisProperty.stringWidth(label, font, getDomain().graph.paintframe.getGraphicsContext2D());
 		}
 		return width;

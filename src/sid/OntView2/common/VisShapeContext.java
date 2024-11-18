@@ -105,7 +105,7 @@ public class VisShapeContext extends ContextMenu {
 			Text regularText = new Text("Instances of ");
 			Text boldBlueText = new Text(shape.asVisClass().label);
 			boldBlueText.setFill(Color.BLUE);
-			boldBlueText.setFont(Font.font("Arial", FontWeight.BOLD, FontPosture.ITALIC, 14));
+			boldBlueText.setFont(Font.font("DejaVu Sans", FontWeight.BOLD, FontPosture.ITALIC, 14));
 
 			TextFlow textFlow = new TextFlow(regularText, boldBlueText);
 

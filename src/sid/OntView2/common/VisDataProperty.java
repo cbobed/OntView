@@ -66,8 +66,8 @@ public class VisDataProperty extends VisProperty {
 		voffset = pvoffset;
 		connectionPoints = new ArrayList<Point2D>();
 
-		textFont = Font.font("Arial", FontWeight.NORMAL, 10);
-		circleFont  = Font.font("Arial", FontWeight.BOLD, 10);
+		textFont = Font.font("DejaVu Sans", FontWeight.NORMAL, 10);
+		circleFont  = Font.font("DejaVu Sans", FontWeight.BOLD, 10);
 		connectionPoints = new ArrayList<>();
 
 		if (EntitySearcher.isFunctional(dPropExp.asOWLDataProperty(), ontology)) isFunctional = true;
@@ -80,7 +80,7 @@ public class VisDataProperty extends VisProperty {
 	
 	public int getLabelHeight() {
 		if (height ==0) {
-			Font font = Font.font("Arial", FontWeight.NORMAL, 9);
+			Font font = Font.font("DejaVu Sans", FontWeight.NORMAL, 9);
 			height = VisProperty.stringHeight(font, getDomain().graph.paintframe.getGraphicsContext2D()) + 8;
 		}
 		return height;
@@ -88,7 +88,7 @@ public class VisDataProperty extends VisProperty {
 	
 	public int getLabelWidth(){
 		if (width ==0){
-			Font font = Font.font("Arial", FontWeight.NORMAL, 9);
+			Font font = Font.font("DejaVu Sans", FontWeight.NORMAL, 9);
 			width = VisProperty.stringWidth(label+": "+range, font, getDomain().graph.paintframe.getGraphicsContext2D());
 		}
 		return width;
