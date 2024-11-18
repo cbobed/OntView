@@ -442,7 +442,6 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 		StackPane titlePane = new StackPane();
 		titlePane.getChildren().add(titledPane);
-		//titlePane.setPadding(new Insets(0, 0, 4, 0));
 
 		return titlePane;
 	}

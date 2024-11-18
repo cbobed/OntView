@@ -48,7 +48,6 @@ public class VisGraph implements Runnable{
 	PaintFrame paintframe;
     VisGraph   unexpandedGraph = null;
     boolean    expanded = false;
-    boolean    disjoint = true;
     boolean    created  = false;
 	private OWLOntology activeOntology;
 	private HashSet<OWLClassExpression> set;

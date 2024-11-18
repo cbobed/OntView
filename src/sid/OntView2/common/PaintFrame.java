@@ -237,6 +237,19 @@ public class PaintFrame extends Canvas {
 		}
 	}
 
+	public boolean hideDisjoint = true;
+	public void drawAllDisjointShapes() {
+		if (!hideDisjoint) {
+			for (Entry<String, Shape> entry : visGraph.shapeMap.entrySet()) {
+				Shape shape = entry.getValue();
+				selectedDisjoints.add(shape);
+			}
+		} else {
+			selectedDisjoints.clear();
+		}
+		Platform.runLater(drawerRunnable);
+	}
+
 	public void drawConnectorShape(Shape shape) {
 		if (this.getScene() != null && !this.isDisabled() && this.isVisible() && this.getGraphicsContext2D() != null) {
 			GraphicsContext g = this.getGraphicsContext2D();

@@ -21,7 +21,7 @@ public class VisConnectorDisjoint extends VisConnectorEquiv {
 		int posy1,posy2;
 		Color col = color;
 
-        if ((from.visible) &&(to.visible)&&(from.graph.disjoint)){
+        if ((from.visible) &&(to.visible)){
 			if (color==null)
 				col = VisConnector.color;
 

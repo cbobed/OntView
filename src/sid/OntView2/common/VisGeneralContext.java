@@ -91,7 +91,9 @@ public class VisGeneralContext extends ContextMenu {
 	}
 
 	private void disjointItemClicked() {
-		parent.getVisGraph().disjoint = ! parent.getVisGraph().disjoint;
+		//parent.getVisGraph().disjoint = !parent.getVisGraph().disjoint;
+        parent.hideDisjoint = !parent.selectedDisjoints.isEmpty();
+		parent.drawAllDisjointShapes();
 		updateMenuItemTexts();
 	}
 
@@ -108,7 +110,7 @@ public class VisGeneralContext extends ContextMenu {
 			getMenuItem1().setText("Show Properties");
 		}
 
-		if (!parent.getVisGraph().disjoint) {
+		if (!parent.selectedDisjoints.isEmpty()){
 			getMenuItem2().setText("Hide Disjoint");
 		} else {
 			getMenuItem2().setText("Show Disjoint");
