@@ -77,6 +77,7 @@ public class Mine extends Application implements Embedable{
 
 	public static void createAndShowGUI(Stage primaryStage) {
 		primaryStage.setTitle("Viewer");
+		primaryStage.setMinWidth(1400);
 		primaryStage.setOnCloseRequest(event -> System.exit(0));
 		ClassLoader c = Thread.currentThread().getContextClassLoader();
 
@@ -97,15 +98,16 @@ public class Mine extends Application implements Embedable{
 
 
 		VBox root = new VBox();
+
 		root.getChildren().addAll(viewer.nTopPanel.getMainPane(), viewer.scroll);
 		VBox.setVgrow(viewer.scroll, Priority.ALWAYS);
 
 		viewer.artPanel.setStyle("-fx-background-color: white;");
 		viewer.nTopPanel.setStyle("-fx-border-color: black; -fx-border-width: 1;");
 
+
 		Scene scene = new Scene(root, 1400, 600);
 		scene.getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
-
 		viewer.primaryStage.setScene(scene);
 		viewer.primaryStage.setMaximized(true);
 		viewer.primaryStage.show();
