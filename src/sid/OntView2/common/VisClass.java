@@ -121,7 +121,7 @@ public class VisClass extends Shape {
 	
 	public ArrayList<VisConnectorEquiv> getEquivConnectors(){
 		if (equivList==null) {
-			equivList = new ArrayList<VisConnectorEquiv>();
+			equivList = new ArrayList<>();
 		}	
 		return equivList;
 	}

@@ -108,9 +108,9 @@
 	    <artifactId>exec-maven-plugin</artifactId>
 	    <version>3.4.1</version>
 	    <configuration>
-	        <mainClass>sid.OntView2.main.Mine</mainClass> 
+	        <mainClass>sid.OntView2.main.Mine</mainClass>
 	    </configuration>
-		</plugin>
+      </plugin>
     </plugins>
   </build>
 </project>

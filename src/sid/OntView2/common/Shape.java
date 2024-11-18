@@ -9,6 +9,8 @@ import org.semanticweb.owlapi.model.OWLClassExpression;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Set;
 
 public abstract class Shape{
 	
@@ -68,9 +70,11 @@ public abstract class Shape{
 	public abstract int getLevelRelativePos();
 	public abstract void drawShape(GraphicsContext g);
 	public abstract Point2D getConnectionPoint(Point2D point, boolean b);
-    PaintFrame frame;
+	private int hiddenChildrenCount = 0;
+	private Set<Shape> countedChildren = new HashSet<>();
 
-    /**************************************************************/
+
+	/**************************************************************/
 	public Shape(){
 		inConnectors = new ArrayList<>();
 		outConnectors = new ArrayList<>();
@@ -87,7 +91,21 @@ public abstract class Shape{
 		setState(CLOSED);
         hideSubLevels(this);
 	}
-    
+
+	public void resetHiddenChildrenShapeCount() {
+		hiddenChildrenCount = 0;
+		countedChildren.clear();
+	}
+
+	public int getHiddenChildrenCount(){
+		return hiddenChildrenCount;
+	}
+
+	// Method to increment the hidden children count
+	public void incrementHiddenChildrenCount() {
+		hiddenChildrenCount++;
+	}
+
 	/**
 	 * hides outconnectors and checks if children need to be hidden 
 	 * @param closedShape
@@ -102,8 +120,32 @@ public abstract class Shape{
 			child =  connector.to;
 			connector.hide();
 			child.checkAndHide(closedShape);
+			if (!countedChildren.contains(child)) {
+				countedChildren.add(child);
+				child.collectDescendantsIntoSet(countedChildren, closedShape);
+			}
+		}
+		hiddenChildrenCount = countedChildren.size();
+
+	}
+
+	/**
+	 * Recursively collects all descendants into the given set.
+	 * Ensures no duplicate entries are added.
+	 * @param countedChildren The set of already-counted shapes.
+	 * @param closedShape The root shape triggering the operation.
+	 */
+	private void collectDescendantsIntoSet(Set<Shape> countedChildren, Shape closedShape) {
+		for (VisConnector connector : outConnectors) {
+			Shape child = connector.to;
+			// If not already processed, add and recurse
+			if (!countedChildren.contains(child)) {
+				countedChildren.add(child);
+				child.collectDescendantsIntoSet(countedChildren, closedShape);
+			}
 		}
 	}
+
 	/** 
 	 *  Checks references
 	 *  Before setting invisible a shape we need to check if there's still 
@@ -115,26 +157,34 @@ public abstract class Shape{
 		   this.visible = false;
 		   hideSubLevels(closedShape);
 		   return;
-		}   
-	
+		}
 		hideSubLevels(closedShape);
 	}
 	
 	/**
 	 *  hides shape, connector and notifies parents
      */
-	public void hide(){
+	public void hide() {
+		this.visible = false;
+		for (VisConnector c : inConnectors) {
+			c.hide();
+			c.from.notifyHidden(this);
+		}
 
-		 this.visible = false;
-		 for (VisConnector c : inConnectors) {
-			 c.hide();
-			 //notify Parent
-			 c.from.notifyHidden(this);       
-		 }
-		 for (VisConnector c : outConnectors) {
-			 c.hide();       
-		 }
-		 //Wakes observer thread on hide event
+		for (VisConnector c : outConnectors) {
+			c.hide();
+		}
+
+		// Increment the parent's hidden children count -added
+		for (VisConnector c : outConnectors) {
+			Shape child = c.to;
+			if (!countedChildren.contains(child)) {
+				this.incrementHiddenChildrenCount();
+				countedChildren.add(child);  // Mark this child as counted
+			}
+		}
+
+		// Wake observer thread on hide event
 		graph.updateObservers(VisConstants.GENERALOBSERVER);
 		graph.getDashedConnectorList().clear();
 		graph.addDashedConnectors();
