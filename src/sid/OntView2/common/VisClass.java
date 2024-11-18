@@ -205,13 +205,13 @@ public class VisClass extends Shape {
 	private Font boldFont;
 	private Font getDefinedClassFont(){
 		if (defFont==null)
-			defFont = Font.font("Dialog", FontWeight.BOLD, 10);
+			defFont = Font.font("Arial", FontWeight.BOLD, 10);
 		return defFont;
 	}
 	
 	private Font getBoldFont(){
 		if (boldFont==null)
-			boldFont= Font.font("Dialog", FontWeight.BOLD, 10);
+			boldFont= Font.font("Arial", FontWeight.BOLD, 10);
 		return boldFont;
 	}
 
@@ -702,7 +702,7 @@ public class VisClass extends Shape {
 		GraphicsContext g = graph.paintframe.getGraphicsContext2D();
 	    int max = 0;
 	    Font prevFont = g.getFont();
-		Font newFont = Font.font("Dialog", FontWeight.BOLD, 10);
+		Font newFont = Font.font("Arial", FontWeight.BOLD, 10);
 
 		g.setFont(newFont);
 
@@ -839,7 +839,7 @@ public class VisClass extends Shape {
 
 		for (String line : lines) {
 			Text textNode = new Text(line);
-			textNode.setFont(Font.font("Dialog", FontWeight.BOLD, 10));
+			textNode.setFont(Font.font("Arial", FontWeight.BOLD, 10));
 			totalHeight += (int) textNode.getLayoutBounds().getHeight();
 		}
 
@@ -922,7 +922,7 @@ public class VisClass extends Shape {
 			token = sTokenizer.nextToken();
 			currentX = x+tabsSize(token); 
 			g.fillText(removeFormatInformation(token), currentX, currentY);
-			Font font = Font.font("Dialog", FontWeight.NORMAL, 9);
+			Font font = Font.font("Arial", FontWeight.NORMAL, 9);
 
 			currentY += VisProperty.stringHeight(font, g)+6;
 		}

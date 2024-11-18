@@ -175,7 +175,7 @@ public class VisConstraint extends Shape {
 			Color prevColor = (Color) g.getFill();
 
 			// Set font and fill color for background oval
-			g.setFont(Font.font("Dialog", FontWeight.NORMAL, 9));
+			g.setFont(Font.font("Arial", FontWeight.NORMAL, 9));
 			g.setFill(Color.BLACK);
 			g.fillOval(x - (double) getWidth() / 2, y, getWidth(), getHeight());
 
@@ -187,9 +187,9 @@ public class VisConstraint extends Shape {
 
 				case OBJECT_INTERSECTION_OF:
 				case OBJECT_UNION_OF:
-					g.setFont(Font.font("Dialog", FontWeight.BOLD, 14));
+					g.setFont(Font.font("Arial", FontWeight.BOLD, 14));
 					g.fillText(draw,getPosX() - (double) getWidth() /4, getPosY() + (double) getHeight() /2+2);
-					g.setFont(Font.font("Dialog", FontWeight.BOLD, 9));
+					g.setFont(Font.font("Arial", FontWeight.BOLD, 9));
 					break;
 				case OBJECT_HAS_VALUE :	
 					g.fillText(property+" {"+filler+"}",getPosX() - (double) getWidth() /2, getPosY());

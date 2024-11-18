@@ -214,7 +214,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private void tooltipInfo(Node node, String text) {
 		Tooltip tooltip = new Tooltip(text);
 		Tooltip.install(node, tooltip);
-		tooltip.setFont(new Font("Dialog", 12));
+		tooltip.setFont(new Font("Arial", 12));
 	}
 
 	private Button getfileSystemButton() {
@@ -394,7 +394,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			loadReasonerButton = new Button("Sync");
 			loadReasonerButton.setMinWidth(80);
 			loadReasonerButton.setCursor(Cursor.HAND);
-			loadReasonerButton.setFont(Font.font("Dialog", FontWeight.NORMAL, 10));
+			loadReasonerButton.setFont(Font.font("Arial", FontWeight.NORMAL, 10));
 			loadReasonerButton.getStyleClass().add("button");
 			loadReasonerButton.setOnAction(this::loadReasonerButtonActionActionPerformed);
 		}
@@ -438,7 +438,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private StackPane createTitlePane(String title) {
 		Text titledPane = new Text(title);
 		titledPane.setFill(Color.BLUE);
-		titledPane.setFont(Font.font("Dialog", FontWeight.BOLD, FontPosture.ITALIC, 12));
+		titledPane.setFont(Font.font("Arial", FontWeight.BOLD, FontPosture.ITALIC, 12));
 
 		StackPane titlePane = new StackPane();
 		titlePane.getChildren().add(titledPane);
@@ -449,7 +449,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private CheckBox getReduceCheckBox() {
 		if (reduceCheckBox == null) {
 			reduceCheckBox = new CheckBox();
-			reduceCheckBox.setFont(Font.font("Dialog", FontWeight.NORMAL, 10));
+			reduceCheckBox.setFont(Font.font("Arial", FontWeight.NORMAL, 10));
 			reduceCheckBox.setOnAction(this::reduceActionActionPerformed);
 		}
 		return reduceCheckBox;
@@ -538,7 +538,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		if (loadOntologyButton == null) {
 			loadOntologyButton = new Button("Load Ont");
 			loadOntologyButton.setCursor(Cursor.HAND);
-			loadOntologyButton.setFont(Font.font("Dialog", FontWeight.NORMAL, 10));
+			loadOntologyButton.setFont(Font.font("Arial", FontWeight.NORMAL, 10));
 			loadOntologyButton.getStyleClass().add("button");
 			loadOntologyButton.setMinWidth(100);
 			loadOntologyButton.setOnAction(this::OntologyButtonActionActionPerformed);

@@ -84,7 +84,7 @@ public class VisPropertyBox {
 		if (g == null){
 			return;
 		}
-		Font font = Font.font("Dialog", FontWeight.NORMAL, 9);
+		Font font = Font.font("Arial", FontWeight.NORMAL, 9);
 		g.setFont(font);
 	    for (VisObjectProperty p: propertyList){
 	    	if (p.visible){
