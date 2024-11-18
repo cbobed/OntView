@@ -203,7 +203,6 @@ public class VisGraph implements Runnable{
 		for (Entry<String, Shape> entry : shapeMap.entrySet()){
 			Shape shape = entry.getValue();
 			if (shape instanceof VisClass) {
-				
 				shape.asVisClass().addAssertedDisjointConnectors();
 				shape.asVisClass().addEquivalentConnectors();
 			}

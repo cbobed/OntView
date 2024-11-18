@@ -114,8 +114,8 @@ public class VisClass extends Shape {
 	
 	ArrayList<VisConnectorDisjoint> getDisjointConnectors(){
 		if (disjointList==null) {
-			disjointList = new ArrayList<VisConnectorDisjoint>();
-		}	
+			disjointList = new ArrayList<>();
+		}
 		return disjointList;
 	}
 	
@@ -148,25 +148,19 @@ public class VisClass extends Shape {
 			for (OWLDisjointClassesAxiom axiom: getDisJointClassesAxioms()){
 				for (OWLClassExpression e : axiom.getClassExpressions()){
 					if(e != this.getLinkedClassExpression()){
-						if (graph.getVisualExtension(e)!=null)
+						if (graph.getVisualExtension(e)!=null){
 							addDisjointConnector(graph.getVisualExtension(e));
+						}
 					}
 				}
 		    }	 
 		}
 	}
-	
+
 	public void addDisjointConnector(Shape dst){
-		ArrayList<VisConnectorDisjoint> dstDisj;
-		boolean already = false;
-		dstDisj = dst.asVisClass().getDisjointConnectors();
-		for (VisConnectorDisjoint d : dstDisj){
-			if ((d.from==dst)&&(d.to==this)){
-				already= true;
-			}
-		}
-		if (!already){
-			getDisjointConnectors().add(new VisConnectorDisjoint(this,dst));
+		boolean already = Objects.equals(this.getLabel(), dst.getLabel());
+        if (!already){
+			getDisjointConnectors().add(new VisConnectorDisjoint(this, dst));
 		}
 	}
 	
