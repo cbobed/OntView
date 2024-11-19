@@ -94,12 +94,16 @@ public abstract class Shape{
 
 	public void resetHiddenChildrenShapeCount() {
 		hiddenChildrenCount = 0;
+		childrenHidden = false;
 		countedChildren.clear();
 	}
 
 	public int getHiddenChildrenCount(){
+		childrenHidden = true;
 		return hiddenChildrenCount;
 	}
+
+	public boolean childrenHidden = false;
 
 	// Method to increment the hidden children count
 	public void incrementHiddenChildrenCount() {

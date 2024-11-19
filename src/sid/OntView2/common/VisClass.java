@@ -250,7 +250,7 @@ public class VisClass extends Shape {
 			Color lightBlue = Color.rgb(212, 238, 247);
 			Color lightGreen = Color.rgb(212, 247, 212);
 
-			int propertySpace = 0;
+			int propertySpace = (propertyBox != null) ? 20 : 0;
 
 	    	if (!isDefined) {
 	    		// CBL if it is not defined, we use the previous representation
@@ -355,6 +355,10 @@ public class VisClass extends Shape {
 	    		}
 	    	}
 
+			if(childrenHidden){
+				drawHiddenNodesIndicator(g, 23, getHiddenChildrenCount(), posx, posy);
+			}
+
 		    if (!children.isEmpty() && (outConnectors!=null) &&(!outConnectors.isEmpty())){
 		    	switch (this.getState()) {
 		    	
@@ -401,6 +405,32 @@ public class VisClass extends Shape {
 		}
 		g.setFont(oldFont);
 	}
+
+	private void drawHiddenNodesIndicator(GraphicsContext g, int totalNodes, int hiddenNodes, int x, int y) {
+
+		double width = getWidth();
+		double height = 10;
+		double rectX = x - width / 2;
+		double rectY = y - currentHeight / 2 - height - 5;
+
+		double hiddenPercentage = (double) hiddenNodes / totalNodes;
+		double visiblePercentage = 1.0 - hiddenPercentage;
+
+		double hiddenWidth = width * hiddenPercentage;
+		double visibleWidth = width * visiblePercentage;
+
+		// hidden nodes
+		g.setFill(Color.MEDIUMSEAGREEN);
+		g.fillRect(rectX, rectY, hiddenWidth, height);
+
+		// visible nodes
+		g.setFill(Color.LIGHTGRAY);
+		g.fillRect(rectX + hiddenWidth, rectY, visibleWidth, height);
+
+		g.setStroke(Color.BLACK);
+		g.strokeRect(rectX, rectY, width, height);
+	}
+
 
 	private void propertyDraw(GraphicsContext g, int x, int y, int roundCornerValue, Color colorP) {
 		g.setFill(colorP);
@@ -745,10 +775,7 @@ public class VisClass extends Shape {
 				max += 10;
 			}
 			if (propertyBox != null) {
-				if (!Objects.equals(visibleLabel, "Animal") && !Objects.equals(visibleLabel, "SIDClass_4")){
-					max += 20;
-
-				}
+				max += 20;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

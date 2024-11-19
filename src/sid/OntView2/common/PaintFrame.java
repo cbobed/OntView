@@ -811,6 +811,7 @@ public class PaintFrame extends Canvas {
 		return false;
 	}
 
+
 	private boolean clickedOnShape(int x, int y, MouseEvent e) {
 		if (visGraph == null) {
 			return false;
