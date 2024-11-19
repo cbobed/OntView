@@ -151,11 +151,9 @@ public class VisPropertyBox {
 		calculateHeight();
 		return v;
 	}
-	
-	public void buildConnections(){
-		
-		for (VisObjectProperty vprop : propertyList) {
 
+	public void buildConnections(){
+		for (VisObjectProperty vprop : propertyList) {
 			NodeSet<OWLObjectPropertyExpression> propNodeSet = getReasoner().getSuperObjectProperties(vprop.oPropExp, true);
 			for ( Node<OWLObjectPropertyExpression> node : propNodeSet){
 				Set<OWLObjectPropertyExpression> entities = node.getEntities();

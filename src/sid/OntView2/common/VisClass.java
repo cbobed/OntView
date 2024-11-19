@@ -251,10 +251,6 @@ public class VisClass extends Shape {
 			Color lightGreen = Color.rgb(212, 247, 212);
 
 			int propertySpace = 0;
-			if (!Objects.equals(visibleLabel, "Animal") && !Objects.equals(visibleLabel, "SIDClass_4")){
-				propertySpace = (propertyBox != null) ? 20 : 0;
-
-			}
 
 	    	if (!isDefined) {
 	    		// CBL if it is not defined, we use the previous representation
@@ -398,9 +394,7 @@ public class VisClass extends Shape {
 		    		   break;
 		       }
 			}
-		    /*for (VisConnectorDisjoint disj :  getDisjointConnectors()){
-			    disj.draw(g);
-		    }
+		    /*
 		    for (VisConnectorEquiv equ: getEquivConnectors()){
 			    equ.draw(g);
 		    }*/
@@ -409,9 +403,6 @@ public class VisClass extends Shape {
 	}
 
 	private void propertyDraw(GraphicsContext g, int x, int y, int roundCornerValue, Color colorP) {
-		if (Objects.equals(visibleLabel, "Animal") || Objects.equals(visibleLabel, "SIDClass_4")){
-			return;
-		}
 		g.setFill(colorP);
 		g.fillRoundRect(x - (double) getWidth()/2 + 5, y - (double) currentHeight / 2 + 6, 19, 14, roundCornerValue, roundCornerValue);
 		g.setFill(Color.BLACK);

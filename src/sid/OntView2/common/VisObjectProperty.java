@@ -263,6 +263,7 @@ public class VisObjectProperty extends VisProperty {
 		if (visible) {
 			if (rangeConnector != null)
 				rangeConnector.draw(g);
+			//System.out.println(this.visibleLabel + " parents.size() " + parents.size());
 			if (parents.size()>1){
 				g.setFont(circleFont);
 				if (pbox.vclass.visible){
@@ -270,8 +271,6 @@ public class VisObjectProperty extends VisProperty {
 					g.fillText(OntViewConstants.AND, getPosX()-14, getPosY()-2);
 				}
 				for (VisConnectorHeritance con : parentConnectors) {
-					g.setFill(Color.BLACK);
-					g.setStroke(Color.BLACK);
 					con.draw(g);
 				}	
 			}

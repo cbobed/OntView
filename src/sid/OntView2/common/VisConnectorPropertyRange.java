@@ -30,10 +30,10 @@ public class VisConnectorPropertyRange extends VisConnectorIsA {
 					fromPoint = new Point2D(vprop.getPosX() + vprop.getLabelWidth()+5,vprop.getPosY()-5);
 					toPoint = new Point2D(to.getPosX(),to.getPosY());
 					Color prevColor = (Color) g.getStroke();
-				  	g.setFill(Color.DARKGREEN); // CAMBIAR
+				  	g.setFill(Color.DARKCYAN);
 			  		g.fillOval(fromPoint.getX(), fromPoint.getY()-2, 4, 4);
 //				  	g2d.drawLine(fromPoint.x+2, fromPoint.y-2, toPoint.x, toPoint.y);
-					g.setStroke(Color.DARKGREEN); // CAMBIAR
+					g.setStroke(Color.LIGHTBLUE);
 			  		drawCurve(g, VisConstants.NURB);
 					g.setStroke(prevColor);
 //			  		setPath(path,fromPoint.x+2, fromPoint.y-2, toPoint.x, toPoint.y);

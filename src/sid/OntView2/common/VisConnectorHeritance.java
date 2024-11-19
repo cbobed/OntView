@@ -10,7 +10,6 @@ public class VisConnectorHeritance extends VisConnectorPropProp {
 
 	public VisConnectorHeritance(VisObjectProperty subProp, VisObjectProperty superProp) {
 		super(subProp, superProp);
-		
 	}
 
 	@Override
@@ -18,6 +17,7 @@ public class VisConnectorHeritance extends VisConnectorPropProp {
 		if (g == null){
 			return;
 		}
+		System.out.println("entro funcion");
         if ((visible)&&(from.asVisClass().getPropertyBox().visible)){
 			if ((from != null) && (to!= null)){
 				if ((from.visible) && (to.visible)){
@@ -29,6 +29,7 @@ public class VisConnectorHeritance extends VisConnectorPropProp {
 					StrokeLineCap prevCap = g.getLineCap();
 
 					g.setStroke(Color.BLACK);
+					g.setFill(Color.BLACK);
 					g.strokeLine(fromPoint.getX(),fromPoint.getY(), toPoint.getX(), toPoint.getY());
 
 					g.setStroke(prevColor);
