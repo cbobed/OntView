@@ -2,6 +2,10 @@
 
 # Script to install the necessary JAR files before launching the application
 
+echo "Installing maven..."
+apt-cache search maven
+sudo apt-get install maven
+
 echo "Installing pedviz_0.15.jar..."
 mvn install:install-file -Dfile=lib/pedviz_0.15.jar -DgroupId=org.sid.ontview -DartifactId=pedviz -Dversion=0.15 -Dpackaging=jar
 

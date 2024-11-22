@@ -4,6 +4,7 @@ package sid.OntView2.common;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import org.apache.jena.base.Sys;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 
@@ -17,7 +18,10 @@ public abstract class Shape{
 	public static final int CLOSED = 0 ;
 	public static final int OPEN = 1 ;
 	public static final int PARTIALLY_CLOSED = 2 ;
-	
+	public static final int LEFTCLOSED = 3;
+	public static final int LEFTOPEN = 4;
+
+
 	public int posx,posy;
 	private int height,width;
 	int depthlevel;
@@ -35,6 +39,7 @@ public abstract class Shape{
 	
 	
 	int state = OPEN;
+	int leftState = LEFTOPEN;
 	boolean wasOpened = true;
 	boolean visible = true;
 	boolean wasVisible = true;
@@ -55,6 +60,7 @@ public abstract class Shape{
 	public void setHeight(int x) {height = x;}
 	public void setWidth(int x) {width = x;}
 	public int getTopCorner() {	return posy - getHeight()/2; }
+	public int getLeftCorner() { return posx - getWidth()/2; }
 	public int getBottomCorner() {
 		VisClass v_i = this.asVisClass();
 		if (v_i.getPropertyBox() != null && v_i.getPropertyBox().visible) {
@@ -65,6 +71,8 @@ public abstract class Shape{
 	public VisClass asVisClass(){return (VisClass)this;}
 	public void setState(int pstate){state= pstate;}
 	public int  getState() {return state;}
+	public void setLeftState(int pstate){leftState= pstate;}
+	public int  getLeftState() {return leftState;}
 	public abstract OWLClassExpression getLinkedClassExpression();
 	public abstract String getToolTipInfo();
 	public abstract int getLevelRelativePos();
@@ -87,9 +95,14 @@ public abstract class Shape{
 	 * Marks as closed and hides subLevels 
 	 * Then looks for those remaining visible nodes and adds a reference (dashed line)
 	 */
-	public void close (){
+	public void closeRight (){
 		setState(CLOSED);
         hideSubLevels(this);
+	}
+
+	public void closeLeft (){
+		setLeftState(LEFTCLOSED);
+		hideParents(this);
 	}
 
 	public void resetHiddenChildrenShapeCount() {
@@ -111,6 +124,22 @@ public abstract class Shape{
 	}
 
 	/**
+	 * Check if childres has other visible parents
+	 */
+	boolean childHasOtherParents() {
+		int visibleParentCount = 0;
+
+		for (VisConnector inConnector : this.inConnectors) {
+			if (inConnector.from.isVisible()) {
+				visibleParentCount++;
+			}
+		}
+
+        return visibleParentCount > 1;
+    }
+
+
+	/**
 	 * hides outconnectors and checks if children need to be hidden 
 	 * @param closedShape
 	 */
@@ -122,6 +151,11 @@ public abstract class Shape{
 		Shape child;
 		for (VisConnector connector : outConnectors) {
 			child =  connector.to;
+
+			if (child.childHasOtherParents()){
+				continue;
+			}
+
 			connector.hide();
 			child.checkAndHide(closedShape);
 			if (!countedChildren.contains(child)) {
@@ -130,7 +164,24 @@ public abstract class Shape{
 			}
 		}
 		hiddenChildrenCount = countedChildren.size();
+	}
 
+	/**
+	 * hides fromconnectors and checks if parents need to be hidden
+	 * @param closedShape
+	 */
+	private void hideParents(Shape closedShape){
+		// hides outconnectors and
+		// checks if children need to be hidden
+		// if so, it hides it
+
+		Shape parent;
+		for (VisConnector connector : inConnectors) {
+			parent =  connector.from;
+			connector.hide();
+			parent.checkAndHideParents(closedShape);
+
+		}
 	}
 
 	/**
@@ -142,6 +193,11 @@ public abstract class Shape{
 	private void collectDescendantsIntoSet(Set<Shape> countedChildren, Shape closedShape) {
 		for (VisConnector connector : outConnectors) {
 			Shape child = connector.to;
+
+			if (child.childHasOtherParents()) {
+				continue;
+			}
+
 			// If not already processed, add and recurse
 			if (!countedChildren.contains(child)) {
 				countedChildren.add(child);
@@ -164,6 +220,21 @@ public abstract class Shape{
 		}
 		hideSubLevels(closedShape);
 	}
+
+	/**
+	 *  Checks references
+	 *  Before setting invisible a shape we need to check if there's still
+	 *  any reference ( an out Connector)
+	 * @param closedShape
+	 */
+	public void checkAndHideParents(Shape closedShape){
+		if (getVisibleInReferencesParent()==0) {
+			this.visible = false;
+			hideParents(closedShape);
+			return;
+		}
+		hideParents(closedShape);
+	}
 	
 	/**
 	 *  hides shape, connector and notifies parents
@@ -179,12 +250,11 @@ public abstract class Shape{
 			c.hide();
 		}
 
-		// Increment the parent's hidden children count -added
 		for (VisConnector c : outConnectors) {
 			Shape child = c.to;
 			if (!countedChildren.contains(child)) {
 				this.incrementHiddenChildrenCount();
-				countedChildren.add(child);  // Mark this child as counted
+				countedChildren.add(child);
 			}
 		}
 
@@ -199,6 +269,16 @@ public abstract class Shape{
 		for (VisConnector c : inConnectors){
 			if (c.visible) {
 				count++; 
+			}
+		}
+		return count;
+	}
+
+	private int getVisibleInReferencesParent(){
+		int count = 0;
+		for (VisConnector c : outConnectors){
+			if (c.visible) {
+				count++;
 			}
 		}
 		return count;

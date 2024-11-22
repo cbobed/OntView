@@ -263,7 +263,6 @@ public class VisObjectProperty extends VisProperty {
 		if (visible) {
 			if (rangeConnector != null)
 				rangeConnector.draw(g);
-			//System.out.println(this.visibleLabel + " parents.size() " + parents.size());
 			if (parents.size()>1){
 				g.setFont(circleFont);
 				if (pbox.vclass.visible){

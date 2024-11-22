@@ -847,8 +847,8 @@ public class PaintFrame extends Canvas {
 					showContextMenu(shape, e);
 					break;
 				case PRIMARY:
-					// Click on the open symbol
-					if (pressedOpen(shape, x, y, e)) {
+					// Right: Click on the open symbol
+					if (pressedRightOpen(shape, x, y, e)) {
 						if (shape.getState() == Shape.CLOSED || shape.getState() == Shape.PARTIALLY_CLOSED) {
 							// si estaba cerrado el nodo [+] abrirlo
 							shape.open();
@@ -858,16 +858,40 @@ public class PaintFrame extends Canvas {
 							Platform.runLater(drawerRunnable);
 						}
 					}
-					// Click on the close symbol
-					else if (pressedClose(shape, x, y, e)) {
+					// Right: Click on the close symbol
+					else if (pressedRightClose(shape, x, y, e)) {
 						if (shape.getState() == Shape.OPEN || shape.getState() == Shape.PARTIALLY_CLOSED) {
 							// if [-] clicked, close the node
-							shape.close();
-							System.out.println("hidden shape " + shape.getLabel() + ": " + shape.getHiddenChildrenCount());
+							shape.closeRight();
+							shape.getHiddenChildrenCount();
+							//System.out.println("hidden shape " + shape.getLabel() + ": " + shape.getHiddenChildrenCount());
 							refreshDashedConnectors();
 							VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
 							Platform.runLater(drawerRunnable);
 						}
+					}
+					// Left: Click on the open symbol
+					else if (pressedLeftOpen(shape, x, y, e)) {
+						if (shape.getLeftState() == Shape.LEFTCLOSED ){ //|| shape.getState() == Shape.PARTIALLY_CLOSED) {
+							/* si estaba cerrado el nodo [+] abrirlo
+							shape.open();
+							shape.resetHiddenChildrenShapeCount();
+							refreshDashedConnectors();
+							VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
+							Platform.runLater(drawerRunnable);*/
+						}
+					}
+					// Left: Click on the close symbol
+					else if (pressedLeftClose(shape, x, y, e)) {
+						if (shape.getLeftState() == Shape.LEFTOPEN ){ //|| shape.getState() == Shape.PARTIALLY_CLOSED) {
+							// if [-] clicked, close the node
+							shape.closeLeft();
+							//refreshDashedConnectors();
+							VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
+							Platform.runLater(drawerRunnable);
+						}
+
+
 					} else { // pressed elsewhere on the shape
 						if (!getShowConnectors()) {
 							if (selectedShapes.contains(shape)) {
@@ -987,13 +1011,24 @@ public class PaintFrame extends Canvas {
 
 	}
 
-	private boolean pressedOpen(Shape shape, int x, int y, MouseEvent e) {
+	private boolean pressedRightOpen(Shape shape, int x, int y, MouseEvent e) {
 		return (x >= shape.posx + shape.getWidth() / 2 + 1 && x <= shape.posx + shape.getWidth() / 2 + 10
 				&& y >= shape.posy - 10 && y <= shape.posy && !e.isMetaDown());
 	}
 
-	private boolean pressedClose(Shape shape, int x, int y, MouseEvent e) {
+	private boolean pressedLeftOpen(Shape shape, int x, int y, MouseEvent e) {
+		return (x >= shape.posx - shape.getWidth() / 2 - 10 && x <= shape.posx - shape.getWidth() / 2 - 1
+				&& y >= shape.posy - 10 && y <= shape.posy && !e.isMetaDown());
+	}
+
+
+	private boolean pressedRightClose(Shape shape, int x, int y, MouseEvent e) {
 		return x >= shape.posx + shape.getWidth() / 2 + 1 && x <= shape.posx + shape.getWidth() / 2 + 10
+				&& y >= shape.posy + 1 && y <= shape.posy + 10 && !e.isMetaDown();
+	}
+
+	private boolean pressedLeftClose(Shape shape, int x, int y, MouseEvent e) {
+		return x >= shape.posx - shape.getWidth() / 2 - 10 && x <= shape.posx - shape.getWidth() / 2 - 1
 				&& y >= shape.posy + 1 && y <= shape.posy + 10 && !e.isMetaDown();
 	}
 

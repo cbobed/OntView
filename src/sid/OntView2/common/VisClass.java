@@ -49,7 +49,7 @@ public class VisClass extends Shape {
     int     currentHeight, currentWidth = 0;
 
     int     propertyBoxWidth = 0;
-    
+
     // 17-01-2013
     // CBL: Added the qualified label fields to store the 
     // labels with the translated namespace 
@@ -71,8 +71,10 @@ public class VisClass extends Shape {
     String visibleLabel ="";
 
 	boolean qualifiedRendering = false; 
-	boolean labelRendering = false; 
-	
+	boolean labelRendering = false;
+	private static int totalNodes = -1;
+
+
 	int tabSize = 15; 
 	
 	public String getClassExpressionFragment (){
@@ -356,43 +358,69 @@ public class VisClass extends Shape {
 	    	}
 
 			if(childrenHidden){
-				drawHiddenNodesIndicator(g, 23, getHiddenChildrenCount(), posx, posy);
+				drawHiddenNodesIndicator(g, getHiddenChildrenCount(), posx, posy);
 			}
 
-		    if (!children.isEmpty() && (outConnectors!=null) &&(!outConnectors.isEmpty())){
-		    	switch (this.getState()) {
-		    	
-		    	   case Shape.PARTIALLY_CLOSED :
-		    		   g.setFill(mini);
-		   	           g.fillRect(x + (double) getWidth()/2, y - 10, 10, 10);
-		   	           g.setStroke(Color.BLACK);
-		   	           g.strokeRect(x + (double) getWidth()/2, y - 10, 10, 10);
-		   	           g.strokeLine(x + (double) getWidth()/2 + 2, y - 5, x + (double) getWidth()/2 + 8, y - 5);
-		   	           g.strokeLine(x + (double) getWidth()/2 + 5, y - 8, x + (double) getWidth()/2 + 5, y - 3);
-		   	           // open
-		   	           g.setFill(mini);
-		   	           g.fillRect(x + (double) getWidth()/2, y, 10, 10);
-		   	           g.setStroke(Color.BLACK);
-		   	           g.strokeRect(x + (double) getWidth()/2, y, 10, 10);
-		   	           g.strokeLine(x + (double) getWidth()/2 + 2, y + 5, x + (double) getWidth()/2 + 8, y + 5);
-		    		   break;
-		    		   
-		    	   case CLOSED : 
-		    		   g.setFill(mini);
-		 	           g.fillRect(x + (double) getWidth()/2, y - 10, 10, 10);
-		 	           g.setStroke(Color.BLACK);
-		 	           g.strokeRect(x + (double) getWidth()/2, y - 10, 10, 10);
-		 	           g.strokeLine(x + (double) getWidth()/2 + 2, y - 5, x + (double) getWidth()/2 + 8, y - 5);
-		 	           g.strokeLine(x + (double) getWidth()/2 + 5, y - 8, x + (double) getWidth()/2 + 5, y - 3);
-		    		   break;
-	
-		    	   case  Shape.OPEN :
-		    		   g.setFill(mini);
-		 	           g.fillRect(x + (double) getWidth()/2, y, 10, 10);
-		 	           g.setStroke(Color.BLACK);
-		 	           g.strokeRect(x + (double) getWidth()/2, y, 10, 10);
-		 	           g.strokeLine(x + (double) getWidth()/2 + 2, y + 5, x + (double) getWidth()/2 + 8, y + 5);
-		    		   break;
+		    if (!children.isEmpty() && (outConnectors!=null) &&(!outConnectors.isEmpty())) {
+				switch (this.getState()) {
+					case PARTIALLY_CLOSED:
+						g.setFill(mini);
+						g.fillRect(x + (double) getWidth() / 2, y - 10, 10, 10);
+						g.setStroke(Color.BLACK);
+						g.strokeRect(x + (double) getWidth() / 2, y - 10, 10, 10);
+						g.strokeLine(x + (double) getWidth() / 2 + 2, y - 5, x + (double) getWidth() / 2 + 8, y - 5);
+						g.strokeLine(x + (double) getWidth() / 2 + 5, y - 8, x + (double) getWidth() / 2 + 5, y - 3);
+
+						// open
+						g.setFill(mini);
+						g.fillRect(x + (double) getWidth() / 2, y, 10, 10);
+						g.setStroke(Color.BLACK);
+						g.strokeRect(x + (double) getWidth() / 2, y, 10, 10);
+						g.strokeLine(x + (double) getWidth() / 2 + 2, y + 5, x + (double) getWidth() / 2 + 8, y + 5);
+						break;
+
+					case CLOSED:
+						g.setFill(mini);
+						// right
+						g.fillRect(x + (double) getWidth() / 2, y - 10, 10, 10);
+						g.setStroke(Color.BLACK);
+						g.strokeRect(x + (double) getWidth() / 2, y - 10, 10, 10);
+						g.strokeLine(x + (double) getWidth() / 2 + 2, y - 5, x + (double) getWidth() / 2 + 8, y - 5);
+						g.strokeLine(x + (double) getWidth() / 2 + 5, y - 8, x + (double) getWidth() / 2 + 5, y - 3);
+						break;
+
+					case OPEN:
+						// right
+						g.setFill(mini);
+						g.fillRect(x + (double) getWidth() / 2, y, 10, 10);
+						g.setStroke(Color.BLACK);
+						g.strokeRect(x + (double) getWidth() / 2, y, 10, 10);
+						g.strokeLine(x + (double) getWidth() / 2 + 2, y + 5, x + (double) getWidth() / 2 + 8, y + 5);
+						break;
+					default:
+						break;
+				}
+			}
+			if (!parents.isEmpty() && (inConnectors!=null) &&(!inConnectors.isEmpty())){
+				switch (this.getLeftState()) {
+				   case LEFTCLOSED:
+					   // left
+					   g.setFill(mini);
+					   g.fillRect(x - (double) getWidth()/2 - 10, y - 10, 10, 10);
+					   g.setStroke(Color.BLACK);
+					   g.strokeRect(x - (double) getWidth()/2 - 10, y - 10, 10, 10);
+					   g.strokeLine(x - (double) getWidth()/2 - 8, y - 5, x - (double) getWidth()/2 - 2, y - 5);
+					   g.strokeLine(x - (double) getWidth()/2 - 5, y - 8, x - (double) getWidth()/2 - 5, y - 3);
+					   break;
+
+				   case LEFTOPEN:
+					   // left
+					   g.setFill(mini);
+					   g.fillRect(x - (double) getWidth()/2 - 10, y, 10, 10);
+					   g.setStroke(Color.BLACK);
+					   g.strokeRect(x - (double) getWidth()/2 - 10, y, 10, 10);
+					   g.strokeLine(x - (double) getWidth()/2 - 8, y + 5, x - (double) getWidth()/2 - 2, y + 5);
+					   break;
 		    		   
 		    	   default :
 		    		   break;
@@ -406,12 +434,14 @@ public class VisClass extends Shape {
 		g.setFont(oldFont);
 	}
 
-	private void drawHiddenNodesIndicator(GraphicsContext g, int totalNodes, int hiddenNodes, int x, int y) {
+	private void drawHiddenNodesIndicator(GraphicsContext g, int hiddenNodes, int x, int y) {
+		if (totalNodes == -1) totalNodes = graph.getShapeMap().size() - 2; // Thing, Nothing
 
 		double width = getWidth();
 		double height = 10;
 		double rectX = x - width / 2;
 		double rectY = y - currentHeight / 2 - height - 5;
+		if (isDefined && !label.startsWith(SIDClassExpressionNamer.className)) rectY -= 5;
 
 		double hiddenPercentage = (double) hiddenNodes / totalNodes;
 		double visiblePercentage = 1.0 - hiddenPercentage;

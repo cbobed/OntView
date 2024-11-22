@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<catalog prefer="public" xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+    <group id="Folder Repository, directory=, recursive=true, Auto-Update=true, version=2" prefer="public" xml:base="">
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="#" uri="dbpedia_3.8.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/ActorDefault.owl" uri="ActorDefault.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/ApothecaryOntology.owl" uri="ApothecaryOntology.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/Country.owl" uri="Country.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/DBpedia-ontology.owl" uri="DBpedia-ontology.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/EMAOntology.owl" uri="EMAOntology.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/EmergencyPhysicianOntology.owl" uri="EmergencyPhysicianOntology.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/Expression.owl" uri="Expression.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/Grounding.owl" uri="Grounding.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/HealthInsuranceOntology.owl" uri="HealthInsuranceOntology.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/HospitalPhysicianOntology.owl" uri="HospitalPhysicianOntology.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/HospitalReceptionOntology.owl" uri="HospitalReceptionOntology.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/MedicalFlightCompanyOntology.owl" uri="MedicalFlightCompanyOntology.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/Mid-level-ontology.owl" uri="Mid-level-ontology.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/NonMedicalFlightCompanyOntology.owl" uri="NonMedicalFlightCompanyOntology.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/NonMedicalTransportCompanyOntology.owl" uri="NonMedicalTransportCompanyOntology.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/ObjectList.owl" uri="ObjectList.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/PatientOntology.owl" uri="PatientOntology.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/Process.owl" uri="Process.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/Profile.owl" uri="Profile.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/ProfileDeprecatedElements.owl" uri="ProfileDeprecatedElements.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/SUMO.owl" uri="SUMO.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/Service.owl" uri="Service.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/ShoppingCart.owl" uri="ShoppingCart.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/Units.owl" uri="Units.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="duplicate:http://horus.cps.unizar.es:18080/ontology/animals.owl" uri="animals.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="duplicate:http://horus.cps.unizar.es:18080/ontology/animals.owl" uri="animalsChanged.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/books.owl" uri="books.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/concept.owl" uri="concept.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/core-plus-office.owl" uri="core-plus-office.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/extendedCamera.owl" uri="extendedCamera.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/finance_th_web.owl" uri="finance_th_web.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/geographydataset.owl" uri="geographydataset.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/koala.owl" uri="koala.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/myOntology.owl" uri="myOntology.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/my_ontology.owl" uri="my_ontology.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/om2-1.owl" uri="om2-1.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/ontosem.owl" uri="ontosem.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/order.owl" uri="order.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/portal.owl" uri="portal.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/protons.owl" uri="protons.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/protont.owl" uri="protont.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/protonu.owl" uri="protonu.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/schemaorg.owl" uri="schemaorg.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/simplified_sumo.owl" uri="simplified_sumo.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/spatial_ontology.owl" uri="spatial_ontology.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/support.owl" uri="support.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/technical.owl" uri="technical.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/time-entry.owl" uri="time-entry.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/travel.owl" uri="travel.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="http://horus.cps.unizar.es:18080/ontology/univ-bench.owl" uri="univ-bench.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="duplicate:http://sid.cps.unizar.es/ontology/proyectos.owl" uri="proyectos.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1732186841133" name="duplicate:http://sid.cps.unizar.es/ontology/proyectos.owl" uri="proyectosJEFE.owl"/>
+    </group>
+</catalog>

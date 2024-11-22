@@ -690,28 +690,48 @@ public class VisGraph implements Runnable{
 	 *  If there's a visible shape in that point this will return a reference to it and null otherwise
 	 *  @return shape or null if not found
 	 */
-	public Shape findShape(Point2D p) {
+	public Shape findShape2(Point2D p) {
 		GraphicsContext g = paintframe.getGraphicsContext2D();
         for (Entry<String, Shape> e : shapeMap.entrySet()) {
-            int x = e.getValue().getPosX();
-            int y = e.getValue().getPosY();
+            int x = e.getValue().getLeftCorner();
+            int y = e.getValue().getTopCorner();
             int w = e.getValue().getWidth();
             int h = e.getValue().getHeight();
 
             if (isInShape(x,y,w,h,p) && e.getValue().visible){
-	            return e.getValue();
+				g.setStroke(Color.RED);
+				g.strokeRect(x, y, w, h);
+				return e.getValue();
 			}
         }
 	    return null;
 	}
 
-	private boolean isInShape(int x, int y, int w, int h, Point2D p) {
-		int buttomShowHideSize= 10; // Take into account the size of the button
+	public Shape findShape(Point2D p) {
+		GraphicsContext g = paintframe.getGraphicsContext2D();
+		int buttonMargin = 10; // Margen adicional para los botones laterales
 
-		return (p.getX() >= x - (double) w / 2) && (p.getX() <= x + (double) w / 2 + buttomShowHideSize) &&
-				(p.getY() >= y - (double) h / 2) && (p.getY() <= y + (double) h / 2);
+		for (Entry<String, Shape> e : shapeMap.entrySet()) {
+			int x = e.getValue().getLeftCorner();
+			int y = e.getValue().getTopCorner();
+			int w = e.getValue().getWidth();
+			int h = e.getValue().getHeight();
+
+			if (isInShape(x,y,w,h,p) && e.getValue().visible) {
+				return e.getValue();
+			}
+		}
+		return null;
 	}
-	
+
+	private boolean isInShape(int x, int y, int w, int h, Point2D p) {
+		int buttonMargin = 10; // Take into account the buttons size
+
+		return (p.getX() >= x - buttonMargin) && (p.getX() <= x + w + buttonMargin) &&
+				(p.getY() >= y ) && (p.getY() <= y +  h);
+	}
+
+
 	/**
 	 * Creates a new visclass instance and adds it to the set(hashmap) of visclasses
 	 * Creates or adjusts new Vislevels width
