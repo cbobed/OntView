@@ -851,7 +851,7 @@ public class PaintFrame extends Canvas {
 					if (pressedRightOpen(shape, x, y, e)) {
 						if (shape.getState() == Shape.CLOSED || shape.getState() == Shape.PARTIALLY_CLOSED) {
 							// si estaba cerrado el nodo [+] abrirlo
-							shape.open();
+							shape.openRight();
 							shape.resetHiddenChildrenShapeCount();
 							refreshDashedConnectors();
 							VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
@@ -872,12 +872,12 @@ public class PaintFrame extends Canvas {
 					// Left: Click on the open symbol
 					else if (pressedLeftOpen(shape, x, y, e)) {
 						if (shape.getLeftState() == Shape.LEFTCLOSED ){ //|| shape.getState() == Shape.PARTIALLY_CLOSED) {
-							/* si estaba cerrado el nodo [+] abrirlo
-							shape.open();
-							shape.resetHiddenChildrenShapeCount();
+							// si estaba cerrado el nodo [+] abrirlo
+							shape.openLeft();
+							//shape.resetHiddenChildrenShapeCount();
 							refreshDashedConnectors();
 							VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
-							Platform.runLater(drawerRunnable);*/
+							Platform.runLater(drawerRunnable);
 						}
 					}
 					// Left: Click on the close symbol

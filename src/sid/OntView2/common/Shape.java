@@ -36,7 +36,7 @@ public abstract class Shape{
 
 	//when showing i need to keep track of those that were closed
 	ArrayList<Shape> hiddenSubClasses;
-	
+
 	
 	int state = OPEN;
 	int leftState = LEFTOPEN;
@@ -79,7 +79,7 @@ public abstract class Shape{
 	public abstract void drawShape(GraphicsContext g);
 	public abstract Point2D getConnectionPoint(Point2D point, boolean b);
 	private int hiddenChildrenCount = 0;
-	private Set<Shape> countedChildren = new HashSet<>();
+	private final Set<Shape> countedChildren = new HashSet<>();
 
 
 	/**************************************************************/
@@ -118,11 +118,6 @@ public abstract class Shape{
 
 	public boolean childrenHidden = false;
 
-	// Method to increment the hidden children count
-	public void incrementHiddenChildrenCount() {
-		hiddenChildrenCount++;
-	}
-
 	/**
 	 * Check if childres has other visible parents
 	 */
@@ -137,6 +132,20 @@ public abstract class Shape{
 
         return visibleParentCount > 1;
     }
+
+	/**
+	 * Checks if the shape has other visible children besides the specified child.
+	 * @param excludingChild The child to exclude from the visibility check.
+	 * @return true if there are other visible children, false otherwise.
+	 */
+	private boolean hasOtherVisibleChildren(Shape excludingChild) {
+		for (VisConnector connector : outConnectors) {
+			if (connector.to != excludingChild && connector.isVisible()) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 
 	/**
@@ -161,7 +170,7 @@ public abstract class Shape{
 			child.checkAndHide(closedShape);
 			if (!countedChildren.contains(child)) {
 				countedChildren.add(child);
-				child.collectDescendantsIntoSet(countedChildren, closedShape);
+				child.collectDescendantsIntoSet(countedChildren);
 			}
 		}
 		hiddenChildrenCount = countedChildren.size();
@@ -172,14 +181,15 @@ public abstract class Shape{
 	 * @param closedShape
 	 */
 	private void hideParents(Shape closedShape){
-		// hides outconnectors and
-		// checks if children need to be hidden
-		// if so, it hides it
-
 		Shape parent;
 		for (VisConnector connector : inConnectors) {
 			parent =  connector.from;
 			connector.hide();
+
+			if (parent.hasOtherVisibleChildren(this)) {
+				continue;
+			}
+
 			parent.checkAndHideParents(closedShape);
 
 		}
@@ -189,9 +199,8 @@ public abstract class Shape{
 	 * Recursively collects all descendants into the given set.
 	 * Ensures no duplicate entries are added.
 	 * @param countedChildren The set of already-counted shapes.
-	 * @param closedShape The root shape triggering the operation.
 	 */
-	private void collectDescendantsIntoSet(Set<Shape> countedChildren, Shape closedShape) {
+	private void collectDescendantsIntoSet(Set<Shape> countedChildren) {
 		for (VisConnector connector : outConnectors) {
 			Shape child = connector.to;
 
@@ -202,7 +211,7 @@ public abstract class Shape{
 			// If not already processed, add and recurse
 			if (!countedChildren.contains(child)) {
 				countedChildren.add(child);
-				child.collectDescendantsIntoSet(countedChildren, closedShape);
+				child.collectDescendantsIntoSet(countedChildren);
 			}
 		}
 	}
@@ -229,12 +238,10 @@ public abstract class Shape{
 	 * @param closedShape
 	 */
 	public void checkAndHideParents(Shape closedShape){
-		if (getVisibleInReferencesParent()==0) {
+		if (getVisibleOutReferences()==0) {
 			this.visible = false;
 			hideParents(closedShape);
-			return;
 		}
-		hideParents(closedShape);
 	}
 	
 	/**
@@ -253,10 +260,6 @@ public abstract class Shape{
 
 		for (VisConnector c : outConnectors) {
 			Shape child = c.to;
-			if (!countedChildren.contains(child)) {
-				this.incrementHiddenChildrenCount();
-				countedChildren.add(child);
-			}
 		}
 
 		// Wake observer thread on hide event
@@ -275,7 +278,7 @@ public abstract class Shape{
 		return count;
 	}
 
-	private int getVisibleInReferencesParent(){
+	private int getVisibleOutReferences(){
 		int count = 0;
 		for (VisConnector c : outConnectors){
 			if (c.visible) {
@@ -309,12 +312,11 @@ public abstract class Shape{
 				 c.from.notifyHidden(this);       
 			 }
 		 }
-//	     this.hiddenSubClasses.add(s); 
-	 }		 
+	 }
 	/**
 	 * @return all subclasses hidden or not
 	 */
-	public boolean allSubHidden (){
+	public boolean allSubHidden(){
 		//if all subclasses are hidden
 		for (VisConnector c : this.outConnectors){
 			if (c.visible) 
@@ -325,35 +327,46 @@ public abstract class Shape{
 	
 	/**************************************************************/
 	
-	public void open (){
+	public void openRight(){
         setState(OPEN);
-        hiddenSubClasses.clear();
         showSubLevels();
 	}
+
+	public void openLeft(){
+		setLeftState(LEFTOPEN);
+		showParentLevels();
+	}
 	
-	public void show(Shape parent){
+	public void show(Shape parent) {
 		this.visible = true;
-		
+
 		switch (getState()) {
-			case CLOSED : 
-	   			break;
-	   			
-		   	case OPEN :
-		   	    for (VisConnector connector : outConnectors) {
-				   connector.show();
-			       connector.to.show(this);
-			    }
-		   	    break;
-		  
-		   	case PARTIALLY_CLOSED :
-		   	    for (VisConnector connector : outConnectors) {
-		   	       //if its not a previously hidden node we'll show it	
-				   if (!hiddenSubClasses.contains(connector.to)){
-					  connector.show();
-					  connector.to.show(this);
-				   }
-			 } 
-	    }
+			case CLOSED:
+				break;
+
+			case OPEN, PARTIALLY_CLOSED:
+				for (VisConnector connector : outConnectors) {
+					connector.show();
+					connector.to.show(this);
+				}
+				break;//if its not a previously hidden node we'll show it
+		}
+	}
+
+	public void showLeft(Shape parent){
+		this.visible = true;
+
+		switch (getLeftState()) {
+			case LEFTCLOSED:
+				break;
+
+			case LEFTOPEN:
+				for (VisConnector connector : inConnectors) {
+					connector.show();
+					connector.from.showLeft(this);
+				}
+				break;
+        }
 	}
 	
 	public void showSubLevels(){
@@ -361,6 +374,13 @@ public abstract class Shape{
            c.to.show(this);
            c.show();
 		}	
+	}
+
+	public void showParentLevels(){
+		for (VisConnector c : inConnectors) {
+			c.from.showLeft(this);
+			c.show();
+		}
 	}
 	
 	public void setVisLevel(VisLevel v){

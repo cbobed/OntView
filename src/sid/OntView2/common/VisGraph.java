@@ -1505,7 +1505,7 @@ public class VisGraph implements Runnable{
 		for (Entry<String,Shape> entry : shapeMap.entrySet()){
 			Shape s = entry.getValue();
 			if ((s.getState() == VisClass.CLOSED) || (s.getState() == VisClass.PARTIALLY_CLOSED)){
-				s.open();
+				s.openRight();
 			}
 			s.setVisible(true);
 		}
