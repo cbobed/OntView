@@ -153,6 +153,7 @@ public abstract class Shape{
 			child =  connector.to;
 
 			if (child.childHasOtherParents()){
+				connector.hide();
 				continue;
 			}
 
@@ -372,17 +373,6 @@ public abstract class Shape{
 	public VisLevel getVisLevel(){
 	    return	vdepthlevel;
 	}
-	
-
-    public int stateMapping (String stringVal){
-    	if (stringVal.equals("closed"))
-    		return CLOSED;
-    	else if (stringVal.equals("open"))
-    		return OPEN;
-    	else if (stringVal.equals("partClosed"))
-    		return PARTIALLY_CLOSED;
-    	return OPEN;
-    }
 	
 	/**
      * Inverts lookup in the shapeMap by returning the key out of an owlclassexpression

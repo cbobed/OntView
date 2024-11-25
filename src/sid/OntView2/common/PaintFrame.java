@@ -864,7 +864,6 @@ public class PaintFrame extends Canvas {
 							// if [-] clicked, close the node
 							shape.closeRight();
 							shape.getHiddenChildrenCount();
-							//System.out.println("hidden shape " + shape.getLabel() + ": " + shape.getHiddenChildrenCount());
 							refreshDashedConnectors();
 							VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
 							Platform.runLater(drawerRunnable);
