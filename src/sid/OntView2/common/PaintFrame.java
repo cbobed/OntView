@@ -871,7 +871,7 @@ public class PaintFrame extends Canvas {
 					}
 					// Left: Click on the open symbol
 					else if (pressedLeftOpen(shape, x, y, e)) {
-						if (shape.getLeftState() == Shape.LEFTCLOSED ){ //|| shape.getState() == Shape.PARTIALLY_CLOSED) {
+						if (shape.getLeftState() == Shape.LEFTCLOSED || shape.getLeftState() == Shape.LEFT_PARTIALLY_CLOSED) {
 							// si estaba cerrado el nodo [+] abrirlo
 							shape.openLeft();
 							//shape.resetHiddenChildrenShapeCount();
@@ -882,7 +882,7 @@ public class PaintFrame extends Canvas {
 					}
 					// Left: Click on the close symbol
 					else if (pressedLeftClose(shape, x, y, e)) {
-						if (shape.getLeftState() == Shape.LEFTOPEN ){ //|| shape.getState() == Shape.PARTIALLY_CLOSED) {
+						if (shape.getLeftState() == Shape.LEFTOPEN || shape.getLeftState() == Shape.LEFT_PARTIALLY_CLOSED) {
 							// if [-] clicked, close the node
 							shape.closeLeft();
 							//refreshDashedConnectors();

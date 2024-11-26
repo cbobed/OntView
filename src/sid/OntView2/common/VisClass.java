@@ -18,6 +18,8 @@ import sid.OntView2.utils.ExpressionManager;
 
 import java.util.*;
 
+import static sid.OntView2.common.VisConstants.THING_ENTITY;
+
 public class VisClass extends Shape {
 	
     //Graphic
@@ -107,7 +109,7 @@ public class VisClass extends Shape {
         
         //<CBL 24/9/13> Added the initialization in the constructor
         definitions = new ArrayList<>();
-        visibleDefinitionLabels = new ArrayList<String>(); 
+        visibleDefinitionLabels = new ArrayList<>();
       
 	}
 
@@ -401,8 +403,25 @@ public class VisClass extends Shape {
 						break;
 				}
 			}
-			if (!parents.isEmpty() && (inConnectors!=null) &&(!inConnectors.isEmpty())){
+			if (!parents.isEmpty() && (inConnectors!=null) &&(!inConnectors.isEmpty()) &&
+					(!inConnectors.get(0).from.getLabel().matches("Thing"))){
 				switch (this.getLeftState()) {
+					case LEFT_PARTIALLY_CLOSED:
+						g.setFill(mini);
+						g.fillRect(x - (double) getWidth()/2 - 10, y - 10, 10, 10);
+						g.setStroke(Color.BLACK);
+						g.strokeRect(x - (double) getWidth()/2 - 10, y - 10, 10, 10);
+						g.strokeLine(x - (double) getWidth()/2 - 8, y - 5, x - (double) getWidth()/2 - 2, y - 5);
+						g.strokeLine(x - (double) getWidth()/2 - 5, y - 8, x - (double) getWidth()/2 - 5, y - 3);
+
+						// open
+						g.setFill(mini);
+						g.fillRect(x - (double) getWidth()/2 - 10, y, 10, 10);
+						g.setStroke(Color.BLACK);
+						g.strokeRect(x - (double) getWidth()/2 - 10, y, 10, 10);
+						g.strokeLine(x - (double) getWidth()/2 - 8, y + 5, x - (double) getWidth()/2 - 2, y + 5);
+						break;
+
 				   case LEFTCLOSED:
 					   // left
 					   g.setFill(mini);

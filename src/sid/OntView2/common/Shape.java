@@ -3,7 +3,6 @@ package sid.OntView2.common;
 
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
 import org.apache.jena.base.Sys;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
@@ -20,6 +19,8 @@ public abstract class Shape{
 	public static final int PARTIALLY_CLOSED = 2 ;
 	public static final int LEFTCLOSED = 3;
 	public static final int LEFTOPEN = 4;
+	public static final int LEFT_PARTIALLY_CLOSED = 5;
+
 
 
 	public int posx,posy;
@@ -35,9 +36,7 @@ public abstract class Shape{
 	                        outDashedConnectors;
 
 	//when showing i need to keep track of those that were closed
-	ArrayList<Shape> hiddenSubClasses;
 
-	
 	int state = OPEN;
 	int leftState = LEFTOPEN;
 	boolean wasOpened = true;
@@ -80,6 +79,7 @@ public abstract class Shape{
 	public abstract Point2D getConnectionPoint(Point2D point, boolean b);
 	private int hiddenChildrenCount = 0;
 	private final Set<Shape> countedChildren = new HashSet<>();
+	private final Set<Shape> countedParent = new HashSet<>();
 
 
 	/**************************************************************/
@@ -88,19 +88,18 @@ public abstract class Shape{
 		outConnectors = new ArrayList<>();
 		outDashedConnectors = new ArrayList<>();
 		inDashedConnectors = new ArrayList<>();
-		hiddenSubClasses = new ArrayList<>();
 	}
 
 	/** 
 	 * Marks as closed and hides subLevels 
 	 * Then looks for those remaining visible nodes and adds a reference (dashed line)
 	 */
-	public void closeRight (){
+	public void closeRight(){
 		setState(CLOSED);
         hideSubLevels(this);
 	}
 
-	public void closeLeft (){
+	public void closeLeft(){
 		setLeftState(LEFTCLOSED);
 		hideParents(this);
 	}
@@ -177,16 +176,19 @@ public abstract class Shape{
 	}
 
 	/**
-	 * hides fromconnectors and checks if parents need to be hidden
+	 * hides inconnectors and checks if parents need to be hidden
 	 * @param closedShape
 	 */
 	private void hideParents(Shape closedShape){
 		Shape parent;
 		for (VisConnector connector : inConnectors) {
 			parent =  connector.from;
+			if(parent.getLabel().matches("Thing")) break;
+
 			connector.hide();
 
 			if (parent.hasOtherVisibleChildren(this)) {
+				parent.setState(PARTIALLY_CLOSED);
 				continue;
 			}
 
@@ -338,6 +340,7 @@ public abstract class Shape{
 	}
 	
 	public void show(Shape parent) {
+		//System.out.println(this.getLabel() + " " + getState());
 		this.visible = true;
 
 		switch (getState()) {
@@ -346,8 +349,10 @@ public abstract class Shape{
 
 			case OPEN, PARTIALLY_CLOSED:
 				for (VisConnector connector : outConnectors) {
+					if (connector.isVisible()) continue;
 					connector.show();
 					connector.to.show(this);
+					connector.to.checkLastNode();
 				}
 				break;//if its not a previously hidden node we'll show it
 		}
@@ -360,7 +365,7 @@ public abstract class Shape{
 			case LEFTCLOSED:
 				break;
 
-			case LEFTOPEN:
+			case LEFTOPEN, LEFT_PARTIALLY_CLOSED:
 				for (VisConnector connector : inConnectors) {
 					connector.show();
 					connector.from.showLeft(this);
@@ -373,7 +378,14 @@ public abstract class Shape{
 		for (VisConnector c : outConnectors) {
            c.to.show(this);
            c.show();
+		   c.to.checkLastNode();
 		}	
+	}
+
+	public void checkLastNode(){
+		if (outConnectors.isEmpty()){
+			checkAndUpdateState();
+		}
 	}
 
 	public void showParentLevels(){
@@ -384,7 +396,6 @@ public abstract class Shape{
 	}
 	
 	public void setVisLevel(VisLevel v){
-		//System.out.println("\n setVisLevel");
 		v.addShape(this);
 		if (v.width <  width)
 			v.width = width + VisLevel.MIN_WIDTH;
@@ -393,6 +404,28 @@ public abstract class Shape{
 	public VisLevel getVisLevel(){
 	    return	vdepthlevel;
 	}
+
+	/**
+	 * Check and update the state of each node based on the visibility of
+	 * its connectors and children
+	 */
+	private void checkAndUpdateState() {
+		System.out.println("checkAndUpdateState " + getLabel());
+		int inConnectorsHidden = 0;
+		for ( VisConnector connector: inConnectors){
+
+			if (!connector.isVisible()) inConnectorsHidden++;
+		}
+		if (inConnectorsHidden == inConnectors.size()){
+			setLeftState(LEFTCLOSED);
+		} else if (inConnectorsHidden == 0){
+			setLeftState(LEFTOPEN);
+		} else {
+			setLeftState(LEFT_PARTIALLY_CLOSED);
+		}
+		System.out.println(inConnectorsHidden);
+	}
+
 	
 	/**
      * Inverts lookup in the shapeMap by returning the key out of an owlclassexpression
