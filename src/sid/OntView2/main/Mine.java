@@ -26,6 +26,8 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 
 import openllet.owlapi.OpenlletReasonerFactory;
+import org.semanticweb.HermiT.Reasoner.ReasonerFactory;
+
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClassExpression;
@@ -41,7 +43,6 @@ import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
 import sid.OntView2.common.*;
 import sid.OntView2.expressionNaming.SIDClassExpressionNamer;
 import sid.OntView2.utils.ExpressionManager;
-
 
 public class Mine extends Application implements Embedable{
 	private Stage primaryStage;
@@ -225,6 +226,9 @@ public class Mine extends Application implements Embedable{
 		OWLReasonerFactory reasonerFactory = null;
 		if (r.equalsIgnoreCase("Openllet")) {
 			reasonerFactory = new OpenlletReasonerFactory();
+		}
+		else if (r.equalsIgnoreCase("HermiT")){
+			reasonerFactory = new ReasonerFactory();
 		}
 //		else if (r.equalsIgnoreCase("JFact")) {
 //			reasonerFactory = new JFactFactory();

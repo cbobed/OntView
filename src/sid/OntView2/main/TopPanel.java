@@ -551,7 +551,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			loadReasonerCombo = new ComboBox<>();
 			loadReasonerCombo.setEditable(true);
 			loadReasonerCombo.setPromptText("Select reasoner");
-			ObservableList <String> items = FXCollections.observableArrayList("Openllet");
+			ObservableList <String> items = FXCollections.observableArrayList("Openllet", "HermiT");
 			loadReasonerCombo.setItems(items);
 
 			if (!items.isEmpty()) {
