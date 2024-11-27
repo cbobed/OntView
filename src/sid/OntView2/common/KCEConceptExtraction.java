@@ -5,10 +5,13 @@ import it.essepuntato.taxonomy.HTaxonomy;
 import org.semanticweb.owlapi.model.OWLOntology;
 import sid.OntView2.utils.OWLAPITaxonomyMakerExtended;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 public class KCEConceptExtraction extends KConceptExtractor {
+
+	private final Set<Shape> nonHiddenShape = new HashSet<>();
 
 	public void hideNonKeyConcepts(OWLOntology activeOntology, VisGraph graph, int limitResultSize) {
 		// Retrieve Key Concepts
@@ -19,7 +22,15 @@ public class KCEConceptExtraction extends KConceptExtractor {
 			Shape shape = entry.getValue();
 			if (isNonKeyConcept(entry.getKey(), conceptSet, shapeMap)) {
 				shape.hide();
+			} else {
+				if (!(shape.getLabel().matches("Nothing"))) {
+					nonHiddenShape.add(shape);
+				}
 			}
+		}
+		for (Shape s: nonHiddenShape){
+			s.collectHiddenChildren();
+			s.setHiddenChildren();
 		}
 		graph.addDashedConnectors();
 	}

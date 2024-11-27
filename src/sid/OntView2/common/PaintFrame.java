@@ -855,8 +855,8 @@ public class PaintFrame extends Canvas {
 							shape.resetHiddenChildrenShapeCount();
 							refreshDashedConnectors();
 							VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
+							setStateChanged(true);
 							Platform.runLater(relaxerRunnable);
-							Platform.runLater(drawerRunnable);
 						}
 					}
 					// Right: Click on the close symbol
@@ -867,8 +867,8 @@ public class PaintFrame extends Canvas {
 							shape.setHiddenChildren();
 							refreshDashedConnectors();
 							VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
+							setStateChanged(true);
 							Platform.runLater(relaxerRunnable);
-							Platform.runLater(drawerRunnable);
 						}
 					}
 					// Left: Click on the open symbol
@@ -879,8 +879,8 @@ public class PaintFrame extends Canvas {
 							//shape.resetHiddenChildrenShapeCount();
 							refreshDashedConnectors();
 							VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
+							setStateChanged(true);
 							Platform.runLater(relaxerRunnable);
-							Platform.runLater(drawerRunnable);
 						}
 					}
 					// Left: Click on the close symbol
@@ -890,8 +890,8 @@ public class PaintFrame extends Canvas {
 							shape.closeLeft();
 							//refreshDashedConnectors();
 							VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
+							setStateChanged(true);
 							Platform.runLater(relaxerRunnable);
-							Platform.runLater(drawerRunnable);
 						}
 
 

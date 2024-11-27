@@ -410,7 +410,7 @@ public abstract class Shape{
 	 * its connectors and children
 	 */
 	private void checkAndUpdateState() {
-		System.out.println("checkAndUpdateState " + getLabel());
+		//System.out.println("checkAndUpdateState " + getLabel());
 		int inConnectorsHidden = 0;
 		for ( VisConnector connector: inConnectors){
 
@@ -423,7 +423,7 @@ public abstract class Shape{
 		} else {
 			setLeftState(LEFT_PARTIALLY_CLOSED);
 		}
-		System.out.println(inConnectorsHidden);
+		//System.out.println(inConnectorsHidden);
 	}
 
 	
