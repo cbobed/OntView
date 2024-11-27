@@ -2,13 +2,11 @@ package sid.OntView2.common;
 
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
-import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Font;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.text.Text;
 
-import org.apache.jena.base.Sys;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.NodeSet;
@@ -17,8 +15,6 @@ import sid.OntView2.expressionNaming.SIDClassExpressionNamer;
 import sid.OntView2.utils.ExpressionManager;
 
 import java.util.*;
-
-import static sid.OntView2.common.VisConstants.THING_ENTITY;
 
 public class VisClass extends Shape {
 	
@@ -359,7 +355,7 @@ public class VisClass extends Shape {
 	    		}
 	    	}
 
-			if(childrenHidden){
+			if(hiddenChildren){
 				drawHiddenNodesIndicator(g, getHiddenChildrenCount(), posx, posy);
 			}
 

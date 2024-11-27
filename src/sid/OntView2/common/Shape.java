@@ -3,7 +3,6 @@ package sid.OntView2.common;
 
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
-import org.apache.jena.base.Sys;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 
@@ -77,9 +76,10 @@ public abstract class Shape{
 	public abstract int getLevelRelativePos();
 	public abstract void drawShape(GraphicsContext g);
 	public abstract Point2D getConnectionPoint(Point2D point, boolean b);
-	private int hiddenChildrenCount = 0;
 	private final Set<Shape> countedChildren = new HashSet<>();
 	private final Set<Shape> countedParent = new HashSet<>();
+	public boolean hiddenChildren = false;
+
 
 
 	/**************************************************************/
@@ -105,17 +105,18 @@ public abstract class Shape{
 	}
 
 	public void resetHiddenChildrenShapeCount() {
-		hiddenChildrenCount = 0;
-		childrenHidden = false;
+		hiddenChildren = false;
 		countedChildren.clear();
 	}
 
 	public int getHiddenChildrenCount(){
-		childrenHidden = true;
-		return hiddenChildrenCount;
+		return countedChildren.size();
 	}
 
-	public boolean childrenHidden = false;
+	public void setHiddenChildren(){
+		hiddenChildren = !countedChildren.isEmpty();
+	}
+
 
 	/**
 	 * Check if childres has other visible parents
@@ -172,7 +173,6 @@ public abstract class Shape{
 				child.collectDescendantsIntoSet(countedChildren);
 			}
 		}
-		hiddenChildrenCount = countedChildren.size();
 	}
 
 	/**
