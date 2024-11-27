@@ -855,6 +855,7 @@ public class PaintFrame extends Canvas {
 							shape.resetHiddenChildrenShapeCount();
 							refreshDashedConnectors();
 							VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
+							Platform.runLater(relaxerRunnable);
 							Platform.runLater(drawerRunnable);
 						}
 					}
@@ -866,6 +867,7 @@ public class PaintFrame extends Canvas {
 							shape.setHiddenChildren();
 							refreshDashedConnectors();
 							VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
+							Platform.runLater(relaxerRunnable);
 							Platform.runLater(drawerRunnable);
 						}
 					}
@@ -877,6 +879,7 @@ public class PaintFrame extends Canvas {
 							//shape.resetHiddenChildrenShapeCount();
 							refreshDashedConnectors();
 							VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
+							Platform.runLater(relaxerRunnable);
 							Platform.runLater(drawerRunnable);
 						}
 					}
@@ -887,6 +890,7 @@ public class PaintFrame extends Canvas {
 							shape.closeLeft();
 							//refreshDashedConnectors();
 							VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
+							Platform.runLater(relaxerRunnable);
 							Platform.runLater(drawerRunnable);
 						}
 
@@ -1169,7 +1173,6 @@ public class PaintFrame extends Canvas {
 				extractorRDFRank.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20);
 			}
 		}
-		
 		compactGraph();
 	}
 

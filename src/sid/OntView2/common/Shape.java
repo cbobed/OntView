@@ -447,7 +447,26 @@ public abstract class Shape{
 			return s1.getPosY()-s2.getPosY();
 		 }
 	 };
-    
-	
-	
+
+	/**
+	 * Recursively collects the hidden children of the current Shape and adds them to the countedChildren set.
+	 * If a visible child is encountered, that path is not traversed further.
+	 */
+	public void collectHiddenChildren() {
+		for (VisConnector connector : outConnectors) {
+			Shape child = connector.to;
+
+			if (child.isVisible()) {
+				continue;
+			}
+
+			if (!countedChildren.contains(child)) {
+				countedChildren.add(child);
+				child.collectHiddenChildren();
+			}
+		}
+	}
+
+
+
 }
