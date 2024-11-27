@@ -1,5 +1,6 @@
 package sid.OntView2.utils;
 
+import java.util.Objects;
 import java.util.Set;
 
 import org.semanticweb.owlapi.rdf.rdfxml.renderer.OWLOntologyXMLNamespaceManager;
@@ -50,7 +51,7 @@ public class ExpressionManager {
 	public static String currentOntologyIRI = null;
 
 	public static void setNamespaceManager (OWLOntologyManager om, OWLOntology o) {
-		manager = new OWLOntologyXMLNamespaceManager(o, om.getOntologyFormat(o));
+		manager = new OWLOntologyXMLNamespaceManager(o, Objects.requireNonNull(om.getOntologyFormat(o)));
 		currentOntologyIRI = o.getOntologyID().getOntologyIRI().toString();
 	}
 

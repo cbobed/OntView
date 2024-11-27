@@ -697,9 +697,14 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		parent.artPanel.stop();
 		String x = (String) getOntologyCombo().getValue();
 		if ((x != null) && (!x.isEmpty())) {
-			parent.loadActiveOntology(IRI.create(x));
-			loadReasonerButton.setDisable(false);
-			getReasonerCombo().setDisable(false);
+			try {
+				parent.loadActiveOntology(IRI.create(x));
+			} catch (Exception e) {
+				parent.showErrorDialog("Error", "Enable to load ontology.", "Please try a different one.");
+			} finally {
+				loadReasonerButton.setDisable(false);
+				getReasonerCombo().setDisable(false);
+			}
 		} else {
 			parent.showErrorDialog("Error", "No ontology selected.", "Please select an ontology first.");
 		}
