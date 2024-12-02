@@ -11,7 +11,7 @@ import java.util.*;
 import java.util.Map.Entry;
 
 public class PageRankConceptExtraction extends KConceptExtractor {
-    private final Set<Shape> nonHiddenShape = new HashSet<>();
+    //private final Set<Shape> nonHiddenShape = new HashSet<>();
 
     public final static boolean PageRankRankGraph = true;
     public void hideNonKeyConcepts(OWLOntology activeOntology, VisGraph graph, int limitResultSize){
@@ -28,16 +28,16 @@ public class PageRankConceptExtraction extends KConceptExtractor {
             Shape shape = entry.getValue();
             if (isNonKeyConcept(entry.getKey(),conceptSet,shapeMap)){
                 shape.hide();
-            } else {
+            } /*else {
                 if (!(shape.getLabel().matches("Nothing"))) {
                     nonHiddenShape.add(shape);
                 }
-            }
-        }
+            }*/
+        }/*
         for (Shape s: nonHiddenShape){
             s.collectHiddenChildren();
             s.setHiddenChildren();
-        }
+        }*/
         graph.addDashedConnectors();
     }
 

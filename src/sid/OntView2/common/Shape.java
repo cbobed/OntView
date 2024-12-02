@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public abstract class Shape{
-	
+
 	public static final int CLOSED = 0 ;
 	public static final int OPEN = 1 ;
 	public static final int PARTIALLY_CLOSED = 2 ;
@@ -50,7 +50,7 @@ public abstract class Shape{
 	public void setVisible(boolean b){visible = b;}
 	public int  getPosX(){return posx;}
 	public int  getPosY(){return posy;}
-	public int  getHeight(){return height*getZoomLevel();}	
+	public int  getHeight(){return height*getZoomLevel();}
 	public int  getTotalHeight(){return height*getZoomLevel();}
 	public int  getWidth(){return width;}
 	public void setPosX(int x) {posx = x;}
@@ -90,8 +90,8 @@ public abstract class Shape{
 		inDashedConnectors = new ArrayList<>();
 	}
 
-	/** 
-	 * Marks as closed and hides subLevels 
+	/**
+	 * Marks as closed and hides subLevels
 	 * Then looks for those remaining visible nodes and adds a reference (dashed line)
 	 */
 	public void closeRight(){
@@ -110,6 +110,7 @@ public abstract class Shape{
 	}
 
 	public int getHiddenChildrenCount(){
+		hiddenChildren = true;
 		return countedChildren.size();
 	}
 
@@ -125,7 +126,7 @@ public abstract class Shape{
 		int visibleParentCount = 0;
 
 		for (VisConnector inConnector : this.inConnectors) {
-			if (inConnector.from.isVisible()) {
+			if (inConnector.isVisible()) {
 				visibleParentCount++;
 			}
 		}
@@ -149,17 +150,18 @@ public abstract class Shape{
 
 
 	/**
-	 * hides outconnectors and checks if children need to be hidden 
+	 * hides outconnectors and checks if children need to be hidden
 	 * @param closedShape
 	 */
 	private void hideSubLevels(Shape closedShape){
-	// hides outconnectors and 
-    // checks if children need to be hidden 
+	// hides outconnectors and
+    // checks if children need to be hidden
     // if so, it hides it
-		
+
 		Shape child;
 		for (VisConnector connector : outConnectors) {
 			child =  connector.to;
+			System.out.println(child.getLabel());
 
 			if (child.childHasOtherParents()){
 				connector.hide();
@@ -218,9 +220,9 @@ public abstract class Shape{
 		}
 	}
 
-	/** 
+	/**
 	 *  Checks references
-	 *  Before setting invisible a shape we need to check if there's still 
+	 *  Before setting invisible a shape we need to check if there's still
 	 *  any reference ( an in Connector)
 	 * @param closedShape
 	 */
@@ -245,7 +247,7 @@ public abstract class Shape{
 			hideParents(closedShape);
 		}
 	}
-	
+
 	/**
 	 *  hides shape, connector and notifies parents
      */
@@ -269,12 +271,12 @@ public abstract class Shape{
 		graph.getDashedConnectorList().clear();
 		graph.addDashedConnectors();
 	}
-	
+
 	private int getVisibleInReferences(){
 		int count = 0;
 		for (VisConnector c : inConnectors){
 			if (c.visible) {
-				count++; 
+				count++;
 			}
 		}
 		return count;
@@ -289,19 +291,19 @@ public abstract class Shape{
 		}
 		return count;
 	}
-	
+
 	/**
 	 * this is called by a hidden node
-	 * it notifies parents that it's hidden	
+	 * it notifies parents that it's hidden
 	 */
 	private void notifyHidden(Shape s){
 
 		 if (!(this instanceof VisConstraint)) {
-	    	 if (allSubHidden()){ 
+	    	 if (allSubHidden()){
 				setState(CLOSED);
 	         }
 		 	 else {
-			    setState(PARTIALLY_CLOSED);	
+			    setState(PARTIALLY_CLOSED);
 		     }
 		 }
 		 else {
@@ -311,7 +313,7 @@ public abstract class Shape{
 				 }
 				 c.hide();
 				 //notify Parent
-				 c.from.notifyHidden(this);       
+				 c.from.notifyHidden(this);
 			 }
 		 }
 	 }
@@ -321,14 +323,14 @@ public abstract class Shape{
 	public boolean allSubHidden(){
 		//if all subclasses are hidden
 		for (VisConnector c : this.outConnectors){
-			if (c.visible) 
+			if (c.visible)
 				return false;
-		}	
+		}
 		return true;
-	}		 
-	
+	}
+
 	/**************************************************************/
-	
+
 	public void openRight(){
         setState(OPEN);
         showSubLevels();
@@ -338,7 +340,7 @@ public abstract class Shape{
 		setLeftState(LEFTOPEN);
 		showParentLevels();
 	}
-	
+
 	public void show(Shape parent) {
 		//System.out.println(this.getLabel() + " " + getState());
 		this.visible = true;
@@ -373,13 +375,13 @@ public abstract class Shape{
 				break;
         }
 	}
-	
+
 	public void showSubLevels(){
 		for (VisConnector c : outConnectors) {
            c.to.show(this);
            c.show();
 		   c.to.checkLastNode();
-		}	
+		}
 	}
 
 	public void checkLastNode(){
@@ -394,12 +396,12 @@ public abstract class Shape{
 			c.show();
 		}
 	}
-	
+
 	public void setVisLevel(VisLevel v){
 		v.addShape(this);
 		if (v.width <  width)
 			v.width = width + VisLevel.MIN_WIDTH;
-		
+
 	}
 	public VisLevel getVisLevel(){
 	    return	vdepthlevel;
@@ -426,22 +428,22 @@ public abstract class Shape{
 		//System.out.println(inConnectorsHidden);
 	}
 
-	
+
 	/**
      * Inverts lookup in the shapeMap by returning the key out of an owlclassexpression
 	 * @param e
 	 * @return
 	 */
- 	 public static String getKey(OWLClassExpression e){	
+ 	 public static String getKey(OWLClassExpression e){
     	if (e instanceof OWLClass) {
     		return e.asOWLClass().getIRI().toString(); }
-  	    else { 
+  	    else {
     	    return e.toString();
-    	}    
+    	}
      }
-		
-		
-	 public static final Comparator<Shape> POSY_ORDER = 
+
+
+	 public static final Comparator<Shape> POSY_ORDER =
             new Comparator<Shape>() {
 			public int compare(Shape s1, Shape s2) {
 			return s1.getPosY()-s2.getPosY();

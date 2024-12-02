@@ -42,17 +42,12 @@
         <version>22.0.1</version>
     </dependency>
 
-      <dependency>
-          <groupId>net.sourceforge.owlapi</groupId>
-          <artifactId>owlapi-distribution</artifactId>
-          <version>5.1.10</version>
-      </dependency>
-
-      <dependency>
-          <groupId>net.sourceforge.owlapi</groupId>
-          <artifactId>org.semanticweb.hermit</artifactId>
-          <version>1.4.3.517</version>
-      </dependency>
+    <!-- HermiT -->
+    <dependency>
+        <groupId>net.sourceforge.owlapi</groupId>
+        <artifactId>org.semanticweb.hermit</artifactId>
+        <version>1.4.3.517</version>
+    </dependency>
     
     <!-- Openllet -->
 	<dependency>
