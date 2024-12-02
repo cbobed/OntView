@@ -185,7 +185,7 @@ public abstract class Shape{
 		Shape parent;
 		for (VisConnector connector : inConnectors) {
 			parent =  connector.from;
-			if(parent.getLabel().matches("Thing")) break;
+			if (parent.getLabel().matches("Thing")) break;
 
 			connector.hide();
 
@@ -244,6 +244,10 @@ public abstract class Shape{
 	public void checkAndHideParents(Shape closedShape){
 		if (getVisibleOutReferences()==0) {
 			this.visible = false;
+			for (VisConnector connector : inConnectors) {
+				connector.hide();
+			}
+
 			hideParents(closedShape);
 		}
 	}

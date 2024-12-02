@@ -39,7 +39,7 @@ public class PaintFrame extends Canvas {
 	private static final long serialVersionUID = 1L;
 	public ScrollPane scroll;
 	static final int BORDER_PANEL = 50;
-	static final int MIN_SPACE = 30;
+	static final int MIN_SPACE = 20;
 	static final int MIN_INITIAL_SPACE = 40;
 	private static final int DOWN = 0;
 	private static final int UP = -1;
@@ -322,13 +322,6 @@ public class PaintFrame extends Canvas {
 				for (Entry<String, Shape> entry : visGraph.shapeMap.entrySet()) {
 					Shape shape = entry.getValue();
 					if (!(shape instanceof SuperNode)) {
-						/*if (Objects.equals(shape.getLabel(), "Person")) {
-							System.out.println("Person x: " + shape.getPosX() + "y " + shape.getPosY());
-							for (VisObjectProperty p : shape.asVisClass().getPropertyBox().propertyList) {
-								System.out.println("Propiedad: " + p.visibleLabel);
-							}
-
-						}*/
 						shape.drawShape(g);
 					}
 				}
@@ -474,6 +467,9 @@ public class PaintFrame extends Canvas {
 								if ((s_i != shape_j) && (s_i.visible) && (shape_j.visible)) {
 									if ((s_i.getTopCorner() < shape_j.getTopCorner()) &&
 											(shape_j.getTopCorner() < (s_i.getBottomCorner() + MIN_SPACE )) ) {
+										//System.out.println("s_i - " + s_i.getLabel() + " - shape_j - " + shape_j.getLabel());
+										//System.out.println("s_i: " + s_i.getTopCorner() + " " + s_i.getBottomCorner() + " altura: " + s_i.getHeight());
+										//System.out.println("shape_j: " + shape_j.getTopCorner() + " " + shape_j.getBottomCorner() + " altura: " + shape_j.getHeight());
 										stateChanged = true;
 										shapeRepulsion(s_i, DOWN);
 									}
@@ -495,7 +491,6 @@ public class PaintFrame extends Canvas {
 				draw();
 			}
 		}
-
 	}
 
 	/**
@@ -853,6 +848,8 @@ public class PaintFrame extends Canvas {
 							// si estaba cerrado el nodo [+] abrirlo
 							shape.openRight();
 							shape.resetHiddenChildrenShapeCount();
+							//shape.collectHiddenChildren();
+							//shape.setHiddenChildren();
 							refreshDashedConnectors();
 							VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
 							setStateChanged(true);

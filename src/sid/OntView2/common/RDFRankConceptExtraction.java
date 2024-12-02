@@ -17,7 +17,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import sid.OntView2.utils.PageRankScoreComparator;
 
 public class RDFRankConceptExtraction extends KConceptExtractor { //true
-   // private final Set<Shape> nonHiddenShape = new HashSet<>();
+    private final Set<Shape> nonHiddenShape = new HashSet<>();
 
     public final static boolean RDFRankDebug = true;
     public void hideNonKeyConcepts(OWLOntology activeOntology, VisGraph graph, int limitResultSize){
@@ -34,16 +34,16 @@ public class RDFRankConceptExtraction extends KConceptExtractor { //true
             Shape shape = entry.getValue();
             if (isNonKeyConcept(entry.getKey(),conceptSet,shapeMap)){
                 shape.hide();
-            } /*else {
+            } else {
                 if (!(shape.getLabel().matches("Nothing"))) {
                     nonHiddenShape.add(shape);
                 }
-            }*/
-        }/*
+            }
+        }
         for (Shape s: nonHiddenShape){
             s.collectHiddenChildren();
             s.setHiddenChildren();
-        }*/
+        }
         graph.addDashedConnectors();
     }
 
