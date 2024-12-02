@@ -451,23 +451,27 @@ public abstract class Shape{
 	 };
 
 	/**
-	 * Recursively collects the hidden children of the current Shape and adds them to the countedChildren set.
-	 * If a visible child is encountered, that path is not traversed further.
+	 * Recursively collects the count of hidden children in the hierarchy.
+	 * Traverses the entire list of connectors until it encounters a child
+	 * with no outgoing connectors and accumulates the count of hidden nodes.
 	 */
 	public void collectHiddenChildren() {
 		for (VisConnector connector : outConnectors) {
 			Shape child = connector.to;
 
-			if (child.isVisible()) {
-				continue;
-			}
-
-			if (!countedChildren.contains(child)) {
-				countedChildren.add(child);
-				child.collectHiddenChildren();
+			if (child.outConnectors.isEmpty()) {
+				if (!countedChildren.contains(child)) {
+					countedChildren.add(child);
+				}
+			} else {
+				if (!countedChildren.contains(child)) {
+					countedChildren.add(child);
+					child.collectHiddenChildren();
+				}
 			}
 		}
 	}
+
 
 
 
