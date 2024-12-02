@@ -467,9 +467,9 @@ public class PaintFrame extends Canvas {
 								if ((s_i != shape_j) && (s_i.visible) && (shape_j.visible)) {
 									if ((s_i.getTopCorner() < shape_j.getTopCorner()) &&
 											(shape_j.getTopCorner() < (s_i.getBottomCorner() + MIN_SPACE )) ) {
-										//System.out.println("s_i - " + s_i.getLabel() + " - shape_j - " + shape_j.getLabel());
-										//System.out.println("s_i: " + s_i.getTopCorner() + " " + s_i.getBottomCorner() + " altura: " + s_i.getHeight());
-										//System.out.println("shape_j: " + shape_j.getTopCorner() + " " + shape_j.getBottomCorner() + " altura: " + shape_j.getHeight());
+										System.out.println("s_i - " + s_i.getLabel() + " - shape_j - " + shape_j.getLabel());
+										System.out.println("s_i: " + s_i.getTopCorner() + " " + s_i.getBottomCorner() + " altura: " + s_i.getHeight());
+										System.out.println("shape_j: " + shape_j.getTopCorner() + " " + shape_j.getBottomCorner() + " altura: " + shape_j.getHeight());
 										stateChanged = true;
 										shapeRepulsion(s_i, DOWN);
 									}
@@ -1077,7 +1077,6 @@ public class PaintFrame extends Canvas {
 		return null;
 	}
 
-
 	private void shapeRepulsion(Shape repellingShape, int direction) {
 		if (repulsion) {
 			VisLevel currentLevel = repellingShape.getVisLevel();
@@ -1090,11 +1089,9 @@ public class PaintFrame extends Canvas {
 						if (upperShape == null) // it's the visible upper shape
 							return;
 
-						GraphicsContext g = this.getGraphicsContext2D();
-
 						int upperShapeHeight = upperShape.getHeight();
 						if ((upperShape instanceof VisClass) && (upperShape.asVisClass().propertyBox != null) && (upperShape.asVisClass().propertyBox.visible))
-							upperShapeHeight += upperShape.asVisClass().getTotalHeight();
+							upperShapeHeight = upperShape.asVisClass().getTotalHeight();
 
 						if (repellingShape.getTopCorner() < (upperShape.getPosY() + upperShapeHeight/2 + MIN_SPACE)) {
 							upperShape.setPosY(upperShape.getPosY() - upperShape.getHeight() / 2 );
@@ -1111,14 +1108,13 @@ public class PaintFrame extends Canvas {
 						if (lowerShape == null) // it's the visible upper shape
 							return;
 
-						int lowerShapeHeight = repellingShape.getHeight();
 						if ((repellingShape instanceof VisClass) && (repellingShape.asVisClass().propertyBox != null) && (repellingShape.asVisClass().propertyBox.visible)) {
-							if (repellingShape.getBottomCorner() > lowerShape.getTopCorner() - MIN_SPACE) {
+							if (repellingShape.getBottomCorner() + MIN_SPACE > lowerShape.getTopCorner()) {
 								lowerShape.setPosY(lowerShape.getPosY() + lowerShape.getTotalHeight() / 2);
 							}
 						}
 						else {
-							if (repellingShape.getBottomCorner() > lowerShape.getTopCorner() - MIN_SPACE) {
+							if (repellingShape.getBottomCorner() + MIN_SPACE > lowerShape.getTopCorner() ) {
 								lowerShape.setPosY(lowerShape.getPosY() + lowerShape.getHeight() / 2);
 							}
 						}

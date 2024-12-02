@@ -450,7 +450,7 @@ public abstract class Shape{
 	 public static final Comparator<Shape> POSY_ORDER =
             new Comparator<Shape>() {
 			public int compare(Shape s1, Shape s2) {
-			return s1.getPosY()-s2.getPosY();
+			return s1.getTopCorner()-s2.getTopCorner();
 		 }
 	 };
 
