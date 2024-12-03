@@ -456,6 +456,7 @@ public class VisClass extends Shape {
 		double height = 10;
 		double rectX = x - width / 2;
 		double rectY = y - currentHeight / 2 - height - 5;
+
 		if (isDefined && !label.startsWith(SIDClassExpressionNamer.className)) rectY -= 5;
 
 		double hiddenPercentage = (double) hiddenNodes / totalNodes;

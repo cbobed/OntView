@@ -467,9 +467,6 @@ public class PaintFrame extends Canvas {
 								if ((s_i != shape_j) && (s_i.visible) && (shape_j.visible)) {
 									if ((s_i.getTopCorner() < shape_j.getTopCorner()) &&
 											(shape_j.getTopCorner() < (s_i.getBottomCorner() + MIN_SPACE )) ) {
-										System.out.println("s_i - " + s_i.getLabel() + " - shape_j - " + shape_j.getLabel());
-										System.out.println("s_i: " + s_i.getTopCorner() + " " + s_i.getBottomCorner() + " altura: " + s_i.getHeight());
-										System.out.println("shape_j: " + shape_j.getTopCorner() + " " + shape_j.getBottomCorner() + " altura: " + shape_j.getHeight());
 										stateChanged = true;
 										shapeRepulsion(s_i, DOWN);
 									}
@@ -873,7 +870,7 @@ public class PaintFrame extends Canvas {
 						if (shape.getLeftState() == Shape.LEFTCLOSED || shape.getLeftState() == Shape.LEFT_PARTIALLY_CLOSED) {
 							// si estaba cerrado el nodo [+] abrirlo
 							shape.openLeft();
-							//shape.resetHiddenChildrenShapeCount();
+							shape.resetHiddenChildrenShapeCount();
 							refreshDashedConnectors();
 							VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
 							setStateChanged(true);
@@ -885,6 +882,7 @@ public class PaintFrame extends Canvas {
 						if (shape.getLeftState() == Shape.LEFTOPEN || shape.getLeftState() == Shape.LEFT_PARTIALLY_CLOSED) {
 							// if [-] clicked, close the node
 							shape.closeLeft();
+							shape.getHiddenChildrenCount();
 							//refreshDashedConnectors();
 							VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
 							setStateChanged(true);

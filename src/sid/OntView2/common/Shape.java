@@ -111,6 +111,11 @@ public abstract class Shape{
 
 	public int getHiddenChildrenCount(){
 		hiddenChildren = true;
+		System.out.println("countedchildren " + countedChildren.size() + "................");
+		for (Shape c : countedChildren){
+			System.out.println(c.getLabel());
+		}
+		System.out.println("\n");
 		return countedChildren.size();
 	}
 
@@ -170,10 +175,9 @@ public abstract class Shape{
 
 			connector.hide();
 			child.checkAndHide(closedShape);
-			if (!countedChildren.contains(child)) {
-				countedChildren.add(child);
-				child.collectDescendantsIntoSet(countedChildren);
-			}
+			countedChildren.add(child);
+			child.collectDescendantsIntoSet(countedChildren);
+
 		}
 	}
 
@@ -194,6 +198,7 @@ public abstract class Shape{
 				continue;
 			}
 
+			countedChildren.add(parent);
 			parent.checkAndHideParents(closedShape);
 
 		}
@@ -212,11 +217,8 @@ public abstract class Shape{
 				continue;
 			}
 
-			// If not already processed, add and recurse
-			if (!countedChildren.contains(child)) {
-				countedChildren.add(child);
-				child.collectDescendantsIntoSet(countedChildren);
-			}
+			countedChildren.add(child);
+			child.collectDescendantsIntoSet(countedChildren);
 		}
 	}
 
@@ -244,10 +246,10 @@ public abstract class Shape{
 	public void checkAndHideParents(Shape closedShape){
 		if (getVisibleOutReferences()==0) {
 			this.visible = false;
+			countedChildren.add(closedShape);
 			for (VisConnector connector : inConnectors) {
 				connector.hide();
 			}
-
 			hideParents(closedShape);
 		}
 	}
@@ -464,9 +466,7 @@ public abstract class Shape{
 			Shape child = connector.to;
 
 			if (child.outConnectors.isEmpty()) {
-				if (!countedChildren.contains(child)) {
-					countedChildren.add(child);
-				}
+				countedChildren.add(child);
 			} else {
 				if (!countedChildren.contains(child)) {
 					countedChildren.add(child);
