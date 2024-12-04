@@ -96,7 +96,7 @@ public abstract class Shape{
 	 */
 	public void closeRight(){
 		setState(CLOSED);
-        hideSubLevels(this);
+        hideSubLevels(this, countedChildren);
 	}
 
 	public void closeLeft(){
@@ -158,7 +158,7 @@ public abstract class Shape{
 	 * hides outconnectors and checks if children need to be hidden
 	 * @param closedShape
 	 */
-	private void hideSubLevels(Shape closedShape){
+	private void hideSubLevels(Shape closedShape, Set<Shape> countedChildren){
 	// hides outconnectors and
     // checks if children need to be hidden
     // if so, it hides it
@@ -166,7 +166,6 @@ public abstract class Shape{
 		Shape child;
 		for (VisConnector connector : outConnectors) {
 			child =  connector.to;
-			System.out.println(child.getLabel());
 
 			if (child.childHasOtherParents()){
 				connector.hide();
@@ -174,9 +173,9 @@ public abstract class Shape{
 			}
 
 			connector.hide();
-			child.checkAndHide(closedShape);
-			countedChildren.add(child);
-			child.collectDescendantsIntoSet(countedChildren);
+			if (countedChildren.add(child))
+				child.checkAndHide(closedShape, countedChildren);
+			//child.collectDescendantsIntoSet(countedChildren);
 
 		}
 	}
@@ -205,36 +204,19 @@ public abstract class Shape{
 	}
 
 	/**
-	 * Recursively collects all descendants into the given set.
-	 * Ensures no duplicate entries are added.
-	 * @param countedChildren The set of already-counted shapes.
-	 */
-	private void collectDescendantsIntoSet(Set<Shape> countedChildren) {
-		for (VisConnector connector : outConnectors) {
-			Shape child = connector.to;
-
-			if (child.childHasOtherParents()) {
-				continue;
-			}
-
-			countedChildren.add(child);
-			child.collectDescendantsIntoSet(countedChildren);
-		}
-	}
-
-	/**
 	 *  Checks references
 	 *  Before setting invisible a shape we need to check if there's still
 	 *  any reference ( an in Connector)
 	 * @param closedShape
 	 */
-	public void checkAndHide(Shape closedShape){
+	public void checkAndHide(Shape closedShape, Set<Shape> countedChildren){
 		if (getVisibleInReferences()==0) {
-		   this.visible = false;
-		   hideSubLevels(closedShape);
-		   return;
+			this.visible = false;
+			countedChildren.add(this);
+			hideSubLevels(closedShape, countedChildren);
+			return;
 		}
-		hideSubLevels(closedShape);
+		hideSubLevels(closedShape, countedChildren);
 	}
 
 	/**
