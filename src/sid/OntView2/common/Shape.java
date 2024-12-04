@@ -79,6 +79,7 @@ public abstract class Shape{
 	private final Set<Shape> countedChildren = new HashSet<>();
 	private final Set<Shape> countedParent = new HashSet<>();
 	public boolean hiddenChildren = false;
+	public boolean hiddenParent = false;
 
 
 
@@ -101,12 +102,17 @@ public abstract class Shape{
 
 	public void closeLeft(){
 		setLeftState(LEFTCLOSED);
-		hideParents(this);
+		hideParents(this, countedParent);
 	}
 
 	public void resetHiddenChildrenShapeCount() {
 		hiddenChildren = false;
 		countedChildren.clear();
+	}
+
+	public void resetHiddenParentShapeCount() {
+		hiddenParent = false;
+		countedParent.clear();
 	}
 
 	public int getHiddenChildrenCount(){
@@ -119,8 +125,22 @@ public abstract class Shape{
 		return countedChildren.size();
 	}
 
+	public int getHiddenParentCount(){
+		hiddenParent = true;
+		System.out.println("countedParent " + countedParent.size() + "................");
+		for (Shape c : countedParent){
+			System.out.println(c.getLabel());
+		}
+		System.out.println("\n");
+		return countedParent.size();
+	}
+
 	public void setHiddenChildren(){
 		hiddenChildren = !countedChildren.isEmpty();
+	}
+
+	public void setHiddenParent(){
+		hiddenParent = !countedParent.isEmpty();
 	}
 
 
@@ -184,10 +204,11 @@ public abstract class Shape{
 	 * hides inconnectors and checks if parents need to be hidden
 	 * @param closedShape
 	 */
-	private void hideParents(Shape closedShape){
+	private void hideParents(Shape closedShape, Set<Shape> countedParent){
 		Shape parent;
 		for (VisConnector connector : inConnectors) {
 			parent =  connector.from;
+
 			if (parent.getLabel().matches("Thing")) break;
 
 			connector.hide();
@@ -197,8 +218,8 @@ public abstract class Shape{
 				continue;
 			}
 
-			countedChildren.add(parent);
-			parent.checkAndHideParents(closedShape);
+			if (countedParent.add(parent))
+				parent.checkAndHideParents(closedShape, countedParent);
 
 		}
 	}
@@ -225,14 +246,14 @@ public abstract class Shape{
 	 *  any reference ( an out Connector)
 	 * @param closedShape
 	 */
-	public void checkAndHideParents(Shape closedShape){
+	public void checkAndHideParents(Shape closedShape, Set<Shape> countedParent){
 		if (getVisibleOutReferences()==0) {
 			this.visible = false;
-			countedChildren.add(closedShape);
+			countedParent.add(this);
 			for (VisConnector connector : inConnectors) {
 				connector.hide();
 			}
-			hideParents(closedShape);
+			hideParents(closedShape, countedParent);
 		}
 	}
 
