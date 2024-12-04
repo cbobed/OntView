@@ -1507,6 +1507,7 @@ public class VisGraph implements Runnable{
 			if ((s.getState() == VisClass.CLOSED) || (s.getState() == VisClass.PARTIALLY_CLOSED)){
 				s.openRight();
 			}
+			s.resetHiddenChildrenShapeCount();
 			s.setVisible(true);
 		}
 	}

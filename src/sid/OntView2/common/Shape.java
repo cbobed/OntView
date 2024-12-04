@@ -3,6 +3,7 @@ package sid.OntView2.common;
 
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
+import org.apache.jena.base.Sys;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 
@@ -117,7 +118,7 @@ public abstract class Shape{
 
 	public int getHiddenChildrenCount(){
 		hiddenChildren = true;
-		System.out.println("countedchildren " + countedChildren.size() + "................");
+		System.out.println(this.getLabel() + " " + countedChildren.size() + "................");
 		for (Shape c : countedChildren){
 			System.out.println(c.getLabel());
 		}
@@ -195,14 +196,11 @@ public abstract class Shape{
 			connector.hide();
 			if (countedChildren.add(child))
 				child.checkAndHide(closedShape, countedChildren);
-			//child.collectDescendantsIntoSet(countedChildren);
-
 		}
 	}
 
 	/**
 	 * hides inconnectors and checks if parents need to be hidden
-	 * @param closedShape
 	 */
 	private void hideParents(Shape closedShape, Set<Shape> countedParent){
 		Shape parent;
@@ -210,8 +208,6 @@ public abstract class Shape{
 			parent =  connector.from;
 
 			if (parent.getLabel().matches("Thing")) break;
-
-			connector.hide();
 
 			if (parent.hasOtherVisibleChildren(this)) {
 				parent.setState(PARTIALLY_CLOSED);
@@ -228,7 +224,6 @@ public abstract class Shape{
 	 *  Checks references
 	 *  Before setting invisible a shape we need to check if there's still
 	 *  any reference ( an in Connector)
-	 * @param closedShape
 	 */
 	public void checkAndHide(Shape closedShape, Set<Shape> countedChildren){
 		if (getVisibleInReferences()==0) {
@@ -244,7 +239,6 @@ public abstract class Shape{
 	 *  Checks references
 	 *  Before setting invisible a shape we need to check if there's still
 	 *  any reference ( an out Connector)
-	 * @param closedShape
 	 */
 	public void checkAndHideParents(Shape closedShape, Set<Shape> countedParent){
 		if (getVisibleOutReferences()==0) {
@@ -465,21 +459,20 @@ public abstract class Shape{
 	 * with no outgoing connectors and accumulates the count of hidden nodes.
 	 */
 	public void collectHiddenChildren() {
+		collectHiddenChildren(countedChildren);
+	}
+
+	public void collectHiddenChildren(Set<Shape> countedChildren){
 		for (VisConnector connector : outConnectors) {
 			Shape child = connector.to;
 
-			if (child.outConnectors.isEmpty()) {
+			if (!child.isVisible()) {
 				countedChildren.add(child);
-			} else {
-				if (!countedChildren.contains(child)) {
-					countedChildren.add(child);
-					child.collectHiddenChildren();
-				}
+			}
+
+			if (!child.outConnectors.isEmpty()) {
+				child.collectHiddenChildren(countedChildren);
 			}
 		}
 	}
-
-
-
-
 }
