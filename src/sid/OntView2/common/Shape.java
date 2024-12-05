@@ -3,6 +3,7 @@ package sid.OntView2.common;
 
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
+import org.apache.jena.base.Sys;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 
@@ -183,7 +184,6 @@ public abstract class Shape {
         for (Shape c : countedChildren) {
             System.out.println(c.getLabel());
         }
-        System.out.println("\n");
         return countedChildren.size();
     }
 
@@ -193,7 +193,6 @@ public abstract class Shape {
         for (Shape c : countedParents) {
             System.out.println(c.getLabel());
         }
-        System.out.println("\n");
         return countedParents.size();
     }
 
@@ -260,12 +259,14 @@ public abstract class Shape {
             if (countedChildren.add(child))
                 child.checkAndHide(closedShape, countedChildren);
         }
+
+        System.out.println("final " + getLabel());
     }
 
     /**
      * hides inconnectors and checks if parents need to be hidden
      */
-    private void hideParents(Shape closedShape, Set<Shape> countedParent) {
+    private void hideParents(Shape closedShape, Set<Shape> countedParents) {
         Shape parent;
         for (VisConnector connector : inConnectors) {
             parent = connector.from;
@@ -279,11 +280,12 @@ public abstract class Shape {
                 continue;
             }
 
-            if (countedParent.add(parent)) {
-                parent.checkAndHideParents(closedShape, countedParent);
-                parent.recalculateHiddenParentsCount();
+            if (countedParents.add(parent)) {
+                parent.checkAndHideParents(closedShape, countedParents);
             }
         }
+        updateHiddenParentsForChildren();
+        System.out.println("final " + getLabel() + "\n");
     }
 
     /**
@@ -306,14 +308,14 @@ public abstract class Shape {
      * Before setting invisible a shape we need to check if there's still
      * any reference ( an out Connector)
      */
-    public void checkAndHideParents(Shape closedShape, Set<Shape> countedParent) {
+    public void checkAndHideParents(Shape closedShape, Set<Shape> countedParents) {
         if (getVisibleOutReferences() == 0) {
             this.visible = false;
-            countedParent.add(this);
+            countedParents.add(this);
             for (VisConnector connector : inConnectors) {
                 connector.hide();
             }
-            hideParents(closedShape, countedParent);
+            hideParents(closedShape, countedParents);
         }
     }
 
@@ -330,7 +332,6 @@ public abstract class Shape {
         for (VisConnector c : outConnectors) {
             c.hide();
         }
-        recalculateHiddenParentsCount();
 
         // Wake observer thread on hide event
         graph.updateObservers(VisConstants.GENERALOBSERVER);
@@ -541,25 +542,41 @@ public abstract class Shape {
     }
 
     /**
-     * Recalculates the number of hidden parents for this shape and propagates
-     * the update to its children if necessary.
+     * Updates the hidden parents count for children of nodes in countedParents.
      */
-    public void recalculateHiddenParentsCount() {
-        int hiddenParentCount = 0;
-        for (VisConnector inConnector : inConnectors) {
-            if (!inConnector.isVisible()) {
-                hiddenParentCount++;
-            }
-        }
-        setHiddenParents();
-        System.out.println("Node " + getLabel() + " has " + hiddenParentCount + " hidden parents.");
+    private void updateHiddenParentsForChildren() {
+        Set<Shape> parentsToProcess = new HashSet<>(countedParents);
 
-        // Notify children to update their counts if this node is hidden
-        if (hiddenParentCount == inConnectors.size()) {
-            for (VisConnector connector : outConnectors) {
-                connector.to.recalculateHiddenParentsCount();
+        for (Shape parent : parentsToProcess) {
+            for (VisConnector connector : parent.outConnectors) {
+                Shape child = connector.to;
+
+                if (!child.isVisible()) {
+                    continue;
+                }
+
+                child.countedParents.clear();
+
+                for (VisConnector inConnector : child.inConnectors) {
+                    Shape grandParent = inConnector.from;
+                    if (!grandParent.isVisible()) {
+                        addHiddenAncestors(grandParent, child.countedParents);
+                    }
+                }
             }
         }
     }
 
+    /**
+     * Adds all hidden ancestors of a node to the provided set until a visible ancestor is encountered.
+     */
+    private void addHiddenAncestors(Shape s, Set<Shape> countedParents) {
+        if (!s.isVisible()) {
+            if (countedParents.add(s)) {
+                for (VisConnector inConnector : s.inConnectors) {
+                    addHiddenAncestors(inConnector.from, countedParents);
+                }
+            }
+        }
+    }
 }
