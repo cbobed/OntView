@@ -6,7 +6,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import org.apache.jena.base.Sys;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.model.parameters.Imports;
@@ -17,7 +16,6 @@ import org.semanticweb.owlapi.search.EntitySearcher;
 import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 import org.xml.sax.SAXException;
 import sid.OntView2.utils.ExpressionManager;
-import sid.OntView2.utils.ProgressBarDialogThread;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
@@ -1507,7 +1505,8 @@ public class VisGraph implements Runnable{
 			if ((s.getState() == VisClass.CLOSED) || (s.getState() == VisClass.PARTIALLY_CLOSED)){
 				s.openRight();
 			}
-			s.resetHiddenChildrenShapeCount();
+			s.resetHiddenChildrenCount();
+			s.resetHiddenParentsCount();
 			s.setVisible(true);
 		}
 	}

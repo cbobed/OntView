@@ -3,7 +3,6 @@ package sid.OntView2.common;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.CountDownLatch;
-import java.util.stream.Collectors;
 
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -30,7 +29,6 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 import reducer.StructuralReducer;
-import sid.OntView2.main.Mine;
 import sid.OntView2.utils.ProgressBarDialogThread;
 
 public class PaintFrame extends Canvas {
@@ -844,7 +842,7 @@ public class PaintFrame extends Canvas {
 						if (shape.getState() == Shape.CLOSED || shape.getState() == Shape.PARTIALLY_CLOSED) {
 							// si estaba cerrado el nodo [+] abrirlo
 							shape.openRight();
-							shape.resetHiddenChildrenShapeCount();
+							shape.resetHiddenChildrenCount();
 							//shape.collectHiddenChildren();
 							//shape.setHiddenChildren();
 							refreshDashedConnectors();
@@ -870,7 +868,7 @@ public class PaintFrame extends Canvas {
 						if (shape.getLeftState() == Shape.LEFTCLOSED || shape.getLeftState() == Shape.LEFT_PARTIALLY_CLOSED) {
 							// si estaba cerrado el nodo [+] abrirlo
 							shape.openLeft();
-							shape.resetHiddenParentShapeCount();
+							shape.resetHiddenParentsCount();
 							refreshDashedConnectors();
 							VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
 							setStateChanged(true);
@@ -882,7 +880,7 @@ public class PaintFrame extends Canvas {
 						if (shape.getLeftState() == Shape.LEFTOPEN || shape.getLeftState() == Shape.LEFT_PARTIALLY_CLOSED) {
 							// if [-] clicked, close the node
 							shape.closeLeft();
-							shape.getHiddenParentCount();
+							shape.getHiddenParentsCount();
 							//refreshDashedConnectors();
 							VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
 							setStateChanged(true);

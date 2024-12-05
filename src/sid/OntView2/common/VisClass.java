@@ -360,11 +360,11 @@ public class VisClass extends Shape {
 				drawHiddenNodesIndicator(g, getHiddenChildrenCount(), getLeftCorner(), posy, "children");
 			}
 
-			if(hiddenParent){
+			if(hiddenParents){
 				if (hiddenChildren){
-					drawHiddenNodesIndicator(g, getHiddenParentCount(), getLeftCorner(), posy - 16, "parents");
+					drawHiddenNodesIndicator(g, getHiddenParentsCount(), getLeftCorner(), posy - 16, "parents");
 				} else {
-					drawHiddenNodesIndicator(g, getHiddenParentCount(), getLeftCorner(), posy, "parents");
+					drawHiddenNodesIndicator(g, getHiddenParentsCount(), getLeftCorner(), posy, "parents");
 				}
 			}
 
