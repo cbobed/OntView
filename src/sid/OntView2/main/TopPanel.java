@@ -197,7 +197,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		if (zoomSlider == null) {
 			zoomSlider = new Slider();
 			zoomSlider.setMin(0);
-			zoomSlider.setMax(10);
+			zoomSlider.setMax(20);
 			zoomSlider.setOrientation(Orientation.VERTICAL);
 			zoomSlider.setValue(5);
 

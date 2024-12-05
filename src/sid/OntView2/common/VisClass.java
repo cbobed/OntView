@@ -71,6 +71,7 @@ public class VisClass extends Shape {
 	boolean qualifiedRendering = false; 
 	boolean labelRendering = false;
 	private static int totalNodes = -1;
+	private static double width;
 
 
 	int tabSize = 15; 
@@ -356,7 +357,15 @@ public class VisClass extends Shape {
 	    	}
 
 			if(hiddenChildren){
-				drawHiddenNodesIndicator(g, getHiddenChildrenCount(), getLeftCorner(), posy);
+				drawHiddenNodesIndicator(g, getHiddenChildrenCount(), getLeftCorner(), posy, "children");
+			}
+
+			if(hiddenParent){
+				if (hiddenChildren){
+					drawHiddenNodesIndicator(g, getHiddenParentCount(), getLeftCorner(), posy - 16, "parents");
+				} else {
+					drawHiddenNodesIndicator(g, getHiddenParentCount(), getLeftCorner(), posy, "parents");
+				}
 			}
 
 		    if (!children.isEmpty() && (outConnectors!=null) &&(!outConnectors.isEmpty())) {
@@ -449,10 +458,12 @@ public class VisClass extends Shape {
 		g.setFont(oldFont);
 	}
 
-	private void drawHiddenNodesIndicator(GraphicsContext g, int hiddenNodes, int x, int y) {
-		if (totalNodes == -1) totalNodes = graph.getShapeMap().size() - 2; // Thing, Nothing
+	private void drawHiddenNodesIndicator(GraphicsContext g, int hiddenNodes, int x, int y, String text) {
+		if (totalNodes == -1) {
+			totalNodes = graph.getShapeMap().size() - 2; // Thing, Nothing
+			width = getIndicatorSize(g, totalNodes) + 8;
+		}
 
-		double width = getIndicatorSize(g, totalNodes) + 8;
 		double height = 13;
 		double rectX = x ;
 		double rectY = y - (double) currentHeight / 2 - height - 5;
@@ -472,7 +483,7 @@ public class VisClass extends Shape {
 		g.setStroke(Color.BLACK);
 		g.strokeRect(rectX, rectY, width, height);
 
-		drawCenteredText(g, hiddenNodes + " hidden nodes", rectX, rectY, width, height);
+		drawCenteredText(g, hiddenNodes + " hidden " + text, rectX, rectY, width, height);
 	}
 
 	private void drawCenteredText(GraphicsContext g, String text, double rectX, double rectY, double rectWidth, double rectHeight) {
@@ -488,7 +499,7 @@ public class VisClass extends Shape {
 	}
 
 	private double getIndicatorSize(GraphicsContext g, int totalNodes) {
-		Text textNode = new Text(totalNodes + " hidden nodes");
+		Text textNode = new Text(totalNodes + " hidden children");
 		textNode.setFont(g.getFont());
 		return textNode.getLayoutBounds().getWidth();
 	}

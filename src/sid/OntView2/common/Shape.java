@@ -209,6 +209,8 @@ public abstract class Shape{
 
 			if (parent.getLabel().matches("Thing")) break;
 
+			connector.hide();
+
 			if (parent.hasOtherVisibleChildren(this)) {
 				parent.setState(PARTIALLY_CLOSED);
 				continue;
