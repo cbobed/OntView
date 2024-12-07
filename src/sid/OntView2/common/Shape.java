@@ -3,7 +3,6 @@ package sid.OntView2.common;
 
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
-import org.apache.jena.base.Sys;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 
