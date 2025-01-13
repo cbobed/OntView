@@ -251,7 +251,7 @@ public abstract class Shape {
 
             if (child.childHasOtherParents()) {
                 connector.hide();
-                child.checkAndUpdateVisibilityStates();
+                child.checkAndUpdateParentVisibilityStates();
                 continue;
             }
 
@@ -418,7 +418,7 @@ public abstract class Shape {
                     if (connector.isVisible()) continue;
                     connector.show();
                     connector.to.show(this);
-                    connector.to.checkAndUpdateVisibilityStates();
+                    connector.to.checkAndUpdateParentVisibilityStates();
                 }
                 break;//if its not a previously hidden node we'll show it
         }
@@ -435,7 +435,7 @@ public abstract class Shape {
                 for (VisConnector connector : inConnectors) {
                     connector.show();
                     connector.from.showLeft(this);
-                    connector.from.checkAndUpdateVisibilityStates();
+                    connector.from.checkAndUpdateChildrenVisibilityStates();
                 }
                 break;
         }
@@ -445,7 +445,7 @@ public abstract class Shape {
         for (VisConnector c : outConnectors) {
             c.to.show(this);
             c.show();
-            c.to.checkAndUpdateVisibilityStates();
+            c.to.checkAndUpdateParentVisibilityStates();
         }
     }
 
@@ -454,7 +454,7 @@ public abstract class Shape {
             System.out.println(c.from.getLabel());
             c.from.showLeft(this);
             c.show();
-            c.from.checkAndUpdateVisibilityStates();
+            c.from.checkAndUpdateChildrenVisibilityStates();
         }
     }
 
@@ -514,60 +514,12 @@ public abstract class Shape {
         }
     }
 
-    public void checkAndUpdateVisibilityStates2() {
-        if (!isVisible()) return;
-
-        if(getLabel().matches("Animal")){
-            System.out.println("");
-        }
-
-        System.out.println("checkAndUpdateVisibilityStates " + getLabel());
-        // Check children visibility
-        int childrenConnectorsHidden = 0;
-
-        for (VisConnector connector : outConnectors) {
-            if (!connector.isVisible()) {
-                childrenConnectorsHidden++;
-            }
-        }
-
-        if (childrenConnectorsHidden == outConnectors.size()) {
-            setState(CLOSED);
-        } else if (childrenConnectorsHidden == 0) {
-            setState(OPEN);
-        } else {
-            setState(PARTIALLY_CLOSED);
-        }
-
-        // Check parents visibility
-        int parentConnectorsHidden = 0;
-
-        for (VisConnector connector : inConnectors) {
-            if (!connector.isVisible()) {
-                parentConnectorsHidden++;
-            }
-        }
-
-        if (parentConnectorsHidden == inConnectors.size()) {
-            setLeftState(LEFTCLOSED);
-        } else if (parentConnectorsHidden == 0) {
-            setLeftState(LEFTOPEN);
-        } else {
-            setLeftState(LEFT_PARTIALLY_CLOSED);
-        }
-    }
-
     /**
-     * Updates the state of the parent nodes based on the visibility of their children.
+     * Updates the state of the shape based on the visibility of its children.
      */
-    public void checkAndUpdateVisibilityStates() {
-        if (!isVisible()) return;
+    public void checkAndUpdateChildrenVisibilityStates() {
 
-        if(getLabel().matches("Animal")){
-            System.out.println("");
-        }
-
-        System.out.println("checkAndUpdateVisibilityStates " + getLabel());
+        System.out.println("checkAndUpdateChildrenVisibilityStates " + getLabel());
         // Check children visibility
         boolean allChildrenHidden = true;
         boolean allChildrenVisible = true;
@@ -591,6 +543,12 @@ public abstract class Shape {
         } else {
             setState(PARTIALLY_CLOSED);
         }
+    }
+
+    /**
+     * Updates the state of the shape based on the visibility of its parents.
+     */
+    public void checkAndUpdateParentVisibilityStates() {
 
         // Check parents visibility
         boolean allParentsHidden = true;
@@ -616,7 +574,6 @@ public abstract class Shape {
             setLeftState(LEFT_PARTIALLY_CLOSED);
         }
     }
-
 
 
     // NOT USED
