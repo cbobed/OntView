@@ -453,8 +453,8 @@ public abstract class Shape {
         for (VisConnector c : inConnectors) {
             System.out.println(c.from.getLabel());
             c.from.showLeft(this);
-            c.from.checkAndUpdateVisibilityStates();
             c.show();
+            c.from.checkAndUpdateVisibilityStates();
         }
     }
 
@@ -514,10 +514,59 @@ public abstract class Shape {
         }
     }
 
+    public void checkAndUpdateVisibilityStates2() {
+        if (!isVisible()) return;
+
+        if(getLabel().matches("Animal")){
+            System.out.println("");
+        }
+
+        System.out.println("checkAndUpdateVisibilityStates " + getLabel());
+        // Check children visibility
+        int childrenConnectorsHidden = 0;
+
+        for (VisConnector connector : outConnectors) {
+            if (!connector.isVisible()) {
+                childrenConnectorsHidden++;
+            }
+        }
+
+        if (childrenConnectorsHidden == outConnectors.size()) {
+            setState(CLOSED);
+        } else if (childrenConnectorsHidden == 0) {
+            setState(OPEN);
+        } else {
+            setState(PARTIALLY_CLOSED);
+        }
+
+        // Check parents visibility
+        int parentConnectorsHidden = 0;
+
+        for (VisConnector connector : inConnectors) {
+            if (!connector.isVisible()) {
+                parentConnectorsHidden++;
+            }
+        }
+
+        if (parentConnectorsHidden == inConnectors.size()) {
+            setLeftState(LEFTCLOSED);
+        } else if (parentConnectorsHidden == 0) {
+            setLeftState(LEFTOPEN);
+        } else {
+            setLeftState(LEFT_PARTIALLY_CLOSED);
+        }
+    }
+
     /**
      * Updates the state of the parent nodes based on the visibility of their children.
      */
     public void checkAndUpdateVisibilityStates() {
+        if (!isVisible()) return;
+
+        if(getLabel().matches("Animal")){
+            System.out.println("");
+        }
+
         System.out.println("checkAndUpdateVisibilityStates " + getLabel());
         // Check children visibility
         boolean allChildrenHidden = true;
