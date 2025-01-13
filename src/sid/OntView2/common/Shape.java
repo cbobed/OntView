@@ -139,8 +139,8 @@ public abstract class Shape {
 
     public abstract Point2D getConnectionPoint(Point2D point, boolean b);
 
-    private final Set<Shape> countedChildren = new HashSet<>();
-    private final Set<Shape> countedParents = new HashSet<>();
+    private final Set<Shape> hiddenChildrenSet = new HashSet<>();
+    private final Set<Shape> hiddenParentsSet = new HashSet<>();
     public boolean hiddenChildren = false;
     public boolean hiddenParents = false;
 
@@ -159,48 +159,48 @@ public abstract class Shape {
      */
     public void closeRight() {
         setState(CLOSED);
-        hideSubLevels(this, countedChildren);
+        hideSubLevels(this, hiddenChildrenSet);
     }
 
     public void closeLeft() {
         setLeftState(LEFTCLOSED);
-        hideParents(this, countedParents);
+        hideParents(this, hiddenParentsSet);
     }
 
     public void resetHiddenChildrenCount() {
         hiddenChildren = false;
-        countedChildren.clear();
+        hiddenChildrenSet.clear();
     }
 
     public void resetHiddenParentsCount() {
         hiddenParents = false;
-        countedParents.clear();
+        hiddenParentsSet.clear();
     }
 
-    public int getHiddenChildrenCount() {
+    public int getHiddenChildrenSet() {
         hiddenChildren = true;
-        System.out.println(this.getLabel() + " " + countedChildren.size() + "................");
+       /* System.out.println(this.getLabel() + " " + countedChildren.size() + "................");
         for (Shape c : countedChildren) {
             System.out.println(c.getLabel());
-        }
-        return countedChildren.size();
+        }*/
+        return hiddenChildrenSet.size();
     }
 
-    public int getHiddenParentsCount() {
+    public int getHiddenParentsSet() {
         hiddenParents = true;
-        System.out.println(this.getLabel() + " " + countedParents.size() + "................");
+        /*System.out.println(this.getLabel() + " " + countedParents.size() + "................");
         for (Shape c : countedParents) {
             System.out.println(c.getLabel());
-        }
-        return countedParents.size();
+        }*/
+        return hiddenParentsSet.size();
     }
 
     public void setHiddenChildren() {
-        hiddenChildren = !countedChildren.isEmpty();
+        hiddenChildren = !hiddenChildrenSet.isEmpty();
     }
 
     public void setHiddenParents() {
-        hiddenParents = !countedParents.isEmpty();
+        hiddenParents = !hiddenParentsSet.isEmpty();
     }
 
 
@@ -251,6 +251,7 @@ public abstract class Shape {
 
             if (child.childHasOtherParents()) {
                 connector.hide();
+                child.checkAndUpdateVisibilityStates();
                 continue;
             }
 
@@ -259,7 +260,6 @@ public abstract class Shape {
                 child.checkAndHide(closedShape, countedChildren);
         }
 
-        System.out.println("final " + getLabel());
     }
 
     /**
@@ -283,8 +283,7 @@ public abstract class Shape {
                 parent.checkAndHideParents(closedShape, countedParents);
             }
         }
-        updateHiddenParentsForChildren();
-        System.out.println("final " + getLabel() + "\n");
+
     }
 
     /**
@@ -419,7 +418,7 @@ public abstract class Shape {
                     if (connector.isVisible()) continue;
                     connector.show();
                     connector.to.show(this);
-                    connector.to.checkLastNode();
+                    connector.to.checkAndUpdateVisibilityStates();
                 }
                 break;//if its not a previously hidden node we'll show it
         }
@@ -436,6 +435,7 @@ public abstract class Shape {
                 for (VisConnector connector : inConnectors) {
                     connector.show();
                     connector.from.showLeft(this);
+                    connector.from.checkAndUpdateVisibilityStates();
                 }
                 break;
         }
@@ -445,19 +445,15 @@ public abstract class Shape {
         for (VisConnector c : outConnectors) {
             c.to.show(this);
             c.show();
-            c.to.checkLastNode();
-        }
-    }
-
-    public void checkLastNode() {
-        if (outConnectors.isEmpty()) {
-            checkAndUpdateState();
+            c.to.checkAndUpdateVisibilityStates();
         }
     }
 
     public void showParentLevels() {
         for (VisConnector c : inConnectors) {
+            System.out.println(c.from.getLabel());
             c.from.showLeft(this);
+            c.from.checkAndUpdateVisibilityStates();
             c.show();
         }
     }
@@ -472,28 +468,6 @@ public abstract class Shape {
     public VisLevel getVisLevel() {
         return vdepthlevel;
     }
-
-    /**
-     * Check and update the state of each node based on the visibility of
-     * its connectors and children
-     */
-    private void checkAndUpdateState() {
-        //System.out.println("checkAndUpdateState " + getLabel());
-        int inConnectorsHidden = 0;
-        for (VisConnector connector : inConnectors) {
-
-            if (!connector.isVisible()) inConnectorsHidden++;
-        }
-        if (inConnectorsHidden == inConnectors.size()) {
-            setLeftState(LEFTCLOSED);
-        } else if (inConnectorsHidden == 0) {
-            setLeftState(LEFTOPEN);
-        } else {
-            setLeftState(LEFT_PARTIALLY_CLOSED);
-        }
-        //System.out.println(inConnectorsHidden);
-    }
-
 
     /**
      * Inverts lookup in the shapeMap by returning the key out of an owlclassexpression
@@ -523,7 +497,7 @@ public abstract class Shape {
      * with no outgoing connectors and accumulates the count of hidden nodes.
      */
     public void collectHiddenChildren() {
-        collectHiddenChildren(countedChildren);
+        collectHiddenChildren(hiddenChildrenSet);
     }
 
     public void collectHiddenChildren(Set<Shape> countedChildren) {
@@ -541,10 +515,67 @@ public abstract class Shape {
     }
 
     /**
+     * Updates the state of the parent nodes based on the visibility of their children.
+     */
+    public void checkAndUpdateVisibilityStates() {
+        System.out.println("checkAndUpdateVisibilityStates " + getLabel());
+        // Check children visibility
+        boolean allChildrenHidden = true;
+        boolean allChildrenVisible = true;
+
+        for (VisConnector connector : outConnectors) {
+            if (connector.isVisible()) {
+                allChildrenHidden = false;
+            } else {
+                allChildrenVisible = false;
+            }
+
+            if (!allChildrenHidden && !allChildrenVisible) {
+                break;
+            }
+        }
+
+        if (allChildrenHidden) {
+            setState(CLOSED);
+        } else if (allChildrenVisible) {
+            setState(OPEN);
+        } else {
+            setState(PARTIALLY_CLOSED);
+        }
+
+        // Check parents visibility
+        boolean allParentsHidden = true;
+        boolean allParentsVisible = true;
+
+        for (VisConnector connector : inConnectors) {
+            if (connector.isVisible()) {
+                allParentsHidden = false;
+            } else {
+                allParentsVisible = false;
+            }
+
+            if (!allParentsHidden && !allParentsVisible) {
+                break;
+            }
+        }
+
+        if (allParentsHidden) {
+            setLeftState(LEFTCLOSED);
+        } else if (allParentsVisible) {
+            setLeftState(LEFTOPEN);
+        } else {
+            setLeftState(LEFT_PARTIALLY_CLOSED);
+        }
+    }
+
+
+
+    // NOT USED
+    /**
      * Updates the hidden parents count for children of nodes in countedParents.
      */
     private void updateHiddenParentsForChildren() {
-        Set<Shape> parentsToProcess = new HashSet<>(countedParents);
+        Set<Shape> parentsToProcess = new HashSet<>(hiddenParentsSet);
 
         for (Shape parent : parentsToProcess) {
             for (VisConnector connector : parent.outConnectors) {
@@ -554,12 +585,12 @@ public abstract class Shape {
                     continue;
                 }
 
-                child.countedParents.clear();
+                child.hiddenParentsSet.clear();
 
                 for (VisConnector inConnector : child.inConnectors) {
                     Shape grandParent = inConnector.from;
                     if (!grandParent.isVisible()) {
-                        addHiddenAncestors(grandParent, child.countedParents);
+                        addHiddenAncestors(grandParent, child.hiddenParentsSet);
                     }
                 }
             }

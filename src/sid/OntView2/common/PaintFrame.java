@@ -856,7 +856,7 @@ public class PaintFrame extends Canvas {
 						if (shape.getState() == Shape.OPEN || shape.getState() == Shape.PARTIALLY_CLOSED) {
 							// if [-] clicked, close the node
 							shape.closeRight();
-							shape.getHiddenChildrenCount();
+							shape.getHiddenChildrenSet();
 							refreshDashedConnectors();
 							VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
 							setStateChanged(true);
@@ -880,8 +880,8 @@ public class PaintFrame extends Canvas {
 						if (shape.getLeftState() == Shape.LEFTOPEN || shape.getLeftState() == Shape.LEFT_PARTIALLY_CLOSED) {
 							// if [-] clicked, close the node
 							shape.closeLeft();
-							shape.getHiddenParentsCount();
-							//refreshDashedConnectors();
+							shape.getHiddenParentsSet();
+							refreshDashedConnectors();
 							VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
 							setStateChanged(true);
 							Platform.runLater(relaxerRunnable);

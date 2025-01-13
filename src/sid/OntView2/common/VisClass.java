@@ -357,15 +357,7 @@ public class VisClass extends Shape {
 	    	}
 
 			if(hiddenChildren){
-				drawHiddenNodesIndicator(g, getHiddenChildrenCount(), getLeftCorner(), posy, "children");
-			}
-
-			if(hiddenParents){
-				if (hiddenChildren){
-					drawHiddenNodesIndicator(g, getHiddenParentsCount(), getLeftCorner(), posy - 16, "parents");
-				} else {
-					drawHiddenNodesIndicator(g, getHiddenParentsCount(), getLeftCorner(), posy, "parents");
-				}
+				drawHiddenNodesIndicator(g, getHiddenChildrenSet(), getLeftCorner(), posy);
 			}
 
 		    if (!children.isEmpty() && (outConnectors!=null) &&(!outConnectors.isEmpty())) {
@@ -458,14 +450,13 @@ public class VisClass extends Shape {
 		g.setFont(oldFont);
 	}
 
-	private void drawHiddenNodesIndicator(GraphicsContext g, int hiddenNodes, int x, int y, String text) {
+	private void drawHiddenNodesIndicator(GraphicsContext g, int hiddenNodes, int x, int y) {
 		if (totalNodes == -1) {
 			totalNodes = graph.getShapeMap().size() - 2; // Thing, Nothing
 			width = getIndicatorSize(g, totalNodes) + 8;
 		}
 
 		double height = 13;
-		double rectX = x ;
 		double rectY = y - (double) currentHeight / 2 - height - 5;
 
 		if (isDefined && !label.startsWith(SIDClassExpressionNamer.className)) rectY -= 5;
@@ -473,17 +464,17 @@ public class VisClass extends Shape {
 		double hiddenPercentage = (double) hiddenNodes / totalNodes;
 		double visiblePercentage = 1.0 - hiddenPercentage;
 
-		double hiddenWidth = width * hiddenPercentage;
-		double visibleWidth = width * visiblePercentage;
+		double visibleWidth = width * hiddenPercentage;
+		double hiddenWidth = width * visiblePercentage;
 
-		g.setFill(Color.MEDIUMSEAGREEN); // hidden nodes
-		g.fillRect(rectX, rectY, hiddenWidth, height);
-		g.setFill(Color.LIGHTGRAY); // visible nodes
-		g.fillRect(rectX + hiddenWidth, rectY, visibleWidth, height);
+		g.setFill(Color.MEDIUMSEAGREEN); // visible nodes
+		g.fillRect(x, rectY, visibleWidth, height);
+		g.setFill(Color.LIGHTGRAY); // hidden nodes
+		g.fillRect((double) x + visibleWidth, rectY, hiddenWidth, height);
 		g.setStroke(Color.BLACK);
-		g.strokeRect(rectX, rectY, width, height);
+		g.strokeRect(x, rectY, width, height);
 
-		drawCenteredText(g, hiddenNodes + " hidden " + text, rectX, rectY, width, height);
+		drawCenteredText(g, hiddenNodes + " hidden children", x, rectY, width, height);
 	}
 
 	private void drawCenteredText(GraphicsContext g, String text, double rectX, double rectY, double rectWidth, double rectHeight) {
