@@ -1085,12 +1085,18 @@ public class PaintFrame extends Canvas {
 						if (upperShape == null) // it's the visible upper shape
 							return;
 
-						int upperShapeHeight = upperShape.getHeight();
-						if ((upperShape instanceof VisClass) && (upperShape.asVisClass().propertyBox != null) && (upperShape.asVisClass().propertyBox.visible))
-							upperShapeHeight = upperShape.asVisClass().getTotalHeight();
+						int upperShapeHeight = (upperShape instanceof VisClass && upperShape.asVisClass().propertyBox != null
+								&& upperShape.asVisClass().propertyBox.visible)
+								? upperShape.getTotalHeight()
+								: upperShape.getHeight();
 
-						if (repellingShape.getTopCorner() < (upperShape.getPosY() + upperShapeHeight/2 + MIN_SPACE)) {
-							upperShape.setPosY(upperShape.getPosY() - upperShape.getHeight() / 2 );
+						int repellingTopCorner = repellingShape.getTopCorner();
+						if (repellingShape.hiddenChildren) repellingTopCorner -= repellingShape.asVisClass().topToBarDistance;
+
+						int upperShapeLimit = upperShape.getPosY() + upperShapeHeight / 2 + MIN_SPACE;
+
+						if (repellingTopCorner < upperShapeLimit) {
+							upperShape.setPosY(upperShape.getPosY() - upperShapeHeight / 2);
 						}
 
 						shapeRepulsion(upperShape, direction);
@@ -1101,19 +1107,21 @@ public class PaintFrame extends Canvas {
 				case DOWN:
 					if (repellingIndex < orderedList.size() - 1) {
 						Shape lowerShape = getLowerShape(repellingIndex, orderedList);
-						if (lowerShape == null) // it's the visible upper shape
+						if (lowerShape == null) // it's the visible lower shape
 							return;
 
-						if ((repellingShape instanceof VisClass) && (repellingShape.asVisClass().propertyBox != null) && (repellingShape.asVisClass().propertyBox.visible)) {
-							if (repellingShape.getBottomCorner() + MIN_SPACE > lowerShape.getTopCorner()) {
-								lowerShape.setPosY(lowerShape.getPosY() + lowerShape.getTotalHeight() / 2);
-							}
+						int lowerShapeHeight = (lowerShape instanceof VisClass && lowerShape.asVisClass().propertyBox != null
+								&& lowerShape.asVisClass().propertyBox.visible)
+								? lowerShape.getTotalHeight()
+								: lowerShape.getHeight();
+
+						int lowerShapeTopCorner = lowerShape.getTopCorner();
+						if (lowerShape.hiddenChildren) lowerShapeTopCorner -= lowerShape.asVisClass().topToBarDistance;
+
+						if (repellingShape.getBottomCorner() + MIN_SPACE > lowerShapeTopCorner) {
+							lowerShape.setPosY(lowerShape.getPosY() + lowerShapeHeight / 2);
 						}
-						else {
-							if (repellingShape.getBottomCorner() + MIN_SPACE > lowerShape.getTopCorner() ) {
-								lowerShape.setPosY(lowerShape.getPosY() + lowerShape.getHeight() / 2);
-							}
-						}
+
 						shapeRepulsion(lowerShape, direction);
 					}
 					break;

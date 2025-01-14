@@ -72,6 +72,7 @@ public class VisClass extends Shape {
 	boolean labelRendering = false;
 	private static int totalNodes = -1;
 	private static double width;
+	public int topToBarDistance;
 
 
 	int tabSize = 15; 
@@ -475,6 +476,8 @@ public class VisClass extends Shape {
 		g.strokeRect(x, rectY, width, height);
 
 		drawCenteredText(g, hiddenNodes + " hidden children", x, rectY, width, height);
+
+		topToBarDistance = (int) ((y - (double) currentHeight / 2) - rectY);
 	}
 
 	private void drawCenteredText(GraphicsContext g, String text, double rectX, double rectY, double rectWidth, double rectHeight) {

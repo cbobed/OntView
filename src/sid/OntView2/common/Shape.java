@@ -539,6 +539,7 @@ public abstract class Shape {
         if (allChildrenHidden) {
             setState(CLOSED);
         } else if (allChildrenVisible) {
+            resetHiddenChildrenCount();
             setState(OPEN);
         } else {
             setState(PARTIALLY_CLOSED);
