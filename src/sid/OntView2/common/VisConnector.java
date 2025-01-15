@@ -159,22 +159,25 @@ public abstract class VisConnector {
 	protected void calculateNurbPoints(double fromPointX, double fromPointY, double toPointX,double toPointY){
 
 		double xdiff = toPointX-fromPointX;
-//		double ydiff = toPointY-toPointY;
-	    if  (xdiff > 0) {
+	    if  (xdiff > 0) { // Right to left
 			controlx1 = fromPointX + 0.1 * (xdiff);
 			controly1 = fromPointY;
 			controlx2 = fromPointX + 0.4 * (xdiff);
 			controly2 = toPointY;
-		}
-	    else {
-
+		} else if (xdiff == 0) { // Up to down
+			double pseudoXdiff = 50;
+			controlx1 = fromPointX - pseudoXdiff;
+			controly1 = fromPointY - pseudoXdiff/2;
+			controlx2 = toPointX - pseudoXdiff;
+			controly2 = toPointY + pseudoXdiff/2;
+		} else { // Left to right
 	    	controlx1 = toPointX + 0.4 * (-1.0) * (xdiff);
 	    	controly1 = fromPointY;
 	    	controlx2 = toPointX + 0.1 * (-1.0) * (xdiff);
 	    	controly2 = toPointY;
         }
-	    
-	
+
+
 	}
 
 	protected void setPath(Path path, double fromPointX, double fromPointY, double toPointX, double toPointY){

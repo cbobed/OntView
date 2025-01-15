@@ -101,6 +101,15 @@ public abstract class Shape {
         return posx - getWidth() / 2;
     }
 
+    public int getRightCorner() {
+        return posx + getWidth() / 2;
+    }
+
+    public int getBottomShapeCorner() {
+        return posy + getHeight() / 2;
+    }
+
+
     public int getBottomCorner() {
         VisClass v_i = this.asVisClass();
         if (v_i.getPropertyBox() != null && v_i.getPropertyBox().visible) {
@@ -518,8 +527,6 @@ public abstract class Shape {
      * Updates the state of the shape based on the visibility of its children.
      */
     public void checkAndUpdateChildrenVisibilityStates() {
-
-        System.out.println("checkAndUpdateChildrenVisibilityStates " + getLabel());
         // Check children visibility
         boolean allChildrenHidden = true;
         boolean allChildrenVisible = true;
@@ -550,7 +557,6 @@ public abstract class Shape {
      * Updates the state of the shape based on the visibility of its parents.
      */
     public void checkAndUpdateParentVisibilityStates() {
-
         // Check parents visibility
         boolean allParentsHidden = true;
         boolean allParentsVisible = true;

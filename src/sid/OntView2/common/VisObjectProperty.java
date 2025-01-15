@@ -54,9 +54,8 @@ public class VisObjectProperty extends VisProperty {
 	boolean isInverseFunctional = false;
 	OWLSubPropertyChainOfAxiom propertyChainAxiom = null;
 
-	public int getPosX(){return getDomain().getPosX()-(getDomain().getWidth()/2)+2;}
+	public int getPosX(){return getDomain().getPosX()-(getDomain().getWidth()/2);}
 	public int getPosY(){return  15+getDomain().getPosY()+(getDomain().getHeight()/2)+getLabelHeight()*voffset;}
-
 	public OWLReasoner getReasoner(){return pbox.vclass.graph.paintframe.getReasoner();}
 	
 	public boolean onProperty(Point2D p){

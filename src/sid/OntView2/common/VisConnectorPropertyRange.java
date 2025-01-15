@@ -27,22 +27,38 @@ public class VisConnectorPropertyRange extends VisConnectorIsA {
 		if ((visible)&&(parentBox.visible)&&(!globalHide)){
 			if ((from != null) && (to!= null)){
 				if ((from.visible) && (to.visible)){
-					fromPoint = new Point2D(vprop.getPosX() + vprop.getLabelWidth()+5,vprop.getPosY()-5);
-					toPoint = new Point2D(to.getPosX(),to.getPosY());
+					if (vprop.getPosX() > to.getLeftCorner()){
+						fromPoint = new Point2D(vprop.getPosX()-5,vprop.getPosY()-5);
+
+					} else if (vprop.getPosX() == to.getLeftCorner()){
+						fromPoint = new Point2D(vprop.getPosX(),vprop.getPosY()-5);
+					}
+					else{
+						fromPoint = new Point2D(vprop.getPosX() + vprop.getLabelWidth()+5,vprop.getPosY()-5);
+					}
+
+					double toX = (vprop.getPosX() == to.getLeftCorner()) ? to.getLeftCorner() : to.getRightCorner();
+					toPoint = (vprop.getPosY() > to.getBottomShapeCorner()) ?
+							new Point2D(toX, to.getBottomShapeCorner() - 1) :
+							new Point2D(toX, to.getTopCorner() + 1);
+
 					Color prevColor = (Color) g.getStroke();
+					double prevLineWidth = g.getLineWidth();
+
 				  	g.setFill(Color.DARKCYAN);
 			  		g.fillOval(fromPoint.getX(), fromPoint.getY()-2, 4, 4);
-//				  	g2d.drawLine(fromPoint.x+2, fromPoint.y-2, toPoint.x, toPoint.y);
-					g.setStroke(Color.LIGHTBLUE);
+					g.setStroke(Color.DARKTURQUOISE);
+					g.setLineWidth(1.7);
 			  		drawCurve(g, VisConstants.NURB);
+
 					g.setStroke(prevColor);
-//			  		setPath(path,fromPoint.x+2, fromPoint.y-2, toPoint.x, toPoint.y);
-//			  		g2d.draw(path);
+					g.setLineWidth(prevLineWidth);
 				  	g.setFill(prevColor);
 				} 	
 			}
 		}	
 	}
+
 	protected void drawCurve(GraphicsContext g2d,int method){
 		switch (method){
 			case VisConstants.BEZIER:
