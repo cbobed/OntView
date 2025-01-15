@@ -26,16 +26,21 @@ public class VisConnectorPropProp extends VisConnector {
 	}
 
 	private Point2D getFromPoint(){
-//		if (fromPoint==null){
-			fromPoint = new Point2D(fromProp.getPosX()+fromProp.getLabelWidth()+14, fromProp.getPosY());
-//		}
-		return fromPoint; 
+		if(from.getPosX() > to.getPosX()){
+			fromPoint = new Point2D(fromProp.getPosX(), fromProp.getPosY()-1);
+		} /*else if (from.getPosX() == to.getPosX()){
+			fromPoint = new Point2D(fromProp.getPosX(), fromProp.getPosY());
+		}*/ else {
+			fromPoint = new Point2D(fromProp.getPosX()+fromProp.getLabelWidth()+5, fromProp.getPosY());
+		}
+		//fromPoint = new Point2D(fromProp.getPosX()+fromProp.getLabelWidth()+5, fromProp.getPosY());
+		return fromPoint;
 	}
 	
 	private Point2D getToPoint() {
-		d = (toProp.getPosY()< fromProp.getPosY() ? -5:5);
+		d = (toProp.getPosY()<fromProp.getPosY() ? -5:5);
 		if (from == to){
-			toPoint = new Point2D(toProp.getPosX()+ (double) (toProp.getLabelWidth() * 3) /4, toProp.getPosY()-d);
+			toPoint = new Point2D(toProp.getPosX() + toProp.getLabelWidth()-3, toProp.getPosY()- d);
 		}
 		else{
 			toPoint = new Point2D(toProp.getPosX()+toProp.getLabelWidth()+10,toProp.getPosY());
@@ -63,14 +68,22 @@ public class VisConnectorPropProp extends VisConnector {
 		}
         if (drawable()){
 			Color prevColor = (Color) g.getStroke();
-			g.setStroke(Color.PINK);
-			g.strokeOval(getFromPoint().getX()-8, getFromPoint().getY()-3, 3, 3);
-//			VisConnector.drawArrow(g,getFromPoint().x-5,getFromPoint().y, getToPoint().x-2, getToPoint().y);
-			setPath(path, getFromPoint().getX()-5,getFromPoint().getY(), getToPoint().getX()-2, getToPoint().getY());
+			double prevLineWidth = g.getLineWidth();
+
+			g.setStroke(Color.HOTPINK);
+			g.setLineWidth(1.7);
+			setPath(path, getFromPoint().getX(),getFromPoint().getY(), getToPoint().getX(), getToPoint().getY());
 			drawPath(g, path);
+
+			g.setFill(Color.DEEPPINK);
+			g.fillOval(getFromPoint().getX()-3, getFromPoint().getY()-2, 4, 4);
+
+			g.setLineWidth(prevLineWidth);
+			g.setFill(prevColor);
 		 	g.setStroke(prevColor);
 		} 	
 	}
+
 	
 	protected void drawCurve(GraphicsContext g2d,int method){
 		switch (method){
