@@ -582,6 +582,13 @@ public abstract class Shape {
         }
     }
 
+    /**
+     * Updates the hidden parents count. Hide node by double-clicked
+     */
+    public void updateParents() {
+        Set<Shape> visitedParents = new HashSet<>();
+        updateAncestorsForHiddenChildren(this, visitedParents);
+    }
 
     /**
      * Updates the hidden children count for the first visible parent of nodes in hiddenChildrenSet.
