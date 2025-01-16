@@ -457,8 +457,6 @@ public class VisClass extends Shape {
 			width = getIndicatorSize(g, totalNodes) + 8;
 		}
 
-		System.out.println(getLabel() + " total children " + children.size());
-
 		double height = 13;
 		double rectY = y - (double) currentHeight / 2 - height - 5;
 

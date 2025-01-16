@@ -857,6 +857,7 @@ public class PaintFrame extends Canvas {
 							// if [-] clicked, close the node
 							shape.closeRight();
 							shape.getHiddenChildrenSet();
+							shape.updateHiddenChildrenForParents();
 							refreshDashedConnectors();
 							VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
 							setStateChanged(true);
