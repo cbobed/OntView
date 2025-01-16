@@ -188,19 +188,11 @@ public abstract class Shape {
 
     public int getHiddenChildrenSet() {
         hiddenChildren = true;
-       /* System.out.println(this.getLabel() + " " + countedChildren.size() + "................");
-        for (Shape c : countedChildren) {
-            System.out.println(c.getLabel());
-        }*/
         return hiddenChildrenSet.size();
     }
 
     public int getHiddenParentsSet() {
         hiddenParents = true;
-        /*System.out.println(this.getLabel() + " " + countedParents.size() + "................");
-        for (Shape c : countedParents) {
-            System.out.println(c.getLabel());
-        }*/
         return hiddenParentsSet.size();
     }
 
@@ -622,7 +614,7 @@ public abstract class Shape {
                         addHiddenDescendants(childNode, parent.hiddenChildrenSet);
                     }
                 }
-                parent.hiddenChildren = !parent.hiddenChildrenSet.isEmpty();
+                parent.hiddenChildren = parent.getState() != OPEN;
             } else {
                 updateAncestorsForHiddenChildren(parent, visitedNodes);
             }

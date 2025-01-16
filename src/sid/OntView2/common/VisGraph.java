@@ -1506,7 +1506,6 @@ public class VisGraph implements Runnable{
 				s.openRight();
 			}
 			s.resetHiddenChildrenCount();
-			s.resetHiddenParentsCount();
 			s.setVisible(true);
 		}
 	}
