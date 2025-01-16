@@ -81,79 +81,6 @@ public abstract class VisConnector {
 	 * @param toPointX
 	 * @param toPointY
 	 */
-	protected void calculateBezierPoints2(double fromPointX, double fromPointY, double toPointX,double toPointY){
-
-		final int MINDIF = 50;
-		double xdiff = toPointX - fromPointX;
-		double ydiff = toPointY - fromPointY;
-
-
-		// Destination point is upper and right
-		if ((toPointY - fromPointY < 0) && (xdiff > 0)){
-			double c1 = 1.0;
-			double c2 = 1.0;
-			double offset = 0.0;
-			if (Math.abs(xdiff)<MINDIF){
-				c1 = -3.0;
-				c2 = -3.0;
-				offset = 60;
-			}
-			controlx1 = fromPointX + 0.1 * c1 * (xdiff) + offset;
-			controly1 = fromPointY + (ydiff);
-			controlx2 = fromPointX + 0.9 * c2 * (xdiff) + offset;
-			controly2 = fromPointY + (ydiff);
-
-		}
-
-		// Destination point is upper and left
-		else if ((toPointY - fromPointY < 0) && (xdiff <= 0)){
-			double c1 = 1.0;
-			double c2 = 1.0;
-			double offset = 0.0;
-			if (Math.abs(xdiff)<MINDIF){
-				c1 = -3.0;
-				c2 = -3.0;
-				offset = 60;
-			}
-			controlx1 = fromPointX + 0.1 * c1 * (xdiff) + offset;
-			controly1 = fromPointY + (ydiff);
-			controlx2 = fromPointX + 0.9 * c2 * (xdiff) + offset;
-			controly2 = fromPointY + (ydiff);
-		}
-
-		// Destination point is lower and right
-		else if ((toPointY - fromPointY >= 0) && (xdiff > 0)){
-			double c1 = 1.0;
-			double c2 = 1.0;
-			double offset = 0.0;
-			if (Math.abs(xdiff)<MINDIF){
-				c1 = -3.0;
-				c2 = -3.0;
-				offset = 60;
-			}
-			controlx1 = fromPointX + 0.1 * c1 * (xdiff) + offset;
-			controly1 = fromPointY + (ydiff);
-			controlx2 = fromPointX + 0.9 * c2 * (xdiff) + offset;
-			controly2 = fromPointY + (ydiff);
-		}
-
-		// Destination point is lower and left
-		else if ((toPointY - fromPointY >= 0) && (xdiff <= 0)){
-			double c1 = 1.0;
-			double c2 = 1.0;
-			double offset = 0.0;
-			if (Math.abs(xdiff)<MINDIF){
-				c1     = -3.0;
-				c2     = -3.0;
-				offset =  60;
-			}
-			controlx1 = fromPointX + 0.1 * c1 * (xdiff) + offset;
-			controly1 = fromPointY + (ydiff);
-			controlx2 = fromPointX + 0.9 * c2 * (xdiff) + offset;
-			controly2 = fromPointY + (ydiff);
-		}
-	}
-
 	protected void calculateBezierPoints(double fromPointX, double fromPointY, double toPointX,double toPointY){
 
 		final int MINDIF = 50;
@@ -169,12 +96,7 @@ public abstract class VisConnector {
 				((toPointY - fromPointY < 0) && (xdiff <= 0)) ||
 				((toPointY - fromPointY >= 0) && (xdiff > 0)) ||
 				((toPointY - fromPointY >= 0) && (xdiff <= 0))){
-	    	/*if (Math.abs(xdiff)<MINDIF){
-				System.out.println("here");
-	    		c1 = -3.0;
-	    		c2 = -3.0;
-	    		offset = 60;
-	    	}*/
+
 	    	controlx1 = fromPointX + 0.1 * c1 * (xdiff) + offset;
 	    	controly1 = fromPointY + (ydiff);
 	    	controlx2 = fromPointX + 0.9 * c2 * (xdiff) + offset;

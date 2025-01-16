@@ -29,8 +29,10 @@ public class KCEConceptExtraction extends KConceptExtractor {
 			}
 		}
 		for (Shape s: nonHiddenShape){
-			s.collectHiddenChildren();
-			s.setHiddenChildren();
+			if (s.getState()!=Shape.OPEN) {
+				s.collectHiddenChildren();
+				s.setHiddenChildren();
+			}
 		}
 		graph.addDashedConnectors();
 	}
