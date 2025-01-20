@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SuperNode extends Shape {
-    private List<VisClass> subNodes;
+    private final List<VisClass> subNodes;
 
     public SuperNode() {
         subNodes = new ArrayList<>();

@@ -419,6 +419,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 	private HBox createRow(Node... children) {
 		HBox row = new HBox(5);
+		row.setAlignment(Pos.CENTER);
 		row.getChildren().addAll(children);
 		return row;
 	}

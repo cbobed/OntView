@@ -841,7 +841,7 @@ public class PaintFrame extends Canvas {
 					// Right: Click on the open symbol
 					if (pressedRightOpen(shape, x, y, e)) {
 						if (shape.getState() == Shape.CLOSED || shape.getState() == Shape.PARTIALLY_CLOSED) {
-							// si estaba cerrado el nodo [+] abrirlo
+							// si estaba cerrado el nodo  [+] abrirlo
 							shape.openRight();
 							shape.updateHiddenChildrenForParents();
 							shape.resetHiddenChildrenCount();

@@ -444,6 +444,7 @@ public abstract class Shape {
 
     public void showSubLevels() {
         for (VisConnector c : outConnectors) {
+            if (c.isVisible()) continue;
             c.to.show(this);
             c.show();
             c.to.checkAndUpdateParentVisibilityStates();
@@ -600,6 +601,7 @@ public abstract class Shape {
     private void updateAncestorsForHiddenChildren(Shape currentNode, Set<Shape> visitedNodes) {
         for (VisConnector inConnector : currentNode.inConnectors) {
             Shape parent = inConnector.from;
+            //System.out.println("Shape parent = " + parent.getLabel());
 
             if (visitedNodes.contains(parent)) {
                 continue;
@@ -610,9 +612,11 @@ public abstract class Shape {
                 parent.hiddenChildrenSet.clear();
                 for (VisConnector outConnector : parent.outConnectors) {
                     Shape childNode = outConnector.to;
+                    //System.out.println("Shape childNode = " + childNode.getLabel());
                     if (!childNode.isVisible()) {
                         addHiddenDescendants(childNode, parent.hiddenChildrenSet);
-                    }
+                    } else {
+                        updateAncestorsForHiddenChildren(childNode, visitedNodes);                    }
                 }
                 parent.hiddenChildren = parent.getState() != OPEN;
             } else {

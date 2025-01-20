@@ -1316,8 +1316,7 @@ public class VisGraph implements Runnable{
         connectorList.add(con);
         vis.inConnectors.add(con);
         parent.outConnectors.add(con);
-	}		
-	 
+	}
 		
 	 private void removeAnnonymousClassExpressionShape(Set<Shape> set){
 		 //only if it was previously added
@@ -1469,7 +1468,33 @@ public class VisGraph implements Runnable{
 			  return nVis;
 			  
 		  }	
+	 }
+
+	private void storeDescendants() {
+		Set<Shape> childrenToProcess = new HashSet<>(shapeMap.values());
+		Set<Shape> visitedNodes = new HashSet<>();
+
+		for (Shape child : childrenToProcess) {
+			traverseAndStoreDescendants(child, visitedNodes);
 		}
+	}
+
+	private void traverseAndStoreDescendants(Shape currentNode, Set<Shape> visitedNodes) {
+		if (visitedNodes.contains(currentNode)) {
+			return;
+		}
+		visitedNodes.add(currentNode);
+
+		Set<Shape> allDescendants = new HashSet<>();
+		for (VisConnector outConnector : currentNode.outConnectors) {
+			Shape childNode = outConnector.to;
+			allDescendants.add(childNode);
+			traverseAndStoreDescendants(childNode, visitedNodes);
+			allDescendants.addAll(childNode.asVisClass().descendants);
+		}
+		currentNode.asVisClass().descendants.addAll(allDescendants);
+	}
+
 
 	@Override
 	public void run() {
@@ -1479,6 +1504,7 @@ public class VisGraph implements Runnable{
 			HashSet<OWLClassExpression> topSet = new HashSet<>(); 
 			topSet.add(getActiveOntology().getOWLOntologyManager().getOWLDataFactory().getOWLThing()); 
 			this.buildReasonedGraph(getActiveOntology(), getReasoner(), topSet, isExpanded());
+			storeDescendants();
 		} catch (XPathExpressionException e) {
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {

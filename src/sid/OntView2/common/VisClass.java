@@ -33,6 +33,8 @@ public class VisClass extends Shape {
 	HashSet<OWLDataProperty> dAplicable;
 	ArrayList<Shape>   children;
 	ArrayList<Shape>   parents;
+
+	Set<Shape> descendants = new HashSet<>();
 	ArrayList<VisConnectorDisjoint> disjointList;
 	ArrayList<VisConnectorEquiv> equivList;
 	ArrayList<String>  properties; // those that have this class as its domain  
@@ -70,8 +72,7 @@ public class VisClass extends Shape {
 
 	boolean qualifiedRendering = false; 
 	boolean labelRendering = false;
-	private static int totalNodes = -1;
-	private static double width;
+	private static double width= -1;
 	public int topToBarDistance;
 
 
@@ -452,9 +453,13 @@ public class VisClass extends Shape {
 	}
 
 	private void drawHiddenNodesIndicator(GraphicsContext g, int hiddenNodes, int x, int y) {
-		if (totalNodes == -1) {
-			totalNodes = graph.getShapeMap().size() - 2; // Thing, Nothing
-			width = getIndicatorSize(g, totalNodes) + 8;
+		if (width == -1) {
+			width = getIndicatorSize(g, graph.getShapeMap().size() - 2) + 8;
+		}
+
+		System.out.println(getLabel() + " children " + descendants.size());
+		for (Shape child : descendants) {
+			System.out.println("- " + child.getLabel());
 		}
 
 		double height = 13;
@@ -462,7 +467,7 @@ public class VisClass extends Shape {
 
 		if (isDefined && !label.startsWith(SIDClassExpressionNamer.className)) rectY -= 5;
 
-		double hiddenPercentage = (double) hiddenNodes / totalNodes;
+		double hiddenPercentage = (double) hiddenNodes / descendants.size();
 		double visiblePercentage = 1.0 - hiddenPercentage;
 
 		double visibleWidth = width * hiddenPercentage;
