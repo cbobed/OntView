@@ -145,7 +145,7 @@ public class Mine extends Application implements Embedable{
 		}
 	}
 
-	protected void loadActiveOntology(IRI source){
+	protected boolean loadActiveOntology(IRI source){
 		manager = OWLManager.createOWLOntologyManager();
 		artPanel.setCursor(Cursor.WAIT);
 		try {
@@ -157,6 +157,7 @@ public class Mine extends Application implements Embedable{
 			artPanel.setCursor(Cursor.DEFAULT);
 			activeOntology = null;
 			manager = null;
+			return false;
 		}
 		artPanel.setCursor(Cursor.DEFAULT);
 		artPanel.setOntology(activeOntology);
@@ -170,10 +171,10 @@ public class Mine extends Application implements Embedable{
 			for (String ns: ExpressionManager.getNamespaceManager().getNamespaces()) {
 				System.err.println("prefix: "+ExpressionManager.getNamespaceManager().getPrefixForNamespace(ns));
 				System.err.println("  ns: "+ns);
-
 			}
 
 		}
+		return true;
 	}
 
 	protected void loadActiveOntology(String source){

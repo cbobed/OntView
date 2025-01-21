@@ -93,13 +93,9 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	}
 
 	private VBox createLoadOntologyRow() {
-		ComboBox<Object> urlComboBox = getOntologyCombo();
-		Button loadOntologyButton = getLoadOntologyButton();
-		Button folderOntologyButton = getfileSystemButton();
-
 		StackPane titlePane = createTitlePane("Load Ontology");
 
-		HBox row = createRow(urlComboBox, folderOntologyButton, loadOntologyButton);
+		HBox row = createRow(getOntologyCombo(), getfileSystemButton(), getLoadOntologyButton());
 		row.setAlignment(Pos.CENTER);
 
 		return createContainer(titlePane, row);
@@ -698,14 +694,10 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		parent.artPanel.stop();
 		String x = (String) getOntologyCombo().getValue();
 		if ((x != null) && (!x.isEmpty())) {
-			try {
-				parent.loadActiveOntology(IRI.create(x));
-			} catch (Exception e) {
-				parent.showErrorDialog("Error", "Enable to load ontology.", "Please try a different one.");
-			} finally {
-				loadReasonerButton.setDisable(false);
-				getReasonerCombo().setDisable(false);
-			}
+			boolean success = parent.loadActiveOntology(IRI.create(x));
+			if (!success) return;
+			loadReasonerButton.setDisable(false);
+			getReasonerCombo().setDisable(false);
 		} else {
 			parent.showErrorDialog("Error", "No ontology selected.", "Please select an ontology first.");
 		}
