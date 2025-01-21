@@ -40,7 +40,22 @@ public class VisConnectorDisjoint extends VisConnectorEquiv {
 			g.setStroke(col);
 		  	g.strokeLine(fromPoint.getX(), fromPoint.getY(), toPoint.getX(), toPoint.getY());
 		  	g.strokeLine(fromPoint.getX()-5, fromPoint.getY(), toPoint.getX()-5, toPoint.getY());
+			//drawCrossingLine(g, fromPoint, toPoint, -45, 20);
 			g.setStroke(prevColor);
 		}	
+	}
+
+	private void drawCrossingLine(GraphicsContext g, Point2D fromPoint, Point2D toPoint, double angleDeg, double length) {
+		double dx = toPoint.getX() - fromPoint.getX();
+		double dy = toPoint.getY() - fromPoint.getY();
+		double crossingAngle = Math.atan2(dy, dx) + Math.toRadians(angleDeg);
+
+		double startX = ((fromPoint.getX() + toPoint.getX()) / 2) - (Math.cos(crossingAngle) * length / 2);
+		double startY = ((fromPoint.getY() + toPoint.getY()) / 2) - (Math.sin(crossingAngle) * length / 2);
+		double endX = ((fromPoint.getX() + toPoint.getX()) / 2) + (Math.cos(crossingAngle) * length / 2);
+		double endY = ((fromPoint.getY() + toPoint.getY()) / 2) + (Math.sin(crossingAngle) * length / 2);
+
+		g.setStroke(Color.RED);
+		g.strokeLine(startX, startY, endX, endY);
 	}
 }

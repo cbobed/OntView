@@ -1470,6 +1470,9 @@ public class VisGraph implements Runnable{
 		  }	
 	 }
 
+	/**
+	 * Initiates the traversal of all nodes in shapeMap and stores their descendants.
+	 */
 	private void storeDescendants() {
 		Set<Shape> childrenToProcess = new HashSet<>(shapeMap.values());
 		Set<Shape> visitedNodes = new HashSet<>();
@@ -1479,6 +1482,9 @@ public class VisGraph implements Runnable{
 		}
 	}
 
+	/**
+	 * Traverses the descendants of the given node and stores them in the descendants set of the node.
+	 */
 	private void traverseAndStoreDescendants(Shape currentNode, Set<Shape> visitedNodes) {
 		if (visitedNodes.contains(currentNode)) {
 			return;

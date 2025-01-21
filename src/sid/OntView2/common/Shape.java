@@ -248,6 +248,7 @@ public abstract class Shape {
 
         Shape child;
         for (VisConnector connector : outConnectors) {
+            if (!connector.isVisible()) continue;
             child = connector.to;
 
             if (child.childHasOtherParents()) {
@@ -590,6 +591,7 @@ public abstract class Shape {
         Set<Shape> childrenToProcess = new HashSet<>(hiddenChildrenSet);
         Set<Shape> visitedNodes = new HashSet<>();
 
+        updateAncestorsForHiddenChildren(this, visitedNodes);
         for (Shape child : childrenToProcess) {
             updateAncestorsForHiddenChildren(child, visitedNodes);
         }
@@ -601,7 +603,6 @@ public abstract class Shape {
     private void updateAncestorsForHiddenChildren(Shape currentNode, Set<Shape> visitedNodes) {
         for (VisConnector inConnector : currentNode.inConnectors) {
             Shape parent = inConnector.from;
-            //System.out.println("Shape parent = " + parent.getLabel());
 
             if (visitedNodes.contains(parent)) {
                 continue;
@@ -612,11 +613,7 @@ public abstract class Shape {
                 parent.hiddenChildrenSet.clear();
                 for (VisConnector outConnector : parent.outConnectors) {
                     Shape childNode = outConnector.to;
-                    //System.out.println("Shape childNode = " + childNode.getLabel());
-                    if (!childNode.isVisible()) {
-                        addHiddenDescendants(childNode, parent.hiddenChildrenSet);
-                    } else {
-                        updateAncestorsForHiddenChildren(childNode, visitedNodes);                    }
+                    addHiddenDescendants(childNode, parent.hiddenChildrenSet);
                 }
                 parent.hiddenChildren = parent.getState() != OPEN;
             } else {
@@ -626,16 +623,16 @@ public abstract class Shape {
     }
 
     /**
-     * Adds all hidden descendants of a node to the provided set until a visible descendant is encountered.
+     * Adds all hidden descendants of a node to the provided set.
      */
     private void addHiddenDescendants(Shape s, Set<Shape> countedChildren) {
         if (!s.isVisible()) {
-            if (countedChildren.add(s)) {
-                for (VisConnector outConnector : s.outConnectors) {
-                    addHiddenDescendants(outConnector.to, countedChildren);
-                }
-            }
+            countedChildren.add(s);
         }
+        for (VisConnector outConnector : s.outConnectors) {
+            addHiddenDescendants(outConnector.to, countedChildren);
+        }
+
     }
 
     // NOT USED

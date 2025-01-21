@@ -457,11 +457,6 @@ public class VisClass extends Shape {
 			width = getIndicatorSize(g, graph.getShapeMap().size() - 2) + 8;
 		}
 
-		System.out.println(getLabel() + " children " + descendants.size());
-		for (Shape child : descendants) {
-			System.out.println("- " + child.getLabel());
-		}
-
 		double height = 13;
 		double rectY = y - (double) currentHeight / 2 - height - 5;
 
