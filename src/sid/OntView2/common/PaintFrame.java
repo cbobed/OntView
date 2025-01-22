@@ -523,6 +523,7 @@ public class PaintFrame extends Canvas {
 	}
 
 	private void handleMousePressed(MouseEvent e) {
+		System.out.println("Mouse pressed");
 		if (visGraph == null) {
 			return;
 		}
@@ -545,6 +546,7 @@ public class PaintFrame extends Canvas {
 	}
 
 	public void handleMouseReleased(MouseEvent e) {
+		System.out.println("Mouse released");
 		if (visGraph == null) {
 			return;
 		}
@@ -554,13 +556,20 @@ public class PaintFrame extends Canvas {
 		mouseLastY = 0;
 		mouseLastX = 0;
 		setCursor(Cursor.DEFAULT);
+
+		Platform.runLater(drawerRunnable);
 	}
 
 	/*
 	 * MOUSEMOTIONLISTENER
 	 */
 
+	private boolean isDragging = false;
+
 	public void handleMouseDragged(MouseEvent e) {
+		System.out.println("Mouse dragged");
+		isDragging = true;
+
 		int draggedY, draggedX;
 		int direction;
 		repulsion = (e.getButton() != MouseButton.SECONDARY);
@@ -599,23 +608,6 @@ public class PaintFrame extends Canvas {
 		}
 	}
 
-
-	/*private void configureTooltipLockHandler() {
-		this.sceneProperty().addListener((observable, oldScene, newScene) -> {
-			if (newScene != null) {
-				newScene.addEventHandler(KeyEvent.KEY_PRESSED, this::handleKeyPressed);
-			}
-		});
-	}
-
-	public void handleKeyPressed(KeyEvent event) {
-		if (event.getEventType() == KeyEvent.KEY_PRESSED && event.isAltDown() && event.getCode() == KeyCode.S) { // O Fn+F2 dependiendo del sistema
-			System.out.println("Alt + S pressed");
-			tooltipLocked = !tooltipLocked; // Cambiar el estado de bloqueo
-			System.out.println("Tooltip locked: " + tooltipLocked);
-		}
-	}*/
-
 	public void handleMouseMoved(MouseEvent e) {
 		if (visGraph == null) {
 			return;
@@ -645,6 +637,13 @@ public class PaintFrame extends Canvas {
 	}
 
 	public void handleMouseClicked(MouseEvent e) {
+		if (isDragging) {
+			e.consume();
+			isDragging = false;
+			return;
+		}
+		System.out.println("Mouse clicked");
+
 		Point2D p = translatePoint(new Point2D(e.getX(), e.getY()));
 		int x = (int) p.getX();
 		int y = (int) p.getY();
