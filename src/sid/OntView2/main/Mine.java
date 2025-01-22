@@ -19,7 +19,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.scene.control.Alert;
@@ -162,7 +161,7 @@ public class Mine extends Application implements Embedable{
 		artPanel.setCursor(Cursor.DEFAULT);
 		artPanel.setOntology(activeOntology);
 
-		artPanel.setActiveOntolgySource(source.toString()); //this might FAIL
+		artPanel.setActiveOntologySource(source.toString()); //this might FAIL
 
 		// CBL expression manager
 		if (activeOntology != null && manager != null) {

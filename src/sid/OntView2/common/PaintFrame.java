@@ -33,7 +33,6 @@ import sid.OntView2.utils.ProgressBarDialogThread;
 
 public class PaintFrame extends Canvas {
 
-	private CountDownLatch latch;
 	private static final long serialVersionUID = 1L;
 	public ScrollPane scroll;
 	static final int BORDER_PANEL = 50;
@@ -53,7 +52,7 @@ public class PaintFrame extends Canvas {
 	OWLOntology activeOntology;
 	private String activeOntologySource;
 	OWLReasoner reasoner;
-	VisGraph visGraph, oVisGraph, rVisGraph; // visGraph will handle both depending on which is currently selected
+	VisGraph visGraph, rVisGraph; // visGraph will handle both depending on which is currently selected
 	private VisShapeContext menuVisShapeContext = null;
 	private VisGeneralContext menuVisGeneralContext = null;
 
@@ -61,8 +60,8 @@ public class PaintFrame extends Canvas {
 		return stable;
 	}
 
-	public void setReasoner(OWLReasoner preasoner) {
-		reasoner = preasoner;
+	public void setReasoner(OWLReasoner pReasoner) {
+		reasoner = pReasoner;
 	}
 
 	public OWLReasoner getReasoner() {
@@ -77,11 +76,7 @@ public class PaintFrame extends Canvas {
 		return activeOntology;
 	}
 
-	public String getActiveOntologySource() {
-		return activeOntologySource;
-	}
-
-	public void setActiveOntolgySource(String p) {
+	public void setActiveOntologySource(String p) {
 		activeOntologySource = p;
 	}
 
@@ -139,7 +134,7 @@ public class PaintFrame extends Canvas {
 	public void setOriginalSize(Dimension2D in) { oSize = in; }
 	
 	/*** 
-	 * Runnables required to push the drawing to the javaFx application thread using Platform.runLater()
+	 * Runnable required to push the drawing to the javaFx application thread using Platform.runLater()
 	 */
 
 	public class Relaxer implements Runnable {
@@ -149,7 +144,7 @@ public class PaintFrame extends Canvas {
 	}
 	
 	public class ConnectorDrawer implements Runnable {
-		Shape s = null; 
+		Shape s = null;
 		public ConnectorDrawer (Shape s) {
 			this.s = s; 
 		}
@@ -190,8 +185,6 @@ public class PaintFrame extends Canvas {
 	
 	/**
 	 * scales by factor and adjusts panel size
-	 *
-	 * @param factor
 	 */
 
 	public void scale(double factor, Dimension2D size) {
@@ -351,7 +344,7 @@ public class PaintFrame extends Canvas {
 	}
 
 	public void createReasonedGraph(HashSet<OWLClassExpression> set, boolean check) {
-		latch = new CountDownLatch(1);
+		CountDownLatch latch = new CountDownLatch(1);
 
 		if (visGraph != null) {
 			visGraph.clearShapeMap();
@@ -438,7 +431,7 @@ public class PaintFrame extends Canvas {
 
 	/**
 	 * Updates node positions Avoids shapes being on top of each other updates y
-	 * coord until there's no overlap
+	 * coordinate until there's no overlap
 	 **/
 
 	// Relax is already encapsulated in the relaxerRunnable so all the calls should already be done 
@@ -490,7 +483,7 @@ public class PaintFrame extends Canvas {
 
 	/**
 	 *
-	 * MOUSELISTENER METHODS
+	 * MOUSE-LISTENER METHODS
 	 *
 	 **/
 
@@ -501,14 +494,13 @@ public class PaintFrame extends Canvas {
 	Shape pressedShape = null;
 	List<Shape> selectedShapes = new ArrayList<>();
 	List<Shape> selectedDisjoints = new ArrayList<>();
-	Shape drawConnector = null;
 	Shape eraseConnector = null;
 	Cursor cursorState = Cursor.DEFAULT;
 	public boolean hideRange = false;
-	private Embedable parentframe;
+	private Embedable parentFrame;
 	private final Tooltip tooltip = new Tooltip();
-	private WebView web = new WebView();
-	private WebEngine webEngine = web.getEngine();
+	private final WebView web = new WebView();
+	private final WebEngine webEngine = web.getEngine();
 
 	public void cleanConnectors() {
 		selectedShapes.clear();
@@ -523,7 +515,6 @@ public class PaintFrame extends Canvas {
 	}
 
 	private void handleMousePressed(MouseEvent e) {
-		System.out.println("Mouse pressed");
 		if (visGraph == null) {
 			return;
 		}
@@ -546,7 +537,6 @@ public class PaintFrame extends Canvas {
 	}
 
 	public void handleMouseReleased(MouseEvent e) {
-		System.out.println("Mouse released");
 		if (visGraph == null) {
 			return;
 		}
@@ -567,7 +557,6 @@ public class PaintFrame extends Canvas {
 	private boolean isDragging = false;
 
 	public void handleMouseDragged(MouseEvent e) {
-		System.out.println("Mouse dragged");
 		isDragging = true;
 
 		int draggedY, draggedX;
@@ -642,7 +631,6 @@ public class PaintFrame extends Canvas {
 			isDragging = false;
 			return;
 		}
-		System.out.println("Mouse clicked");
 
 		Point2D p = translatePoint(new Point2D(e.getX(), e.getY()));
 		int x = (int) p.getX();
@@ -653,7 +641,6 @@ public class PaintFrame extends Canvas {
 		if (clickedOnShape(x, y, e))
 			return;
 		if (e.getButton() == MouseButton.SECONDARY) {
-			System.out.println("Right click");
 			if (menuVisGeneralContext != null) {
 				closeContextMenu(menuVisGeneralContext);
 			}
@@ -749,14 +736,11 @@ public class PaintFrame extends Canvas {
 
 	/**
 	 * translates point to current zoom factor
-	 *
-	 * @param p
-	 * @return Point
 	 */
 
 	private Point2D translatePoint(Point2D p) {
 		/*
-		 * when scaling positions get messed up so to keep actions as in a 1,1 ratio i
+		 * when scaling positions get messed up so to keep actions as in a 1,1 ratio I
 		 * need to scale down event points
 		 */
 		return new Point2D((int) (p.getX() / factor), (int) (p.getY() / factor));
@@ -840,7 +824,7 @@ public class PaintFrame extends Canvas {
 					// Right: Click on the open symbol
 					if (pressedRightOpen(shape, x, y, e)) {
 						if (shape.getState() == Shape.CLOSED || shape.getState() == Shape.PARTIALLY_CLOSED) {
-							// si estaba cerrado el nodo  [+] abrirlo
+							// if [+] clicked, open the node
 							shape.openRight();
 							shape.updateHiddenChildrenForParents();
 							shape.resetHiddenChildrenCount();
@@ -866,7 +850,7 @@ public class PaintFrame extends Canvas {
 					// Left: Click on the open symbol
 					else if (pressedLeftOpen(shape, x, y, e)) {
 						if (shape.getLeftState() == Shape.LEFTCLOSED || shape.getLeftState() == Shape.LEFT_PARTIALLY_CLOSED) {
-							// si estaba cerrado el nodo [+] abrirlo
+							// if [+] clicked, open the node
 							shape.openLeft();
 							shape.resetHiddenParentsCount();
 							refreshDashedConnectors();
@@ -1044,7 +1028,6 @@ public class PaintFrame extends Canvas {
 
 	private void closeContextMenu(ContextMenu menu) {
 		menu.hide();
-		menu = null;
 	}
 
 	private void showContextMenu(int x, int y) {
@@ -1192,7 +1175,7 @@ public class PaintFrame extends Canvas {
 					shape.setPosY(currentY);
 					visibleShapesPerLevel.get(level.id).add(shape); 
 					currentY += shape.getHeight() + levelHeight;
-					maxY = (maxY<currentY?currentY:maxY); 
+					maxY = (Math.max(maxY, currentY));
 				}
 			}
 			ySpanPerLevel.put(level.id, currentY-minY); 
@@ -1217,19 +1200,11 @@ public class PaintFrame extends Canvas {
 		StructuralReducer.applyStructuralReduction(getOntology());
 	}
 
-	public boolean doApplyReductionCheck() {
-		if (getOntology() != null) {
-			applyStructuralReduction();
-			return true;
-		}
-		return false;
-	}
-
 	public void setParentFrame(Embedable pemb) {
-		parentframe = pemb;
+		parentFrame = pemb;
 	}
 
 	public Embedable getParentFrame() {
-		return parentframe;
+		return parentFrame;
 	}
 }
