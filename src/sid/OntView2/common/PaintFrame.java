@@ -1207,7 +1207,7 @@ public class PaintFrame extends Canvas {
 			currentY = BORDER_PANEL + (span - ySpanPerLevel.get(level.id))/ 2; 
 			for (Shape shape : visibleShapesPerLevel.get(level.id)) {
 				shape.setPosY(currentY);
-				currentY += shape.getHeight() + levelHeight;
+				currentY += shape.getHeight() + levelHeight + MIN_SPACE;
 			}
 		}
 		setStateChanged(true);

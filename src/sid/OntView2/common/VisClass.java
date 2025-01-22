@@ -358,9 +358,9 @@ public class VisClass extends Shape {
 	    		}
 	    	}
 
-			//if(hiddenChildren){
+			if(!outConnectors.isEmpty()){
 				drawHiddenNodesIndicator(g, getHiddenChildrenSet(), getLeftCorner(), posy);
-			//}
+			}
 
 		    if (!children.isEmpty() && (outConnectors!=null) &&(!outConnectors.isEmpty())) {
 				switch (this.getState()) {
@@ -475,11 +475,11 @@ public class VisClass extends Shape {
 		g.setStroke(Color.BLACK);
 		g.strokeRect(x, rectY, width, height);
 
-		drawCenteredText(g, hiddenNodes + " / " + descendants.size() + " hidden desc.", x, rectY, width, height);
-
-
-		//drawCenteredText(g, hiddenNodes + " hidden descendants", x, rectY, width, height);
-
+		if (hiddenNodes == 0) {
+			drawCenteredText(g, hiddenNodes + " hidden descendants", x, rectY, width, height);
+		} else {
+			drawCenteredText(g, hiddenNodes + " / " + descendants.size() + " hidden desc.", x, rectY, width, height);
+		}
 		topToBarDistance = (int) ((y - (double) currentHeight / 2) - rectY);
 	}
 
@@ -496,7 +496,7 @@ public class VisClass extends Shape {
 	}
 
 	private double getIndicatorSize(GraphicsContext g, int totalNodes) {
-		Text textNode = new Text(totalNodes + " / " + totalNodes + " hidden desc.");
+		Text textNode = new Text(totalNodes + "hidden descendants");
 		textNode.setFont(g.getFont());
 		return textNode.getLayoutBounds().getWidth();
 	}

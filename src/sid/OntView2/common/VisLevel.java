@@ -11,7 +11,7 @@ public class VisLevel {
 
 
    /***************************/
-	final static int MIN_WIDTH=80;
+	final static int MIN_WIDTH=100;
 	int id;
 	int width = MIN_WIDTH;
 	int shapeNo = 0;
