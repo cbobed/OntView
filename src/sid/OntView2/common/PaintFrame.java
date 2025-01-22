@@ -56,6 +56,9 @@ public class PaintFrame extends Canvas {
 	private VisShapeContext menuVisShapeContext = null;
 	private VisGeneralContext menuVisGeneralContext = null;
 
+	Set<Shape> globalHiddenSet = new HashSet<>();
+
+
 	public boolean isStable() {
 		return stable;
 	}
@@ -90,6 +93,8 @@ public class PaintFrame extends Canvas {
 	private boolean showConnectors = false;
 	public void setShowConnectors(boolean b) { showConnectors = b; }
 	public boolean getShowConnectors() { return showConnectors; }
+
+
 
 	public PaintFrame() {
 		super();
@@ -826,8 +831,8 @@ public class PaintFrame extends Canvas {
 						if (shape.getState() == Shape.CLOSED || shape.getState() == Shape.PARTIALLY_CLOSED) {
 							// if [+] clicked, open the node
 							shape.openRight();
-							shape.updateHiddenChildrenForParents();
 							shape.resetHiddenChildrenCount();
+							shape.updateHiddenChildrenForParents();
 							refreshDashedConnectors();
 							VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
 							setStateChanged(true);
@@ -839,7 +844,7 @@ public class PaintFrame extends Canvas {
 						if (shape.getState() == Shape.OPEN || shape.getState() == Shape.PARTIALLY_CLOSED) {
 							// if [-] clicked, close the node
 							shape.closeRight();
-							shape.getHiddenChildrenSet();
+							//shape.getHiddenChildrenSet();
 							shape.updateHiddenChildrenForParents();
 							refreshDashedConnectors();
 							VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
@@ -864,7 +869,7 @@ public class PaintFrame extends Canvas {
 						if (shape.getLeftState() == Shape.LEFTOPEN || shape.getLeftState() == Shape.LEFT_PARTIALLY_CLOSED) {
 							// if [-] clicked, close the node
 							shape.closeLeft();
-							shape.getHiddenParentsSet();
+							//shape.getHiddenParentsSet();
 							refreshDashedConnectors();
 							VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
 							setStateChanged(true);
@@ -1073,8 +1078,7 @@ public class PaintFrame extends Canvas {
 								? upperShape.getTotalHeight()
 								: upperShape.getHeight();
 
-						int repellingTopCorner = repellingShape.getTopCorner();
-						if (repellingShape.hiddenChildren) repellingTopCorner -= repellingShape.asVisClass().topToBarDistance;
+						int repellingTopCorner = repellingShape.getTopCorner() - repellingShape.asVisClass().topToBarDistance;
 
 						int upperShapeLimit = upperShape.getPosY() + upperShapeHeight / 2 + MIN_SPACE;
 
@@ -1098,8 +1102,7 @@ public class PaintFrame extends Canvas {
 								? lowerShape.getTotalHeight()
 								: lowerShape.getHeight();
 
-						int lowerShapeTopCorner = lowerShape.getTopCorner();
-						if (lowerShape.hiddenChildren) lowerShapeTopCorner -= lowerShape.asVisClass().topToBarDistance;
+						int lowerShapeTopCorner = lowerShape.getTopCorner() - lowerShape.asVisClass().topToBarDistance;
 
 						if (repellingShape.getBottomCorner() + MIN_SPACE > lowerShapeTopCorner) {
 							lowerShape.setPosY(lowerShape.getPosY() + lowerShapeHeight / 2);

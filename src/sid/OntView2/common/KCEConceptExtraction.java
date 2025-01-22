@@ -31,7 +31,6 @@ public class KCEConceptExtraction extends KConceptExtractor {
 		for (Shape s: nonHiddenShape){
 			if (s.getState()!=Shape.OPEN) {
 				s.collectHiddenChildren();
-				s.setHiddenChildren();
 			}
 		}
 		graph.addDashedConnectors();

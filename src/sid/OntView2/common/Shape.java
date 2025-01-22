@@ -150,7 +150,6 @@ public abstract class Shape {
 
     private Set<Shape> hiddenChildrenSet = new HashSet<>();
     private final Set<Shape> hiddenParentsSet = new HashSet<>();
-    public boolean hiddenChildren = false;
     public boolean hiddenParents = false;
 
 
@@ -177,7 +176,6 @@ public abstract class Shape {
     }
 
     public void resetHiddenChildrenCount() {
-        hiddenChildren = false;
         hiddenChildrenSet.clear();
     }
 
@@ -187,7 +185,6 @@ public abstract class Shape {
     }
 
     public int getHiddenChildrenSet() {
-        hiddenChildren = true;
         return hiddenChildrenSet.size();
     }
 
@@ -195,15 +192,6 @@ public abstract class Shape {
         hiddenParents = true;
         return hiddenParentsSet.size();
     }
-
-    public void setHiddenChildren() {
-        hiddenChildren = !hiddenChildrenSet.isEmpty();
-    }
-
-    public void setHiddenParents() {
-        hiddenParents = !hiddenParentsSet.isEmpty();
-    }
-
 
     /**
      * Check if childres has other visible parents
@@ -250,7 +238,6 @@ public abstract class Shape {
         for (VisConnector connector : outConnectors) {
             if (!connector.isVisible()) continue;
             child = connector.to;
-            System.out.println("Child: " + child.getLabel());
 
             if (child.childHasOtherParents()) {
                 connector.hide();
@@ -259,8 +246,10 @@ public abstract class Shape {
             }
 
             connector.hide();
-            if (countedChildren.add(child))
+            if (countedChildren.add(child)) {
+                graph.paintframe.globalHiddenSet.add(child);
                 child.checkAndHide(closedShape, countedChildren);
+            }
         }
 
     }
@@ -298,6 +287,7 @@ public abstract class Shape {
         if (getVisibleInReferences() == 0) {
             this.visible = false;
             countedChildren.add(this);
+            graph.paintframe.globalHiddenSet.add(this);
             hideSubLevels(closedShape, countedChildren);
             return;
         }
@@ -327,6 +317,8 @@ public abstract class Shape {
         this.visible = false;
         for (VisConnector c : inConnectors) {
             c.hide();
+            c.from.hiddenChildrenSet.add(this);
+            graph.paintframe.globalHiddenSet.add(this);
             c.from.notifyHidden(this);
         }
 
@@ -421,6 +413,7 @@ public abstract class Shape {
                     if (connector.isVisible()) continue;
                     connector.show();
                     connector.to.show(this);
+                    graph.paintframe.globalHiddenSet.remove(connector.to);
                     connector.to.checkAndUpdateParentVisibilityStates();
                 }
                 break;//if its not a previously hidden node we'll show it
@@ -448,14 +441,18 @@ public abstract class Shape {
         for (VisConnector c : outConnectors) {
             if (c.isVisible()) continue;
             c.to.show(this);
+            graph.paintframe.globalHiddenSet.remove(c.to);
             c.show();
             c.to.checkAndUpdateParentVisibilityStates();
+        }
+        System.out.println("Hidden children: " + graph.paintframe.globalHiddenSet.size());
+        for (Shape s: graph.paintframe.globalHiddenSet){
+            System.out.println(s.getLabel());
         }
     }
 
     public void showParentLevels() {
         for (VisConnector c : inConnectors) {
-            System.out.println(c.from.getLabel());
             c.from.showLeft(this);
             c.show();
             c.from.checkAndUpdateChildrenVisibilityStates();
@@ -596,19 +593,31 @@ public abstract class Shape {
         for (Shape child : childrenToProcess) {
             updateAncestorsForHiddenChildren(child, visitedNodes);
         }
+
+        /*System.out.println("Hidden children: " + graph.paintframe.globalHiddenSet.size());
+        for (Shape s: graph.paintframe.globalHiddenSet){
+            System.out.println(s.getLabel());
+        }*/
     }
 
     /**
      * Recursively traverses the ancestors of a node to update the hidden children count for visible ancestors.
      */
     private void updateAncestorsForHiddenChildren(Shape currentNode, Set<Shape> visitedNodes) {
+        if (visitedNodes.contains(currentNode)) {
+            return;
+        }
+        visitedNodes.add(currentNode);
+
         for (VisConnector inConnector : currentNode.inConnectors) {
             Shape parent = inConnector.from;
 
-            if (visitedNodes.contains(parent)) {
+            if (visitedNodes.contains(parent)) continue;
+            if (parent.getLabel().matches("Thing")) {
+                parent.hiddenChildrenSet.clear();
+                parent.hiddenChildrenSet.addAll(graph.paintframe.globalHiddenSet);
                 continue;
             }
-            visitedNodes.add(parent);
 
             if (parent.isVisible()) {
                 parent.hiddenChildrenSet.clear();
@@ -616,10 +625,9 @@ public abstract class Shape {
                     Shape childNode = outConnector.to;
                     addHiddenDescendants(childNode, parent.hiddenChildrenSet);
                 }
-                parent.hiddenChildren = parent.getState() != OPEN;
-            } else {
-                updateAncestorsForHiddenChildren(parent, visitedNodes);
             }
+            updateAncestorsForHiddenChildren(parent, visitedNodes);
+
         }
     }
 
