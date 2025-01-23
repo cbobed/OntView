@@ -817,7 +817,11 @@ public class VisGraph implements Runnable{
 	
 	public void clearDashedConnectorList(){
 		dashedConnectorList.clear();
-
+		for (Entry<String,Shape> entry : shapeMap.entrySet()) {
+			Shape s = entry.getValue();
+			s.inDashedConnectors.clear();
+			s.outDashedConnectors.clear();
+		}
 	}
 	 
     /**

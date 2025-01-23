@@ -286,7 +286,6 @@ public abstract class Shape {
         if (getVisibleInReferences() == 0) {
             this.visible = false;
             countedChildren.add(this);
-            graph.paintframe.globalHiddenSet.add(this);
             hideSubLevels(closedShape, countedChildren);
             return;
         }
