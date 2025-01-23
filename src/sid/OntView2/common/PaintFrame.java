@@ -826,9 +826,9 @@ public class PaintFrame extends Canvas {
 					// Right: Click on the open symbol
 					if (pressedRightOpen(shape, x, y, e)) {
 						if (shape.getState() == Shape.CLOSED || shape.getState() == Shape.PARTIALLY_CLOSED) {
-							// if [+] clicked, open the node
+							// if +[+] clicked, open the node
 							shape.openRight();
-							shape.resetHiddenChildrenCount();
+							//shape.resetHiddenChildrenCount();
 							shape.updateHiddenDescendantsForParents();
 							refreshDashedConnectors();
 							VisLevel.adjustWidthAndPos(visGraph.getLevelSet());

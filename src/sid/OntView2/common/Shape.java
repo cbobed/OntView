@@ -37,11 +37,7 @@ public abstract class Shape {
 
     int state = OPEN;
     int leftState = LEFTOPEN;
-    boolean wasOpened = true;
     boolean visible = true;
-    boolean wasVisible = true;
-    boolean selected = false;
-    boolean moved = false;
 
     public abstract String getLabel();
 
@@ -149,9 +145,8 @@ public abstract class Shape {
     public abstract Point2D getConnectionPoint(Point2D point, boolean b);
 
     private final Set<Shape> hiddenDescendantsSet = new HashSet<>();
+    private final Set<Shape> openDescendantsSet = new HashSet<>();
     private final Set<Shape> hiddenParentsSet = new HashSet<>();
-    public boolean hiddenParents = false;
-
 
     /**************************************************************/
     public Shape() {
@@ -180,7 +175,6 @@ public abstract class Shape {
     }
 
     public void resetHiddenParentsCount() {
-        hiddenParents = false;
         hiddenParentsSet.clear();
     }
 
@@ -189,7 +183,6 @@ public abstract class Shape {
     }
 
     public int getHiddenParentsSet() {
-        hiddenParents = true;
         return hiddenParentsSet.size();
     }
 
@@ -433,6 +426,7 @@ public abstract class Shape {
     }
 
     public void showSubLevels() {
+        System.out.println("showSubLevels " + this.getLabel());
         for (VisConnector c : outConnectors) {
             if (c.isVisible()) continue;
             c.to.show(this);
