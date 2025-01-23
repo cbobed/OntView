@@ -257,12 +257,17 @@ public class PaintFrame extends Canvas {
 				for (VisConnector c: shape.outConnectors) {
 					c.draw(g); 
 				}
-				for (VisConnector c: shape.inDashedConnectors) {
-					c.draw(g); 
+				for (VisConnector c : shape.inDashedConnectors) {
+					if (c.from.isVisible()) {
+						c.draw(g);
+					}
 				}
-				for (VisConnector c: shape.outDashedConnectors) {
-					c.draw(g); 
+				for (VisConnector c : shape.outDashedConnectors) {
+					if (c.to.isVisible()) {
+						c.draw(g);
+					}
 				}
+
 			}
 		}
 	}
