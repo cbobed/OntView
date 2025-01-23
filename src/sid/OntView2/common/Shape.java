@@ -145,7 +145,7 @@ public abstract class Shape {
     public abstract Point2D getConnectionPoint(Point2D point, boolean b);
 
     private final Set<Shape> hiddenDescendantsSet = new HashSet<>();
-    private final Set<Shape> openDescendantsSet = new HashSet<>();
+    private final Set<Shape> visibleDescendantsSet = new HashSet<>();
     private final Set<Shape> hiddenParentsSet = new HashSet<>();
 
     /**************************************************************/
@@ -390,7 +390,8 @@ public abstract class Shape {
         showParentLevels();
     }
 
-    public void show(Shape parent) {
+    public void show(Shape parent, Set<Shape> openDescendantsSet) {
+        if (!this.isVisible()) openDescendantsSet.add(this);
         this.visible = true;
 
         switch (getState()) {
@@ -401,7 +402,7 @@ public abstract class Shape {
                 for (VisConnector connector : outConnectors) {
                     if (connector.isVisible()) continue;
                     connector.show();
-                    connector.to.show(this);
+                    connector.to.show(this, openDescendantsSet);
                     connector.to.checkAndUpdateParentVisibilityStates();
                 }
                 break; //if its not a previously hidden node we'll show it
@@ -426,12 +427,15 @@ public abstract class Shape {
     }
 
     public void showSubLevels() {
-        System.out.println("showSubLevels " + this.getLabel());
         for (VisConnector c : outConnectors) {
             if (c.isVisible()) continue;
-            c.to.show(this);
+            c.to.show(this, visibleDescendantsSet);
             c.show();
             c.to.checkAndUpdateParentVisibilityStates();
+        }
+        System.out.println("*********openDescendantsSet********* " + visibleDescendantsSet.size());
+        for (Shape s : visibleDescendantsSet) {
+            System.out.println("- " +s.getLabel());
         }
     }
 
@@ -565,7 +569,7 @@ public abstract class Shape {
         Set<Shape> visitedParents = new HashSet<>();
         for (VisConnector s: this.inConnectors){
             Shape parent =  s.from;
-            updateAncestorsForHiddenChildren(parent, visitedParents, parent.hiddenDescendantsSet);
+            updateAncestorsForHiddenDescendants(parent, visitedParents, parent.hiddenDescendantsSet);
         }
     }
 
@@ -576,17 +580,17 @@ public abstract class Shape {
         Set<Shape> descendantsToProcess = new HashSet<>(hiddenDescendantsSet);
         Set<Shape> visitedNodes = new HashSet<>();
 
-        updateAncestorsForHiddenChildren(this, visitedNodes, descendantsToProcess);
+        updateAncestorsForHiddenDescendants(this, visitedNodes, descendantsToProcess);
 
         for (Shape child : descendantsToProcess) {
-            updateSameLevelParents(child, visitedNodes);
+            updateSameLevelParentsHiddenDescendants(child, visitedNodes);
         }
     }
 
     /**
      * Updates the hidden descendants count for its ancestors.
      */
-    private void updateAncestorsForHiddenChildren(Shape currentNode, Set<Shape> visitedNodes, Set<Shape> hiddenChildrenSet) {
+    private void updateAncestorsForHiddenDescendants(Shape currentNode, Set<Shape> visitedNodes, Set<Shape> hiddenChildrenSet) {
         if (visitedNodes.contains(currentNode)) return;
 
         visitedNodes.add(currentNode);
@@ -595,14 +599,14 @@ public abstract class Shape {
             if (visitedNodes.contains(parent)) continue;
 
             parent.hiddenDescendantsSet.addAll(hiddenChildrenSet);
-            updateAncestorsForHiddenChildren(parent, visitedNodes, hiddenChildrenSet);
+            updateAncestorsForHiddenDescendants(parent, visitedNodes, hiddenChildrenSet);
         }
     }
 
     /**
      * Updates the hidden descendants count for the first visible parent of node.
      */
-    private void updateSameLevelParents(Shape currentNode, Set<Shape> visitedNodes) {
+    private void updateSameLevelParentsHiddenDescendants(Shape currentNode, Set<Shape> visitedNodes) {
         if (visitedNodes.contains(currentNode)) return;
 
         visitedNodes.add(currentNode);
@@ -618,7 +622,7 @@ public abstract class Shape {
                     addHiddenDescendants(childNode, parent.hiddenDescendantsSet);
                 }
             } else {
-                updateSameLevelParents(parent, visitedNodes);
+                updateSameLevelParentsHiddenDescendants(parent, visitedNodes);
             }
         }
     }
@@ -633,8 +637,64 @@ public abstract class Shape {
         for (VisConnector outConnector : s.outConnectors) {
             addHiddenDescendants(outConnector.to, countedChildren);
         }
-
     }
+
+    /**
+     * Updates the hidden descendants count for the first visible parent of nodes in hiddenDescendantsSet.
+     */
+    public void updateVisibleDescendantsForParents() {
+        Set<Shape> descendantsToProcess = new HashSet<>(visibleDescendantsSet);
+        Set<Shape> visitedNodes = new HashSet<>();
+
+        updateAncestorsForVisibleChildren(this, visitedNodes, descendantsToProcess);
+
+        /*for (Shape child : descendantsToProcess) {
+            updateSameLevelParentsVisibleDescendants(child, visitedNodes);
+        }*/
+
+        visibleDescendantsSet.clear();
+    }
+
+    /**
+     * Updates the hidden descendants count for its ancestors.
+     */
+    private void updateAncestorsForVisibleChildren(Shape currentNode, Set<Shape> visitedNodes, Set<Shape> visibleDescendantsSet) {
+        if (visitedNodes.contains(currentNode)) return;
+
+        visitedNodes.add(currentNode);
+        for (VisConnector inConnector : currentNode.inConnectors) {
+            Shape parent = inConnector.from;
+            if (visitedNodes.contains(parent)) continue;
+
+            parent.hiddenDescendantsSet.removeAll(visibleDescendantsSet);
+            updateAncestorsForHiddenDescendants(parent, visitedNodes, visibleDescendantsSet);
+        }
+    }
+
+    /**
+     * Updates the hidden descendants count for the first visible parent of node.
+     */
+    private void updateSameLevelParentsVisibleDescendants(Shape currentNode, Set<Shape> visitedNodes) {
+        if (visitedNodes.contains(currentNode)) return;
+
+        visitedNodes.add(currentNode);
+
+        for (VisConnector inConnector : currentNode.inConnectors) {
+            Shape parent = inConnector.from;
+            if (visitedNodes.contains(parent)) continue;
+
+            if (parent.isVisible()) {
+                parent.hiddenDescendantsSet.clear();
+                for (VisConnector outConnector : parent.outConnectors) {
+                    Shape childNode = outConnector.to;
+                    addHiddenDescendants(childNode, parent.hiddenDescendantsSet);
+                }
+            } else {
+                updateSameLevelParentsHiddenDescendants(parent, visitedNodes);
+            }
+        }
+    }
+
 
     // NOT USED
     /**
