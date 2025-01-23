@@ -817,6 +817,7 @@ public class VisGraph implements Runnable{
 	
 	public void clearDashedConnectorList(){
 		dashedConnectorList.clear();
+
 	}
 	 
     /**
@@ -848,6 +849,8 @@ public class VisGraph implements Runnable{
 					VisConnector prevAdded = VisConnector.getConnector(dashedConnectorList, source, currentSon);
 					if (prevAdded == null){
 						dashedConnectorList.add(new VisConnectorDashed(source, currentSon));
+						currentSon.inDashedConnectors.add(new VisConnectorDashed(source, currentSon));
+						source.outDashedConnectors.add(new VisConnectorDashed(source, currentSon));
 					}
 				}
 			}

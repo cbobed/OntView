@@ -247,7 +247,6 @@ public abstract class Shape {
 
             connector.hide();
             if (countedChildren.add(child)) {
-                graph.paintframe.globalHiddenSet.add(child);
                 child.checkAndHide(closedShape, countedChildren);
             }
         }
@@ -579,20 +578,17 @@ public abstract class Shape {
      */
     public void updateParents() {
         Set<Shape> visitedParents = new HashSet<>();
-        updateAncestorsForHiddenChildren(this, visitedParents);
+        //updateAncestorsForHiddenChildren(this, visitedParents);
     }
 
     /**
      * Updates the hidden children count for the first visible parent of nodes in hiddenChildrenSet.
      */
     public void updateHiddenChildrenForParents() {
-        Set<Shape> childrenToProcess = new HashSet<>(hiddenChildrenSet);
+        int hiddenDescendantsCount = hiddenChildrenSet.size();
         Set<Shape> visitedNodes = new HashSet<>();
 
-        updateAncestorsForHiddenChildren(this, visitedNodes);
-        for (Shape child : childrenToProcess) {
-            updateAncestorsForHiddenChildren(child, visitedNodes);
-        }
+        updateAncestorsForHiddenChildren(this, visitedNodes, hiddenChildrenSet);
 
         /*System.out.println("Hidden children: " + graph.paintframe.globalHiddenSet.size());
         for (Shape s: graph.paintframe.globalHiddenSet){
@@ -603,7 +599,7 @@ public abstract class Shape {
     /**
      * Recursively traverses the ancestors of a node to update the hidden children count for visible ancestors.
      */
-    private void updateAncestorsForHiddenChildren(Shape currentNode, Set<Shape> visitedNodes) {
+    private void updateAncestorsForHiddenChildren(Shape currentNode, Set<Shape> visitedNodes, Set<Shape> hiddenChildrenSet) {
         if (visitedNodes.contains(currentNode)) {
             return;
         }
@@ -613,6 +609,10 @@ public abstract class Shape {
             Shape parent = inConnector.from;
 
             if (visitedNodes.contains(parent)) continue;
+
+            parent.hiddenChildrenSet.addAll(hiddenChildrenSet);
+
+            /*
             if (parent.getLabel().matches("Thing")) {
                 parent.hiddenChildrenSet.clear();
                 parent.hiddenChildrenSet.addAll(graph.paintframe.globalHiddenSet);
@@ -625,8 +625,8 @@ public abstract class Shape {
                     Shape childNode = outConnector.to;
                     addHiddenDescendants(childNode, parent.hiddenChildrenSet);
                 }
-            }
-            updateAncestorsForHiddenChildren(parent, visitedNodes);
+            }*/
+            updateAncestorsForHiddenChildren(parent, visitedNodes, hiddenChildrenSet);
 
         }
     }

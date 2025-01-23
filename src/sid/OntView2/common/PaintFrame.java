@@ -424,10 +424,6 @@ public class PaintFrame extends Canvas {
 		return pressedShape;
 	}
 
-	public Shape getEraseConnector() {
-		return eraseConnector;
-	}
-
 	private boolean stateChanged = true;
 
 	public void setStateChanged(boolean value) {
@@ -499,7 +495,6 @@ public class PaintFrame extends Canvas {
 	Shape pressedShape = null;
 	List<Shape> selectedShapes = new ArrayList<>();
 	List<Shape> selectedDisjoints = new ArrayList<>();
-	Shape eraseConnector = null;
 	Cursor cursorState = Cursor.DEFAULT;
 	public boolean hideRange = false;
 	private Embedable parentFrame;
