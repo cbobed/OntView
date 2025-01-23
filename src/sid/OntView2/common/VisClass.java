@@ -359,7 +359,7 @@ public class VisClass extends Shape {
 	    	}
 
 			if(!outConnectors.isEmpty()){
-				drawHiddenNodesIndicator(g, getHiddenChildrenSet(), getLeftCorner(), posy);
+				drawHiddenNodesIndicator(g, getHiddenDescendantsSet(), getLeftCorner(), posy);
 			}
 
 		    if (!children.isEmpty() && (outConnectors!=null) &&(!outConnectors.isEmpty())) {

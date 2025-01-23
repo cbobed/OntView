@@ -56,9 +56,6 @@ public class PaintFrame extends Canvas {
 	private VisShapeContext menuVisShapeContext = null;
 	private VisGeneralContext menuVisGeneralContext = null;
 
-	Set<Shape> globalHiddenSet = new HashSet<>();
-
-
 	public boolean isStable() {
 		return stable;
 	}
@@ -832,7 +829,7 @@ public class PaintFrame extends Canvas {
 							// if [+] clicked, open the node
 							shape.openRight();
 							shape.resetHiddenChildrenCount();
-							shape.updateHiddenChildrenForParents();
+							shape.updateHiddenDescendantsForParents();
 							refreshDashedConnectors();
 							VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
 							setStateChanged(true);
@@ -845,7 +842,7 @@ public class PaintFrame extends Canvas {
 							// if [-] clicked, close the node
 							shape.closeRight();
 							//shape.getHiddenChildrenSet();
-							shape.updateHiddenChildrenForParents();
+							shape.updateHiddenDescendantsForParents();
 							refreshDashedConnectors();
 							VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
 							setStateChanged(true);
