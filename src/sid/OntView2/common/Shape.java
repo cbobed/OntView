@@ -6,10 +6,7 @@ import javafx.scene.canvas.GraphicsContext;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public abstract class Shape {
 
@@ -433,10 +430,8 @@ public abstract class Shape {
             c.show();
             c.to.checkAndUpdateParentVisibilityStates();
         }
-        System.out.println("*********openDescendantsSet********* " + visibleDescendantsSet.size());
-        for (Shape s : visibleDescendantsSet) {
-            System.out.println("- " +s.getLabel());
-        }
+        hiddenDescendantsSet.removeAll(visibleDescendantsSet);
+
     }
 
     public void showParentLevels() {
@@ -648,9 +643,9 @@ public abstract class Shape {
 
         updateAncestorsForVisibleChildren(this, visitedNodes, descendantsToProcess);
 
-        /*for (Shape child : descendantsToProcess) {
+        for (Shape child : descendantsToProcess) {
             updateSameLevelParentsVisibleDescendants(child, visitedNodes);
-        }*/
+        }
 
         visibleDescendantsSet.clear();
     }
@@ -667,7 +662,7 @@ public abstract class Shape {
             if (visitedNodes.contains(parent)) continue;
 
             parent.hiddenDescendantsSet.removeAll(visibleDescendantsSet);
-            updateAncestorsForHiddenDescendants(parent, visitedNodes, visibleDescendantsSet);
+            updateAncestorsForVisibleChildren(parent, visitedNodes, visibleDescendantsSet);
         }
     }
 
@@ -694,7 +689,6 @@ public abstract class Shape {
             }
         }
     }
-
 
     // NOT USED
     /**
