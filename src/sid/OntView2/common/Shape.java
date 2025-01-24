@@ -30,7 +30,7 @@ public abstract class Shape {
             inDashedConnectors,
             outDashedConnectors;
 
-    //when showing i need to keep track of those that were closed
+    //when showing I need to keep track of those that were closed
 
     int state = OPEN;
     int leftState = LEFTOPEN;
@@ -78,8 +78,8 @@ public abstract class Shape {
         posy = y;
     }
 
-    public void setHeight(int x) {
-        height = x;
+    public void setHeight(int value) {
+        height = value;
     }
 
     public void setWidth(int x) {
@@ -115,16 +115,16 @@ public abstract class Shape {
         return (VisClass) this;
     }
 
-    public void setState(int pstate) {
-        state = pstate;
+    public void setState(int pState) {
+        state = pState;
     }
 
     public int getState() {
         return state;
     }
 
-    public void setLeftState(int pstate) {
-        leftState = pstate;
+    public void setLeftState(int pState) {
+        leftState = pState;
     }
 
     public int getLeftState() {
@@ -165,6 +165,7 @@ public abstract class Shape {
     public void closeLeft() {
         setLeftState(LEFTCLOSED);
         hideParents(this, hiddenParentsSet);
+        hiddenParentsSet.clear();
     }
 
     public void resetHiddenChildrenCount() {
@@ -184,7 +185,7 @@ public abstract class Shape {
     }
 
     /**
-     * Check if childres has other visible parents
+     * Check if children has other visible parents
      */
     boolean childHasOtherParents() {
         int visibleParentCount = 0;
@@ -215,12 +216,10 @@ public abstract class Shape {
 
 
     /**
-     * hides outconnectors and checks if children need to be hidden
-     *
-     * @param closedShape
+     * hides outConnectors and checks if children need to be hidden
      */
     private void hideSubLevels(Shape closedShape, Set<Shape> countedChildren) {
-        // hides outconnectors and
+        // hides outConnectors and
         // checks if children need to be hidden
         // if so, it hides it
 
@@ -244,7 +243,7 @@ public abstract class Shape {
     }
 
     /**
-     * hides inconnectors and checks if parents need to be hidden
+     * hides inConnectors and checks if parents need to be hidden
      */
     private void hideParents(Shape closedShape, Set<Shape> countedParents) {
         Shape parent;
@@ -256,6 +255,7 @@ public abstract class Shape {
             connector.hide();
 
             if (parent.hasOtherVisibleChildren(this)) {
+                parent.hiddenDescendantsSet.addAll(countedParents);
                 parent.setState(PARTIALLY_CLOSED);
                 continue;
             }
@@ -402,7 +402,7 @@ public abstract class Shape {
                     connector.to.show(this, openDescendantsSet);
                     connector.to.checkAndUpdateParentVisibilityStates();
                 }
-                break; //if its not a previously hidden node we'll show it
+                break; //if it's not a previously hidden node we'll show it
         }
     }
 
@@ -418,6 +418,7 @@ public abstract class Shape {
                     connector.show();
                     connector.from.showLeft(this);
                     connector.from.checkAndUpdateChildrenVisibilityStates();
+                    connector.from.checkAndUpdateParentVisibilityStates();
                 }
                 break;
         }
@@ -439,6 +440,7 @@ public abstract class Shape {
             c.from.showLeft(this);
             c.show();
             c.from.checkAndUpdateChildrenVisibilityStates();
+            c.from.checkAndUpdateParentVisibilityStates();
         }
     }
 
@@ -454,10 +456,7 @@ public abstract class Shape {
     }
 
     /**
-     * Inverts lookup in the shapeMap by returning the key out of an owlclassexpression
-     *
-     * @param e
-     * @return
+     * Inverts lookup in the shapeMap by returning the key out of an OWLClassExpression
      */
     public static String getKey(OWLClassExpression e) {
         if (e instanceof OWLClass) {
@@ -578,7 +577,7 @@ public abstract class Shape {
         updateAncestorsForHiddenDescendants(this, visitedNodes, descendantsToProcess);
 
         for (Shape child : descendantsToProcess) {
-            updateSameLevelParentsHiddenDescendants(child, visitedNodes);
+            updateSameLevelParentsDescendants(child, visitedNodes);
         }
     }
 
@@ -599,9 +598,9 @@ public abstract class Shape {
     }
 
     /**
-     * Updates the hidden descendants count for the first visible parent of node.
+     * Updates the descendants count for the first visible parent of node.
      */
-    private void updateSameLevelParentsHiddenDescendants(Shape currentNode, Set<Shape> visitedNodes) {
+    private void updateSameLevelParentsDescendants(Shape currentNode, Set<Shape> visitedNodes) {
         if (visitedNodes.contains(currentNode)) return;
 
         visitedNodes.add(currentNode);
@@ -617,7 +616,7 @@ public abstract class Shape {
                     addHiddenDescendants(childNode, parent.hiddenDescendantsSet);
                 }
             } else {
-                updateSameLevelParentsHiddenDescendants(parent, visitedNodes);
+                updateSameLevelParentsDescendants(parent, visitedNodes);
             }
         }
     }
@@ -644,7 +643,7 @@ public abstract class Shape {
         updateAncestorsForVisibleChildren(this, visitedNodes, descendantsToProcess);
 
         for (Shape child : descendantsToProcess) {
-            updateSameLevelParentsVisibleDescendants(child, visitedNodes);
+            updateSameLevelParentsDescendants(child, visitedNodes);
         }
 
         visibleDescendantsSet.clear();
@@ -663,70 +662,6 @@ public abstract class Shape {
 
             parent.hiddenDescendantsSet.removeAll(visibleDescendantsSet);
             updateAncestorsForVisibleChildren(parent, visitedNodes, visibleDescendantsSet);
-        }
-    }
-
-    /**
-     * Updates the hidden descendants count for the first visible parent of node.
-     */
-    private void updateSameLevelParentsVisibleDescendants(Shape currentNode, Set<Shape> visitedNodes) {
-        if (visitedNodes.contains(currentNode)) return;
-
-        visitedNodes.add(currentNode);
-
-        for (VisConnector inConnector : currentNode.inConnectors) {
-            Shape parent = inConnector.from;
-            if (visitedNodes.contains(parent)) continue;
-
-            if (parent.isVisible()) {
-                parent.hiddenDescendantsSet.clear();
-                for (VisConnector outConnector : parent.outConnectors) {
-                    Shape childNode = outConnector.to;
-                    addHiddenDescendants(childNode, parent.hiddenDescendantsSet);
-                }
-            } else {
-                updateSameLevelParentsHiddenDescendants(parent, visitedNodes);
-            }
-        }
-    }
-
-    // NOT USED
-    /**
-     * Updates the hidden parents count for children of nodes in countedParents.
-     */
-    private void updateHiddenParentsForChildren() {
-        Set<Shape> parentsToProcess = new HashSet<>(hiddenParentsSet);
-
-        for (Shape parent : parentsToProcess) {
-            for (VisConnector connector : parent.outConnectors) {
-                Shape child = connector.to;
-
-                if (!child.isVisible()) {
-                    continue;
-                }
-
-                child.hiddenParentsSet.clear();
-
-                for (VisConnector inConnector : child.inConnectors) {
-                    Shape grandParent = inConnector.from;
-                    if (!grandParent.isVisible()) {
-                        addHiddenAncestors(grandParent, child.hiddenParentsSet);
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Adds all hidden ancestors of a node to the provided set until a visible ancestor is encountered.
-     */
-    private void addHiddenAncestors(Shape s, Set<Shape> countedParents) {
-        if (!s.isVisible()) {
-            if (countedParents.add(s)) {
-                for (VisConnector inConnector : s.inConnectors) {
-                    addHiddenAncestors(inConnector.from, countedParents);
-                }
-            }
         }
     }
 }
