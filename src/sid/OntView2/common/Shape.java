@@ -165,7 +165,6 @@ public abstract class Shape {
     public void closeLeft() {
         setLeftState(LEFTCLOSED);
         hideParents(this, hiddenParentsSet);
-        hiddenParentsSet.clear();
     }
 
     public void resetHiddenChildrenCount() {
@@ -250,20 +249,27 @@ public abstract class Shape {
         for (VisConnector connector : inConnectors) {
             parent = connector.from;
 
-            if (parent.getLabel().matches("Thing")) break;
-
-            connector.hide();
+            if (parent.getLabel().matches("Thing")) {
+                parent.checkAndUpdateChildrenVisibilityStates();
+                break;
+            }
 
             if (parent.hasOtherVisibleChildren(this)) {
-                parent.hiddenDescendantsSet.addAll(countedParents);
                 parent.setState(PARTIALLY_CLOSED);
                 continue;
             }
+
+            if (!connector.isVisible()) {
+                continue;
+            }
+
+            connector.hide();
 
             if (countedParents.add(parent)) {
                 parent.checkAndHideParents(closedShape, countedParents);
             }
         }
+        countedParents.clear();
 
     }
 
@@ -290,7 +296,7 @@ public abstract class Shape {
     public void checkAndHideParents(Shape closedShape, Set<Shape> countedParents) {
         if (getVisibleOutReferences() == 0) {
             this.visible = false;
-            countedParents.add(this);
+            //countedParents.add(this);
             for (VisConnector connector : inConnectors) {
                 connector.hide();
             }
@@ -390,6 +396,7 @@ public abstract class Shape {
     public void show(Shape parent, Set<Shape> openDescendantsSet) {
         if (!this.isVisible()) openDescendantsSet.add(this);
         this.visible = true;
+        System.out.println("show " + this.getLabel() + " " + hiddenDescendantsSet.size());
 
         switch (getState()) {
             case CLOSED:
@@ -602,6 +609,7 @@ public abstract class Shape {
      */
     private void updateSameLevelParentsDescendants(Shape currentNode, Set<Shape> visitedNodes) {
         if (visitedNodes.contains(currentNode)) return;
+        //System.out.println("updateSameLevelParentsDescendants " + currentNode.getLabel());
 
         visitedNodes.add(currentNode);
 
@@ -664,4 +672,5 @@ public abstract class Shape {
             updateAncestorsForVisibleChildren(parent, visitedNodes, visibleDescendantsSet);
         }
     }
+
 }
