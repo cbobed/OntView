@@ -36,7 +36,7 @@ public class PageRankConceptExtraction extends KConceptExtractor {
         }
         for (Shape s: nonHiddenShape){
             if (s.getState()!=Shape.OPEN) {
-                s.collectHiddenChildren();
+                s.updateHiddenDescendants();
             }
         }
         graph.addDashedConnectors();

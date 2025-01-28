@@ -248,6 +248,8 @@ public abstract class Shape {
         Shape parent;
         for (VisConnector connector : inConnectors) {
             parent = connector.from;
+            countedParents.clear();
+
 
             if (parent.getLabel().matches("Thing")) {
                 parent.checkAndUpdateChildrenVisibilityStates();
@@ -255,10 +257,12 @@ public abstract class Shape {
             }
 
             if (parent.hasOtherVisibleChildren(this)) {
+                connector.hide();
                 parent.setState(PARTIALLY_CLOSED);
                 continue;
             }
 
+            System.out.println("from " + connector.from.getLabel() + " to " + connector.to.getLabel() + " " + connector.isVisible());
             if (!connector.isVisible()) {
                 continue;
             }
@@ -294,6 +298,8 @@ public abstract class Shape {
      * any reference ( an out Connector)
      */
     public void checkAndHideParents(Shape closedShape, Set<Shape> countedParents) {
+        System.out.println("checkAndHide " + this.getLabel()+ " " + countedParents.size());
+
         if (getVisibleOutReferences() == 0) {
             this.visible = false;
             //countedParents.add(this);
@@ -438,6 +444,9 @@ public abstract class Shape {
             c.show();
             c.to.checkAndUpdateParentVisibilityStates();
         }
+        for (Shape s: visibleDescendantsSet){
+            s.updateHiddenDescendants();
+        }
         hiddenDescendantsSet.removeAll(visibleDescendantsSet);
 
     }
@@ -480,29 +489,6 @@ public abstract class Shape {
                     return s1.getTopCorner() - s2.getTopCorner();
                 }
             };
-
-    /**
-     * Recursively collects the count of hidden children in the hierarchy.
-     * Traverses the entire list of connectors until it encounters a child
-     * with no outgoing connectors and accumulates the count of hidden nodes.
-     */
-    public void collectHiddenChildren() {
-        collectHiddenChildren(hiddenDescendantsSet);
-    }
-
-    public void collectHiddenChildren(Set<Shape> countedChildren) {
-        for (VisConnector connector : outConnectors) {
-            Shape child = connector.to;
-
-            if (!child.isVisible()) {
-                countedChildren.add(child);
-            }
-
-            if (!child.outConnectors.isEmpty()) {
-                child.collectHiddenChildren(countedChildren);
-            }
-        }
-    }
 
     /**
      * Updates the state of the shape based on the visibility of its children.
@@ -562,6 +548,31 @@ public abstract class Shape {
             setLeftState(LEFT_PARTIALLY_CLOSED);
         }
     }
+
+    /**
+     * Checks and updates the hidden descendants of a specific shape.
+     * It traverses all descendants connected to the current shape via its outConnectors
+     * and collects only those that are hidden.
+     */
+    public void updateHiddenDescendants() {
+        Set<Shape> hiddenDescendantsSet = new HashSet<>();
+        collectHiddenDescendants(this, hiddenDescendantsSet);
+        this.hiddenDescendantsSet.clear();
+        this.hiddenDescendantsSet.addAll(hiddenDescendantsSet);
+    }
+
+    private void collectHiddenDescendants(Shape current, Set<Shape> hiddenDescendantsSet) {
+        if (current.outConnectors.isEmpty()) {
+            return;
+        }
+
+        for (VisConnector c : current.outConnectors) {
+            Shape child = c.to;
+            if (!child.isVisible()) hiddenDescendantsSet.add(child);
+            collectHiddenDescendants(child, hiddenDescendantsSet);
+        }
+    }
+
 
     /**
      * Updates the parents hidden descendants count. Node hided by double-clicked
