@@ -224,8 +224,10 @@ public abstract class Shape {
 
         Shape child;
         for (VisConnector connector : outConnectors) {
-            if (!connector.isVisible()) continue;
+
             child = connector.to;
+            if (!child.isVisible()) countedChildren.add(child); // add anyway, just to keep track of the hidden children
+            if (!connector.isVisible()) continue;
 
             if (child.childHasOtherParents()) {
                 connector.hide();
@@ -262,7 +264,6 @@ public abstract class Shape {
                 continue;
             }
 
-            System.out.println("from " + connector.from.getLabel() + " to " + connector.to.getLabel() + " " + connector.isVisible());
             if (!connector.isVisible()) {
                 continue;
             }
@@ -303,10 +304,12 @@ public abstract class Shape {
         if (getVisibleOutReferences() == 0) {
             this.visible = false;
             //countedParents.add(this);
+            hideParents(closedShape, countedParents);
+        }
+        if (!isVisible()){ // hide connectors once all nodes are hidden
             for (VisConnector connector : inConnectors) {
                 connector.hide();
             }
-            hideParents(closedShape, countedParents);
         }
     }
 
@@ -402,7 +405,6 @@ public abstract class Shape {
     public void show(Shape parent, Set<Shape> openDescendantsSet) {
         if (!this.isVisible()) openDescendantsSet.add(this);
         this.visible = true;
-        System.out.println("show " + this.getLabel() + " " + hiddenDescendantsSet.size());
 
         switch (getState()) {
             case CLOSED:
@@ -430,8 +432,8 @@ public abstract class Shape {
                 for (VisConnector connector : inConnectors) {
                     connector.show();
                     connector.from.showLeft(this);
-                    connector.from.checkAndUpdateChildrenVisibilityStates();
-                    connector.from.checkAndUpdateParentVisibilityStates();
+                    //connector.from.checkAndUpdateChildrenVisibilityStates();
+                    //connector.from.checkAndUpdateParentVisibilityStates();
                 }
                 break;
         }
@@ -592,8 +594,9 @@ public abstract class Shape {
         Set<Shape> descendantsToProcess = new HashSet<>(hiddenDescendantsSet);
         Set<Shape> visitedNodes = new HashSet<>();
 
-        updateAncestorsForHiddenDescendants(this, visitedNodes, descendantsToProcess);
+        updateAncestorsForHiddenDescendants(this, visitedNodes, hiddenDescendantsSet);
 
+        visitedNodes.clear();
         for (Shape child : descendantsToProcess) {
             updateSameLevelParentsDescendants(child, visitedNodes);
         }
@@ -620,8 +623,6 @@ public abstract class Shape {
      */
     private void updateSameLevelParentsDescendants(Shape currentNode, Set<Shape> visitedNodes) {
         if (visitedNodes.contains(currentNode)) return;
-        //System.out.println("updateSameLevelParentsDescendants " + currentNode.getLabel());
-
         visitedNodes.add(currentNode);
 
         for (VisConnector inConnector : currentNode.inConnectors) {

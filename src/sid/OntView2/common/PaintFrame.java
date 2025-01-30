@@ -852,7 +852,7 @@ public class PaintFrame extends Canvas {
 						if (shape.getLeftState() == Shape.LEFTCLOSED || shape.getLeftState() == Shape.LEFT_PARTIALLY_CLOSED) {
 							// if [+] clicked, open the node
 							shape.openLeft();
-							shape.resetHiddenParentsCount();
+							//shape.resetHiddenParentsCount();
 							refreshDashedConnectors();
 							VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
 							setStateChanged(true);
