@@ -411,6 +411,7 @@ public abstract class Shape {
                     connector.show();
                     connector.to.show(this, openDescendantsSet);
                     connector.to.checkAndUpdateParentVisibilityStates();
+                    connector.to.checkAndUpdateChildrenVisibilityStates();
                 }
                 break; //if it's not a previously hidden node we'll show it
         }
@@ -429,7 +430,7 @@ public abstract class Shape {
                     connector.show();
                     connector.from.showLeft(this, visibleDescendantsSet);
                     connector.from.checkAndUpdateChildrenVisibilityStates();
-                    //connector.from.checkAndUpdateParentVisibilityStates();
+                    connector.from.checkAndUpdateParentVisibilityStates();
                 }
                 break;
         }
@@ -441,6 +442,7 @@ public abstract class Shape {
             c.to.show(this, visibleDescendantsSet);
             c.show();
             c.to.checkAndUpdateParentVisibilityStates();
+            c.to.checkAndUpdateChildrenVisibilityStates();
         }
         for (Shape s: visibleDescendantsSet){
             s.updateHiddenDescendants();
@@ -454,12 +456,10 @@ public abstract class Shape {
             c.from.showLeft(this, visibleDescendantsSet);
             c.show();
             c.from.checkAndUpdateChildrenVisibilityStates();
-            //c.from.checkAndUpdateParentVisibilityStates();
+            c.from.checkAndUpdateParentVisibilityStates();
         }
-        System.out.println("Visible Descendants: ");
         for (Shape s: visibleDescendantsSet){
             s.updateParentsShowLeft(visibleDescendantsSet);
-            System.out.println("- " + s.getLabel());
         }
     }
 
@@ -467,7 +467,6 @@ public abstract class Shape {
         v.addShape(this);
         if (v.width < width)
             v.width = width + VisLevel.MIN_WIDTH;
-
     }
 
     public VisLevel getVisLevel() {
@@ -684,16 +683,13 @@ public abstract class Shape {
     }
 
     /**
-     * Updates the parents hidden descendants count
+     * Updates the parents hidden descendants count by removing the hidden the visible nodes in hiddenDescendantsSet.
      */
     public void updateParentsShowLeft(Set<Shape> visibleDescendantsSet) {
         Set<Shape> visitedParents = new HashSet<>();
         updateAncestorsForHiddenDescendantsShowLeft(this, visitedParents, visibleDescendantsSet);
     }
 
-    /**
-     * Updates the hidden descendants count for its ancestors.
-     */
     private void updateAncestorsForHiddenDescendantsShowLeft(Shape currentNode, Set<Shape> visitedNodes, Set<Shape> visibleDescendantsSet) {
         if (visitedNodes.contains(currentNode)) return;
 
