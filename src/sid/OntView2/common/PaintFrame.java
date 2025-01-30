@@ -805,6 +805,7 @@ public class PaintFrame extends Canvas {
 				if (shape.allSubHidden()) {
 					shape.hide();
 					shape.updateParents();
+					refreshDashedConnectors();
 					setStateChanged(true);
 					Platform.runLater(relaxerRunnable);
 					return true;

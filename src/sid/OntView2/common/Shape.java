@@ -255,19 +255,16 @@ public abstract class Shape {
 
             if (parent.getLabel().matches("Thing")) {
                 parent.checkAndUpdateChildrenVisibilityStates();
+                parent.updateHiddenDescendants();
                 break;
             }
 
             if (parent.hasOtherVisibleChildren(this)) {
                 connector.hide();
                 parent.setState(PARTIALLY_CLOSED);
+                parent.updateHiddenDescendants();
                 continue;
             }
-
-            if (!connector.isVisible()) {
-                continue;
-            }
-
             connector.hide();
 
             if (countedParents.add(parent)) {
@@ -299,8 +296,6 @@ public abstract class Shape {
      * any reference ( an out Connector)
      */
     public void checkAndHideParents(Shape closedShape, Set<Shape> countedParents) {
-        System.out.println("checkAndHide " + this.getLabel()+ " " + countedParents.size());
-
         if (getVisibleOutReferences() == 0) {
             this.visible = false;
             //countedParents.add(this);
@@ -432,8 +427,8 @@ public abstract class Shape {
                 for (VisConnector connector : inConnectors) {
                     connector.show();
                     connector.from.showLeft(this);
-                    //connector.from.checkAndUpdateChildrenVisibilityStates();
-                    //connector.from.checkAndUpdateParentVisibilityStates();
+                    connector.from.checkAndUpdateChildrenVisibilityStates();
+                    connector.from.checkAndUpdateParentVisibilityStates();
                 }
                 break;
         }
