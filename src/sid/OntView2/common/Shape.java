@@ -252,17 +252,17 @@ public abstract class Shape {
             parent = connector.from;
             countedParents.clear();
 
-
             if (parent.getLabel().matches("Thing")) {
                 parent.checkAndUpdateChildrenVisibilityStates();
-                parent.updateHiddenDescendants();
+                //parent.updateHiddenDescendants();
                 break;
             }
 
             if (parent.hasOtherVisibleChildren(this)) {
                 connector.hide();
                 parent.setState(PARTIALLY_CLOSED);
-                parent.updateHiddenDescendants();
+                parent.updateHiddenDescendants(); // update hidden descendants for the parent
+                parent.updateHiddenDescendantsForParents(); // update hidden descendants for the parent's parents
                 continue;
             }
             connector.hide();
@@ -416,7 +416,8 @@ public abstract class Shape {
         }
     }
 
-    public void showLeft(Shape parent) {
+    public void showLeft(Shape parent, Set<Shape> visibleDescendantsSet) {
+        if (!this.isVisible()) visibleDescendantsSet.add(this);
         this.visible = true;
 
         switch (getLeftState()) {
@@ -426,9 +427,9 @@ public abstract class Shape {
             case LEFTOPEN, LEFT_PARTIALLY_CLOSED:
                 for (VisConnector connector : inConnectors) {
                     connector.show();
-                    connector.from.showLeft(this);
+                    connector.from.showLeft(this, visibleDescendantsSet);
                     connector.from.checkAndUpdateChildrenVisibilityStates();
-                    connector.from.checkAndUpdateParentVisibilityStates();
+                    //connector.from.checkAndUpdateParentVisibilityStates();
                 }
                 break;
         }
@@ -450,10 +451,15 @@ public abstract class Shape {
 
     public void showParentLevels() {
         for (VisConnector c : inConnectors) {
-            c.from.showLeft(this);
+            c.from.showLeft(this, visibleDescendantsSet);
             c.show();
             c.from.checkAndUpdateChildrenVisibilityStates();
-            c.from.checkAndUpdateParentVisibilityStates();
+            //c.from.checkAndUpdateParentVisibilityStates();
+        }
+        System.out.println("Visible Descendants: ");
+        for (Shape s: visibleDescendantsSet){
+            s.updateParentsShowLeft(visibleDescendantsSet);
+            System.out.println("- " + s.getLabel());
         }
     }
 
@@ -478,7 +484,6 @@ public abstract class Shape {
             return e.toString();
         }
     }
-
 
     public static final Comparator<Shape> POSY_ORDER =
             new Comparator<Shape>() {
@@ -510,7 +515,6 @@ public abstract class Shape {
         if (allChildrenHidden) {
             setState(CLOSED);
         } else if (allChildrenVisible) {
-            resetHiddenChildrenCount();
             setState(OPEN);
         } else {
             setState(PARTIALLY_CLOSED);
@@ -569,7 +573,6 @@ public abstract class Shape {
             collectHiddenDescendants(child, hiddenDescendantsSet);
         }
     }
-
 
     /**
      * Updates the parents hidden descendants count. Node hided by double-clicked
@@ -677,6 +680,30 @@ public abstract class Shape {
 
             parent.hiddenDescendantsSet.removeAll(visibleDescendantsSet);
             updateAncestorsForVisibleChildren(parent, visitedNodes, visibleDescendantsSet);
+        }
+    }
+
+    /**
+     * Updates the parents hidden descendants count
+     */
+    public void updateParentsShowLeft(Set<Shape> visibleDescendantsSet) {
+        Set<Shape> visitedParents = new HashSet<>();
+        updateAncestorsForHiddenDescendantsShowLeft(this, visitedParents, visibleDescendantsSet);
+    }
+
+    /**
+     * Updates the hidden descendants count for its ancestors.
+     */
+    private void updateAncestorsForHiddenDescendantsShowLeft(Shape currentNode, Set<Shape> visitedNodes, Set<Shape> visibleDescendantsSet) {
+        if (visitedNodes.contains(currentNode)) return;
+
+        visitedNodes.add(currentNode);
+        for (VisConnector inConnector : currentNode.inConnectors) {
+            Shape parent = inConnector.from;
+            if (visitedNodes.contains(parent)) continue;
+
+            parent.hiddenDescendantsSet.removeAll(visibleDescendantsSet);
+            updateAncestorsForHiddenDescendantsShowLeft(parent, visitedNodes, visibleDescendantsSet);
         }
     }
 
