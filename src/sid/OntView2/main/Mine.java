@@ -173,6 +173,7 @@ public class Mine extends Application implements Embedable{
 			}
 
 		}
+
 		return true;
 	}
 
@@ -263,7 +264,7 @@ public class Mine extends Application implements Embedable{
 
 	public void restoreViewButtonAction(ActionEvent arg0) {
 		// TODO Auto-generated method stub
-		if (artPanel.getVisGraph()!= null){
+		//if (artPanel.getVisGraph()!= null){
 			FileChooser selector = new FileChooser();
 			selector.setInitialDirectory(new File(System.getProperty("user.dir")));
 			File file = selector.showOpenDialog(primaryStage);
@@ -273,14 +274,14 @@ public class Mine extends Application implements Embedable{
 					path = file.getCanonicalFile().toString();
 				} catch (IOException e) {
 					showErrorDialog("Error", "Failed to load view.", "Remember to load the exact" +
-							" same ontology and reasoner as when the view was saved. Follow the instructions ont the " +
-							"help buttom.");
+							" same ontology and reasoner as when the view was saved. Follow the instructions on the " +
+							"help button.");
 					e.printStackTrace();
 				}
 				VisPositionConfig.restoreState(path, artPanel.getVisGraph());
 			}
 			VisLevel.adjustWidthAndPos(artPanel.getVisGraph().getLevelSet());
-		}
+		//}
 	}
 
 	public void createImage(Canvas panel) {

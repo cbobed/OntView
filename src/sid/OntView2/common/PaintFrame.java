@@ -80,6 +80,10 @@ public class PaintFrame extends Canvas {
 		activeOntologySource = p;
 	}
 
+	public String getActiveOntologySource() {
+		return activeOntologySource;
+	}
+
 	public String getKceOption() {
 		return kceOption;
 	}

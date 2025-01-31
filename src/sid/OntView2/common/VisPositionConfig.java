@@ -1,7 +1,6 @@
 package sid.OntView2.common;
 
-
-import javafx.scene.paint.Color;
+import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.w3c.dom.Document;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -11,7 +10,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map.Entry;
 
 
@@ -25,18 +23,16 @@ public class VisPositionConfig {
 	
 	public void setup(String path){
 		DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
-	      domFactory.setNamespaceAware(true); 
-	      DocumentBuilder builder;
-	      try {
-	    	builder = domFactory.newDocumentBuilder();
-	    	
+		domFactory.setNamespaceAware(true);
+		DocumentBuilder builder;
+		try {
+			builder = domFactory.newDocumentBuilder();
 			doc = builder.parse(path);
-		  } 
-	      catch (Exception e) {
-	    	  e.printStackTrace();
-		  }	
-
-	      xpath = XPathFactory.newInstance().newXPath();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		xpath = XPathFactory.newInstance().newXPath();
 	}
 	
 	public static void saveState(String path, VisGraph graph){
@@ -63,6 +59,8 @@ public class VisPositionConfig {
 	
 	public void recoverVisInfo(VisGraph graph) throws XPathExpressionException{
 
+		recoverGraphInfo(graph);
+
 		for (Entry<String, Shape> entry : graph.shapeMap.entrySet()) {
 			Shape shape = entry.getValue();
 //				String key = escapeXML(entry.getKey());
@@ -79,8 +77,21 @@ public class VisPositionConfig {
 		graph.clearDashedConnectorList();
 		graph.addDashedConnectors();
 	}
+
+	public void recoverGraphInfo(VisGraph graph) throws XPathExpressionException{
+		String s="//ontologyName/text()";
+		XPathExpression expr = xpath.compile(s);
+		Object ontologyName = expr.evaluate(doc, XPathConstants.STRING);
+		System.out.println(" ontologyName result: "+ ontologyName);
+
+		s="//reasoner/text()";
+		expr = xpath.compile(s);
+		Object reasoner = expr.evaluate(doc, XPathConstants.STRING);
+		System.out.println(" reasoner result: "+ reasoner);
+
+	}
 	
-	public void recoverShapePos(Shape shape, String key) throws XPathExpressionException{ // AQUI
+	public void recoverShapePos(Shape shape, String key) throws XPathExpressionException{
 
 		String search;
 		if ((shape instanceof VisConstraint)|| (shape instanceof VisClass)&&(shape.asVisClass().isAnonymous)) {
@@ -156,6 +167,10 @@ public class VisPositionConfig {
         	 BufferedWriter out = new BufferedWriter(new FileWriter(new File(resourcePath)));
 			 out.write("<?xml version=\"1.0\" ?>\n");
 			 out.write("<root>\n");
+
+			 out.write("\t<ontologyName>" + graph.paintframe.getActiveOntologySource() + "</ontologyName>\n");
+			 out.write("\t<reasoner>" + graph.getReasoner().getClass().getName() + "</reasoner>\n");
+
 			 for (Entry<String, Shape> entry : graph.shapeMap.entrySet()){
 				 Shape shape = entry.getValue();
 				 String key;
