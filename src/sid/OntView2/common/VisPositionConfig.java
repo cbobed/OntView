@@ -1,6 +1,5 @@
 package sid.OntView2.common;
 
-import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.w3c.dom.Document;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -19,7 +18,7 @@ public class VisPositionConfig {
 	DocumentBuilderFactory domFactory;
 	Document doc;
 	XPath xpath;
-
+	static VisPositionConfig config = new VisPositionConfig();
 	
 	public void setup(String path){
 		DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
@@ -44,11 +43,33 @@ public class VisPositionConfig {
 			}
 		}
 	}
+
+	public static String[] restoreOntologyReasoner(String path){
+		config.setup(path);
+		try {
+			return config.recoverGraphInfo();
+		} catch (XPathExpressionException e) {
+			e.printStackTrace();
+		}
+		return new String[0];
+	}
+
+	public String[] recoverGraphInfo() throws XPathExpressionException{
+		String s="//ontologyName/text()";
+		XPathExpression expr = xpath.compile(s);
+		Object ontologyName = expr.evaluate(doc, XPathConstants.STRING);
+		System.out.println(" ontologyName result: "+ ontologyName);
+
+		s="//reasoner/text()";
+		expr = xpath.compile(s);
+		Object reasoner = expr.evaluate(doc, XPathConstants.STRING);
+		System.out.println(" reasoner result: "+ reasoner);
+
+		return new String[]{(String) ontologyName, (String) reasoner};
+	}
 	
 	public static void restoreState(String path, VisGraph graph){
-		if (graph!= null){
-			VisPositionConfig config = new VisPositionConfig();
-			config.setup(path);
+		if (graph!= null && config!=null){
 			try {
 				config.recoverVisInfo(graph);
 			} catch (XPathExpressionException e) {
@@ -58,9 +79,6 @@ public class VisPositionConfig {
 	}
 	
 	public void recoverVisInfo(VisGraph graph) throws XPathExpressionException{
-
-		recoverGraphInfo(graph);
-
 		for (Entry<String, Shape> entry : graph.shapeMap.entrySet()) {
 			Shape shape = entry.getValue();
 //				String key = escapeXML(entry.getKey());
@@ -76,19 +94,6 @@ public class VisPositionConfig {
 		}
 		graph.clearDashedConnectorList();
 		graph.addDashedConnectors();
-	}
-
-	public void recoverGraphInfo(VisGraph graph) throws XPathExpressionException{
-		String s="//ontologyName/text()";
-		XPathExpression expr = xpath.compile(s);
-		Object ontologyName = expr.evaluate(doc, XPathConstants.STRING);
-		System.out.println(" ontologyName result: "+ ontologyName);
-
-		s="//reasoner/text()";
-		expr = xpath.compile(s);
-		Object reasoner = expr.evaluate(doc, XPathConstants.STRING);
-		System.out.println(" reasoner result: "+ reasoner);
-
 	}
 	
 	public void recoverShapePos(Shape shape, String key) throws XPathExpressionException{
@@ -112,17 +117,22 @@ public class VisPositionConfig {
 		String search;
 		if ((shape instanceof VisConstraint)|| (shape instanceof VisClass)&&(shape.asVisClass().isAnonymous)) {
 			search = "Anon[@id='"+key+"']";
-		 }
-		 else {
+		}
+		else {
 			search = "Named[@id='"+key+"']";
-		 }		
-		String s="//"+search+"/state/text()";
+		}
+		// right state
+		String s="//"+search+"/rightState/text()";
 		XPathExpression expr = xpath.compile(s);
         Object result = expr.evaluate(doc, XPathConstants.STRING);
-//        if (mapState((String) result) == Shape.CLOSED)	shape.close();
-//        if (mapState((String) result) == Shape.OPEN)	shape.open();
-        shape.setState(mapState((String) result));
-        
+        shape.setState(mapStateRight((String) result));
+
+		// left state
+		s="//"+search+"/leftState/text()";
+		expr = xpath.compile(s);
+		result = expr.evaluate(doc, XPathConstants.STRING);
+		shape.setLeftState(mapStateLeft((String) result));
+
 	}
 	
 	public void recoverShapeVisibility(Shape shape, String key) throws XPathExpressionException{
@@ -142,7 +152,7 @@ public class VisPositionConfig {
 	}
 
 	
-	public int mapState(String stateString){
+	public int mapStateRight(String stateString){
 		if (stateString.equals("closed")) 		return Shape.CLOSED;
 		if (stateString.equals("open")) 		return Shape.OPEN;
 		if (stateString.equals("partially"))	return Shape.PARTIALLY_CLOSED;
@@ -150,6 +160,13 @@ public class VisPositionConfig {
 		if (stateString.equals("1"))			return Shape.OPEN;
 		if (stateString.equals("2"))			return Shape.PARTIALLY_CLOSED;
 		return Shape.OPEN;
+	}
+
+	public int mapStateLeft(String stateString){
+		if (stateString.equals("3"))			return Shape.LEFTCLOSED;
+		if (stateString.equals("4"))			return Shape.LEFTOPEN;
+		if (stateString.equals("5"))			return Shape.LEFT_PARTIALLY_CLOSED;
+		return Shape.LEFTOPEN;
 	}
 
 	public boolean mapBool( String boolString){
@@ -190,7 +207,9 @@ public class VisPositionConfig {
 						  	out.write("\t"); out.write("\t");
 						  	out.write("<posy>"+shape.getPosY()+"</posy>\n");
 						  	out.write("\t"); out.write("\t");
-						  	out.write("<state>"+shape.getState()+"</state>\n");
+						  	out.write("<rightState>"+shape.getState()+"</rightState>\n");
+							out.write("\t"); out.write("\t");
+				 			out.write("<leftState>"+shape.getLeftState()+"</leftState>\n");
 						  	out.write("\t"); out.write("\t");
 						  	out.write("<visible>"+shape.visible+"</visible>\n");
 					  out.write("\t"); 

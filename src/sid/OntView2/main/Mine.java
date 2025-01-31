@@ -278,6 +278,15 @@ public class Mine extends Application implements Embedable{
 							"help button.");
 					e.printStackTrace();
 				}
+				String[] info = VisPositionConfig.restoreOntologyReasoner(path);
+				// load ontology and reasoner
+				nTopPanel.getOntologyCombo().setValue(info[0]);
+				nTopPanel.OntologyButtonActionActionPerformed(arg0);
+
+				nTopPanel.getReasonerCombo().setValue("openllet");
+				nTopPanel.loadReasonerButtonActionActionPerformed(arg0);
+
+				System.out.println("info: "+info[0]+" "+info[1]);
 				VisPositionConfig.restoreState(path, artPanel.getVisGraph());
 			}
 			VisLevel.adjustWidthAndPos(artPanel.getVisGraph().getLevelSet());

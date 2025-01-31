@@ -690,7 +690,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		}
 	}
 
-	private void OntologyButtonActionActionPerformed(ActionEvent event) {
+	void OntologyButtonActionActionPerformed(ActionEvent event) {
 		parent.artPanel.stop();
 		String x = (String) getOntologyCombo().getValue();
 		if ((x != null) && (!x.isEmpty())) {
@@ -726,7 +726,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		}
 	}
 
-	private void loadReasonerButtonActionActionPerformed(ActionEvent event) {
+	 void loadReasonerButtonActionActionPerformed(ActionEvent event) {
 		String x = getReasonerCombo().getValue();
 		//parent.artPanel.setShowConnectors(true);
 		if(toggleSwitch != null)
