@@ -734,7 +734,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 		if ((x != null) && (!x.isEmpty())) {
 			try {
-				parent.loadReasoner(x);
+				boolean loaded = parent.loadReasoner(x);
+				if(!loaded) return;
 				createButtonActionActionPerformed(event);
 				ArrayList<String> recent = new ArrayList<>();
 				String selected = (String) getOntologyCombo().getValue();

@@ -3,6 +3,7 @@ package sid.OntView2.main;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.imageio.ImageIO;
 
 import javafx.application.Application;
@@ -114,7 +115,6 @@ public class Mine extends Application implements Embedable{
 	/* Rest of methods */
 	public void createButtonAction() {
 		if (reasoner != null) {
-			Stage loadingStage = showLoadingStage();
 			Task<Void> task = new Task<>() {
 				@Override
 				protected Void call() {
@@ -133,14 +133,17 @@ public class Mine extends Application implements Embedable{
 						}
 						nTopPanel.restoreSliderValue();
 						artPanel.start();
+						artPanel.setCursor(Cursor.DEFAULT);
 
 					} catch (Exception e) {
 						e.printStackTrace();
-						Platform.runLater(() -> artPanel.setCursor(Cursor.DEFAULT));
+						artPanel.setCursor(Cursor.DEFAULT);
 					}
 					return null;
 				}
 			};
+
+			Stage loadingStage = showLoadingStage(task);
 
 			task.setOnSucceeded(e -> loadingStage.close());
 			task.setOnFailed(e -> loadingStage.close());
@@ -153,7 +156,6 @@ public class Mine extends Application implements Embedable{
 		manager = OWLManager.createOWLOntologyManager();
 		artPanel.setCursor(Cursor.WAIT);
 
-		Stage loadingStage = showLoadingStage();
 
 		Task<Boolean> task = new Task<>() {
 			@Override
@@ -171,6 +173,9 @@ public class Mine extends Application implements Embedable{
 				}
 			}
 		};
+
+		Stage loadingStage = showLoadingStage(task);
+
 
 		task.setOnSucceeded(event -> {
 			boolean success = task.getValue();
@@ -200,6 +205,8 @@ public class Mine extends Application implements Embedable{
 			showErrorDialog("Error", "Failed to load ontology.", "An unexpected error occurred.");
 		});
 
+		//loadingStage.setOnCloseRequest(event -> task.cancel());
+
 		new Thread(task).start();
 		return true;
 	}
@@ -220,7 +227,7 @@ public class Mine extends Application implements Embedable{
 		artPanel.setOntology(activeOntology);
 	}
 
-	protected void loadReasoner(String reasonerString){
+	protected boolean loadReasoner(String reasonerString){
 		if (activeOntology!=null) {
 			ConsoleProgressMonitor progressMonitor = new ConsoleProgressMonitor();
 			// Specify the progress monitor via a configuration.  We could also specify other setup parameters in
@@ -235,13 +242,16 @@ public class Mine extends Application implements Embedable{
 				applyRenaming();
 				reasoner.precomputeInferences();
 				artPanel.setReasoner(reasoner);
+				return true;
 			} catch (Exception e) {
 				e.printStackTrace();
 				showErrorDialog("Error", "Failed to load reasoner.", e.getMessage());
+				return false;
 			}
 		} else {
 			artPanel.stop();
 			showErrorDialog("Error", "No active ontology.", "Please load an ontology before loading a reasoner.");
+			return false;
 		}
 	}
 
@@ -433,12 +443,10 @@ public class Mine extends Application implements Embedable{
 		alert.showAndWait();
 	}
 
-	private Stage showLoadingStage() {
+	private <T> Stage showLoadingStage(Task<T> task) {
 		Stage loadingStage = new Stage();
 		loadingStage.initModality(Modality.APPLICATION_MODAL);
 		loadingStage.initStyle(StageStyle.UNDECORATED);
-
-		loadingStage.setTitle("Loading");
 
 		Label loadingLabel = new Label("Please, wait...");
 		loadingLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #ffffff;");
@@ -447,7 +455,17 @@ public class Mine extends Application implements Embedable{
 		progressIndicator.setProgress(ProgressIndicator.INDETERMINATE_PROGRESS);
 		progressIndicator.setStyle("-fx-accent: #3498db;");
 
-		VBox loadingBox = new VBox(15.0, progressIndicator, loadingLabel);
+		Button cancelButton = new Button("Cancel");
+		cancelButton.setStyle("-fx-font-size: 14px; -fx-background-color: black; -fx-text-fill: white;" +
+				"-fx-padding: 5px; -fx-border-color: darkred; -fx-border-width: 2px; -fx-border-radius: 8px;" +
+				"-fx-cursor: hand;");
+		cancelButton.setOnAction(event -> {
+			task.cancel();
+			loadingStage.close();
+			System.err.println("Task cancelled");
+		});
+
+		VBox loadingBox = new VBox(15.0, progressIndicator, loadingLabel, cancelButton);
 		loadingBox.setAlignment(javafx.geometry.Pos.CENTER);
 		loadingBox.setStyle(
 				"-fx-background-color: rgba(0, 0, 0, 0.8); " +
@@ -456,11 +474,8 @@ public class Mine extends Application implements Embedable{
 						"-fx-effect: dropshadow(gaussian, black, 10, 0.5, 0, 0);"
 		);
 
-		Scene loadingScene = new Scene(loadingBox, 250, 150);
+		Scene loadingScene = new Scene(loadingBox, 250, 200);
 		loadingStage.setScene(loadingScene);
-
-		loadingStage.setOnCloseRequest(Event::consume);
-		loadingScene.setOnKeyPressed(Event::consume);
 
 		loadingStage.show();
 		return loadingStage;
