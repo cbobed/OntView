@@ -837,6 +837,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 					entry.getValue().asVisClass().getPropertyBox().setVisible(false);
 				}
 			}
+			parent.artPanel.compactGraph();
 		} else {
 			for (Entry<String, Shape> entry : classesInGraph) {
 				if ((entry.getValue() instanceof VisClass) && (entry.getValue().asVisClass().getPropertyBox() != null)) {

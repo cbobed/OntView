@@ -36,8 +36,18 @@
     -fx-border-color: darkred;
     -fx-border-width: 2px;
     -fx-border-radius: 8px;
-    -fx-background-color: linear-gradient(to bottom, #8B0000, #B22222);
+    -fx-background-color: linear-gradient(to bottom, #800000, #B22222);
     -fx-background-radius: 8px;
+}
+
+.cancelButton:pressed {
+    -fx-padding: 5px;
+    -fx-border-color: darkred;
+    -fx-border-width: 2px;
+    -fx-border-radius: 8px;
+    -fx-background-color: linear-gradient(to bottom, #B22222, #800000);
+    -fx-background-radius: 8px;
+
 }
 
 .container {

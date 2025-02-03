@@ -160,22 +160,20 @@ public class Mine extends Application implements Embedable{
 		Task<Boolean> task = new Task<>() {
 			@Override
 			protected Boolean call() {
-				try {
-					activeOntology = manager.loadOntologyFromOntologyDocument(source);
-					return activeOntology != null;
-				} catch (OWLOntologyCreationException e) {
-					e.printStackTrace();
-					showErrorDialog("Error", "Failed to load ontology.", e.getMessage());
-					artPanel.setCursor(Cursor.DEFAULT);
-					activeOntology = null;
-					manager = null;
-					return false;
-				}
+			try {
+				activeOntology = manager.loadOntologyFromOntologyDocument(source);
+				return activeOntology != null;
+			} catch (OWLOntologyCreationException e) {
+				e.printStackTrace();
+				artPanel.setCursor(Cursor.DEFAULT);
+				activeOntology = null;
+				manager = null;
+				return false;
+			}
 			}
 		};
 
 		Stage loadingStage = showLoadingStage(task);
-
 
 		task.setOnSucceeded(event -> {
 			boolean success = task.getValue();
@@ -186,12 +184,10 @@ public class Mine extends Application implements Embedable{
 				artPanel.setActiveOntologySource(source.toString());
 				if (activeOntology != null && manager != null) {
 					ExpressionManager.setNamespaceManager(manager, activeOntology);
-
 					for (String ns: ExpressionManager.getNamespaceManager().getNamespaces()) {
 						System.err.println("prefix: "+ExpressionManager.getNamespaceManager().getPrefixForNamespace(ns));
 						System.err.println("  ns: "+ns);
 					}
-
 				}
 			} else {
 				activeOntology = null;
@@ -199,13 +195,15 @@ public class Mine extends Application implements Embedable{
 			}
 		});
 
-		task.setOnFailed(event -> {
-			artPanel.setCursor(Cursor.DEFAULT);
-			loadingStage.close();
-			showErrorDialog("Error", "Failed to load ontology.", "An unexpected error occurred.");
+		task.exceptionProperty().addListener((observable, oldValue, newValue) ->  {
+			if(newValue != null) {
+				artPanel.setCursor(Cursor.DEFAULT);
+				loadingStage.close();
+				activeOntology = null;
+				manager = null;
+				showErrorDialog("Error", "Failed to load ontology.", newValue.getMessage());
+			}
 		});
-
-		//loadingStage.setOnCloseRequest(event -> task.cancel());
 
 		new Thread(task).start();
 		return true;
@@ -473,7 +471,7 @@ public class Mine extends Application implements Embedable{
 		);
 
 		ClassLoader c = Thread.currentThread().getContextClassLoader();
-		Scene loadingScene = new Scene(loadingBox, 250, 200);
+		Scene loadingScene = new Scene(loadingBox, 300, 200);
 		loadingScene.getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
 		loadingStage.setScene(loadingScene);
 

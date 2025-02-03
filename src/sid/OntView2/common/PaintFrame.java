@@ -1158,7 +1158,7 @@ public class PaintFrame extends Canvas {
 		compactGraph();
 	}
 
-	private void compactGraph() {
+	public void compactGraph() {
 		int currentY = BORDER_PANEL;
 		int minY = -1; 
 		int maxY = -1; 
