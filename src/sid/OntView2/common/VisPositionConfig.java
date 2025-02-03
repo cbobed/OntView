@@ -88,6 +88,10 @@ public class VisPositionConfig {
 			recoverShapeState(shape, key);
 			recoverShapeVisibility(shape, key);
 		}
+		for (Entry<String, Shape> entry : graph.shapeMap.entrySet()) {
+			Shape shape = entry.getValue();
+			if (shape.isVisible()) shape.updateHiddenDescendants();
+		}
 		for (VisConnector connector : graph.connectorList) {
 //			recoverConnectorVisibility(connector);
 			connector.visible = (connector.from.visible && connector.to.visible);
@@ -148,7 +152,6 @@ public class VisPositionConfig {
 		XPathExpression expr = xpath.compile(s);
         Object result = expr.evaluate(doc, XPathConstants.STRING);
         shape.visible= mapBool((String)result);
-        
 	}
 
 	
@@ -197,9 +200,6 @@ public class VisPositionConfig {
 					 key = "Anon id=\""+escapeXML(entry.getKey())+"\"";
 				 }
 				 else {
-//					 key = escapeXML(entry.getKey()); 
-//					 String[] splittedString =key.split("#");
-//					 key = splittedString[splittedString.length-1];
 					 key = "Named id=\""+escapeXML(entry.getKey())+"\"";
 
 				 }

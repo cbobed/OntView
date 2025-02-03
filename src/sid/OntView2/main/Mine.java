@@ -6,22 +6,22 @@ import java.util.*;
 import javax.imageio.ImageIO;
 
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
-import javafx.scene.control.Alert;
+import javafx.stage.*;
 import javafx.scene.control.Alert.AlertType;
 
 import openllet.owlapi.OpenlletReasonerFactory;
@@ -112,68 +112,95 @@ public class Mine extends Application implements Embedable{
 	}
 
 	/* Rest of methods */
+	public void createButtonAction() {
+		if (reasoner != null) {
+			Stage loadingStage = showLoadingStage();
+			Task<Void> task = new Task<>() {
+				@Override
+				protected Void call() {
+					try {
+						artPanel.setCursor(Cursor.WAIT);
+						//cant cast to set<OWLClassExpression> from set<OWLClass>
+						HashSet<OWLClassExpression> set = new HashSet<>(reasoner.getTopClassNode().getEntities());
+						//set reasoner and ontology before creating
+						artPanel.createReasonedGraph(set, check);
+						artPanel.setCursor(Cursor.DEFAULT);
+						artPanel.cleanConnectors();
 
-	public void createButtonAction(){
-		if (reasoner!= null) {
-			artPanel.setCursor(Cursor.WAIT);
-			//cant cast to set<OWLClassExpression> from set<OWLClass>
-			HashSet<OWLClassExpression> set = new HashSet<>(reasoner.getTopClassNode().getEntities());
-			try {
-				//set reasoner and ontology before creating
-				artPanel.createReasonedGraph(set,check);
-				artPanel.setCursor(Cursor.DEFAULT);
-				artPanel.cleanConnectors();
+						while (!artPanel.isStable()) {
+							Thread.sleep(2000);
+							System.err.println("wait");
+						}
+						nTopPanel.restoreSliderValue();
+						artPanel.start();
 
-			}
-			catch (Exception e1) {
-				e1.printStackTrace();
-				artPanel.setCursor(Cursor.DEFAULT);
-			}
-
-			while (!artPanel.isStable()){
-				try {
-					Thread.sleep(2000);
-					System.err.println("wait");
+					} catch (Exception e) {
+						e.printStackTrace();
+						Platform.runLater(() -> artPanel.setCursor(Cursor.DEFAULT));
+					}
+					return null;
 				}
-				catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-			nTopPanel.restoreSliderValue();
-			artPanel.start();
+			};
+
+			task.setOnSucceeded(e -> loadingStage.close());
+			task.setOnFailed(e -> loadingStage.close());
+
+			new Thread(task).start();
 		}
 	}
 
-	protected boolean loadActiveOntology(IRI source){
+	protected boolean loadActiveOntology(IRI source) {
 		manager = OWLManager.createOWLOntologyManager();
 		artPanel.setCursor(Cursor.WAIT);
-		try {
-			activeOntology = manager.loadOntologyFromOntologyDocument(source);
-		} catch (OWLOntologyCreationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			showErrorDialog("Error", "Failed to load ontology.", e.getMessage());
-			artPanel.setCursor(Cursor.DEFAULT);
-			activeOntology = null;
-			manager = null;
-			return false;
-		}
-		artPanel.setCursor(Cursor.DEFAULT);
-		artPanel.setOntology(activeOntology);
 
-		artPanel.setActiveOntologySource(source.toString()); //this might FAIL
+		Stage loadingStage = showLoadingStage();
 
-		// CBL expression manager
-		if (activeOntology != null && manager != null) {
-			ExpressionManager.setNamespaceManager(manager, activeOntology);
-
-			for (String ns: ExpressionManager.getNamespaceManager().getNamespaces()) {
-				System.err.println("prefix: "+ExpressionManager.getNamespaceManager().getPrefixForNamespace(ns));
-				System.err.println("  ns: "+ns);
+		Task<Boolean> task = new Task<>() {
+			@Override
+			protected Boolean call() {
+				try {
+					activeOntology = manager.loadOntologyFromOntologyDocument(source);
+					return activeOntology != null;
+				} catch (OWLOntologyCreationException e) {
+					e.printStackTrace();
+					showErrorDialog("Error", "Failed to load ontology.", e.getMessage());
+					artPanel.setCursor(Cursor.DEFAULT);
+					activeOntology = null;
+					manager = null;
+					return false;
+				}
 			}
+		};
 
-		}
+		task.setOnSucceeded(event -> {
+			boolean success = task.getValue();
+			artPanel.setCursor(Cursor.DEFAULT);
+			loadingStage.close();
+			if (success) {
+				artPanel.setOntology(activeOntology);
+				artPanel.setActiveOntologySource(source.toString());
+				if (activeOntology != null && manager != null) {
+					ExpressionManager.setNamespaceManager(manager, activeOntology);
 
+					for (String ns: ExpressionManager.getNamespaceManager().getNamespaces()) {
+						System.err.println("prefix: "+ExpressionManager.getNamespaceManager().getPrefixForNamespace(ns));
+						System.err.println("  ns: "+ns);
+					}
+
+				}
+			} else {
+				activeOntology = null;
+				manager = null;
+			}
+		});
+
+		task.setOnFailed(event -> {
+			artPanel.setCursor(Cursor.DEFAULT);
+			loadingStage.close();
+			showErrorDialog("Error", "Failed to load ontology.", "An unexpected error occurred.");
+		});
+
+		new Thread(task).start();
 		return true;
 	}
 
@@ -406,6 +433,38 @@ public class Mine extends Application implements Embedable{
 		alert.showAndWait();
 	}
 
+	private Stage showLoadingStage() {
+		Stage loadingStage = new Stage();
+		loadingStage.initModality(Modality.APPLICATION_MODAL);
+		loadingStage.initStyle(StageStyle.UNDECORATED);
+
+		loadingStage.setTitle("Loading");
+
+		Label loadingLabel = new Label("Please, wait...");
+		loadingLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #ffffff;");
+
+		ProgressIndicator progressIndicator = new ProgressIndicator();
+		progressIndicator.setProgress(ProgressIndicator.INDETERMINATE_PROGRESS);
+		progressIndicator.setStyle("-fx-accent: #3498db;");
+
+		VBox loadingBox = new VBox(15.0, progressIndicator, loadingLabel);
+		loadingBox.setAlignment(javafx.geometry.Pos.CENTER);
+		loadingBox.setStyle(
+				"-fx-background-color: rgba(0, 0, 0, 0.8); " +
+						"-fx-padding: 20px; " +
+						"-fx-background-radius: 10px; " +
+						"-fx-effect: dropshadow(gaussian, black, 10, 0.5, 0, 0);"
+		);
+
+		Scene loadingScene = new Scene(loadingBox, 250, 150);
+		loadingStage.setScene(loadingScene);
+
+		loadingStage.setOnCloseRequest(Event::consume);
+		loadingScene.setOnKeyPressed(Event::consume);
+
+		loadingStage.show();
+		return loadingStage;
+	}
 
 }
  

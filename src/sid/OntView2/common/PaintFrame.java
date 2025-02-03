@@ -380,8 +380,8 @@ public class PaintFrame extends Canvas {
 		//new Thread(visGraph).start();
 		paintFrame.setCursor(Cursor.WAIT);
 
-		ProgressBarDialogThread progressBarObserver = new ProgressBarDialogThread(this);
-		visGraph.addProgressBarObserver((observable, oldValue, newValue) -> progressBarObserver.update());
+		//ProgressBarDialogThread progressBarObserver = new ProgressBarDialogThread(this);
+		//visGraph.addProgressBarObserver((observable, oldValue, newValue) -> progressBarObserver.update());
 
 		VisGraphObserver graphObserver = new VisGraphObserver(this.getVisGraph());
 		visGraph.addGeneralObserver((observable, oldValue, newValue) -> graphObserver.update());
