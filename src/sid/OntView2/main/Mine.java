@@ -443,7 +443,7 @@ public class Mine extends Application implements Embedable{
 		alert.showAndWait();
 	}
 
-	private <T> Stage showLoadingStage(Task<T> task) {
+	private Stage showLoadingStage(Task<?> task) {
 		Stage loadingStage = new Stage();
 		loadingStage.initModality(Modality.APPLICATION_MODAL);
 		loadingStage.initStyle(StageStyle.UNDECORATED);
@@ -456,9 +456,7 @@ public class Mine extends Application implements Embedable{
 		progressIndicator.setStyle("-fx-accent: #3498db;");
 
 		Button cancelButton = new Button("Cancel");
-		cancelButton.setStyle("-fx-font-size: 14px; -fx-background-color: black; -fx-text-fill: white;" +
-				"-fx-padding: 5px; -fx-border-color: darkred; -fx-border-width: 2px; -fx-border-radius: 8px;" +
-				"-fx-cursor: hand;");
+		cancelButton.getStyleClass().add("cancelButton");
 		cancelButton.setOnAction(event -> {
 			task.cancel();
 			loadingStage.close();
@@ -474,7 +472,9 @@ public class Mine extends Application implements Embedable{
 						"-fx-effect: dropshadow(gaussian, black, 10, 0.5, 0, 0);"
 		);
 
+		ClassLoader c = Thread.currentThread().getContextClassLoader();
 		Scene loadingScene = new Scene(loadingBox, 250, 200);
+		loadingScene.getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
 		loadingStage.setScene(loadingScene);
 
 		loadingStage.show();

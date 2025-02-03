@@ -19,6 +19,27 @@
     -fx-background-color: linear-gradient(to bottom, #b0c4de, #a2b9cc);
 }
 
+.cancelButton {
+    -fx-font-size: 14px;
+    -fx-background-color: black;
+    -fx-text-fill: white;
+    -fx-padding: 5px;
+    -fx-border-color: darkred;
+    -fx-border-width: 2px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-cursor: hand;
+}
+
+.cancelButton:hover {
+    -fx-padding: 5px;
+    -fx-border-color: darkred;
+    -fx-border-width: 2px;
+    -fx-border-radius: 8px;
+    -fx-background-color: linear-gradient(to bottom, #8B0000, #B22222);
+    -fx-background-radius: 8px;
+}
+
 .container {
     -fx-border-color: rgb(128, 128, 128);
     -fx-border-width: 1;
