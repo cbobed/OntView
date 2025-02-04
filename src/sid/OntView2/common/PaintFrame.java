@@ -403,8 +403,8 @@ public class PaintFrame extends Canvas {
 		Task<Void> task = new Task<>() {
 			@Override
 			protected Void call() {
-			visGraph.run();
-			return null;
+				visGraph.run();
+				return null;
 			}
 		};
 

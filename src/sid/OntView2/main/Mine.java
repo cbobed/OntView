@@ -3,7 +3,7 @@ package sid.OntView2.main;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.Semaphore;
 import javax.imageio.ImageIO;
 
 import javafx.application.Application;
@@ -11,7 +11,6 @@ import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
@@ -133,10 +132,9 @@ public class Mine extends Application implements Embedable{
 						}
 						nTopPanel.restoreSliderValue();
 						artPanel.start();
-						artPanel.setCursor(Cursor.DEFAULT);
-
 					} catch (Exception e) {
 						e.printStackTrace();
+					} finally {
 						artPanel.setCursor(Cursor.DEFAULT);
 					}
 					return null;
@@ -152,34 +150,31 @@ public class Mine extends Application implements Embedable{
 		}
 	}
 
-	protected boolean loadActiveOntology(IRI source) {
+	protected void loadActiveOntology(IRI source) {
 		manager = OWLManager.createOWLOntologyManager();
 		artPanel.setCursor(Cursor.WAIT);
 
-
-		Task<Boolean> task = new Task<>() {
+		Task<Void> task = new Task<>() {
 			@Override
-			protected Boolean call() {
-			try {
-				activeOntology = manager.loadOntologyFromOntologyDocument(source);
-				return activeOntology != null;
-			} catch (OWLOntologyCreationException e) {
-				e.printStackTrace();
-				artPanel.setCursor(Cursor.DEFAULT);
-				activeOntology = null;
-				manager = null;
-				return false;
-			}
-			}
+			protected Void call() {
+				try {
+					activeOntology = manager.loadOntologyFromOntologyDocument(source);
+				} catch (OWLOntologyCreationException e) {
+					e.printStackTrace();
+					artPanel.setCursor(Cursor.DEFAULT);
+					activeOntology = null;
+					manager = null;
+				}
+                return null;
+            }
 		};
 
 		Stage loadingStage = showLoadingStage(task);
 
 		task.setOnSucceeded(event -> {
-			boolean success = task.getValue();
 			artPanel.setCursor(Cursor.DEFAULT);
 			loadingStage.close();
-			if (success) {
+
 				artPanel.setOntology(activeOntology);
 				artPanel.setActiveOntologySource(source.toString());
 				if (activeOntology != null && manager != null) {
@@ -189,10 +184,9 @@ public class Mine extends Application implements Embedable{
 						System.err.println("  ns: "+ns);
 					}
 				}
-			} else {
-				activeOntology = null;
-				manager = null;
-			}
+				nTopPanel.getLoadReasonerButton().setDisable(false);
+				nTopPanel.getReasonerCombo().setDisable(false);
+
 		});
 
 		task.exceptionProperty().addListener((observable, oldValue, newValue) ->  {
@@ -201,12 +195,11 @@ public class Mine extends Application implements Embedable{
 				loadingStage.close();
 				activeOntology = null;
 				manager = null;
-				showErrorDialog("Error", "Failed to load ontology.", newValue.getMessage());
+				showErrorDialog("Error", "Failed to load the ontology.", newValue.getMessage());
 			}
 		});
 
 		new Thread(task).start();
-		return true;
 	}
 
 	protected void loadActiveOntology(String source){
