@@ -29,7 +29,6 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 import reducer.StructuralReducer;
-import sid.OntView2.utils.ProgressBarDialogThread;
 
 public class PaintFrame extends Canvas {
 
