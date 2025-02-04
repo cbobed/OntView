@@ -195,7 +195,7 @@ public class Mine extends Application implements Embedable{
 				loadingStage.close();
 				activeOntology = null;
 				manager = null;
-				showErrorDialog("Error", "Failed to load the ontology.", newValue.getMessage());
+				showErrorDialog("Error", "Failed to load the ontology", newValue.getMessage());
 			}
 		});
 
