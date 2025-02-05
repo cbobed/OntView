@@ -738,7 +738,14 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		Stage loadingStage = parent.showLoadingStage(task);
 
 		task.setOnSucceeded(e -> loadingStage.close());
-		task.setOnFailed(e -> loadingStage.close());
+		task.setOnFailed(e -> {
+			task.getException().printStackTrace();
+			parent.showAlertDialog("Error", "Reasoner could not be loaded.",  "Try another reasoner.",
+					Alert.AlertType.ERROR);
+			//parent.showAlertDialog("Error", "Reasoner could not be loaded.",  task.getException().getMessage(),
+			//		Alert.AlertType.ERROR);
+			loadingStage.close();
+		});
 
 		new Thread(task).start();
 	}
@@ -752,7 +759,10 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		if ((x != null) && (!x.isEmpty())) {
 			try {
 				boolean loaded = parent.loadReasoner(x);
-				if(!loaded) return;
+				if(!loaded) {
+					System.out.println("Reasoner could not be loaded.");
+					return;
+				}
 				createButtonActionActionPerformed(event);
 				ArrayList<String> recent = new ArrayList<>();
 				String selected = (String) getOntologyCombo().getValue();

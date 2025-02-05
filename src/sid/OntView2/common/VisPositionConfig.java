@@ -189,7 +189,9 @@ public class VisPositionConfig {
 			 out.write("<root>\n");
 
 			 out.write("\t<ontologyName>" + graph.paintframe.getActiveOntologySource() + "</ontologyName>\n");
-			 out.write("\t<reasoner>" + graph.getReasoner().getClass().getName() + "</reasoner>\n");
+			 out.write("\t<reasoner>" + graph.paintframe.getReasoner().getReasonerName() + "</reasoner>\n");
+
+			 //out.write("\t<reasoner>" + graph.getReasoner().getClass().getName() + "</reasoner>\n");
 
 			 for (Entry<String, Shape> entry : graph.shapeMap.entrySet()){
 				 Shape shape = entry.getValue();

@@ -24,7 +24,7 @@ import javafx.stage.*;
 import javafx.scene.control.Alert.AlertType;
 
 import openllet.owlapi.OpenlletReasonerFactory;
-import org.semanticweb.HermiT.Reasoner.ReasonerFactory;
+import org.semanticweb.HermiT.ReasonerFactory;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
@@ -187,7 +187,7 @@ public class Mine extends Application implements Embedable{
 		} catch (OWLOntologyCreationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			showAlertDialog("Error", "Failed to load ontology.", e.getMessage(), Alert.AlertType.ERROR);
+			showAlertDialog("Error", "Ontology could not be loaded.", e.getMessage(), Alert.AlertType.ERROR);
 			artPanel.setCursor(Cursor.DEFAULT);
 			activeOntology = null;
 			manager = null;
@@ -306,7 +306,7 @@ public class Mine extends Application implements Embedable{
 	public void restoreViewTask(ActionEvent arg0, String[] info, String path) {
 		// load ontology and reasoner
 		nTopPanel.getOntologyCombo().setValue(info[0]);
-		nTopPanel.getReasonerCombo().setValue("openllet");
+		nTopPanel.getReasonerCombo().setValue(info[1]);
 
 		Task<Void> task = new Task<>() {
 			@Override
@@ -326,10 +326,8 @@ public class Mine extends Application implements Embedable{
 		task.setOnFailed(e -> {
 			loadingStage.close();
 			showAlertDialog("Error", "Failed to load view.", "View must be damage. " +
-							"The entire ontology is displayed.",
-					Alert.AlertType.ERROR);
+							"The entire ontology is displayed.", Alert.AlertType.ERROR);
 		});
-
 		new Thread(task).start();
 	}
 
@@ -343,16 +341,11 @@ public class Mine extends Application implements Embedable{
 			try {
 				path = file.getCanonicalFile().toString();
 			} catch (IOException e) {
-				showAlertDialog("Error", "Failed to load view.", "Remember to load the exact" +
-						" same ontology and reasoner as when the view was saved. Follow the instructions on the " +
-						"help button.", Alert.AlertType.ERROR);
 				e.printStackTrace();
 			}
 
 			String[] info = VisPositionConfig.restoreOntologyReasoner(path);
 			restoreViewTask(arg0, info, path);
-
-			System.out.println("info: "+info[0]+" "+info[1]);
 		}
 	}
 
