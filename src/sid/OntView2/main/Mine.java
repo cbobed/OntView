@@ -6,6 +6,7 @@ import java.util.*;
 
 import javax.imageio.ImageIO;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
@@ -109,97 +110,106 @@ public class Mine extends Application implements Embedable{
 
 	}
 
+	public void createBottonActionTask(){
+		Task<Void> task = new Task<>() {
+			@Override
+			protected Void call() {
+				createButtonAction();
+				return null;
+			}
+		};
+
+		Stage loadingStage = showLoadingStage(task);
+
+		task.setOnSucceeded(e -> loadingStage.close());
+		task.setOnFailed(e -> loadingStage.close());
+
+		new Thread(task).start();
+
+	}
+
 	/* Rest of methods */
-	public void createButtonAction() {
-		if (reasoner != null) {
-			Task<Void> task = new Task<>() {
-				@Override
-				protected Void call() {
-					try {
-						artPanel.setCursor(Cursor.WAIT);
-						//cant cast to set<OWLClassExpression> from set<OWLClass>
-						HashSet<OWLClassExpression> set = new HashSet<>(reasoner.getTopClassNode().getEntities());
-						//set reasoner and ontology before creating
-						artPanel.createReasonedGraph(set, check);
-						artPanel.setCursor(Cursor.DEFAULT);
-						artPanel.cleanConnectors();
+	protected void createButtonAction() {
+		if (reasoner!= null) {
+			artPanel.setCursor(Cursor.WAIT);
+			//cant cast to set<OWLClassExpression> from set<OWLClass>
+			HashSet<OWLClassExpression> set = new HashSet<>(reasoner.getTopClassNode().getEntities());
+			try {
+				//set reasoner and ontology before creating
+				artPanel.createReasonedGraph(set,check);
+				artPanel.setCursor(Cursor.DEFAULT);
+				artPanel.cleanConnectors();
+			}
+			catch (Exception e1) {
+				e1.printStackTrace();
+				artPanel.setCursor(Cursor.DEFAULT);
+			}
 
-						while (!artPanel.isStable()) {
-							Thread.sleep(2000);
-							System.err.println("wait");
-						}
-						nTopPanel.restorePropertyCheckboxes();
-						nTopPanel.restoreSliderValue();
-						artPanel.start();
-					} catch (Exception e) {
-						e.printStackTrace();
-					} finally {
-						artPanel.setCursor(Cursor.DEFAULT);
-					}
-					return null;
+			while (!artPanel.isStable()){
+				try {
+					Thread.sleep(2000);
+					System.err.println("wait");
 				}
-			};
-
-			Stage loadingStage = showLoadingStage(task);
-
-			task.setOnSucceeded(e -> loadingStage.close());
-			task.setOnFailed(e -> loadingStage.close());
-
-			new Thread(task).start();
+				catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			nTopPanel.restorePropertyCheckboxes();
+			nTopPanel.restoreSliderValue();
+			artPanel.start();
 		}
 	}
 
-	protected void loadActiveOntology(IRI source) {
+	protected void loadActiveOntologyTask(IRI source) {
 		manager = OWLManager.createOWLOntologyManager();
 		artPanel.setCursor(Cursor.WAIT);
 
 		Task<Void> task = new Task<>() {
 			@Override
 			protected Void call() {
-				try {
-					activeOntology = manager.loadOntologyFromOntologyDocument(source);
-				} catch (OWLOntologyCreationException e) {
-					e.printStackTrace();
-					artPanel.setCursor(Cursor.DEFAULT);
-					activeOntology = null;
-					manager = null;
-					showAlertDialog("Error", "Failed to load the ontology.", e.getMessage(), Alert.AlertType.ERROR);
-				}
-                return null;
-            }
+				loadActiveOntology(source);
+				return null;
+			}
 		};
 
 		Stage loadingStage = showLoadingStage(task);
-
-		task.setOnSucceeded(event -> {
-			artPanel.setCursor(Cursor.DEFAULT);
-			loadingStage.close();
-
-				artPanel.setOntology(activeOntology);
-				artPanel.setActiveOntologySource(source.toString());
-				if (activeOntology != null && manager != null) {
-					ExpressionManager.setNamespaceManager(manager, activeOntology);
-					for (String ns: ExpressionManager.getNamespaceManager().getNamespaces()) {
-						System.out.println("prefix: "+ExpressionManager.getNamespaceManager().getPrefixForNamespace(ns));
-						System.out.println("  ns: "+ns);
-					}
-				}
-				nTopPanel.getLoadReasonerButton().setDisable(false);
-				nTopPanel.getReasonerCombo().setDisable(false);
-
-		});
-
-		task.exceptionProperty().addListener((observable, oldValue, newValue) ->  {
-			if(newValue != null) {
-				artPanel.setCursor(Cursor.DEFAULT);
-				loadingStage.close();
-				activeOntology = null;
-				manager = null;
-				showAlertDialog("Error", "Failed to load the ontology.", newValue.getMessage(), Alert.AlertType.ERROR);
-			}
-		});
+		task.setOnSucceeded(e -> loadingStage.close());
+		task.setOnFailed(e -> loadingStage.close());
 
 		new Thread(task).start();
+	}
+
+	protected void loadActiveOntology(IRI source) {
+		manager = OWLManager.createOWLOntologyManager();
+		artPanel.setCursor(Cursor.WAIT);
+		try {
+			activeOntology = manager.loadOntologyFromOntologyDocument(source);
+		} catch (OWLOntologyCreationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			showAlertDialog("Error", "Failed to load ontology.", e.getMessage(), Alert.AlertType.ERROR);
+			artPanel.setCursor(Cursor.DEFAULT);
+			activeOntology = null;
+			manager = null;
+			return;
+		}
+		artPanel.setCursor(Cursor.DEFAULT);
+		artPanel.setOntology(activeOntology);
+
+		artPanel.setActiveOntologySource(source.toString()); //this might FAIL
+
+		// CBL expression manager
+		if (activeOntology != null && manager != null) {
+			ExpressionManager.setNamespaceManager(manager, activeOntology);
+
+			for (String ns: ExpressionManager.getNamespaceManager().getNamespaces()) {
+				System.err.println("prefix: "+ExpressionManager.getNamespaceManager().getPrefixForNamespace(ns));
+				System.err.println("  ns: "+ns);
+			}
+		}
+
+		nTopPanel.getLoadReasonerButton().setDisable(false);
+		nTopPanel.getReasonerCombo().setDisable(false);
 	}
 
 	protected void loadActiveOntology(String source){
@@ -236,13 +246,15 @@ public class Mine extends Application implements Embedable{
 				return true;
 			} catch (Exception e) {
 				e.printStackTrace();
-				showAlertDialog("Error", "Failed to load reasoner.", e.getMessage(), Alert.AlertType.ERROR);
+				Platform.runLater(() -> showAlertDialog("Error", "Failed to load reasoner.",
+						e.getMessage(), AlertType.ERROR));
 				return false;
 			}
 		} else {
 			artPanel.stop();
-			showAlertDialog("Error", "No active ontology.",
-					"Please load an ontology before loading a reasoner.", Alert.AlertType.ERROR);
+			Platform.runLater(() -> showAlertDialog("Error", "No active ontology.",
+				"Please load an ontology before loading a reasoner.", AlertType.ERROR));
+
 			return false;
 		}
 	}
@@ -291,35 +303,57 @@ public class Mine extends Application implements Embedable{
 		}
 	}
 
+	public void restoreViewTask(ActionEvent arg0, String[] info, String path) {
+		// load ontology and reasoner
+		nTopPanel.getOntologyCombo().setValue(info[0]);
+		nTopPanel.getReasonerCombo().setValue("openllet");
+
+		Task<Void> task = new Task<>() {
+			@Override
+			protected Void call() {
+				loadActiveOntology(IRI.create(info[0]));
+				nTopPanel.loadReasonerButtonActionActionPerformed(arg0);
+				VisPositionConfig.restoreState(path, artPanel.getVisGraph());
+				VisLevel.adjustWidthAndPos(artPanel.getVisGraph().getLevelSet());
+				Platform.runLater(artPanel.getDrawerRunnable());
+				return null;
+			}
+		};
+
+		Stage loadingStage = showLoadingStage(task);
+
+		task.setOnSucceeded(e -> loadingStage.close());
+		task.setOnFailed(e -> {
+			loadingStage.close();
+			showAlertDialog("Error", "Failed to load view.", "View must be damage. " +
+							"The entire ontology is displayed.",
+					Alert.AlertType.ERROR);
+		});
+
+		new Thread(task).start();
+	}
+
 	public void restoreViewButtonAction(ActionEvent arg0) {
 		// TODO Auto-generated method stub
-		//if (artPanel.getVisGraph()!= null){
-			FileChooser selector = new FileChooser();
-			selector.setInitialDirectory(new File(System.getProperty("user.dir")));
-			File file = selector.showOpenDialog(primaryStage);
-			if (file != null) {
-				String path = null;
-				try {
-					path = file.getCanonicalFile().toString();
-				} catch (IOException e) {
-					showAlertDialog("Error", "Failed to load view.", "Remember to load the exact" +
-							" same ontology and reasoner as when the view was saved. Follow the instructions on the " +
-							"help button.", Alert.AlertType.ERROR);
-					e.printStackTrace();
-				}
-				String[] info = VisPositionConfig.restoreOntologyReasoner(path);
-				// load ontology and reasoner
-				nTopPanel.getOntologyCombo().setValue(info[0]);
-				nTopPanel.OntologyButtonActionActionPerformed(arg0);
-
-				nTopPanel.getReasonerCombo().setValue("openllet");
-				nTopPanel.loadReasonerButtonActionActionPerformed(arg0);
-
-				System.out.println("info: "+info[0]+" "+info[1]);
-				VisPositionConfig.restoreState(path, artPanel.getVisGraph());
+		FileChooser selector = new FileChooser();
+		selector.setInitialDirectory(new File(System.getProperty("user.dir")));
+		File file = selector.showOpenDialog(primaryStage);
+		if (file != null) {
+			String path = null;
+			try {
+				path = file.getCanonicalFile().toString();
+			} catch (IOException e) {
+				showAlertDialog("Error", "Failed to load view.", "Remember to load the exact" +
+						" same ontology and reasoner as when the view was saved. Follow the instructions on the " +
+						"help button.", Alert.AlertType.ERROR);
+				e.printStackTrace();
 			}
-			VisLevel.adjustWidthAndPos(artPanel.getVisGraph().getLevelSet());
-		//}
+
+			String[] info = VisPositionConfig.restoreOntologyReasoner(path);
+			restoreViewTask(arg0, info, path);
+
+			System.out.println("info: "+info[0]+" "+info[1]);
+		}
 	}
 
 	public void createImage(Canvas panel) {
@@ -435,11 +469,10 @@ public class Mine extends Application implements Embedable{
 		ClassLoader c = Thread.currentThread().getContextClassLoader();
 		alert.getDialogPane().getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
 		alert.getDialogPane().getStyleClass().add("custom-alert");
-
 		alert.showAndWait();
 	}
 
-	private Stage showLoadingStage(Task<?> task) {
+	protected Stage showLoadingStage(Task<?> task) {
 		Stage loadingStage = new Stage();
 		loadingStage.initModality(Modality.APPLICATION_MODAL);
 		loadingStage.initStyle(StageStyle.UNDECORATED);

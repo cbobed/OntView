@@ -652,8 +652,6 @@ public class PaintFrame extends Canvas {
 			return;
 		}
 
-		System.out.println("handleMouseClicked " + e.getY() + " canvas size " + getHeight());
-
 		Point2D p = translatePoint(new Point2D(e.getX(), e.getY()));
 		int x = (int) p.getX();
 		int y = (int) p.getY();

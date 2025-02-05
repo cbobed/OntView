@@ -4,6 +4,7 @@ import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Insets;
@@ -22,6 +23,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Popup;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.semanticweb.owlapi.model.IRI;
 import sid.OntView2.common.*;
@@ -392,7 +394,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			loadReasonerButton.setCursor(Cursor.HAND);
 			loadReasonerButton.setFont(Font.font("DejaVu Sans", FontWeight.NORMAL, 10));
 			loadReasonerButton.getStyleClass().add("button");
-			loadReasonerButton.setOnAction(this::loadReasonerButtonActionActionPerformed);
+			loadReasonerButton.setOnAction(this::loadReasonerButtonActionTask);
 		}
 		return loadReasonerButton;
 	}
@@ -694,7 +696,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		parent.artPanel.stop();
 		String x = (String) getOntologyCombo().getValue();
 		if ((x != null) && (!x.isEmpty())) {
-			parent.loadActiveOntology(IRI.create(x));
+			parent.loadActiveOntologyTask(IRI.create(x));
 		} else {
 			parent.showAlertDialog("Error", "No ontology selected.",
 					"Please select an ontology first.", Alert.AlertType.ERROR);
@@ -722,6 +724,23 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		if (getQualifiedNames().isSelected()) {
 			qualifiedNamesActionActionPerformed(e);
 		}
+	}
+
+	void loadReasonerButtonActionTask(ActionEvent event) {
+		Task<Void> task = new Task<>() {
+			@Override
+			protected Void call() {
+				loadReasonerButtonActionActionPerformed(event);
+				return null;
+			}
+		};
+
+		Stage loadingStage = parent.showLoadingStage(task);
+
+		task.setOnSucceeded(e -> loadingStage.close());
+		task.setOnFailed(e -> loadingStage.close());
+
+		new Thread(task).start();
 	}
 
 	 void loadReasonerButtonActionActionPerformed(ActionEvent event) {
@@ -761,6 +780,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 			} catch (Exception e) {
 				e.printStackTrace();
+				parent.showAlertDialog("Error", "Reasoner could not be loaded.", e.getMessage(),
+						Alert.AlertType.ERROR);
 			}
 		}
 	}
