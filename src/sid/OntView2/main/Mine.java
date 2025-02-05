@@ -3,11 +3,9 @@ package sid.OntView2.main;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.Semaphore;
-import javax.imageio.ImageIO;
 
+import javax.imageio.ImageIO;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
@@ -130,6 +128,7 @@ public class Mine extends Application implements Embedable{
 							Thread.sleep(2000);
 							System.err.println("wait");
 						}
+						nTopPanel.restorePropertyCheckboxes();
 						nTopPanel.restoreSliderValue();
 						artPanel.start();
 					} catch (Exception e) {
@@ -164,6 +163,7 @@ public class Mine extends Application implements Embedable{
 					artPanel.setCursor(Cursor.DEFAULT);
 					activeOntology = null;
 					manager = null;
+					showAlertDialog("Error", "Failed to load the ontology.", e.getMessage(), Alert.AlertType.ERROR);
 				}
                 return null;
             }
@@ -180,8 +180,8 @@ public class Mine extends Application implements Embedable{
 				if (activeOntology != null && manager != null) {
 					ExpressionManager.setNamespaceManager(manager, activeOntology);
 					for (String ns: ExpressionManager.getNamespaceManager().getNamespaces()) {
-						System.err.println("prefix: "+ExpressionManager.getNamespaceManager().getPrefixForNamespace(ns));
-						System.err.println("  ns: "+ns);
+						System.out.println("prefix: "+ExpressionManager.getNamespaceManager().getPrefixForNamespace(ns));
+						System.out.println("  ns: "+ns);
 					}
 				}
 				nTopPanel.getLoadReasonerButton().setDisable(false);
@@ -195,7 +195,7 @@ public class Mine extends Application implements Embedable{
 				loadingStage.close();
 				activeOntology = null;
 				manager = null;
-				showErrorDialog("Error", "Failed to load the ontology", newValue.getMessage());
+				showAlertDialog("Error", "Failed to load the ontology.", newValue.getMessage(), Alert.AlertType.ERROR);
 			}
 		});
 
@@ -236,12 +236,13 @@ public class Mine extends Application implements Embedable{
 				return true;
 			} catch (Exception e) {
 				e.printStackTrace();
-				showErrorDialog("Error", "Failed to load reasoner.", e.getMessage());
+				showAlertDialog("Error", "Failed to load reasoner.", e.getMessage(), Alert.AlertType.ERROR);
 				return false;
 			}
 		} else {
 			artPanel.stop();
-			showErrorDialog("Error", "No active ontology.", "Please load an ontology before loading a reasoner.");
+			showAlertDialog("Error", "No active ontology.",
+					"Please load an ontology before loading a reasoner.", Alert.AlertType.ERROR);
 			return false;
 		}
 	}
@@ -301,9 +302,9 @@ public class Mine extends Application implements Embedable{
 				try {
 					path = file.getCanonicalFile().toString();
 				} catch (IOException e) {
-					showErrorDialog("Error", "Failed to load view.", "Remember to load the exact" +
+					showAlertDialog("Error", "Failed to load view.", "Remember to load the exact" +
 							" same ontology and reasoner as when the view was saved. Follow the instructions on the " +
-							"help button.");
+							"help button.", Alert.AlertType.ERROR);
 					e.printStackTrace();
 				}
 				String[] info = VisPositionConfig.restoreOntologyReasoner(path);
@@ -426,11 +427,15 @@ public class Mine extends Application implements Embedable{
 		nTopPanel.loadSearchCombo();
 	}
 
-	void showErrorDialog(String title, String header, String content) {
-		Alert alert = new Alert(Alert.AlertType.ERROR);
+	void showAlertDialog(String title, String header, String content, AlertType type) {
+		Alert alert = new Alert(type);
 		alert.setTitle(title);
 		alert.setHeaderText(header);
 		alert.setContentText(content);
+		ClassLoader c = Thread.currentThread().getContextClassLoader();
+		alert.getDialogPane().getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
+		alert.getDialogPane().getStyleClass().add("custom-alert");
+
 		alert.showAndWait();
 	}
 

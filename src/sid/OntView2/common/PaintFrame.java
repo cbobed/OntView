@@ -37,6 +37,8 @@ public class PaintFrame extends Canvas {
 	static final int BORDER_PANEL = 50;
 	static final int MIN_SPACE = 20;
 	static final int MIN_INITIAL_SPACE = 40;
+	public static final int MAX_SIZE = 14700;
+	private final int MIN_POS_SHAPE = 30;
 	private static final int DOWN = 0;
 	private static final int UP = -1;
 	boolean stable = false;
@@ -577,6 +579,19 @@ public class PaintFrame extends Canvas {
 		}
 		if (pressedShape != null) {
 			direction = ((draggedY > 0) ? DOWN : UP);
+
+			// Check if the shape is not going out of the canvas
+			if (direction == DOWN) { // To be able to move upwards
+				if (pressedShape.getBottomCorner() >= MAX_SIZE) {
+					e.consume();
+					return;
+				}
+			} else {
+				if (getHeight() >= MAX_SIZE && pressedShape.getTopCorner() <= MIN_POS_SHAPE) {
+					e.consume();
+					return;
+				}
+			}
 			pressedShape.setPosY(pressedShape.getPosY() + draggedY);
 			stateChanged = true;
 			shapeRepulsion(pressedShape, direction);
@@ -636,6 +651,8 @@ public class PaintFrame extends Canvas {
 			isDragging = false;
 			return;
 		}
+
+		System.out.println("handleMouseClicked " + e.getY() + " canvas size " + getHeight());
 
 		Point2D p = translatePoint(new Point2D(e.getX(), e.getY()));
 		int x = (int) p.getX();
@@ -700,6 +717,9 @@ public class PaintFrame extends Canvas {
 	 * Method to check if it needs to expand the canvas size
 	 */
 	public void checkAndResizeCanvas() {
+		if (getHeight() >= MAX_SIZE){
+			return;
+		}
 		double maxY = Double.MIN_VALUE;
 		double minY = Double.MAX_VALUE;
 		
@@ -1068,7 +1088,8 @@ public class PaintFrame extends Canvas {
 				case UP:
 					if (repellingIndex > 0) {
 						Shape upperShape = getUpperShape(repellingIndex, orderedList);
-						if (upperShape == null) // it's the visible upper shape
+						// Temporary fix for the bug that causes the shapes to go out of the canvas
+						if (upperShape == null || (getHeight() >= MAX_SIZE && upperShape.getTopCorner() <= MIN_POS_SHAPE)) // it's the visible upper shape
 							return;
 
 						int upperShapeHeight = (upperShape instanceof VisClass && upperShape.asVisClass().propertyBox != null
@@ -1092,7 +1113,9 @@ public class PaintFrame extends Canvas {
 				case DOWN:
 					if (repellingIndex < orderedList.size() - 1) {
 						Shape lowerShape = getLowerShape(repellingIndex, orderedList);
-						if (lowerShape == null) // it's the visible lower shape
+						// it's the visible lower shape
+						// Temporary fix for the bug that causes the shapes to go out of the canvas
+						if (lowerShape == null || lowerShape.getBottomCorner() >= MAX_SIZE)
 							return;
 
 						int lowerShapeHeight = (lowerShape instanceof VisClass && lowerShape.asVisClass().propertyBox != null

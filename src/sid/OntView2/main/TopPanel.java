@@ -424,7 +424,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		VBox container = new VBox(7);
 		container.getChildren().addAll(children);
 		container.setPadding(new Insets(10, 10, 10, 10));
-        container.getStyleClass().add("container");
+        container.getStyleClass().add("custom-container");
         container.setPrefHeight(VisConstants.CONTAINER_SIZE);
 		container.setMinHeight(VisConstants.CONTAINER_SIZE);
 		container.setMaxHeight(VisConstants.CONTAINER_SIZE);
@@ -696,7 +696,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		if ((x != null) && (!x.isEmpty())) {
 			parent.loadActiveOntology(IRI.create(x));
 		} else {
-			parent.showErrorDialog("Error", "No ontology selected.", "Please select an ontology first.");
+			parent.showAlertDialog("Error", "No ontology selected.",
+					"Please select an ontology first.", Alert.AlertType.ERROR);
 		}
 	}
 
@@ -827,6 +828,15 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	}
 
 	private void propertiesActionActionPerformed(ActionEvent event) {
+		// Temporary fix for the bug that causes the shapes to go out of the canvas
+		if (parent.artPanel.getHeight() >= PaintFrame.MAX_SIZE){
+			getPropertiesCheckBox().setDisable(true);
+			getPropertiesCheckBox().setSelected(false);
+			parent.showAlertDialog("Information Dialog",
+					"Graph is too large to show properties.",
+					"We recommend displaying the node properties one at a time.", Alert.AlertType.INFORMATION);
+			return;
+		}
 		Set<Entry<String, Shape>> classesInGraph = parent.artPanel.getVisGraph().getClassesInGraph();
 		if (!getPropertiesCheckBox().isSelected()) {
 			for (Entry<String, Shape> entry : classesInGraph) {
@@ -861,11 +871,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 					getReduceCheckBox().setSelected(false);
 				}
 			} else {
-				Alert alert = new Alert(Alert.AlertType.INFORMATION);
-				alert.setTitle("Information Dialog");
-				alert.setHeaderText(null);
-				alert.setContentText("Load ontology first");
-				alert.showAndWait();
+				parent.showAlertDialog("Information Dialog", null,
+						"Please load an ontology first.", Alert.AlertType.INFORMATION);
 			}
 		}
 	}
@@ -890,6 +897,11 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		if ((x != null) && (!x.isEmpty())) {
 			getOntologyCombo().setValue(x);
 		}
+	}
+
+	public void restorePropertyCheckboxes() {
+		getPropertiesCheckBox().setSelected(false);
+		getPropertiesCheckBox().setDisable(false);
 	}
 
 	public void restoreSliderValue() {
