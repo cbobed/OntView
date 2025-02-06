@@ -736,7 +736,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			}
 		};
 
-		Stage loadingStage = parent.showLoadingStage(task);
+		Stage loadingStage = parent.artPanel.showLoadingStage(task);
 
 		task.setOnSucceeded(e -> loadingStage.close());
 		task.setOnFailed(e -> {

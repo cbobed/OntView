@@ -156,7 +156,7 @@ public class Mine extends Application implements Embedable{
 			}
 		};
 
-		Stage loadingStage = showLoadingStage(task);
+		Stage loadingStage = artPanel.showLoadingStage(task);
 		task.setOnSucceeded(e -> loadingStage.close());
 		task.setOnFailed(e -> {
 			task.getException().printStackTrace();
@@ -309,7 +309,7 @@ public class Mine extends Application implements Embedable{
 			}
 		};
 
-		Stage loadingStage = showLoadingStage(task);
+		Stage loadingStage = artPanel.showLoadingStage(task);
 
 		task.setOnSucceeded(e -> loadingStage.close());
 		task.setOnFailed(e -> {
@@ -455,43 +455,6 @@ public class Mine extends Application implements Embedable{
 		alert.showAndWait();
 	}
 
-	protected Stage showLoadingStage(Task<?> task) {
-		Stage loadingStage = new Stage();
-		loadingStage.initModality(Modality.APPLICATION_MODAL);
-		loadingStage.initStyle(StageStyle.UNDECORATED);
-
-		Label loadingLabel = new Label("Please, wait...");
-		loadingLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #ffffff;");
-
-		ProgressIndicator progressIndicator = new ProgressIndicator();
-		progressIndicator.setProgress(ProgressIndicator.INDETERMINATE_PROGRESS);
-		progressIndicator.setStyle("-fx-accent: #3498db;");
-
-		Button cancelButton = new Button("Cancel");
-		cancelButton.getStyleClass().add("cancelButton");
-		cancelButton.setOnAction(event -> {
-			task.cancel();
-			loadingStage.close();
-			System.err.println("Task cancelled");
-		});
-
-		VBox loadingBox = new VBox(15.0, progressIndicator, loadingLabel, cancelButton);
-		loadingBox.setAlignment(javafx.geometry.Pos.CENTER);
-		loadingBox.setStyle(
-				"-fx-background-color: rgba(0, 0, 0, 0.8); " +
-						"-fx-padding: 20px; " +
-						"-fx-background-radius: 10px; " +
-						"-fx-effect: dropshadow(gaussian, black, 10, 0.5, 0, 0);"
-		);
-
-		ClassLoader c = Thread.currentThread().getContextClassLoader();
-		Scene loadingScene = new Scene(loadingBox, 300, 200);
-		loadingScene.getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
-		loadingStage.setScene(loadingScene);
-
-		loadingStage.show();
-		return loadingStage;
-	}
 
 }
  
