@@ -110,24 +110,6 @@ public class Mine extends Application implements Embedable{
 
 	}
 
-	public void createBottonActionTask(){
-		Task<Void> task = new Task<>() {
-			@Override
-			protected Void call() {
-				createButtonAction();
-				return null;
-			}
-		};
-
-		Stage loadingStage = showLoadingStage(task);
-
-		task.setOnSucceeded(e -> loadingStage.close());
-		task.setOnFailed(e -> loadingStage.close());
-
-		new Thread(task).start();
-
-	}
-
 	/* Rest of methods */
 	protected void createButtonAction() {
 		if (reasoner!= null) {
@@ -174,7 +156,12 @@ public class Mine extends Application implements Embedable{
 
 		Stage loadingStage = showLoadingStage(task);
 		task.setOnSucceeded(e -> loadingStage.close());
-		task.setOnFailed(e -> loadingStage.close());
+		task.setOnFailed(e -> {
+			loadingStage.close();
+			showAlertDialog("Error", "Ontology could not be loaded.", "The ontology might be " +
+					"damaged or the URI may be incorrect.", Alert.AlertType.ERROR);
+			//showAlertDialog("Error", "Ontology could not be loaded.", task.getException().getMessage(), Alert.AlertType.ERROR);
+		});
 
 		new Thread(task).start();
 	}
@@ -303,7 +290,7 @@ public class Mine extends Application implements Embedable{
 		}
 	}
 
-	public void restoreViewTask(ActionEvent arg0, String[] info, String path) {
+	public void restoreViewTask(ActionEvent arg0, String[] info) {
 		// load ontology and reasoner
 		nTopPanel.getOntologyCombo().setValue(info[0]);
 		nTopPanel.getReasonerCombo().setValue(info[1]);
@@ -313,9 +300,9 @@ public class Mine extends Application implements Embedable{
 			protected Void call() {
 				loadActiveOntology(IRI.create(info[0]));
 				nTopPanel.loadReasonerButtonActionActionPerformed(arg0);
-				VisPositionConfig.restoreState(path, artPanel.getVisGraph());
+				VisPositionConfig.restoreState(artPanel.getVisGraph());
 				VisLevel.adjustWidthAndPos(artPanel.getVisGraph().getLevelSet());
-				Platform.runLater(artPanel.getDrawerRunnable());
+				//Platform.runLater(artPanel.getDrawerRunnable());
 				return null;
 			}
 		};
@@ -325,7 +312,7 @@ public class Mine extends Application implements Embedable{
 		task.setOnSucceeded(e -> loadingStage.close());
 		task.setOnFailed(e -> {
 			loadingStage.close();
-			showAlertDialog("Error", "Failed to load view.", "View must be damage. " +
+			showAlertDialog("Error", "Failed to load view.", "View might be damage. " +
 							"The entire ontology is displayed.", Alert.AlertType.ERROR);
 		});
 		new Thread(task).start();
@@ -345,7 +332,7 @@ public class Mine extends Application implements Embedable{
 			}
 
 			String[] info = VisPositionConfig.restoreOntologyReasoner(path);
-			restoreViewTask(arg0, info, path);
+			restoreViewTask(arg0, info);
 		}
 	}
 

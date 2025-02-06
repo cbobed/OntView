@@ -859,6 +859,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	}
 
 	private void propertiesActionActionPerformed(ActionEvent event) {
+
+
 		// Temporary fix for the bug that causes the shapes to go out of the canvas
 		if (parent.artPanel.getHeight() >= PaintFrame.MAX_SIZE){
 			getPropertiesCheckBox().setDisable(true);

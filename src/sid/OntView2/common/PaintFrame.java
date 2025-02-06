@@ -377,12 +377,7 @@ public class PaintFrame extends Canvas {
 
 		new Thread(task).start();
 
-
-		//new Thread(visGraph).start();
 		paintFrame.setCursor(Cursor.WAIT);
-
-		//ProgressBarDialogThread progressBarObserver = new ProgressBarDialogThread(this);
-		//visGraph.addProgressBarObserver((observable, oldValue, newValue) -> progressBarObserver.update());
 
 		VisGraphObserver graphObserver = new VisGraphObserver(this.getVisGraph());
 		visGraph.addGeneralObserver((observable, oldValue, newValue) -> graphObserver.update());
@@ -391,7 +386,6 @@ public class PaintFrame extends Canvas {
 		stateChanged = true;
 		factor = 1.0;
 		paintFrame.setCursor(Cursor.DEFAULT);
-		// scroll.getVerticalScrollBar().setUnitIncrement(15);
 
 		try {
 			latch.await(); // Block until latch.countDown() is called in VisGraph

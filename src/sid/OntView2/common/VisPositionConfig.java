@@ -1,5 +1,6 @@
 package sid.OntView2.common;
 
+import javafx.application.Platform;
 import org.w3c.dom.Document;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -68,7 +69,7 @@ public class VisPositionConfig {
 		return new String[]{(String) ontologyName, (String) reasoner};
 	}
 	
-	public static void restoreState(String path, VisGraph graph){
+	public static void restoreState(VisGraph graph){
 		if (graph!= null && config!=null){
 			try {
 				config.recoverVisInfo(graph);
@@ -98,6 +99,9 @@ public class VisPositionConfig {
 		}
 		graph.clearDashedConnectorList();
 		graph.addDashedConnectors();
+		graph.paintframe.setStateChanged(true);
+		Platform.runLater(graph.paintframe.getRelaxerRunnable());
+
 	}
 	
 	public void recoverShapePos(Shape shape, String key) throws XPathExpressionException{
@@ -114,7 +118,6 @@ public class VisPositionConfig {
 		XPathExpression expr = xpath.compile(s);
         Object result = expr.evaluate(doc, XPathConstants.STRING);
         shape.setPosY(Integer.parseInt((String) result));
-        
 	}
 
 	public void recoverShapeState(Shape shape, String key) throws XPathExpressionException{
