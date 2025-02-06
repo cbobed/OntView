@@ -792,6 +792,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 				e.printStackTrace();
 				parent.showAlertDialog("Error", "Reasoner could not be loaded.", e.getMessage(),
 						Alert.AlertType.ERROR);
+				throw new RuntimeException(e);
 			}
 		}
 	}

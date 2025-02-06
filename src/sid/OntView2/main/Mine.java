@@ -125,6 +125,7 @@ public class Mine extends Application implements Embedable{
 			catch (Exception e1) {
 				e1.printStackTrace();
 				artPanel.setCursor(Cursor.DEFAULT);
+				throw new RuntimeException(e1);
 			}
 
 			while (!artPanel.isStable()){
@@ -134,6 +135,7 @@ public class Mine extends Application implements Embedable{
 				}
 				catch (InterruptedException e) {
 					e.printStackTrace();
+					throw new RuntimeException(e);
 				}
 			}
 			nTopPanel.restorePropertyCheckboxes();
@@ -157,10 +159,11 @@ public class Mine extends Application implements Embedable{
 		Stage loadingStage = showLoadingStage(task);
 		task.setOnSucceeded(e -> loadingStage.close());
 		task.setOnFailed(e -> {
+			task.getException().printStackTrace();
 			loadingStage.close();
-			showAlertDialog("Error", "Ontology could not be loaded.", "The ontology might be " +
-					"damaged or the URI may be incorrect.", Alert.AlertType.ERROR);
-			//showAlertDialog("Error", "Ontology could not be loaded.", task.getException().getMessage(), Alert.AlertType.ERROR);
+			//showAlertDialog("Error", "Ontology could not be loaded.", "The ontology might be " +
+			//		"damaged or the URI may be incorrect.", Alert.AlertType.ERROR);
+			showAlertDialog("Error", "Ontology could not be loaded.", task.getException().getMessage(), Alert.AlertType.ERROR);
 		});
 
 		new Thread(task).start();
@@ -174,11 +177,10 @@ public class Mine extends Application implements Embedable{
 		} catch (OWLOntologyCreationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			showAlertDialog("Error", "Ontology could not be loaded.", e.getMessage(), Alert.AlertType.ERROR);
 			artPanel.setCursor(Cursor.DEFAULT);
 			activeOntology = null;
 			manager = null;
-			return;
+			throw new RuntimeException(e);
 		}
 		artPanel.setCursor(Cursor.DEFAULT);
 		artPanel.setOntology(activeOntology);
@@ -302,7 +304,6 @@ public class Mine extends Application implements Embedable{
 				nTopPanel.loadReasonerButtonActionActionPerformed(arg0);
 				VisPositionConfig.restoreState(artPanel.getVisGraph());
 				VisLevel.adjustWidthAndPos(artPanel.getVisGraph().getLevelSet());
-				//Platform.runLater(artPanel.getDrawerRunnable());
 				return null;
 			}
 		};
@@ -311,6 +312,7 @@ public class Mine extends Application implements Embedable{
 
 		task.setOnSucceeded(e -> loadingStage.close());
 		task.setOnFailed(e -> {
+			task.getException().printStackTrace();
 			loadingStage.close();
 			showAlertDialog("Error", "Failed to load view.", "View might be damage. " +
 							"The entire ontology is displayed.", Alert.AlertType.ERROR);

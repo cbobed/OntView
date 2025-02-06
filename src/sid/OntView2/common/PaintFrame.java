@@ -391,6 +391,7 @@ public class PaintFrame extends Canvas {
 			latch.await(); // Block until latch.countDown() is called in VisGraph
 		} catch (InterruptedException e) {
 			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 
 	}
@@ -410,8 +411,7 @@ public class PaintFrame extends Canvas {
 
 		task.setOnFailed(e -> {
 			paintFrame.setCursor(Cursor.DEFAULT);
-			Throwable throwable = task.getException();
-			throwable.printStackTrace();
+			task.getException().printStackTrace();
 		});
 		return task;
 	}
