@@ -163,7 +163,8 @@ public class Mine extends Application implements Embedable{
 			loadingStage.close();
 			//showAlertDialog("Error", "Ontology could not be loaded.", "The ontology might be " +
 			//		"damaged or the URI may be incorrect.", Alert.AlertType.ERROR);
-			showAlertDialog("Error", "Ontology could not be loaded.", task.getException().getMessage(), Alert.AlertType.ERROR);
+			showAlertDialog("Error", "Ontology could not be loaded.", task.getException().getMessage(),
+					Alert.AlertType.ERROR);
 		});
 
 		new Thread(task).start();
@@ -192,8 +193,8 @@ public class Mine extends Application implements Embedable{
 			ExpressionManager.setNamespaceManager(manager, activeOntology);
 
 			for (String ns: ExpressionManager.getNamespaceManager().getNamespaces()) {
-				System.err.println("prefix: "+ExpressionManager.getNamespaceManager().getPrefixForNamespace(ns));
-				System.err.println("  ns: "+ns);
+				System.out.println("prefix: "+ExpressionManager.getNamespaceManager().getPrefixForNamespace(ns));
+				System.out.println("  ns: "+ns);
 			}
 		}
 

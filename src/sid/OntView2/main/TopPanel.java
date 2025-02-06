@@ -31,6 +31,7 @@ import sid.OntView2.common.*;
 import java.io.*;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 //VS4E -- DO NOT REMOVE THIS LINE!
 public class TopPanel extends Canvas implements ControlPanelInterface {
@@ -860,8 +861,58 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	}
 
 	private void propertiesActionActionPerformed(ActionEvent event) {
+		Set<Entry<String, Shape>> classesInGraph = parent.artPanel.getVisGraph().getClassesInGraph();
+		AtomicBoolean isGraphTooLarge = new AtomicBoolean(false);
 
+		Task<Void> task = new Task<>() {
+			@Override
+			protected Void call() {
+				if (parent.artPanel.getHeight() >= PaintFrame.MAX_SIZE){
+					isGraphTooLarge.set(true);
+					getPropertiesCheckBox().setDisable(true);
+					getPropertiesCheckBox().setSelected(false);
 
+					parent.showAlertDialog("Information Dialog",  "Graph is too large to show properties.",
+							"We recommend displaying the node properties one at a time.", Alert.AlertType.INFORMATION);
+				} else {
+					for (Entry<String, Shape> entry : classesInGraph) {
+						if ((entry.getValue() instanceof VisClass) && (entry.getValue().asVisClass().getPropertyBox() != null)) {
+							entry.getValue().asVisClass().getPropertyBox().setVisible(getPropertiesCheckBox().isSelected());
+						}
+					}
+					parent.artPanel.compactGraph();
+					parent.artPanel.checkAndResizeCanvas();
+				}
+				return null;
+			}
+		};
+
+		Stage loadingStage = parent.artPanel.showLoadingStage(task);
+
+		task.setOnSucceeded(e -> {
+			loadingStage.close();
+			parent.artPanel.setStateChanged(true);
+			Platform.runLater(() -> parent.artPanel.getRelaxerRunnable());
+		});
+
+		task.setOnFailed(e -> {
+			loadingStage.close();
+			getPropertiesCheckBox().setSelected(false);
+			if (isGraphTooLarge.get()) {
+				parent.showAlertDialog("Information Dialog",  "Graph is too large to show properties.",
+						"We recommend displaying the node properties one at a time.", Alert.AlertType.INFORMATION);
+			} else {
+				parent.showAlertDialog("Error", "Properties could not be loaded.", "Try again.",
+						Alert.AlertType.ERROR);
+			}
+		});
+
+		task.setOnCancelled(e -> getPropertiesCheckBox().setSelected(false));
+
+		new Thread(task).start();
+	}
+
+	private void propertiesActionActionPerformed2(ActionEvent event) {
 		// Temporary fix for the bug that causes the shapes to go out of the canvas
 		if (parent.artPanel.getHeight() >= PaintFrame.MAX_SIZE){
 			getPropertiesCheckBox().setDisable(true);
@@ -872,20 +923,12 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			return;
 		}
 		Set<Entry<String, Shape>> classesInGraph = parent.artPanel.getVisGraph().getClassesInGraph();
-		if (!getPropertiesCheckBox().isSelected()) {
-			for (Entry<String, Shape> entry : classesInGraph) {
-				if ((entry.getValue() instanceof VisClass) && (entry.getValue().asVisClass().getPropertyBox() != null)) {
-					entry.getValue().asVisClass().getPropertyBox().setVisible(false);
-				}
-			}
-			parent.artPanel.compactGraph();
-		} else {
-			for (Entry<String, Shape> entry : classesInGraph) {
-				if ((entry.getValue() instanceof VisClass) && (entry.getValue().asVisClass().getPropertyBox() != null)) {
-					entry.getValue().asVisClass().getPropertyBox().setVisible(true);
-				}
+		for (Entry<String, Shape> entry : classesInGraph) {
+			if ((entry.getValue() instanceof VisClass) && (entry.getValue().asVisClass().getPropertyBox() != null)) {
+				entry.getValue().asVisClass().getPropertyBox().setVisible(getPropertiesCheckBox().isSelected());
 			}
 		}
+		parent.artPanel.compactGraph();
 		parent.artPanel.checkAndResizeCanvas();
 		parent.artPanel.setStateChanged(true);
 		Platform.runLater(parent.artPanel.getRelaxerRunnable());

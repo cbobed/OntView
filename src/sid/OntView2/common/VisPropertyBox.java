@@ -1,6 +1,7 @@
 package sid.OntView2.common;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.Font;
@@ -43,6 +44,9 @@ public class VisPropertyBox {
 			return 0; 
 		}
 	}
+	public int getPropertyHeight(){
+		return height;
+	}
 	public void setHeight(int x){height =x;}
 	
 	private HashMap<String, VisObjectProperty> getVisPropertiesInGraph(){
@@ -84,9 +88,11 @@ public class VisPropertyBox {
 		if (g == null){
 			return;
 		}
+		//Color prevColor = (Color) g.getFill();
 		Font font = Font.font("DejaVu Sans", FontWeight.NORMAL, 9);
 		g.setFont(font);
-	    for (VisObjectProperty p: propertyList){
+		//g.setFill(Color.BLACK);
+		for (VisObjectProperty p: propertyList){
 	    	if (p.visible){
 				p.draw(g);
 				p.drawConnectors(g);
@@ -94,7 +100,8 @@ public class VisPropertyBox {
 	    }
 	    for (VisDataProperty p: dPropertyList){
 	    	p.draw(g);
-}
+		}
+		//g.setFill(prevColor);
     }
 	
 	public void sortProperties(){

@@ -8,20 +8,22 @@ import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Point2D;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.ContentDisplay;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.Cursor;
 
 import javafx.scene.text.Font;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
@@ -649,7 +651,8 @@ public class PaintFrame extends Canvas {
 		Point2D p = translatePoint(new Point2D(e.getX(), e.getY()));
 		int x = (int) p.getX();
 		int y = (int) p.getY();
-		if (clickedOnClosePropertyBox(x, y) || clickedOnCloseDisjointBox(x, y)) {
+		Shape shape = visGraph.findShape(p);
+		if (clickedOnClosePropertyBox(x, y, shape) || clickedOnCloseDisjointBox(x, y)) {
 			return;
 		}
 		if (clickedOnShape(x, y, e))
@@ -917,7 +920,62 @@ public class PaintFrame extends Canvas {
 		return false;
 	}
 
-	private boolean clickedOnClosePropertyBox(int x, int y) {
+	private boolean clickedOnClosePropertyBox3(int x, int y, Shape shape) {
+		if (visGraph == null || shape == null) {
+			return false;
+		}
+
+		if(shape.asVisClass().propertyBox != null){
+			if (shape.asVisClass().onCloseBox(x, y)) {
+				boolean b = shape.asVisClass().propertyBox.visible;
+				shape.asVisClass().propertyBox.setVisible(!b);
+				showRelatedProperties(shape.asVisClass(), visGraph, !b);
+				setStateChanged(true);
+				Platform.runLater(relaxerRunnable);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean clickedOnClosePropertyBox(int x, int y, Shape shape) {
+		if (visGraph == null || shape == null) {
+			return false;
+		}
+
+		if(shape.asVisClass().propertyBox != null){
+			if (shape.asVisClass().onCloseBox(x, y)) {
+				Task<Void> task = new Task<>() {
+					@Override
+					protected Void call() {
+						boolean b = shape.asVisClass().propertyBox.visible;
+						shape.asVisClass().propertyBox.setVisible(!b);
+						showRelatedProperties(shape.asVisClass(), visGraph, !b);
+						return null;
+					}
+				};
+
+				Stage loadingStage = showLoadingStage(task);
+
+				task.setOnSucceeded(e -> {
+					loadingStage.close();
+					setStateChanged(true);
+					Platform.runLater(() -> {getRelaxerRunnable();});
+				});
+				task.setOnFailed(e -> {
+					task.getException().printStackTrace();
+					loadingStage.close();
+
+				});
+
+				new Thread(task).start();
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean clickedOnClosePropertyBox2(int x, int y) {
 		if (visGraph == null) {
 			return false;
 		}
@@ -926,6 +984,16 @@ public class PaintFrame extends Canvas {
 			if ((shape instanceof VisClass) && (shape.asVisClass().propertyBox != null)) {
 				if (shape.asVisClass().onCloseBox(x, y)) {
 					boolean b = shape.asVisClass().propertyBox.visible;
+					// Temporary fix for the bug that causes the shapes to go out of the canvas
+					if (!b) {
+						int h = shape.asVisClass().propertyBox.getPropertyHeight();
+						System.out.println("shape.asVisClass().propertyBox.getPropertyHeight() : " + shape.asVisClass().propertyBox.getPropertyHeight());
+						System.out.println("shape.asVisClass().getBottomCorner() + h : " + shape.asVisClass().getBottomCorner());
+						if (shape.asVisClass().getBottomCorner() + h >= MAX_SIZE) {
+							System.out.println("Shape is too big to show properties.");
+							break;
+						}
+					}
 					shape.asVisClass().propertyBox.setVisible(!b);
 					showRelatedProperties(shape.asVisClass(), visGraph, !b);
 					setStateChanged(true);
@@ -1080,8 +1148,11 @@ public class PaintFrame extends Canvas {
 				case UP:
 					if (repellingIndex > 0) {
 						Shape upperShape = getUpperShape(repellingIndex, orderedList);
+						if (upperShape == null) // it's the visible upper shape
+							return;
+
 						// Temporary fix for the bug that causes the shapes to go out of the canvas
-						if (upperShape == null || (getHeight() >= MAX_SIZE && upperShape.getTopCorner() <= MIN_POS_SHAPE)) // it's the visible upper shape
+						if (getHeight() >= MAX_SIZE && upperShape.getTopCorner() <= MIN_POS_SHAPE) // it's the visible upper shape
 							return;
 
 						int upperShapeHeight = (upperShape instanceof VisClass && upperShape.asVisClass().propertyBox != null
@@ -1106,8 +1177,11 @@ public class PaintFrame extends Canvas {
 					if (repellingIndex < orderedList.size() - 1) {
 						Shape lowerShape = getLowerShape(repellingIndex, orderedList);
 						// it's the visible lower shape
+						if (lowerShape == null)
+							return;
+
 						// Temporary fix for the bug that causes the shapes to go out of the canvas
-						if (lowerShape == null || lowerShape.getBottomCorner() >= MAX_SIZE)
+						if (lowerShape.getBottomCorner() >= MAX_SIZE)
 							return;
 
 						int lowerShapeHeight = (lowerShape instanceof VisClass && lowerShape.asVisClass().propertyBox != null
@@ -1196,7 +1270,7 @@ public class PaintFrame extends Canvas {
 			}
 			ySpanPerLevel.put(level.id, currentY-minY); 
 			// Adjust the x position of the level if needed
-			level.setXpos(level.getXpos() + levelHeight);
+			//level.setXpos(level.getXpos() + levelHeight);
 		}
 
 		span = maxY - minY; // this is the maximum level height we have witnessed
@@ -1223,4 +1297,43 @@ public class PaintFrame extends Canvas {
 	public Embedable getParentFrame() {
 		return parentFrame;
 	}
+
+	public Stage showLoadingStage(Task<?> task) {
+		Stage loadingStage = new Stage();
+		loadingStage.initModality(Modality.APPLICATION_MODAL);
+		loadingStage.initStyle(StageStyle.UNDECORATED);
+
+		Label loadingLabel = new Label("Please, wait...");
+		loadingLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #ffffff;");
+
+		ProgressIndicator progressIndicator = new ProgressIndicator();
+		progressIndicator.setProgress(ProgressIndicator.INDETERMINATE_PROGRESS);
+		progressIndicator.setStyle("-fx-accent: #3498db;");
+
+		Button cancelButton = new Button("Cancel");
+		cancelButton.getStyleClass().add("cancelButton");
+		cancelButton.setOnAction(event -> {
+			task.cancel();
+			loadingStage.close();
+			System.err.println("Task cancelled");
+		});
+
+		VBox loadingBox = new VBox(15.0, progressIndicator, loadingLabel, cancelButton);
+		loadingBox.setAlignment(javafx.geometry.Pos.CENTER);
+		loadingBox.setStyle(
+				"-fx-background-color: rgba(0, 0, 0, 0.8); " +
+						"-fx-padding: 20px; " +
+						"-fx-background-radius: 10px; " +
+						"-fx-effect: dropshadow(gaussian, black, 10, 0.5, 0, 0);"
+		);
+
+		ClassLoader c = Thread.currentThread().getContextClassLoader();
+		Scene loadingScene = new Scene(loadingBox, 300, 200);
+		loadingScene.getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
+		loadingStage.setScene(loadingScene);
+
+		loadingStage.show();
+		return loadingStage;
+	}
+
 }
