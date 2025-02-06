@@ -88,10 +88,10 @@ public class VisPropertyBox {
 		if (g == null){
 			return;
 		}
-		//Color prevColor = (Color) g.getFill();
+		Color prevColor = (Color) g.getFill();
 		Font font = Font.font("DejaVu Sans", FontWeight.NORMAL, 9);
 		g.setFont(font);
-		//g.setFill(Color.BLACK);
+		g.setFill(Color.BLACK);
 		for (VisObjectProperty p: propertyList){
 	    	if (p.visible){
 				p.draw(g);
@@ -101,7 +101,7 @@ public class VisPropertyBox {
 	    for (VisDataProperty p: dPropertyList){
 	    	p.draw(g);
 		}
-		//g.setFill(prevColor);
+		g.setFill(prevColor);
     }
 	
 	public void sortProperties(){
