@@ -210,6 +210,30 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		return zoomSlider;
 	}
 
+	private Slider getZoomSlider2() {
+		if (zoomSlider == null) {
+			zoomSlider = new Slider(0.5, 3, 1);
+			zoomSlider.setShowTickLabels(true);
+			zoomSlider.setShowTickMarks(true);
+			zoomSlider.setMajorTickUnit(0.5);
+			zoomSlider.setMinorTickCount(4);
+			zoomSlider.setBlockIncrement(0.1);
+			zoomSlider.setOrientation(Orientation.VERTICAL);
+
+
+			zoomSlider.getStyleClass().add("zoom-slider");
+			zoomSlider.setPrefHeight(VisConstants.CONTAINER_SIZE);
+			zoomSlider.setMinHeight(VisConstants.CONTAINER_SIZE);
+			zoomSlider.setMaxHeight(VisConstants.CONTAINER_SIZE);
+			zoomSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
+				//parent.artPanel.setFactor(newVal.doubleValue());
+				//parent.artPanel.applyZoom();
+			});
+
+		}
+		return zoomSlider;
+	}
+
 	private void tooltipInfo(Node node, String text) {
 		Tooltip tooltip = new Tooltip(text);
 		Tooltip.install(node, tooltip);

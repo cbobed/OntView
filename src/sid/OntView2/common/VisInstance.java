@@ -26,6 +26,7 @@ public class VisInstance extends Dialog<Void> implements Serializable {
 		ScrollPane scrollPane0 = new ScrollPane(list0);
 		getDialogPane().setContent(scrollPane0);
 		scrollPane0.setFitToWidth(true);
+		scrollPane0.setFitToHeight(true);
 		getDialogPane().setPrefSize(221, 451);
 	}
 

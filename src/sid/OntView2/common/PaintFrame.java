@@ -6,6 +6,7 @@ import java.util.concurrent.CountDownLatch;
 
 import javafx.application.Platform;
 import javafx.concurrent.Task;
+import javafx.geometry.Bounds;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Point2D;
 import javafx.scene.Scene;
@@ -14,11 +15,14 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.Cursor;
 
 import javafx.scene.text.Font;
+import javafx.scene.transform.Scale;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Modality;
@@ -123,6 +127,7 @@ public class PaintFrame extends Canvas {
 		this.addEventHandler(MouseEvent.MOUSE_CLICKED, this::handleMouseClicked);
 		this.addEventHandler(MouseEvent.MOUSE_ENTERED, this::handleMouseEntered);
 		this.addEventHandler(MouseEvent.MOUSE_EXITED, this::handleMouseExited);
+		this.addEventHandler(ScrollEvent.SCROLL, this::handleScroll);
 	}
 
 	/*-*************************************************************
@@ -218,6 +223,16 @@ public class PaintFrame extends Canvas {
 			Platform.runLater(drawerRunnable);
 		}
 
+	}
+
+	Pane canvasWrapper = new Pane(this);
+
+	public void applyZoom() {
+		Scale scale = new Scale(factor, factor, 0, 0);
+		canvasWrapper.getTransforms().setAll(scale);
+
+		Bounds bounds = canvasWrapper.getBoundsInParent();
+		canvasWrapper.setPrefSize(bounds.getWidth(), bounds.getHeight());
 	}
 
 	/*-*************************************************************/
@@ -517,6 +532,33 @@ public class PaintFrame extends Canvas {
 		setCursor(Cursor.DEFAULT);
 	}
 
+	public void handleScroll(ScrollEvent e) {
+		/*if (visGraph == null) {
+			return;
+		}
+
+		double zoomFactor = (e.getDeltaY() > 0) ? 1.1 : 0.9;
+		double newScale = getScaleX() * zoomFactor;
+
+		if (newScale < 0.5 || newScale > 3) {
+			return;
+		}
+
+		setScaleX(newScale);
+		setScaleY(newScale);
+
+		e.consume();*/
+	}
+
+	public void zoomCanvas(double zoomFactor) {
+		double newScale = getScaleX() * zoomFactor;
+
+
+		setScaleX(zoomFactor);
+		setScaleY(zoomFactor);
+	}
+
+
 	private void handleMousePressed(MouseEvent e) {
 		if (visGraph == null) {
 			return;
@@ -526,6 +568,8 @@ public class PaintFrame extends Canvas {
 			pressedShape = null;
 			return;
 		}
+
+		System.out.println("handleMousePressed " + e.getX() + " " + e.getY());
 
 		pressedShape = visGraph.findShape(p);
 
@@ -728,16 +772,14 @@ public class PaintFrame extends Canvas {
 			}
 		}
 
-		boolean needsResize = false;
-		double newHeight = getHeight();
+		if (factor >= 1.0){
+			setHeight((maxY + BORDER_PANEL) * factor);
 
-		if (maxY >= getHeight()) {
-			newHeight = maxY + BORDER_PANEL;
-			needsResize = true;
+		} else {
+			setHeight((maxY + BORDER_PANEL) / factor);
 		}
 
 		if (minY < 0) {
-			newHeight = getHeight() - minY + BORDER_PANEL;
 			// Adjust the shape position
 			for (VisLevel level : visGraph.getLevelSet()) {
 				ArrayList<Shape> orderedShapeList = level.orderedList();
@@ -745,13 +787,8 @@ public class PaintFrame extends Canvas {
 					shape.setPosY((int) ((shape.getPosY() * factor - minY + BORDER_PANEL) / factor));
 				}
 			}
-			needsResize = true;
 		}
 
-		if (needsResize) {
-			System.out.println("Canvas " + newHeight);
-			setHeight(newHeight);
-		}
 	}
 
 	/**
