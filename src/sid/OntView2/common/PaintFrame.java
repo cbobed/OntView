@@ -292,10 +292,14 @@ public class PaintFrame extends Canvas {
 	}
 
 	public void draw() {
-		//System.out.println("draw");
 		if (this.getScene() != null && !this.isDisabled() && this.isVisible() && this.getGraphicsContext2D() != null) {
 			GraphicsContext g = this.getGraphicsContext2D();
-			g.clearRect(0, 0, getWidth(), getHeight());
+			if (factor >= 1.0){
+				g.clearRect(0, 0, getWidth() * factor, getHeight() * factor);
+
+			} else {
+				g.clearRect(0, 0, getWidth() / factor, getHeight() / factor);
+			}
 
 			if (prevFactor != factor) {
 				prevFactor = factor;
@@ -569,7 +573,7 @@ public class PaintFrame extends Canvas {
 			return;
 		}
 
-		System.out.println("handleMousePressed " + e.getX() + " " + e.getY());
+		System.out.println("handleMousePressed " + e.getY() + " " + getHeight());
 
 		pressedShape = visGraph.findShape(p);
 
