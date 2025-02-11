@@ -80,6 +80,7 @@ public class VisPositionConfig {
 	public void recoverVisInfo(VisGraph graph) throws XPathExpressionException{
 		for (Entry<String, Shape> entry : graph.shapeMap.entrySet()) {
 			Shape shape = entry.getValue();
+			if (shape instanceof SuperNode) continue;
 //				String key = escapeXML(entry.getKey());
 			String key = entry.getKey();
 

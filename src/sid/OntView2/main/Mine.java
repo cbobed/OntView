@@ -283,9 +283,11 @@ public class Mine extends Application implements Embedable{
 			File file = selector.showSaveDialog(primaryStage);
 
 			if (file != null) {
-				String path = null;
+				String path;
 				try {
 					path = file.getCanonicalFile().toString();
+					if(!path.endsWith(".xml"))
+						path += ".xml";
 					VisPositionConfig.saveState(path, graph);
 				} catch (Exception e) {
 					e.printStackTrace();
