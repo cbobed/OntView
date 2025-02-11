@@ -37,7 +37,6 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import reducer.StructuralReducer;
 
 public class PaintFrame extends Canvas {
-	public boolean drawable = true;
 	private static final long serialVersionUID = 1L;
 	public ScrollPane scroll;
 	static final int BORDER_PANEL = 50;
@@ -290,8 +289,7 @@ public class PaintFrame extends Canvas {
 	}
 
 	public void draw() {
-		if (this.getScene() != null && !this.isDisabled() && this.isVisible() && this.getGraphicsContext2D() != null
-			&& drawable) {
+		if (this.getScene() != null && !this.isDisabled() && this.isVisible() && this.getGraphicsContext2D() != null) {
 			GraphicsContext g = this.getGraphicsContext2D();
 			if (factor >= 1.0){
 				g.clearRect(0, 0, getWidth() * factor, getHeight() * factor);
@@ -531,21 +529,21 @@ public class PaintFrame extends Canvas {
 	}
 
 	public void handleMouseEntered(MouseEvent e) {
-		if (visGraph == null || !drawable) {
+		if (visGraph == null) {
 			return;
 		}
 		setCursor(Cursor.DEFAULT);
 	}
 
 	public void handleMouseExited(MouseEvent e) {
-		if (visGraph == null || !drawable) {
+		if (visGraph == null) {
 			return;
 		}
 		setCursor(Cursor.DEFAULT);
 	}
 
 	private void handleMousePressed(MouseEvent e) {
-		if (visGraph == null || !drawable) {
+		if (visGraph == null) {
 			return;
 		}
 		Point2D p = translatePoint(new Point2D(e.getX(), e.getY()));
@@ -567,7 +565,7 @@ public class PaintFrame extends Canvas {
 	}
 
 	public void handleMouseReleased(MouseEvent e) {
-		if (visGraph == null || !drawable) {
+		if (visGraph == null) {
 			return;
 		}
 
@@ -587,7 +585,7 @@ public class PaintFrame extends Canvas {
 	private boolean isDragging = false;
 
 	public void handleMouseDragged(MouseEvent e) {
-		if (visGraph == null || !drawable) {
+		if (visGraph == null) {
 			return;
 		}
 		isDragging = true;
@@ -644,7 +642,7 @@ public class PaintFrame extends Canvas {
 	}
 
 	public void handleMouseMoved(MouseEvent e) {
-		if (visGraph == null || !drawable) {
+		if (visGraph == null) {
 			return;
 		}
 		Point2D p = translatePoint(new Point2D(e.getX(), e.getY()));
@@ -672,7 +670,7 @@ public class PaintFrame extends Canvas {
 	}
 
 	public void handleMouseClicked(MouseEvent e) {
-		if (visGraph == null || !drawable) {
+		if (visGraph == null) {
 			return;
 		}
 		if (isDragging) {
@@ -1325,14 +1323,8 @@ public class PaintFrame extends Canvas {
 	}
 
 	public void clearCanvas(){
-		drawable = false;
-		GraphicsContext g = getGraphicsContext2D();
-		if (factor >= 1.0){
-			g.clearRect(0, 0, getWidth() * factor, getHeight() * factor);
-
-		} else {
-			g.clearRect(0, 0, getWidth() / factor, getHeight() / factor);
-		}
+		visGraph = null;
+		Platform.runLater(drawerRunnable);
 	}
 
 	public Stage showLoadingStage(Task<?> task) {

@@ -762,10 +762,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 		Stage loadingStage = parent.artPanel.showLoadingStage(task);
 
-		task.setOnSucceeded(e -> {
-			parent.artPanel.drawable = true;
-			loadingStage.close();
-		});
+		task.setOnSucceeded(e -> loadingStage.close());
 		task.setOnFailed(e -> {
 			task.getException().printStackTrace();
 			parent.showAlertDialog("Error", "Reasoner could not be loaded.",  "Try another reasoner.",
