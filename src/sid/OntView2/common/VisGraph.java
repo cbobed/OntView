@@ -219,6 +219,7 @@ public class VisGraph implements Runnable{
     	adjustPanelSize((float) 1.0);
     	updateProgressBarObserver(90);
     	clearDashedConnectorList();
+		updateXposition();
 
 		paintframe.doKceOptionAction();
 		//showAll();
@@ -227,6 +228,17 @@ public class VisGraph implements Runnable{
     	paintframe.getParentFrame().loadSearchCombo();
     	updateProgressBarObserver(100);
     	paintframe.setStateChanged(true);
+	}
+
+	private void updateXposition() {
+		for ( Entry<String, Shape> entry : shapeMap.entrySet()){
+			Shape shape = entry.getValue();
+
+			if ((shape instanceof VisClass)){
+				shape.asVisClass().setWidth(shape.asVisClass().calculateWidth());
+				//shape.asVisClass().setHeight(shape.asVisClass().calculateHeight());
+			}
+		}
 	}
 
 	public void changeRenderMethod(Boolean labelRendering, Boolean qualifiedRendering ){

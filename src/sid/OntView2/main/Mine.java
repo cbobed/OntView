@@ -437,6 +437,7 @@ public class Mine extends Application implements Embedable{
 					done = true;
 				} catch (IOException e1) {
 					e1.printStackTrace();
+					throw new RuntimeException(e1);
 				}
 			}
 			else {
