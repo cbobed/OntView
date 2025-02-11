@@ -762,7 +762,10 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 		Stage loadingStage = parent.artPanel.showLoadingStage(task);
 
-		task.setOnSucceeded(e -> loadingStage.close());
+		task.setOnSucceeded(e -> {
+			parent.artPanel.drawable = true;
+			loadingStage.close();
+		});
 		task.setOnFailed(e -> {
 			task.getException().printStackTrace();
 			parent.showAlertDialog("Error", "Reasoner could not be loaded.",  "Try another reasoner.",
@@ -833,7 +836,6 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 	private void restoreViewButtonActionActionPerformed(ActionEvent event) {
 		parent.restoreViewButtonAction(event);
-		Platform.runLater(parent.artPanel.getDrawerRunnable());
 	}
 
 	private void comboBox0ItemItemStateChanged(String selectedItem) {

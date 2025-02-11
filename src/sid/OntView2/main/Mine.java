@@ -115,7 +115,8 @@ public class Mine extends Application implements Embedable{
 		if (reasoner!= null) {
 			artPanel.setCursor(Cursor.WAIT);
 			//cant cast to set<OWLClassExpression> from set<OWLClass>
-			HashSet<OWLClassExpression> set = new HashSet<>(reasoner.getTopClassNode().getEntities());
+			HashSet<OWLClassExpression> set = new HashSet<>(reasoner.getTopClassNode().getEntitiesMinusBottom());
+
 			try {
 				//set reasoner and ontology before creating
 				artPanel.createReasonedGraph(set,check);
@@ -311,12 +312,22 @@ public class Mine extends Application implements Embedable{
 
 		Stage loadingStage = artPanel.showLoadingStage(task);
 
-		task.setOnSucceeded(e -> loadingStage.close());
+		task.setOnSucceeded(e -> {
+			loadingStage.close();
+			Platform.runLater(artPanel.getDrawerRunnable());
+		});
 		task.setOnFailed(e -> {
 			task.getException().printStackTrace();
 			loadingStage.close();
-			showAlertDialog("Error", "Failed to load view.", "View might be damage. " +
-							"The entire ontology is displayed.", Alert.AlertType.ERROR);
+			artPanel.clearCanvas();
+			String message = """
+				  • Ontology loading ✔
+				  • Reasoner loading ✔
+				  • View loading ❌
+				""";
+			showAlertDialog("Error", "Failed to load view.", message +
+					"\nView might be corrupted.", Alert.AlertType.ERROR);
+
 		});
 		new Thread(task).start();
 	}

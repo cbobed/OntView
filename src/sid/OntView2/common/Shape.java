@@ -36,6 +36,16 @@ public abstract class Shape {
     int leftState = LEFTOPEN;
     boolean visible = true;
 
+    private double indicatorSize = -1;
+
+    public double getIndicatorSize() {
+        return indicatorSize;
+    }
+
+    public void setIndicatorSize(double indicatorSize) {
+        this.indicatorSize = indicatorSize;
+    }
+
     public abstract String getLabel();
 
     private int getZoomLevel() {

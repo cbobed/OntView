@@ -72,7 +72,6 @@ public class VisClass extends Shape {
 
 	boolean qualifiedRendering = false; 
 	boolean labelRendering = false;
-	private static double width= -1;
 	public int topToBarDistance;
 
 
@@ -453,10 +452,11 @@ public class VisClass extends Shape {
 	}
 
 	private void drawHiddenNodesIndicator(GraphicsContext g, int hiddenNodes, int x, int y) {
-		if (width == -1) {
-			width = getIndicatorSize(g, graph.getShapeMap().size() - 2) + 8;
+		if (getIndicatorSize() == -1) {
+			setIndicatorSize(getIndicatorSize(g, graph.getShapeMap().size() - 2) + 8);
 		}
 
+		double width = getIndicatorSize();
 		double height = 13;
 		double rectY = y - (double) currentHeight / 2 - height - 5;
 

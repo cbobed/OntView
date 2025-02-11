@@ -6,20 +6,22 @@ import javafx.scene.paint.Color;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class SuperNode extends Shape {
-    private final List<VisClass> subNodes;
+    private final Set<Shape> subNodes;
 
     public SuperNode() {
-        subNodes = new ArrayList<>();
+        subNodes = new HashSet<>();
     }
 
-    public void addSubNode(VisClass node) {
+    public void addSubNode(Shape node) {
         subNodes.add(node);
     }
 
-    public List<VisClass> getSubNodes() {
+    public Set<Shape> getSubNodes() {
         return subNodes;
     }
 
@@ -51,27 +53,28 @@ public class SuperNode extends Shape {
 
         int roundCornerValue = 10;
 
-        int minX = Integer.MAX_VALUE;
-        int maxX = Integer.MIN_VALUE;
-        int minY = Integer.MAX_VALUE;
-        int maxY = Integer.MIN_VALUE;
+        double minX = Integer.MAX_VALUE;
+        double maxX = Integer.MIN_VALUE;
+        double minY = Integer.MAX_VALUE;
+        double maxY = Integer.MIN_VALUE;
 
-        for (VisClass node : subNodes) {
-            minX = Math.min(minX, node.getPosX() - node.getWidth() / 2);
-            maxX = Math.max(maxX, node.getPosX() + node.getWidth() / 2);
-            minY = Math.min(minY, node.getPosY() - node.getHeight() / 2);
-            maxY = Math.max(maxY, node.getPosY() + node.getHeight() / 2);
+        for (Shape node : subNodes) {
+            if (getIndicatorSize() == -1) setIndicatorSize(node.getIndicatorSize());
+            minX = Math.min(minX, node.getPosX() - (double) node.getWidth() / 2);
+            maxX = Math.max(maxX, node.getPosX() + (double) node.getWidth() / 2);
+            minY = Math.min(minY, node.getPosY() - (double) node.getHeight() / 2);
+            maxY = Math.max(maxY, node.getPosY() + (double) node.getHeight() / 2);
         }
 
-        int width = maxX - minX + 20;
-        int height = maxY - minY + 30;
+        double width = Math.max(maxX - minX + 40, getIndicatorSize() + 40);
+        double height = maxY - minY + 40;
 
         Color lightgray = Color.rgb(234, 234, 234);
 
         g.setFill(lightgray);
-        g.fillRoundRect(minX - 10, minY - 10, width, height, roundCornerValue, roundCornerValue);
+        g.fillRoundRect(minX - 20, minY - 30, width, height, roundCornerValue, roundCornerValue);
         g.setStroke(Color.DARKBLUE);
-        g.strokeRoundRect(minX - 10, minY - 10, width, height, roundCornerValue, roundCornerValue);
+        g.strokeRoundRect(minX - 20, minY - 30, width, height, roundCornerValue, roundCornerValue);
 
     }
 

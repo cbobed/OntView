@@ -37,7 +37,7 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import reducer.StructuralReducer;
 
 public class PaintFrame extends Canvas {
-
+	public boolean drawable = true;
 	private static final long serialVersionUID = 1L;
 	public ScrollPane scroll;
 	static final int BORDER_PANEL = 50;
@@ -111,7 +111,6 @@ public class PaintFrame extends Canvas {
 			this.setHeight(600);
 			prevSize = new Dimension2D(getWidth(), getHeight());
 			VisConfig.getInstance().setConstants();
-			// visGraph = new VisGraph(this);
 			addEventHandlers();
 
 		} catch (Exception e) {
@@ -127,7 +126,6 @@ public class PaintFrame extends Canvas {
 		this.addEventHandler(MouseEvent.MOUSE_CLICKED, this::handleMouseClicked);
 		this.addEventHandler(MouseEvent.MOUSE_ENTERED, this::handleMouseEntered);
 		this.addEventHandler(MouseEvent.MOUSE_EXITED, this::handleMouseExited);
-		this.addEventHandler(ScrollEvent.SCROLL, this::handleScroll);
 	}
 
 	/*-*************************************************************
@@ -292,7 +290,8 @@ public class PaintFrame extends Canvas {
 	}
 
 	public void draw() {
-		if (this.getScene() != null && !this.isDisabled() && this.isVisible() && this.getGraphicsContext2D() != null) {
+		if (this.getScene() != null && !this.isDisabled() && this.isVisible() && this.getGraphicsContext2D() != null
+			&& drawable) {
 			GraphicsContext g = this.getGraphicsContext2D();
 			if (factor >= 1.0){
 				g.clearRect(0, 0, getWidth() * factor, getHeight() * factor);
@@ -309,6 +308,25 @@ public class PaintFrame extends Canvas {
 			}
 
 			if (visGraph != null) {
+
+				/* draw super nodes
+				for (Entry<String, Shape> entry : visGraph.shapeMap.entrySet()) {
+					Shape shape = entry.getValue();
+					if (shape instanceof SuperNode) {
+						shape.drawShape(g);
+					}
+				}*/
+
+				// draw levels
+				g.setStroke(Color.LIGHTGRAY);
+				for (VisLevel lvl : visGraph.levelSet) {
+					(g).strokeLine(lvl.getXpos(), 0, lvl.getXpos(), (int) (getHeight() / factor));
+					// Uncomment this to get a vertical line in every level
+					g.setStroke(Color.LIGHTGRAY);
+
+				}
+				g.setStroke(Color.BLACK);
+
 				// draw connectors
 				if (showConnectors) {
 					for (VisConnector c : visGraph.connectorList) {
@@ -326,22 +344,6 @@ public class PaintFrame extends Canvas {
 				if(!selectedDisjoints.isEmpty()){
 					drawDisjointShape();
 				}
-
-				g.setStroke(Color.LIGHTGRAY);
-				for (VisLevel lvl : visGraph.levelSet) {
-					(g).strokeLine(lvl.getXpos(), 0, lvl.getXpos(), (int) (getHeight() / factor));
-					// Uncomment this to get a vertical line in every level
-					g.setStroke(Color.LIGHTGRAY);
-
-				}
-				g.setStroke(Color.BLACK);
-
-				/*for (Entry<String, Shape> entry : visGraph.shapeMap.entrySet()) {
-					Shape shape = entry.getValue();
-					if (shape instanceof SuperNode) {
-						shape.drawShape(g);
-					}
-				}*/
 
 				for (Entry<String, Shape> entry : visGraph.shapeMap.entrySet()) {
 					Shape shape = entry.getValue();
@@ -529,42 +531,21 @@ public class PaintFrame extends Canvas {
 	}
 
 	public void handleMouseEntered(MouseEvent e) {
+		if (visGraph == null || !drawable) {
+			return;
+		}
 		setCursor(Cursor.DEFAULT);
 	}
 
 	public void handleMouseExited(MouseEvent e) {
+		if (visGraph == null || !drawable) {
+			return;
+		}
 		setCursor(Cursor.DEFAULT);
 	}
 
-	public void handleScroll(ScrollEvent e) {
-		/*if (visGraph == null) {
-			return;
-		}
-
-		double zoomFactor = (e.getDeltaY() > 0) ? 1.1 : 0.9;
-		double newScale = getScaleX() * zoomFactor;
-
-		if (newScale < 0.5 || newScale > 3) {
-			return;
-		}
-
-		setScaleX(newScale);
-		setScaleY(newScale);
-
-		e.consume();*/
-	}
-
-	public void zoomCanvas(double zoomFactor) {
-		double newScale = getScaleX() * zoomFactor;
-
-
-		setScaleX(zoomFactor);
-		setScaleY(zoomFactor);
-	}
-
-
 	private void handleMousePressed(MouseEvent e) {
-		if (visGraph == null) {
+		if (visGraph == null || !drawable) {
 			return;
 		}
 		Point2D p = translatePoint(new Point2D(e.getX(), e.getY()));
@@ -572,8 +553,6 @@ public class PaintFrame extends Canvas {
 			pressedShape = null;
 			return;
 		}
-
-		System.out.println("handleMousePressed " + e.getY() + " " + getHeight());
 
 		pressedShape = visGraph.findShape(p);
 
@@ -588,7 +567,7 @@ public class PaintFrame extends Canvas {
 	}
 
 	public void handleMouseReleased(MouseEvent e) {
-		if (visGraph == null) {
+		if (visGraph == null || !drawable) {
 			return;
 		}
 
@@ -608,6 +587,9 @@ public class PaintFrame extends Canvas {
 	private boolean isDragging = false;
 
 	public void handleMouseDragged(MouseEvent e) {
+		if (visGraph == null || !drawable) {
+			return;
+		}
 		isDragging = true;
 
 		int draggedY, draggedX;
@@ -662,7 +644,7 @@ public class PaintFrame extends Canvas {
 	}
 
 	public void handleMouseMoved(MouseEvent e) {
-		if (visGraph == null) {
+		if (visGraph == null || !drawable) {
 			return;
 		}
 		Point2D p = translatePoint(new Point2D(e.getX(), e.getY()));
@@ -690,6 +672,9 @@ public class PaintFrame extends Canvas {
 	}
 
 	public void handleMouseClicked(MouseEvent e) {
+		if (visGraph == null || !drawable) {
+			return;
+		}
 		if (isDragging) {
 			e.consume();
 			isDragging = false;
@@ -1337,6 +1322,17 @@ public class PaintFrame extends Canvas {
 
 	public Embedable getParentFrame() {
 		return parentFrame;
+	}
+
+	public void clearCanvas(){
+		drawable = false;
+		GraphicsContext g = getGraphicsContext2D();
+		if (factor >= 1.0){
+			g.clearRect(0, 0, getWidth() * factor, getHeight() * factor);
+
+		} else {
+			g.clearRect(0, 0, getWidth() / factor, getHeight() / factor);
+		}
 	}
 
 	public Stage showLoadingStage(Task<?> task) {

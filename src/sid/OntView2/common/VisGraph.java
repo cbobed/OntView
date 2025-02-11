@@ -197,7 +197,6 @@ public class VisGraph implements Runnable{
 		
 		addBottomNode(reasoner,activeOntology);
 
-		// Comment if using processSuperNodes
 		for (Entry<String, Shape> entry : shapeMap.entrySet()){
 			Shape shape = entry.getValue();
 			if (shape instanceof VisClass) {
@@ -205,8 +204,6 @@ public class VisGraph implements Runnable{
 				shape.asVisClass().addEquivalentConnectors();
 			}
 		}
-
-		//processSuperNodes();
 
 		updateProgressBarObserver(80);
 		placeProperties(activeOntology,reasoner,set);
@@ -230,55 +227,6 @@ public class VisGraph implements Runnable{
     	paintframe.getParentFrame().loadSearchCombo();
     	updateProgressBarObserver(100);
     	paintframe.setStateChanged(true);
-	}
-
-	/**
-	 * Processes the supernodes in the reasoned graph.
-	 * This method identifies and groups equivalent nodes into supernodes.
-	 * Supernodes are created and assigned levels based on the levels of their subnodes.
-	 * Then, the supernodes are added to the shape map (`shapeMap`).
-	 */
-	private void processSuperNodes() {
-		Map<VisClass, SuperNode> superNodesMap = new HashMap<>();
-		for (Entry<String,Shape> entry : shapeMap.entrySet()){
-			Shape shape = entry.getValue();
-			if (shape instanceof VisClass visClass) {
-				shape.asVisClass().addAssertedDisjointConnectors();
-				shape.asVisClass().addEquivalentConnectors();
-
-				for (VisConnectorEquiv equiv : visClass.getEquivConnectors()) {
-					Shape other = equiv.getOtherEnd(visClass);
-					if (other instanceof VisClass otherVisClass) {
-						SuperNode superNode = superNodesMap.get(visClass);
-						if (superNode == null) {
-							superNode = new SuperNode();
-							superNodesMap.put(visClass, superNode);
-						}
-						superNode.addSubNode(visClass);
-
-						if (!superNode.getSubNodes().contains(otherVisClass)) {
-							superNode.addSubNode(otherVisClass);
-							superNodesMap.put(otherVisClass, superNode);
-						}
-					}
-				}
-			}
-		}
-
-		/* Supernode
-		for (SuperNode superNode : superNodesMap.values()) {
-			int minLevelId = superNode.getSubNodes().stream()
-					.mapToInt(subNode -> subNode.getVisLevel().getID())
-					.min()
-					.orElse(0);
-
-			VisLevel superNodeLevel = VisLevel.getLevelFromID(levelSet, minLevelId);
-
-			assert superNodeLevel != null;
-			superNode.setVisLevel(superNodeLevel);
-
-			shapeMap.put("SuperNode_" + superNode.hashCode(), superNode);
-		}*/
 	}
 
 	public void changeRenderMethod(Boolean labelRendering, Boolean qualifiedRendering ){
@@ -1509,6 +1457,45 @@ public class VisGraph implements Runnable{
 	}
 
 
+	/**
+	 * Processes supernodes by grouping equivalent nodes into a single supernode.
+	 */
+	public void processSuperNodes() {
+		Map<VisClass, SuperNode> superNodeMap = new HashMap<>();
+
+		for (Entry<String, Shape> entry : shapeMap.entrySet()) {
+			Shape shape = entry.getValue();
+			if (shape instanceof VisClass) {
+				VisClass visClass = shape.asVisClass();
+
+				if (visClass.getEquivConnectors().isEmpty()) {
+					continue;
+				}
+
+				/*if (superNodeMap.containsKey(visClass)) {
+					continue;
+				}*/
+
+				SuperNode superNode = new SuperNode();
+				superNode.addSubNode(visClass);
+				superNodeMap.put(visClass, superNode);
+
+				for (VisConnectorEquiv connector : visClass.getEquivConnectors()) {
+					Shape otherShape = connector.getOtherEnd(visClass);
+					if (otherShape instanceof VisClass equivalentNode) {
+						superNode.addSubNode(equivalentNode);
+						superNodeMap.put(equivalentNode, superNode);
+					}
+				}
+
+				shapeMap.put("SN_" + superNode.hashCode(), superNode);
+			}
+		}
+
+	}
+
+
+
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
@@ -1518,6 +1505,7 @@ public class VisGraph implements Runnable{
 			topSet.add(getActiveOntology().getOWLOntologyManager().getOWLDataFactory().getOWLThing()); 
 			this.buildReasonedGraph(getActiveOntology(), getReasoner(), topSet, isExpanded());
 			storeDescendants();
+			//processSuperNodes();
 		} catch (XPathExpressionException e) {
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {

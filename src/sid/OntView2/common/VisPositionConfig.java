@@ -59,12 +59,10 @@ public class VisPositionConfig {
 		String s="//ontologyName/text()";
 		XPathExpression expr = xpath.compile(s);
 		Object ontologyName = expr.evaluate(doc, XPathConstants.STRING);
-		System.out.println(" ontologyName result: "+ ontologyName);
 
 		s="//reasoner/text()";
 		expr = xpath.compile(s);
 		Object reasoner = expr.evaluate(doc, XPathConstants.STRING);
-		System.out.println(" reasoner result: "+ reasoner);
 
 		return new String[]{(String) ontologyName, (String) reasoner};
 	}
