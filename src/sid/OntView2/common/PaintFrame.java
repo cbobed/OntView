@@ -350,6 +350,8 @@ public class PaintFrame extends Canvas {
 					}
 				}
 				drawPropertyBoxes(g);
+			} else {
+				System.err.println("visGraph is null in draw method.");
 			}
 		}
 	}

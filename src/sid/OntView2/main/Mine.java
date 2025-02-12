@@ -352,26 +352,23 @@ public class Mine extends Application implements Embedable{
 		}
 	}
 
-	public void createImage(Canvas panel) {
-		int w = (int) panel.getWidth();
-		int h = (int) panel.getHeight();
-		imageDialog(panel, w, h);
+	public void createImage(Canvas canvas) {
+		int w = (int) canvas.getWidth();
+		int h = (int) canvas.getHeight();
+		imageDialog(canvas, w, h);
 
 	}
 
-	public void createImageFromVisibleRect(Canvas panel){
-		int w = (int) panel.getBoundsInLocal().getWidth();
-		int h = (int) panel.getBoundsInLocal().getHeight();
+	public void createImageFromVisibleRect(Canvas canvas) {
+		int w = (int) scroll.getWidth();
+		int h = (int) scroll.getHeight();
 
-		// <CBL 25/9/13>
-		// we have to check the position of the scroll bars
+		double xIni = scroll.getHvalue() * (canvas.getWidth() - w);
+		double yIni = scroll.getVvalue() * (canvas.getHeight() - h);
 
-		int xIni = (int) (scroll.getHvalue() * (panel.getWidth() - scroll.getViewportBounds().getWidth()));
-		int yIni = (int) (scroll.getVvalue() * (panel.getHeight() - scroll.getViewportBounds().getHeight()));
+		System.out.println(w + " " + h + " " + xIni + " " + yIni);
 
-		System.out.println(w + " "+h+" "+xIni+" "+yIni);
-
-		imageDialog(panel, w, h, xIni, yIni);
+		imageDialog(canvas, w, h, (int) xIni, (int) yIni);
 	}
 
 	// <CBL 25/9/13>
@@ -412,38 +409,51 @@ public class Mine extends Application implements Embedable{
 						continue;
 					}
 				}
-				try {
-					String extension = valid.contains(fileChooser.getSelectedExtensionFilter().getDescription().toLowerCase()) ?
-							fileChooser.getSelectedExtensionFilter().getDescription().toLowerCase() : "png";
-					boolean hasSuffix = hasValidSuffix(fl.getName().toLowerCase());
+				String extension = valid.contains(fileChooser.getSelectedExtensionFilter().getDescription().toLowerCase()) ?
+						fileChooser.getSelectedExtensionFilter().getDescription().toLowerCase() : "png";
+				boolean hasSuffix = hasValidSuffix(fl.getName().toLowerCase());
 
-					if (!hasSuffix){
-						String newName = fl.getPath() + "." + extension;
+				if (!hasSuffix){
+					String newName = fl.getPath() + "." + extension;
 
-						File fl2 = new File(newName);
-						if (fl2.exists()) {
-							Alert alert = new Alert(AlertType.CONFIRMATION, "Overwrite?", ButtonType.OK, ButtonType.CANCEL);
-							Optional<ButtonType> result = alert.showAndWait();
-							if (result.isPresent() && result.get() == ButtonType.CANCEL) {
-								continue;
-							}
+					File fl2 = new File(newName);
+					if (fl2.exists()) {
+						Alert alert = new Alert(AlertType.CONFIRMATION, "Overwrite?", ButtonType.OK, ButtonType.CANCEL);
+						Optional<ButtonType> result = alert.showAndWait();
+						if (result.isPresent() && result.get() == ButtonType.CANCEL) {
+							continue;
 						}
-
-						ImageIO.write(SwingFXUtils.fromFXImage(writableImage, null), extension, fl2);
 					}
-					else {
-						ImageIO.write(SwingFXUtils.fromFXImage(writableImage, null), extension, fl);
-					}
-					done = true;
-				} catch (IOException e1) {
-					e1.printStackTrace();
-					throw new RuntimeException(e1);
+					saveViewTask(writableImage, extension, fl2);
 				}
+				else {
+                    saveViewTask(writableImage, extension, fl);
+				}
+				done = true;
 			}
 			else {
 				break;
 			}
 		}
+	}
+
+	private void saveViewTask(WritableImage writableImage, String extension, File finalFl) {
+		Task<Void> task = new Task<>() {
+			@Override
+			protected Void call() throws IOException {
+				ImageIO.write(SwingFXUtils.fromFXImage(writableImage, null), extension, finalFl);
+				return null;
+			}
+		};
+		Stage loadingStage = artPanel.showLoadingStage(task);
+		task.setOnSucceeded(e -> loadingStage.close());
+		task.setOnFailed(e -> {
+			task.getException().printStackTrace();
+			loadingStage.close();
+			showAlertDialog("Error", "Unable to save the ontology view.", task.getException().getMessage(),
+					AlertType.ERROR);
+		});
+		new Thread(task).start();
 	}
 
 	public boolean hasValidSuffix(String in){
