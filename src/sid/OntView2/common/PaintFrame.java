@@ -986,7 +986,7 @@ public class PaintFrame extends Canvas {
 				task.setOnSucceeded(e -> {
 					loadingStage.close();
 					setStateChanged(true);
-					Platform.runLater(() -> {getRelaxerRunnable();});
+					Platform.runLater(relaxerRunnable);
 				});
 				task.setOnFailed(e -> {
 					task.getException().printStackTrace();
@@ -1295,8 +1295,6 @@ public class PaintFrame extends Canvas {
 				}
 			}
 			ySpanPerLevel.put(level.id, currentY-minY); 
-			// Adjust the x position of the level if needed
-			//level.setXpos(level.getXpos() + levelHeight);
 		}
 
 		span = maxY - minY; // this is the maximum level height we have witnessed
@@ -1347,6 +1345,7 @@ public class PaintFrame extends Canvas {
 			task.cancel();
 			loadingStage.close();
 			System.err.println("Task cancelled");
+			//clearCanvas();
 		});
 
 		VBox loadingBox = new VBox(15.0, progressIndicator, loadingLabel, cancelButton);
