@@ -974,9 +974,12 @@ public class PaintFrame extends Canvas {
 				Task<Void> task = new Task<>() {
 					@Override
 					protected Void call() {
-						boolean b = shape.asVisClass().propertyBox.visible;
-						shape.asVisClass().propertyBox.setVisible(!b);
-						showRelatedProperties(shape.asVisClass(), visGraph, !b);
+						boolean visibility = shape.asVisClass().propertyBox.visible;
+						shape.asVisClass().propertyBox.setVisible(!visibility);
+						showRelatedProperties(shape.asVisClass(), visGraph, !visibility);
+						if(visibility){
+							compactNodes(shape);
+						}
 						return null;
 					}
 				};
@@ -1304,6 +1307,31 @@ public class PaintFrame extends Canvas {
 			for (Shape shape : visibleShapesPerLevel.get(level.id)) {
 				shape.setPosY(currentY);
 				currentY += shape.getHeight() + levelHeight + MIN_SPACE;
+			}
+		}
+		setStateChanged(true);
+		Platform.runLater(relaxerRunnable);
+	}
+
+	/**
+	 * Repositions the displaced nodes located after the given shape.
+	 */
+	public void compactNodes(Shape s) {
+		int currentY = s.getBottomCorner() + MIN_INITIAL_SPACE + MIN_SPACE;
+        Map<Integer, ArrayList<Shape>> visibleShapesPerLevel = new HashMap<>();
+		ArrayList<Shape> orderedShapeList = s.vdepthlevel.orderedList();
+		visibleShapesPerLevel.put(s.vdepthlevel.id, new ArrayList<>());
+
+		boolean readyToProcess = false;
+		for (Shape shape : orderedShapeList) {
+			if (shape == s){
+				readyToProcess = true;
+				continue;
+			}
+			if (readyToProcess && shape.isVisible()) {
+				shape.setPosY(currentY);
+				visibleShapesPerLevel.get(s.vdepthlevel.id).add(shape);
+				currentY += shape.getHeight() + MIN_INITIAL_SPACE + MIN_SPACE;
 			}
 		}
 		setStateChanged(true);
