@@ -197,20 +197,7 @@ public class PaintFrame extends Canvas {
 	/**
 	 * scales by factor and adjusts panel size
 	 */
-
 	public void scale(double factor, Dimension2D size) {
-		double newWidth = size.getWidth();
-		double newHeight = size.getHeight();
-
-
-		if (factor >= 1.0){
-			setWidth(newWidth * factor);
-			setHeight(newHeight * factor);
-		} else {
-			setWidth(newWidth / factor);
-			setHeight(newHeight / factor);
-		}
-
 		GraphicsContext gc = this.getGraphicsContext2D();
 		if (gc != null) {
 			gc.restore();
@@ -219,7 +206,6 @@ public class PaintFrame extends Canvas {
 			gc.scale(factor, factor);
 			Platform.runLater(drawerRunnable);
 		}
-
 	}
 
 	Pane canvasWrapper = new Pane(this);
@@ -745,12 +731,15 @@ public class PaintFrame extends Canvas {
 	 * Method to check if it needs to expand the canvas size
 	 */
 	public void checkAndResizeCanvas() {
-		if (getHeight() >= MAX_SIZE){
+		System.out.println("altura - " + getHeight());
+		if (getHeight() >= MAX_SIZE) {
 			return;
 		}
+
 		double maxY = Double.MIN_VALUE;
 		double minY = Double.MAX_VALUE;
-		
+		double maxX = Double.MIN_VALUE;
+
 		for (VisLevel level : visGraph.getLevelSet()) {
 			for (Shape shape : level.levelShapes) {
 				double shapeMaxY = shape.getPosY() * factor + shape.getHeight() * factor;
@@ -758,15 +747,14 @@ public class PaintFrame extends Canvas {
 
 				double shapeMinY = shape.getPosY() * factor - shape.getHeight() / 2.0 * factor;
 				if (shapeMinY < minY) { minY = shapeMinY; }
+
+				double shapeMaxX = shape.getPosX() * factor + shape.getWidth() * factor;
+				if (shapeMaxX > maxX) { maxX = shapeMaxX; }
 			}
 		}
 
-		if (factor >= 1.0){
-			setHeight((maxY + BORDER_PANEL) * factor);
-
-		} else {
-			setHeight((maxY + BORDER_PANEL) / factor);
-		}
+		setHeight(maxY + BORDER_PANEL);
+		setWidth(maxX + BORDER_PANEL);
 
 		if (minY < 0) {
 			// Adjust the shape position
@@ -777,7 +765,6 @@ public class PaintFrame extends Canvas {
 				}
 			}
 		}
-
 	}
 
 	/**

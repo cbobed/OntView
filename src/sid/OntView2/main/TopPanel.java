@@ -1027,8 +1027,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			}
 			parent.artPanel.getVisGraph().setZoomLevel((int) getZoomSlider().getValue());
 			parent.artPanel.setFactor(factor);
-			parent.artPanel.scale(factor, size);
 			parent.artPanel.checkAndResizeCanvas();
+			parent.artPanel.scale(factor, size);
 		}
 	}
 }
