@@ -56,7 +56,11 @@ public class VisShapeContext extends ContextMenu {
 		if (!shape.asVisClass().allSubHidden()) {
 			hideItem.setDisable(true);
 		}
-		hideItem.setOnAction(event -> shape.hide());
+		hideItem.setOnAction(event -> {
+			shape.hide();
+			shape.updateParents();
+			Platform.runLater(parent.drawerRunnable);
+		});
 		
 		
 		this.getItems().add(getShowInstancesItem());
