@@ -172,13 +172,11 @@ public class VisGraph implements Runnable{
 		
 		//It's important to set config constants before creating 
 		//will have to move this elsewhere
-		updateProgressBarObserver(0);
 		clearAll();
 		// <CBL 24/9/13> updated to just take into account the information out of the 
 		// reasoner
 		this.reasonedDepthTraversal(activeOntology,reasoner,set,0);
 		
-		updateProgressBarObserver(70);
 		// <JBL> this method must  not be invoked after expanding
 		// <CBL 24/9/13> 
 		// Updated: it doesn't create the connectors anylonger
@@ -186,7 +184,6 @@ public class VisGraph implements Runnable{
 		// 		same name are stored together
 		linkDefinitionsToDefinedClasses(activeOntology,reasoner);
 		arrangePos();
-		updateProgressBarObserver(75);
 		VisLevel.adjustWidthAndPos(levelSet);
 		if (!check){
 			expandNestedClassExpressions(reasoner,activeOntology);
@@ -205,28 +202,22 @@ public class VisGraph implements Runnable{
 			}
 		}
 
-		updateProgressBarObserver(80);
 		placeProperties(activeOntology,reasoner,set);
     	arrangePos();
 		VisLevel.shrinkLevelSet(levelSet);
     	VisLevel.adjustWidthAndPos(levelSet);
 
-    	updateProgressBarObserver(85);
     	removeRedundantConnector();
     	System.gc();
         reorder = new GraphReorder(this);
     	reorder.visualReorder();
     	adjustPanelSize((float) 1.0);
-    	updateProgressBarObserver(90);
     	clearDashedConnectorList();
 		updateXposition();
-
 		paintframe.doKceOptionAction();
-		//showAll();
 
     	VisLevel.adjustWidthAndPos(getLevelSet());
     	paintframe.getParentFrame().loadSearchCombo();
-    	updateProgressBarObserver(100);
     	paintframe.setStateChanged(true);
 	}
 
@@ -480,7 +471,6 @@ public class VisGraph implements Runnable{
   	            continue;
   	        }
 	  	    vis= addVisClass(key,depthlevel,loop_owlclassExp,activeOntology,reasoner);
-	  	    setProgressFromShapeNumber();
             value = vis;
             // Mix into a set, both reasoned subclasses for the current owlclass expression
   	        // and explicit subclasses
@@ -1518,20 +1508,12 @@ public class VisGraph implements Runnable{
 			this.buildReasonedGraph(getActiveOntology(), getReasoner(), topSet, isExpanded());
 			storeDescendants();
 			//processSuperNodes();
-		} catch (XPathExpressionException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (XPathExpressionException | ParserConfigurationException | SAXException | IOException e) {
 			e.printStackTrace();
 		} finally {
 			// Release the latch to unblock the main thread
 			latch.countDown();
 		}
-		updateProgressBarObserver(100);
-
 	}
 	
 	
@@ -1575,15 +1557,6 @@ public class VisGraph implements Runnable{
 	}
 
 	/**
-	 * Updates the progress bar observer with the given progress percentage.
-	 * This method sets the progress value and triggers the progress bar observer.
-	 */
-	private void updateProgressBarObserver(int percent) {
-		setProgress(percent);
-		progressBarObserver.set(!progressBarObserver.get());
-	}
-
-	/**
 	 * Updates the appropriate observer based on the specified observer type.
 	 * This method triggers either the progress bar observer or the general observer.
 	 */
@@ -1593,18 +1566,5 @@ public class VisGraph implements Runnable{
 		} else if (observerType == VisConstants.GENERALOBSERVER) {
 			generalObserver.set(!generalObserver.get());
 		}
-	}
-
-	/**
-	 * Calculates the progress from the number of shapes in the shape map.
-	 * The progress is calculated as a percentage of the total number of classes in the active ontology.
-	 * This method then updates the progress bar observer with the calculated progress.
-	 */
-	private void setProgressFromShapeNumber() {
-		int prev = (int) (70.0f * ((float) getShapeMap().size() /
-				(float) getActiveOntology().getClassesInSignature(true).size()));
-		int progress = Math.min(prev, 70);
-		setProgress(progress);
-		updateProgressBarObserver(progress);
 	}
 }
