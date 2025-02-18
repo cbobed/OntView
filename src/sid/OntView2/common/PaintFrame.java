@@ -976,10 +976,9 @@ public class PaintFrame extends Canvas {
 					protected Void call() {
 						boolean visibility = shape.asVisClass().propertyBox.visible;
 						shape.asVisClass().propertyBox.setVisible(!visibility);
+						if(visibility) compactNodes(shape);
 						showRelatedProperties(shape.asVisClass(), visGraph, !visibility);
-						if(visibility){
-							compactNodes(shape);
-						}
+
 						return null;
 					}
 				};
@@ -1065,6 +1064,7 @@ public class PaintFrame extends Canvas {
 						for (VisObjectProperty relatedProperty : relatedVisClass.getPropertyBox().getProperties()) {
 							if (isRelated(property, relatedProperty)) {
 								relatedVisClass.getPropertyBox().setVisible(visibility);
+								if(!visibility) compactNodes(relatedShape);
 							}
 						}
 					}
