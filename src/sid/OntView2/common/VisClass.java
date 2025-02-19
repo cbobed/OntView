@@ -318,7 +318,7 @@ public class VisClass extends Shape {
 						propertyDraw(g, x + 5, y - 5, roundCornerValue, lightBlue);
 					}
 					if (!getDisjointConnectors().isEmpty()) {
-						disjointDraw(g, x, y - 5, roundCornerValue, Color.LIGHTYELLOW);
+						disjointDraw(g, x-5, y - 5, roundCornerValue, Color.LIGHTYELLOW);
 					}
 					g.setFill(Color.BLACK);
 				}
@@ -952,6 +952,8 @@ public class VisClass extends Shape {
         int disjointY = getPosY() - getHeight() / 2 + 6;
         int disjointWidth = 14;
 		int disjointHeight = 14;
+
+		if (isDefined && !label.startsWith(SIDClassExpressionNamer.className)) disjointX -= 5;
 
 		return (x >= disjointX && x <= disjointX + disjointWidth) &&
 				(y >= disjointY && y <= disjointY + disjointHeight);
