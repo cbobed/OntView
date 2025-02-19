@@ -890,21 +890,27 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		Task<Void> task = new Task<>() {
 			@Override
 			protected Void call() {
-				if (parent.artPanel.getHeight() >= PaintFrame.MAX_SIZE){
+				if (parent.artPanel.getHeight() >= PaintFrame.MAX_SIZE) {
 					isGraphTooLarge.set(true);
 					getPropertiesCheckBox().setDisable(true);
 					getPropertiesCheckBox().setSelected(false);
 
-					parent.showAlertDialog("Information Dialog",  "Graph is too large to show properties.",
+					parent.showAlertDialog("Information Dialog", "Graph is too large to show properties.",
 							"We recommend displaying the node properties one at a time.", Alert.AlertType.INFORMATION);
 				} else {
 					for (Entry<String, Shape> entry : classesInGraph) {
 						if ((entry.getValue() instanceof VisClass) && (entry.getValue().asVisClass().getPropertyBox() != null)) {
 							entry.getValue().asVisClass().getPropertyBox().setVisible(getPropertiesCheckBox().isSelected());
+							if (!getPropertiesCheckBox().isSelected()) {
+								if(entry.getValue().asVisClass().getPropertyBox() != null)
+									parent.artPanel.compactNodes(entry.getValue().asVisClass());
+							}
 						}
 					}
-					parent.artPanel.compactGraph();
-					parent.artPanel.checkAndResizeCanvas();
+					Platform.runLater(parent.artPanel.getCanvasAdjusterRunnable());
+					parent.artPanel.setStateChanged(true);
+					Platform.runLater(parent.artPanel.getRelaxerRunnable());
+
 				}
 				return null;
 			}
@@ -922,7 +928,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			loadingStage.close();
 			getPropertiesCheckBox().setSelected(false);
 			if (isGraphTooLarge.get()) {
-				parent.showAlertDialog("Information Dialog",  "Graph is too large to show properties.",
+				parent.showAlertDialog("Information Dialog", "Graph is too large to show properties.",
 						"We recommend displaying the node properties one at a time.", Alert.AlertType.INFORMATION);
 			} else {
 				parent.showAlertDialog("Error", "Properties could not be loaded.", "Try again.",
@@ -933,28 +939,6 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		task.setOnCancelled(e -> getPropertiesCheckBox().setSelected(false));
 
 		new Thread(task).start();
-	}
-
-	private void propertiesActionActionPerformed2(ActionEvent event) {
-		// Temporary fix for the bug that causes the shapes to go out of the canvas
-		if (parent.artPanel.getHeight() >= PaintFrame.MAX_SIZE){
-			getPropertiesCheckBox().setDisable(true);
-			getPropertiesCheckBox().setSelected(false);
-			parent.showAlertDialog("Information Dialog",
-					"Graph is too large to show properties.",
-					"We recommend displaying the node properties one at a time.", Alert.AlertType.INFORMATION);
-			return;
-		}
-		Set<Entry<String, Shape>> classesInGraph = parent.artPanel.getVisGraph().getClassesInGraph();
-		for (Entry<String, Shape> entry : classesInGraph) {
-			if ((entry.getValue() instanceof VisClass) && (entry.getValue().asVisClass().getPropertyBox() != null)) {
-				entry.getValue().asVisClass().getPropertyBox().setVisible(getPropertiesCheckBox().isSelected());
-			}
-		}
-		parent.artPanel.compactGraph();
-		parent.artPanel.checkAndResizeCanvas();
-		parent.artPanel.setStateChanged(true);
-		Platform.runLater(parent.artPanel.getRelaxerRunnable());
 	}
 
 	private void reduceActionActionPerformed(ActionEvent event) {
@@ -1007,7 +991,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	public void restoreSliderValue() {
 		if(size != null) {
 			parent.artPanel.setFactor(1.0);
-			parent.artPanel.scale(1.0, size);
+			parent.artPanel.scale(1.0);
 		}
 		getZoomSlider().setValue(5);
 	}
@@ -1027,8 +1011,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			}
 			parent.artPanel.getVisGraph().setZoomLevel((int) getZoomSlider().getValue());
 			parent.artPanel.setFactor(factor);
-			parent.artPanel.checkAndResizeCanvas();
-			parent.artPanel.scale(factor, size);
+			Platform.runLater(parent.artPanel.getCanvasAdjusterRunnable());
+			parent.artPanel.scale(factor);
 		}
 	}
 }

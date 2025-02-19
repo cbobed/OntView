@@ -193,11 +193,13 @@ public class PaintFrame extends Canvas {
 	public GlobalDrawer getDrawerRunnable() {
 		return drawerRunnable; 
 	}
+
+	public CanvasAdjuster getCanvasAdjusterRunnable(){ return canvasAdjusterRunnable; }
 	
 	/**
 	 * scales by factor and adjusts panel size
 	 */
-	public void scale(double factor, Dimension2D size) {
+	public void scale(double factor) {
 		GraphicsContext gc = this.getGraphicsContext2D();
 		if (gc != null) {
 			gc.restore();
@@ -731,7 +733,7 @@ public class PaintFrame extends Canvas {
 	 * Method to check if it needs to expand the canvas size
 	 */
 	public void checkAndResizeCanvas() {
-		System.out.println("altura - " + getHeight());
+		System.out.println("altura - " + getHeight() + "     anchura - " + getWidth());
 		if (getHeight() >= MAX_SIZE) {
 			return;
 		}
