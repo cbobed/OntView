@@ -15,11 +15,17 @@ import java.util.HashMap;
 public class VisConfig {
 
 	static String BASE ="plugins/sid/OntView/Protege/";
+
 	private static VisConfig instance = null;
 	DocumentBuilderFactory domFactory;
 	Document doc;
 	XPath xpath;
 
+//	enum ClassExpressionsOption {ALL, ONLY_CLASSES, ONLY_DOMAIN, ONLY_RANGE, DOMAIN_RANGE}; 
+//	public static ClassExpressionsOption visualizeClassExpressions = ClassExpressionsOption.ALL;
+	
+	public static boolean APPLY_RENAMING_DEBUG_PURPOSES=false; 
+	
 	private VisConfig() throws ParserConfigurationException, SAXException, IOException{
 		  DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
 	      domFactory.setNamespaceAware(true); 

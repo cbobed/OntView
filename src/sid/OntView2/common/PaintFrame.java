@@ -317,7 +317,7 @@ public class PaintFrame extends Canvas {
 
 				// draw levels
 				g.setStroke(Color.LIGHTGRAY);
-				for (VisLevel lvl : visGraph.levelSet) {
+				for (VisLevel lvl : visGraph.levelSet.values()) {
 					(g).strokeLine(lvl.getXpos(), 0, lvl.getXpos(), (int) (getHeight() / factor));
 					// Uncomment this to get a vertical line in every level
 					g.setStroke(Color.LIGHTGRAY);
@@ -476,7 +476,7 @@ public class PaintFrame extends Canvas {
 				stateChanged = false;
 
 				// Faster version
-				for (VisLevel level: visGraph.levelSet) {
+				for (VisLevel level: visGraph.levelSet.values()) {
 					for (Shape s_i: level.getShapeSet()) {
 						for (Shape shape_j: level.getShapeSet()) {
 							if (s_i.getVisLevel() == shape_j.getVisLevel()) {
@@ -751,7 +751,7 @@ public class PaintFrame extends Canvas {
 		double maxY = Double.MIN_VALUE;
 		double minY = Double.MAX_VALUE;
 		
-		for (VisLevel level : visGraph.getLevelSet()) {
+		for (VisLevel level : visGraph.getLevelSet().values()) {
 			for (Shape shape : level.levelShapes) {
 				double shapeMaxY = shape.getPosY() * factor + shape.getHeight() * factor;
 				if (shapeMaxY > maxY) { maxY = shapeMaxY; }
@@ -770,7 +770,7 @@ public class PaintFrame extends Canvas {
 
 		if (minY < 0) {
 			// Adjust the shape position
-			for (VisLevel level : visGraph.getLevelSet()) {
+			for (VisLevel level : visGraph.getLevelSet().values()) {
 				ArrayList<Shape> orderedShapeList = level.orderedList();
 				for (Shape shape : orderedShapeList) {
 					shape.setPosY((int) ((shape.getPosY() * factor - minY + BORDER_PANEL) / factor));
@@ -1281,7 +1281,7 @@ public class PaintFrame extends Canvas {
 		Map<Integer, ArrayList<Shape>> visibleShapesPerLevel = new HashMap<>(); 
 		Map<Integer, Integer> ySpanPerLevel = new HashMap<>(); 
 		maxY = Integer.MIN_VALUE; 
-		for (VisLevel level : visGraph.getLevelSet()) {
+		for (VisLevel level : visGraph.getLevelSet().values()) {
 			currentY = BORDER_PANEL;
 			ArrayList<Shape> orderedShapeList = level.orderedList();
 			visibleShapesPerLevel.put(level.id, new ArrayList<>());
@@ -1301,7 +1301,7 @@ public class PaintFrame extends Canvas {
 
 		span = maxY - minY; // this is the maximum level height we have witnessed
 		// TODO: This must be refined to take into account the size of the intermediate boxes as well (getHeight)
-		for (VisLevel level : visGraph.getLevelSet()) {
+		for (VisLevel level : visGraph.getLevelSet().values()) {
 			currentY = BORDER_PANEL + (span - ySpanPerLevel.get(level.id))/ 2; 
 			for (Shape shape : visibleShapesPerLevel.get(level.id)) {
 				shape.setPosY(currentY);
