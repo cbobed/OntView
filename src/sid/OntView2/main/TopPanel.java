@@ -12,6 +12,7 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -63,6 +64,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private VBox mainPane;
 	private VBox helpPanel;
 	private Button helpButton;
+	private VBox classExpressionPanel;
+	private Button expressionButton;
 	private Popup helpPopup;
 
 	public TopPanel(Mine pparent) {
@@ -108,6 +111,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private HBox createOtherComponentsRow() {
 		HBox row = new HBox(20,
 				createLoadOntologyOptions(),
+				createShowClassExpressionButton(),
 				getPanelCheckBox(),
 				getZoomSlider(),
 				getViewPanel(),
@@ -373,11 +377,13 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 					VisConstants.PAGERANKCOMBOOPTION1,
 					VisConstants.PAGERANKCOMBOOPTION2,
 					VisConstants.RDFRANKCOMBOOPTION1,
-					VisConstants.RDFRANKCOMBOOPTION2);
+					VisConstants.RDFRANKCOMBOOPTION2,
+					VisConstants.CUSTOMCOMBOOPTION3);
 			kceComboBox.setItems(items);
 
 			HBox.setHgrow(kceComboBox, Priority.ALWAYS);
 			kceComboBox.setMaxWidth(Double.MAX_VALUE);
+			kceComboBox.setPrefWidth(130);
 
 			if (!items.isEmpty()) {
 				kceComboBox.setValue(items.get(0));
@@ -426,11 +432,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 	private VBox createLoadOntologyOptions() {
 		if (panelLoad == null) {
-			ComboBox<String> reasonerComboBox = getReasonerCombo();
-			ComboBox<String> kceComboBox = getKceComboBox();
-			Button syncButton = getLoadReasonerButton();
-
-			HBox row1 = createRow(reasonerComboBox, kceComboBox, syncButton);
+			HBox row1 = createRow(getReasonerCombo(), getKceComboBox(), getLoadReasonerButton());
 
 			StackPane titlePane = createTitlePane("Reasoner & KConcept Extraction");
 
@@ -584,6 +586,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 			loadReasonerCombo.getStyleClass().add("custom-combo-box");
 			loadReasonerCombo.setMaxWidth(Double.MAX_VALUE);
+			loadReasonerCombo.setPrefWidth(130);
 			loadReasonerCombo.setDisable(true);
 		}
 		return loadReasonerCombo;
@@ -601,6 +604,25 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			loadOntologyCombo.setDisable(false);
 		}
 		return loadOntologyCombo;
+	}
+
+	private VBox createShowClassExpressionButton() {
+		if (classExpressionPanel == null) {
+			classExpressionPanel = new VBox();
+			classExpressionPanel.setPadding(new Insets(5));
+			classExpressionPanel.setSpacing(5);
+
+
+			StackPane titlePane = createTitlePane("Class Expression");
+			expressionButton = new Button("Select");
+			expressionButton.getStyleClass().add("button");
+			expressionButton.setOnAction(this::selectNodesClassExpressionActionPerformed);
+
+
+
+			classExpressionPanel = createContainer(titlePane, expressionButton);
+		}
+		return classExpressionPanel;
 	}
 
 	private VBox createHelpButton() {
@@ -1014,5 +1036,63 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			Platform.runLater(parent.artPanel.getCanvasAdjusterRunnable());
 			parent.artPanel.scale(factor);
 		}
+	}
+
+	private void selectNodesClassExpressionActionPerformed(ActionEvent event) {
+		Stage stage = new Stage();
+		stage.setTitle("Query (Class Expression)");
+
+		VBox classExpressionBox = new VBox(10);
+		classExpressionBox.setPadding(new Insets(10));
+
+		TextField parentField = new TextField();
+		StackPane parentTitle = createTitlePane("Parent");
+		TextField childField = new TextField();
+		StackPane childTitle = createTitlePane("Child");
+
+		VBox parentBox = createContainer(parentTitle, parentField);
+		VBox childBox = createContainer(childTitle, childField);
+
+		HBox bottomSection = new HBox(10);
+		bottomSection.setPadding(new Insets(10, 0, 0, 0));
+
+		VBox parentListBox = new VBox(5);
+		Label parentLabel = new Label("PARENT");
+		TextField parentSearchField = new TextField();
+		parentSearchField.setPromptText("Buscar...");
+		VBox parentCheckBoxContainer = new VBox(5);
+		parentCheckBoxContainer.setPrefHeight(150);
+		parentListBox.getChildren().addAll(parentLabel, parentSearchField, parentCheckBoxContainer);
+		parentListBox.setMaxWidth(Double.MAX_VALUE);
+
+		VBox childListBox = new VBox(5);
+		Label childLabel = new Label("CHILD");
+		TextField childSearchField = new TextField();
+		childSearchField.setPromptText("Buscar...");
+		VBox childCheckBoxContainer = new VBox(5);
+		childCheckBoxContainer.setPrefHeight(150);
+		childListBox.getChildren().addAll(childLabel, childSearchField, childCheckBoxContainer);
+		childListBox.setMaxWidth(Double.MAX_VALUE);
+
+		Button helpButton = new Button("?");
+		helpButton.setStyle(
+				"-fx-font-size: 14px; -fx-shape: 'M 0 50 a 50 50 0 1 1 100 0 a 50 50 0 1 1 -100 0'; " +
+						"-fx-background-radius: 50%; -fx-min-width: 35px; -fx-min-height: 35px; " +
+						"-fx-pref-width: 35px; -fx-pref-height: 35px;"
+		);
+
+
+		// Layout principal
+		bottomSection.getChildren().addAll(parentListBox, childListBox);
+		HBox.setHgrow(parentListBox, Priority.ALWAYS);
+		HBox.setHgrow(childListBox, Priority.ALWAYS);
+		
+		classExpressionBox.getChildren().addAll(parentBox, childBox, bottomSection, helpButton);
+
+		Scene scene = new Scene(classExpressionBox, 800, 400);
+		ClassLoader c = Thread.currentThread().getContextClassLoader();
+		scene.getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
+		stage.setScene(scene);
+		stage.show();
 	}
 }

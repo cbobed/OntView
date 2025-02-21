@@ -10,6 +10,7 @@ public class VisConstants {
 
 	public static final String RDFRANKCOMBOOPTION1 = "RDFRank 10";
 	public static final String RDFRANKCOMBOOPTION2 = "RDFRank 20";
+	public static final String CUSTOMCOMBOOPTION3 = "Custom";
 	public static final int CONNECTOROFFSET = 7;
 
 	public static final int CONTAINER_SIZE = 65;

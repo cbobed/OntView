@@ -102,7 +102,7 @@ public class Mine extends Application implements Embedable{
 		viewer.nTopPanel.setStyle("-fx-border-color: black; -fx-border-width: 1;");
 
 
-		Scene scene = new Scene(root, 1400, 600);
+		Scene scene = new Scene(root, 1500, 600);
 		scene.getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
 		viewer.primaryStage.setScene(scene);
 		viewer.primaryStage.setMaximized(true);
