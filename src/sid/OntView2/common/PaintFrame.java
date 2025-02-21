@@ -831,7 +831,8 @@ public class PaintFrame extends Canvas {
 				e.consume();
 				if (shape instanceof VisClass visClass) {
 					OWLClassExpression classExpression = visClass.getLinkedClassExpression();
-					if (classExpression != null && (classExpression.isOWLThing() || classExpression.isOWLNothing())) {
+					if (classExpression != null && (classExpression.isOWLThing() || classExpression.isOWLNothing())
+							|| visClass.isBottom) {
 						return false;
 					}
 				}
