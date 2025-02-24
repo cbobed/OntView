@@ -1088,6 +1088,11 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		}
 
 		parentCheckBoxList.setItems(checkBoxList);
+
+		for (CheckBox checkBox : checkBoxList) {
+			checkBox.setOnAction(event -> handleCheckBoxSelection(checkBox, checkBoxList, parentSearchField));
+		}
+
 		parentSearchField.textProperty().addListener((observable, oldValue, newValue) -> {
 			filterCheckBoxes(checkBoxList, newValue, parentCheckBoxList);
 		});
@@ -1119,6 +1124,11 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		}
 
 		childCheckBoxList.setItems(checkBoxList);
+
+		for (CheckBox checkBox : checkBoxList) {
+			checkBox.setOnAction(event -> handleCheckBoxSelection(checkBox, checkBoxList, childSearchField));
+		}
+
 		childSearchField.textProperty().addListener((observable, oldValue, newValue) -> {
 			filterCheckBoxes(checkBoxList, newValue, childCheckBoxList);
 		});
@@ -1127,6 +1137,17 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		childListBox.setMaxWidth(Double.MAX_VALUE);
 
 		return childListBox;
+	}
+
+	private void handleCheckBoxSelection(CheckBox selectedCheckBox, ObservableList<CheckBox> checkBoxList, TextField childSearchField) {
+		if (selectedCheckBox.isSelected()) {
+			for (CheckBox checkBox : checkBoxList) {
+				if (checkBox != selectedCheckBox) {
+					checkBox.setSelected(false);
+				}
+			}
+			childSearchField.setPromptText(selectedCheckBox.getText());
+		}
 	}
 
 	private void filterCheckBoxes(ObservableList<CheckBox> checkBoxList, String searchText, ListView<CheckBox> childCheckBoxList) {
