@@ -70,6 +70,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private TextField parentField, childField;
 	private VBox parentListBox, childListBox;
 	private Button helpButtonCE;
+	private ListView<CheckBox> childCheckBoxList;
+
 
 	public TopPanel(Mine pparent) {
 		parent = pparent;
@@ -1076,17 +1078,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		ListView<CheckBox> parentCheckBoxList = new ListView<>();
 		parentCheckBoxList.setPrefHeight(150);
 
-		ObservableList<CheckBox> checkBoxList = FXCollections.observableArrayList();
-		if (parent.artPanel.getVisGraph() != null) {
-			Map<String, Shape> shapeMap = parent.artPanel.getVisGraph().shapeMap;
-			if (shapeMap != null) {
-				for (Map.Entry<String, Shape> entry : shapeMap.entrySet()) {
-					CheckBox checkBox = new CheckBox(entry.getValue().getLabel());
-					checkBoxList.add(checkBox);
-				}
-			}
-		}
-
+		ObservableList<CheckBox> checkBoxList = toCheckBoxList(getAllShapeMap());
 		parentCheckBoxList.setItems(checkBoxList);
 
 		for (CheckBox checkBox : checkBoxList) {
@@ -1109,25 +1101,11 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		TextField childSearchField = new TextField();
 		childSearchField.setPromptText("Search node...");
 
-		ListView<CheckBox> childCheckBoxList = new ListView<>();
+		childCheckBoxList = new ListView<>();
 		childCheckBoxList.setPrefHeight(150);
 
-		ObservableList<CheckBox> checkBoxList = FXCollections.observableArrayList();
-		if (parent.artPanel.getVisGraph() != null) {
-			Map<String, Shape> shapeMap = parent.artPanel.getVisGraph().shapeMap;
-			if (shapeMap != null) {
-				for (Map.Entry<String, Shape> entry : shapeMap.entrySet()) {
-					CheckBox checkBox = new CheckBox(entry.getValue().getLabel());
-					checkBoxList.add(checkBox);
-				}
-			}
-		}
-
+		ObservableList<CheckBox> checkBoxList = toCheckBoxList(getAllShapeMap());
 		childCheckBoxList.setItems(checkBoxList);
-
-		for (CheckBox checkBox : checkBoxList) {
-			checkBox.setOnAction(event -> handleCheckBoxSelection(checkBox, checkBoxList, childSearchField));
-		}
 
 		childSearchField.textProperty().addListener((observable, oldValue, newValue) -> {
 			filterCheckBoxes(checkBoxList, newValue, childCheckBoxList);
@@ -1139,15 +1117,61 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		return childListBox;
 	}
 
-	private void handleCheckBoxSelection(CheckBox selectedCheckBox, ObservableList<CheckBox> checkBoxList, TextField childSearchField) {
-		if (selectedCheckBox.isSelected()) {
-			for (CheckBox checkBox : checkBoxList) {
-				if (checkBox != selectedCheckBox) {
-					checkBox.setSelected(false);
+
+	private void handleCheckBoxSelection(CheckBox selectedCheckBox, ObservableList<CheckBox> checkBoxList, TextField searchField) {
+		boolean isSelected = selectedCheckBox.isSelected();
+		for (CheckBox checkBox : checkBoxList) {
+			if (checkBox != selectedCheckBox) {
+				checkBox.setSelected(false);
+			}
+		}
+
+		if (isSelected) {
+			searchField.setPromptText(selectedCheckBox.getText());
+			VisClass shape = getShapeByLabel(selectedCheckBox.getText());
+			if (shape != null) {
+				Set<Shape> descendants = shape.getDescendants();
+				childCheckBoxList.setItems(toCheckBoxList(descendants));
+			}
+		} else {
+			searchField.setPromptText("Search node...");
+			childCheckBoxList.setItems(toCheckBoxList(getAllShapeMap()));
+		}
+	}
+
+
+	private Set<Shape> getAllShapeMap() {
+		Set<Shape> allNodes = new HashSet<>();
+		if (parent.artPanel.getVisGraph() != null) {
+			Map<String, Shape> shapeMap = parent.artPanel.getVisGraph().shapeMap;
+			for (Shape shape : shapeMap.values()) {
+				if (shape instanceof VisClass) {
+					allNodes.add(shape);
 				}
 			}
-			childSearchField.setPromptText(selectedCheckBox.getText());
 		}
+		return allNodes;
+	}
+
+	private ObservableList<CheckBox> toCheckBoxList(Set<Shape> nodeList) {
+		ObservableList<CheckBox> checkBoxList = FXCollections.observableArrayList();
+		for (Shape node : nodeList) {
+			CheckBox checkBox = new CheckBox(node.getLabel());
+			checkBoxList.add(checkBox);
+		}
+		return checkBoxList;
+	}
+
+	private VisClass getShapeByLabel(String label) {
+		if (parent.artPanel.getVisGraph() != null) {
+			Map<String, Shape> shapeMap = parent.artPanel.getVisGraph().shapeMap;
+			for (Shape shape : shapeMap.values()) {
+				if (shape instanceof VisClass && shape.getLabel().equals(label)) {
+					return (VisClass) shape;
+				}
+			}
+		}
+		return null;
 	}
 
 	private void filterCheckBoxes(ObservableList<CheckBox> checkBoxList, String searchText, ListView<CheckBox> childCheckBoxList) {

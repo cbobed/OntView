@@ -84,6 +84,8 @@ public class VisClass extends Shape {
     
 	public boolean isAnonymous(){return isAnonymous;}
 	public ArrayList<Shape> getChildren() {return children;}
+
+	public Set<Shape> getDescendants() { return descendants; }
  	
 	public VisClass(int par_depthlevel,OWLClassExpression o, String plabel, VisGraph pgraph) {
 		
