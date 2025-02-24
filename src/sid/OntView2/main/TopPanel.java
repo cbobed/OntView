@@ -67,6 +67,9 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private VBox classExpressionPanel;
 	private Button expressionButton;
 	private Popup helpPopup;
+	private TextField parentField, childField;
+	private VBox parentListBox, childListBox;
+	private Button helpButtonCE;
 
 	public TopPanel(Mine pparent) {
 		parent = pparent;
@@ -457,6 +460,15 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
         container.setPrefHeight(VisConstants.CONTAINER_SIZE);
 		container.setMinHeight(VisConstants.CONTAINER_SIZE);
 		container.setMaxHeight(VisConstants.CONTAINER_SIZE);
+		container.setAlignment(Pos.CENTER);
+		return container;
+	}
+
+	private VBox createContainerNoSize(Node... children) {
+		VBox container = new VBox(7);
+		container.getChildren().addAll(children);
+		container.setPadding(new Insets(10, 10, 10, 10));
+		container.getStyleClass().add("custom-container");
 		container.setAlignment(Pos.CENTER);
 		return container;
 	}
@@ -858,6 +870,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	}
 
 	private void comboBox0ItemItemStateChanged(String selectedItem) {
+		if (parent.artPanel.getVisGraph() == null) return;
 		String key = parent.artPanel.getVisGraph().getQualifiedLabelMap().get(selectedItem);
 		if (key != null)
 			parent.artPanel.focusOnShape(key, null);
@@ -1038,6 +1051,109 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		}
 	}
 
+	private TextField getParentClassExpression() {
+		if (parentField == null) {
+			parentField = new TextField();
+			parentField.setPromptText("Type here...");
+		}
+		return parentField;
+	}
+
+	private TextField getChildClassExpression() {
+		if (childField == null) {
+			childField = new TextField();
+			childField.setPromptText("Type here...");
+		}
+		return childField;
+	}
+
+	private VBox selectParentCheckBox() {
+		parentListBox = new VBox(5);
+		StackPane parentTitle = createTitlePane("Parent");
+		TextField parentSearchField = new TextField();
+		parentSearchField.setPromptText("Search node...");
+
+		ListView<CheckBox> parentCheckBoxList = new ListView<>();
+		parentCheckBoxList.setPrefHeight(150);
+
+		ObservableList<CheckBox> checkBoxList = FXCollections.observableArrayList();
+		if (parent.artPanel.getVisGraph() != null) {
+			Map<String, Shape> shapeMap = parent.artPanel.getVisGraph().shapeMap;
+			if (shapeMap != null) {
+				for (Map.Entry<String, Shape> entry : shapeMap.entrySet()) {
+					CheckBox checkBox = new CheckBox(entry.getValue().getLabel());
+					checkBoxList.add(checkBox);
+				}
+			}
+		}
+
+		parentCheckBoxList.setItems(checkBoxList);
+		parentSearchField.textProperty().addListener((observable, oldValue, newValue) -> {
+			filterCheckBoxes(checkBoxList, newValue, parentCheckBoxList);
+		});
+
+		parentListBox.getChildren().addAll(parentTitle, parentSearchField, parentCheckBoxList);
+		parentListBox.setMaxWidth(Double.MAX_VALUE);
+
+		return parentListBox;
+	}
+
+	private VBox selectChildCheckBox() {
+		childListBox = new VBox(5);
+		StackPane childTitle = createTitlePane("Child");
+		TextField childSearchField = new TextField();
+		childSearchField.setPromptText("Search node...");
+
+		ListView<CheckBox> childCheckBoxList = new ListView<>();
+		childCheckBoxList.setPrefHeight(150);
+
+		ObservableList<CheckBox> checkBoxList = FXCollections.observableArrayList();
+		if (parent.artPanel.getVisGraph() != null) {
+			Map<String, Shape> shapeMap = parent.artPanel.getVisGraph().shapeMap;
+			if (shapeMap != null) {
+				for (Map.Entry<String, Shape> entry : shapeMap.entrySet()) {
+					CheckBox checkBox = new CheckBox(entry.getValue().getLabel());
+					checkBoxList.add(checkBox);
+				}
+			}
+		}
+
+		childCheckBoxList.setItems(checkBoxList);
+		childSearchField.textProperty().addListener((observable, oldValue, newValue) -> {
+			filterCheckBoxes(checkBoxList, newValue, childCheckBoxList);
+		});
+
+		childListBox.getChildren().addAll(childTitle, childSearchField, childCheckBoxList);
+		childListBox.setMaxWidth(Double.MAX_VALUE);
+
+		return childListBox;
+	}
+
+	private void filterCheckBoxes(ObservableList<CheckBox> checkBoxList, String searchText, ListView<CheckBox> childCheckBoxList) {
+		ObservableList<CheckBox> filteredList = FXCollections.observableArrayList();
+		for (CheckBox checkBox : checkBoxList) {
+			if (checkBox.getText().toLowerCase().contains(searchText.toLowerCase())) {
+				filteredList.add(checkBox);
+			}
+		}
+		childCheckBoxList.setItems(filteredList);
+	}
+
+	private Button getHelpButtonCE(){
+		if (helpButtonCE == null) {
+			helpButtonCE = new Button("?");
+			helpButtonCE.getStyleClass().add("button");
+			helpButtonCE.setStyle(
+					"-fx-font-size: 14px; -fx-shape: 'M 0 50 a 50 50 0 1 1 100 0 a 50 50 0 1 1 -100 0'; " +
+							"-fx-background-radius: 50%; -fx-min-width: 35px; -fx-min-height: 35px; " +
+							"-fx-pref-width: 35px; -fx-pref-height: 35px;"
+			);
+			//helpButtonCE.setOnAction(this::helpButtonCEActionActionPerformed);
+		}
+		return helpButtonCE;
+
+	}
+
 	private void selectNodesClassExpressionActionPerformed(ActionEvent event) {
 		Stage stage = new Stage();
 		stage.setTitle("Query (Class Expression)");
@@ -1045,49 +1161,20 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		VBox classExpressionBox = new VBox(10);
 		classExpressionBox.setPadding(new Insets(10));
 
-		TextField parentField = new TextField();
 		StackPane parentTitle = createTitlePane("Parent");
-		TextField childField = new TextField();
 		StackPane childTitle = createTitlePane("Child");
-
-		VBox parentBox = createContainer(parentTitle, parentField);
-		VBox childBox = createContainer(childTitle, childField);
+		VBox parentBox = createContainerNoSize(parentTitle, getParentClassExpression(), childTitle, getChildClassExpression());
 
 		HBox bottomSection = new HBox(10);
 		bottomSection.setPadding(new Insets(10, 0, 0, 0));
 
-		VBox parentListBox = new VBox(5);
-		Label parentLabel = new Label("PARENT");
-		TextField parentSearchField = new TextField();
-		parentSearchField.setPromptText("Buscar...");
-		VBox parentCheckBoxContainer = new VBox(5);
-		parentCheckBoxContainer.setPrefHeight(150);
-		parentListBox.getChildren().addAll(parentLabel, parentSearchField, parentCheckBoxContainer);
-		parentListBox.setMaxWidth(Double.MAX_VALUE);
+		VBox parentBoxContainer = selectParentCheckBox();
+		VBox childBoxContainer = selectChildCheckBox();
+		bottomSection.getChildren().addAll(parentBoxContainer, childBoxContainer);
+		HBox.setHgrow(parentBoxContainer, Priority.ALWAYS);
+		HBox.setHgrow(childBoxContainer, Priority.ALWAYS);
 
-		VBox childListBox = new VBox(5);
-		Label childLabel = new Label("CHILD");
-		TextField childSearchField = new TextField();
-		childSearchField.setPromptText("Buscar...");
-		VBox childCheckBoxContainer = new VBox(5);
-		childCheckBoxContainer.setPrefHeight(150);
-		childListBox.getChildren().addAll(childLabel, childSearchField, childCheckBoxContainer);
-		childListBox.setMaxWidth(Double.MAX_VALUE);
-
-		Button helpButton = new Button("?");
-		helpButton.setStyle(
-				"-fx-font-size: 14px; -fx-shape: 'M 0 50 a 50 50 0 1 1 100 0 a 50 50 0 1 1 -100 0'; " +
-						"-fx-background-radius: 50%; -fx-min-width: 35px; -fx-min-height: 35px; " +
-						"-fx-pref-width: 35px; -fx-pref-height: 35px;"
-		);
-
-
-		// Layout principal
-		bottomSection.getChildren().addAll(parentListBox, childListBox);
-		HBox.setHgrow(parentListBox, Priority.ALWAYS);
-		HBox.setHgrow(childListBox, Priority.ALWAYS);
-		
-		classExpressionBox.getChildren().addAll(parentBox, childBox, bottomSection, helpButton);
+		classExpressionBox.getChildren().addAll(parentBox, bottomSection, getHelpButtonCE());
 
 		Scene scene = new Scene(classExpressionBox, 800, 400);
 		ClassLoader c = Thread.currentThread().getContextClassLoader();
