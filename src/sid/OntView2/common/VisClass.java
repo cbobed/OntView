@@ -35,6 +35,7 @@ public class VisClass extends Shape {
 	ArrayList<Shape>   parents;
 
 	Set<Shape> descendants = new HashSet<>();
+	Set<Shape> ancestors = new HashSet<>();
 	ArrayList<VisConnectorDisjoint> disjointList;
 	ArrayList<VisConnectorEquiv> equivList;
 	ArrayList<String>  properties; // those that have this class as its domain  
@@ -86,6 +87,7 @@ public class VisClass extends Shape {
 	public ArrayList<Shape> getChildren() {return children;}
 
 	public Set<Shape> getDescendants() { return descendants; }
+	public Set<Shape> getAncestors() { return ancestors; }
  	
 	public VisClass(int par_depthlevel,OWLClassExpression o, String plabel, VisGraph pgraph) {
 		

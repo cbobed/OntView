@@ -1458,44 +1458,35 @@ public class VisGraph implements Runnable{
 		currentNode.asVisClass().descendants.addAll(allDescendants);
 	}
 
-
 	/**
-	 * Processes supernodes by grouping equivalent nodes into a single supernode.
-	 */
-	public void processSuperNodes() {
-		Map<VisClass, SuperNode> superNodeMap = new HashMap<>();
+	 * Initiates the traversal of all nodes in shapeMap and stores their ancestors.	 */
+	private void storeAncestors() {
+		Set<Shape> nodesToProcess = new HashSet<>(shapeMap.values());
+		Set<Shape> visitedNodes = new HashSet<>();
 
-		for (Entry<String, Shape> entry : shapeMap.entrySet()) {
-			Shape shape = entry.getValue();
-			if (shape instanceof VisClass) {
-				VisClass visClass = shape.asVisClass();
-
-				if (visClass.getEquivConnectors().isEmpty()) {
-					continue;
-				}
-
-				/*if (superNodeMap.containsKey(visClass)) {
-					continue;
-				}*/
-
-				SuperNode superNode = new SuperNode();
-				superNode.addSubNode(visClass);
-				superNodeMap.put(visClass, superNode);
-
-				for (VisConnectorEquiv connector : visClass.getEquivConnectors()) {
-					Shape otherShape = connector.getOtherEnd(visClass);
-					if (otherShape instanceof VisClass equivalentNode) {
-						superNode.addSubNode(equivalentNode);
-						superNodeMap.put(equivalentNode, superNode);
-					}
-				}
-
-				shapeMap.put("SN_" + superNode.hashCode(), superNode);
-			}
+		for (Shape node : nodesToProcess) {
+			traverseAndStoreAncestors(node, visitedNodes);
 		}
-
 	}
 
+	/**
+	 * Traverses the ancestors of the given node and stores them in the ancestors set of the node.
+	 */
+	private void traverseAndStoreAncestors(Shape currentNode, Set<Shape> visitedNodes) {
+		if (visitedNodes.contains(currentNode)) {
+			return;
+		}
+		visitedNodes.add(currentNode);
+
+		Set<Shape> allAncestors = new HashSet<>();
+		for (VisConnector inConnector : currentNode.inConnectors) {
+			Shape parentNode = inConnector.from;
+			allAncestors.add(parentNode);
+			traverseAndStoreAncestors(parentNode, visitedNodes);
+			allAncestors.addAll(parentNode.asVisClass().ancestors);
+		}
+		currentNode.asVisClass().ancestors.addAll(allAncestors);
+	}
 
 
 	@Override
@@ -1507,7 +1498,7 @@ public class VisGraph implements Runnable{
 			topSet.add(getActiveOntology().getOWLOntologyManager().getOWLDataFactory().getOWLThing()); 
 			this.buildReasonedGraph(getActiveOntology(), getReasoner(), topSet, isExpanded());
 			storeDescendants();
-			//processSuperNodes();
+			storeAncestors();
 		} catch (XPathExpressionException | ParserConfigurationException | SAXException | IOException e) {
 			e.printStackTrace();
 		} finally {
