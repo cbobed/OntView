@@ -26,6 +26,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import openllet.core.utils.Bool;
 import org.semanticweb.owlapi.model.IRI;
 import sid.OntView2.common.*;
 
@@ -1079,12 +1080,10 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		parentCheckBoxList = new ListView<>();
 		parentCheckBoxList.setPrefHeight(150);
 
-		ObservableList<CheckBox> checkBoxList = toCheckBoxList(getAllShapeMap());
+		ObservableList<CheckBox> checkBoxList = toCheckBoxList2(getAllShapeMap());
 		parentCheckBoxList.setItems(checkBoxList);
 
-		for (CheckBox checkBox : checkBoxList) {
-			checkBox.setOnAction(event -> handleParentCheckBoxSelection(checkBox, checkBoxList, parentSearchField));
-		}
+		checkBoxList.forEach(checkBox -> checkBox.setOnAction(event -> handleParentCheckBoxSelection(checkBox, checkBoxList, parentSearchField)));
 
 		parentSearchField.textProperty().addListener((observable, oldValue, newValue) -> {
 			filterCheckBoxes(checkBoxList, newValue, parentCheckBoxList);
@@ -1105,7 +1104,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		childCheckBoxList = new ListView<>();
 		childCheckBoxList.setPrefHeight(150);
 
-		ObservableList<CheckBox> checkBoxList = toCheckBoxList(getAllShapeMap());
+		ObservableList<CheckBox> checkBoxList = toCheckBoxList2(getAllShapeMap());
 		childCheckBoxList.setItems(checkBoxList);
 
 		for (CheckBox checkBox : checkBoxList) {
@@ -1136,13 +1135,13 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			selectedParent = getShapeByLabel(selectedCheckBox.getText());
 			if (selectedParent != null) {
 				Set<Shape> descendants = selectedParent.getDescendants();
-				updateCheckBoxList(childCheckBoxList, descendants, searchField);
+				childCheckBoxList.setItems(toCheckBoxList(descendants, false, searchField));
 			}
 		} else {
 			searchField.setPromptText("Search node...");
 			selectedParent = null;
 			if (selectedChild == null) {
-				updateCheckBoxList(childCheckBoxList, getAllShapeMap(), searchField);
+				childCheckBoxList.setItems(toCheckBoxList(getAllShapeMap(), false, searchField));
 			}
 		}
 	}
@@ -1160,34 +1159,16 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			selectedChild = getShapeByLabel(selectedCheckBox.getText());
 			if (selectedChild != null) {
 				Set<Shape> ancestors = selectedChild.getAncestors();
-				updateCheckBoxList(parentCheckBoxList, ancestors, searchField);
+				parentCheckBoxList.setItems(toCheckBoxList(ancestors, true, searchField));
 			}
 		} else {
 			searchField.setPromptText("Search node...");
 			selectedChild = null;
 			if (selectedParent == null) {
-				updateCheckBoxList(parentCheckBoxList, getAllShapeMap(), searchField);
+				parentCheckBoxList.setItems(toCheckBoxList(getAllShapeMap(), true, searchField));
 			}
 		}
 	}
-
-	private void updateCheckBoxList(ListView<CheckBox> listView, Set<Shape> newNodes, TextField searchField) {
-		ObservableList<CheckBox> checkBoxList = listView.getItems();
-		checkBoxList.clear();
-
-		for (Shape node : newNodes) {
-			CheckBox checkBox = new CheckBox(node.getLabel());
-			checkBox.setOnAction(event -> {
-				if (listView == parentCheckBoxList) {
-					handleParentCheckBoxSelection(checkBox, checkBoxList, searchField);
-				} else {
-					handleChildCheckBoxSelection(checkBox, checkBoxList, searchField);
-				}
-			});
-			checkBoxList.add(checkBox);
-		}
-	}
-
 
 	private Set<Shape> getAllShapeMap() {
 		Set<Shape> allNodes = new HashSet<>();
@@ -1202,11 +1183,25 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		return allNodes;
 	}
 
-	private ObservableList<CheckBox> toCheckBoxList(Set<Shape> nodeList) {
+	private ObservableList<CheckBox> toCheckBoxList2(Set<Shape> nodeList) {
 		ObservableList<CheckBox> checkBoxList = FXCollections.observableArrayList();
 		for (Shape node : nodeList) {
 			CheckBox checkBox = new CheckBox(node.getLabel());
 			checkBoxList.add(checkBox);
+		}
+		return checkBoxList;
+	}
+
+	private ObservableList<CheckBox> toCheckBoxList(Set<Shape> nodeList, Boolean isParent, TextField searchField) {
+		ObservableList<CheckBox> checkBoxList = FXCollections.observableArrayList();
+		for (Shape node : nodeList) {
+			CheckBox checkBox = new CheckBox(node.getLabel());
+			checkBoxList.add(checkBox);
+			if (isParent){
+				checkBox.setOnAction(event -> handleParentCheckBoxSelection(checkBox, checkBoxList, searchField));
+			} else {
+				checkBox.setOnAction(event -> handleChildCheckBoxSelection(checkBox, checkBoxList, searchField));
+			}
 		}
 		return checkBoxList;
 	}
