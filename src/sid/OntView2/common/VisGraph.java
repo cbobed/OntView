@@ -173,16 +173,15 @@ public class VisGraph implements Runnable{
 	 *  builds the complete graph
 	 *  relies on wether it's expanded or not, and rearranging visual info
 	 */
-	public void buildReasonedGraph(OWLOntology activeOntology,OWLReasoner reasoner, HashSet<OWLClassExpression> set,boolean check) throws XPathExpressionException, ParserConfigurationException, SAXException, IOException {
+	public void buildReasonedGraph(OWLOntology activeOntology,OWLReasoner reasoner, Set<OWLClassExpression> rootCpts, boolean check) throws XPathExpressionException, ParserConfigurationException, SAXException, IOException {
 		
 		//It's important to set config constants before creating 
 		//will have to move this elsewhere
 		updateProgressBarObserver(0);
 		clearAll();
 		
-		// <CBL 24/9/13> updated to just take into account the information out of the 
-		// reasoner
-		this.reasonedDepthTraversal(activeOntology,reasoner,set,0);
+		set.stream().forEach(x->System.err.println("Build 1st set: "+x)); 
+		this.reasonedTraversal(activeOntology,reasoner, null, rootCpts);
 		
 		updateProgressBarObserver(70);
 		// <JBL> this method must  not be invoked after expanding
@@ -210,7 +209,6 @@ public class VisGraph implements Runnable{
 		}	
 		VisLevel.adjustWidthAndPos(levelSet);
 		
-		addBottomNode(reasoner,activeOntology);
 		
 		// here, we should add the 
 		
@@ -326,7 +324,7 @@ public class VisGraph implements Runnable{
 				}
 			}
 			
-			VisClass addedVis = addVisClass(e.toString(), maxLevel+1, e,activeOntology,reasoner);
+			VisClass addedVis = addVisClassOld(e.toString(), maxLevel+1, e,activeOntology,reasoner);
 			HashSet<OWLClassExpression> equivSet = new HashSet<>(); 
 			equivSet.addAll(reasoner.getEquivalentClasses(e).getEntitiesMinusTop());
 
@@ -363,7 +361,9 @@ public class VisGraph implements Runnable{
 			potentialChildren.forEach(x->auxChildren.add(x.getLinkedClassExpression()) );
 			directChildren.forEach(x->auxChildren.add(x.getRepresentativeElement()));
 			
-			createConnections(addedVis, auxParents, auxChildren, equivSet, reasoner, activeOntology);
+			createParentConnections(addedVis, auxParents); 
+			createEquivConnections(addedVis, equivSet); 
+			createChildConnections(addedVis,auxChildren, reasoner, activeOntology);
 		}
 	}
 	
@@ -581,128 +581,98 @@ public class VisGraph implements Runnable{
 		}
 	}
 
-
-	/**
-	 * Traversal of the reasoned graph 
-	*/
-	private void reasonedDepthTraversal(OWLOntology activeOntology, 
-			                               OWLReasoner reasoner,
-			                               HashSet<OWLClassExpression> par,int depthlevel){
-    	String key;
-    	Shape value;
-    	VisClass vis;
+	private void reasonedTraversal(OWLOntology activeOntology, 
+			OWLReasoner reasoner,
+			Set<OWLClassExpression> previousCELevel, 
+			Set<OWLClassExpression> currentCELevel){
+		
+		HashSet<OWLClassExpression> nextLevel = new HashSet<>(); 
+		
+		for (OWLClassExpression ce: currentCELevel) {
+			String key;
+			Shape value;
+			VisClass vis;
 	
-	    for (OWLClassExpression loop_owlclassExp : par) {
-         	//getting key and value. Different if it's a named class or just an expression
-	    	key  = Shape.getKey(loop_owlclassExp);
-	    	value = shapeMap.get(key);
-	    	// if it's already been added, just skip it  
-	    	if(value != null){
-  	            continue;
-  	        }
-	  	    vis= addVisClass(key,depthlevel,loop_owlclassExp,activeOntology,reasoner);
-	  	    setProgressFromShapeNumber();
-            value = vis;
-            // Mix into a set, both reasoned subclasses for the current owlclass expression
-  	        // and explicit subclasses
-            HashSet<OWLClassExpression> subSet   = new HashSet<>();
-            HashSet<OWLClassExpression> equivSet = new HashSet<>();
-            
-            // <CBL>: 
-            // At first sight, we do not need the superClasses taken from the ontology anymore
-            // but we need the superClasses to establish the connections in the graph
-            HashSet<OWLClassExpression> superSet = new HashSet<>();
-            
-  	        //esto probablemente me lo lleve afuera para descargar el codigo
-  	        for( Node<OWLClass> loop_node : reasoner.getSubClasses(loop_owlclassExp, true).getNodes()) {
-  	  	        for( OWLClass loop_var2 : loop_node.getEntities()) {
-  	  	        	if (!loop_node.isBottomNode()) {
-						subSet.add(loop_var2);
+			key  = Shape.getKey(ce);
+			value = shapeMap.get(key);
+			if(value != null){
+				continue;
+			}
+			vis = addVisClass(key, ce, activeOntology, reasoner); 
+			
+			HashSet<OWLClassExpression> equivSet = new HashSet<>();
+	
+			reasoner.getSubClasses(ce, true).entities().forEach(
+					c -> {
+						if (!c.isOWLNothing()) {
+							nextLevel.add(c);				
+						}
 					}
-  	  	        }
-  	  	    }
-
-  	        for( Node<OWLClass> loop_node : reasoner.getSuperClasses(loop_owlclassExp, true).getNodes()) {
-  	  	        for( OWLClass loop_var2 : loop_node.getEntities()) {
-  	  	        	if (!loop_node.isBottomNode()) {
-						superSet.add(loop_var2);
-					}
-  	  	        }
-  	  	    }
-
-  	        reasonedDepthTraversal(activeOntology,reasoner,subSet, depthlevel+1);
-  	        
-  	      // <CBL>: 
-  	        // Processing the superclasses might seem quite redundant as we now 
-  	        // can traverse the reasoned graph using only the named classes
-  	        // but we need to have created the shapes to include them in the graph
-  	        // due to the depth first traversal we perform
-  	        if (!superSet.isEmpty()){
-  	        	reasonedDepthTraversal(activeOntology,reasoner,superSet, depthlevel-1);
-  	        }
-  	        else {
-	        	if (getTopClass(activeOntology)!= null && !(vis.getLinkedClassExpression().isTopEntity())) {
-	        		connect(vis,(VisClass) shapeMap.get(OWLRDFVocabulary.OWL_THING.getIRI().toString()),connectorList);
-	        	}
-  	        }
-  	        reasonedDepthTraversal(activeOntology,reasoner,equivSet, depthlevel);
-  	        createConnections(vis,superSet,subSet,equivSet,reasoner,activeOntology);
-	     }
-	}
-	
-	
-	
-	
-	private void addBottomNode(OWLReasoner reasoner,OWLOntology activeOntology) {
-		int maxLevel=0;
-		for (VisLevel lvl :levelSet.values()){
-			maxLevel = (maxLevel < lvl.getID() ? lvl.getID() : maxLevel);
+			); 
+			
+			reasoner.getEquivalentClasses(ce).entities().forEach(equivSet::add);
+		
+			if (getTopClass(activeOntology)!= null && !(vis.getLinkedClassExpression().isTopEntity())) {
+				connect(vis,(VisClass) shapeMap.get(OWLRDFVocabulary.OWL_THING.getIRI().toString()),connectorList);
+			}
+			
+			if (previousCELevel != null) {
+				createParentConnections(vis,previousCELevel);
+				createEquivConnections(vis, equivSet);
+			}
 		}
-		VisLevel newl = new VisLevel(this, maxLevel+1, 0);
-		for (OWLClass e : reasoner.getBottomClassNode().getEntities()){
-			 Shape o = getShapeFromOWLClassExpression(e);
-			 if (o==null){
-//				 addVisClass(e.asOWLClass().getIRI().getFragment(), maxLevel+1, e,activeOntology,reasoner);
-				 addVisClass(e.asOWLClass().getIRI().toString(), maxLevel+1, e,activeOntology,reasoner);
-			 }
-			 else{
-				 o.setVisLevel(newl);
-			 }
+		
+		if (!nextLevel.isEmpty()) {
+			reasonedTraversal(activeOntology, 
+					reasoner,
+					currentCELevel,
+					nextLevel); 
+		}
+		else {
+			addBottomNode(reasoner, activeOntology); 
+		}
+	}
 
+	private void addBottomNode(OWLReasoner reasoner,OWLOntology activeOntology) {
+		reasoner.getBottomClassNode().forEach(e -> {
+			Shape o = getShapeFromOWLClassExpression(e);
+			 if (o==null){
+				addVisClass(e.asOWLClass().getIRI().toString(), e, activeOntology, reasoner); 
+			 }
 			for (OWLClassExpression exp : EntitySearcher.getEquivalentClasses(e, activeOntology).toList()){
 		    	 if (!(exp instanceof OWLClass) && (shapeMap.get(exp.toString())==null)){
-		    		addVisClass(exp.toString(), maxLevel+1, exp, activeOntology,reasoner); 
+		    		addVisClass(exp.asOWLClass().getIRI().toString(), exp, activeOntology, reasoner);  
 		    	 }
 		     }
+		});	 
+	}
+	
+	private void createParentConnections(VisClass vis,Set<OWLClassExpression> superSet){
+
+		for (OWLClassExpression e : superSet){
+			connect(vis,(VisClass) getShapeFromOWLClassExpression(e),connectorList);
 		}
 	}
 	
+	private void createEquivConnections(VisClass vis, Set<OWLClassExpression> equivSet){
+		for (OWLClassExpression same : equivSet){
+			// Just connect the anonymous definition to the visclass
+			if ((vis.isDefined) && same.isAnonymous())
+				connect(vis,getShapeFromOWLClassExpression(same).asVisClass(),connectorList);
+		}
+	}
 	
-	/**
-	*  Creates connections between classes
-	*  In reasoned graph, it doesn't add bottom-level nodes
-	*  That level is processed after creating the body (first reasonedDepthTraversal call)
-    */
-	private void createConnections(VisClass vis,HashSet<OWLClassExpression> superSet,HashSet<OWLClassExpression> subSet,
-			                                    HashSet<OWLClassExpression> equivSet,OWLReasoner reasoner,OWLOntology activeOntlogy){
+	private void createChildConnections(VisClass vis, Set<OWLClassExpression> subSet,
+										OWLReasoner reasoner,OWLOntology activeOntlogy){
 
 		
 		for (OWLClassExpression child : subSet) {
-		
 			if ( (child instanceof OWLClass) && (hasAnonymousDefinition(child, reasoner)) )
 				continue;
 			Shape val = getShapeFromOWLClassExpression(child);
 			if (val!= null){
 				connect(val.asVisClass(),vis, connectorList);
 			}	
-		}
-		for (OWLClassExpression same : equivSet){
-			// Just connect the anonymous definition to the visclass
-			if ((vis.isDefined) && same.isAnonymous())
-				connect(vis,getShapeFromOWLClassExpression(same).asVisClass(),connectorList);
-		}
-		for (OWLClassExpression e : superSet){
-			connect(vis,(VisClass) getShapeFromOWLClassExpression(e),connectorList);
 		}
 	}
 	
@@ -811,7 +781,7 @@ public class VisGraph implements Runnable{
 	 * Creates a new visclass instance and adds it to the set(hashmap) of visclasses
 	 * Creates or adjusts new Vislevels width
 	 */
-	public VisClass addVisClass(String label,int depthlevel,OWLClassExpression e,OWLOntology activeOntology, OWLReasoner reasoner) {
+	public VisClass addVisClassOld(String label,int depthlevel,OWLClassExpression e,OWLOntology activeOntology, OWLReasoner reasoner) {
 
 	       VisLevel vlevel;
 	       int levelPosx = VisClass.FIRST_X_SEPARATION;
@@ -861,7 +831,7 @@ public class VisGraph implements Runnable{
 	       else 
 	    	   vis.qualifiedLabel = vis.label;
 
-		vlevel.addShape(vis);
+	       vlevel.addShape(vis);
 		   vis.setVisLevel(vlevel);
 		   if (e.isAnonymous()) {
 	           vis.isAnonymous = true;
@@ -887,6 +857,54 @@ public class VisGraph implements Runnable{
 	       }
 	       return vis;
 	}
+	
+	public VisClass addVisClass(String label, OWLClassExpression ce, OWLOntology activeOntology, OWLReasoner reasoner) {
+		System.out.println("Adding "+ce);
+		String auxQLabel = ""; 
+		VisClass vis = new VisClass(0, ce, label, this); 
+		shapeMap.put(label, vis);
+		if (ce instanceof OWLClass){
+		   for (OWLAnnotation  an : EntitySearcher.getAnnotations(ce.asOWLClass(), activeOntology).toList() ){
+			   if (an.getProperty().toString().equals("rdfs:label")){
+				   vis.explicitLabel = an.getValue().toString();
+				   vis.explicitLabel.replaceAll("\"", "");
+				   vis.explicitLabel = replaceString(vis.explicitLabel);
+				   auxQLabel = qualifyLabel(ce.asOWLClass(), vis.explicitLabel);
+				   if (auxQLabel != null && !"null".equalsIgnoreCase(auxQLabel)) {
+					   vis.explicitQualifiedLabel = auxQLabel;
+				   }
+				   else {
+					   vis.explicitQualifiedLabel = vis.explicitLabel;
+				   }
+			   }
+		   }
+       }
+	   vis.label = ExpressionManager.getReducedClassExpression(ce);
+	   vis.visibleLabel = vis.label; 
+	   auxQLabel = ExpressionManager.getReducedQualifiedClassExpression(ce); 
+       if (auxQLabel != null && !"null".equalsIgnoreCase(auxQLabel))
+    	   vis.qualifiedLabel = auxQLabel; 
+       else 
+    	   vis.qualifiedLabel = vis.label;
+
+	   if (ce.isAnonymous()) {
+           vis.isAnonymous = true;
+	   }
+	   if ((ce instanceof OWLClass) && (EntitySearcher.isDefined(ce.asOWLClass(), activeOntology) )) {
+           vis.isDefined = true;
+	   }
+       if (reasoner != null){
+    	   Node<OWLClass> equivClasses = reasoner.getEquivalentClasses(ce);
+    	   equivClasses.entities().forEach(x-> {
+    		   if (x.isOWLNothing()) vis.isBottom=true; 
+    	   }); 
+       }
+	   if (ce instanceof OWLClass){
+    	   getQualifiedLabelMap().put(vis.label, ce.asOWLClass().getIRI().toString());
+       }
+	   return vis; 
+	}
+	
 	
 	public Set<Entry<String,Shape>> getClassesInGraph(){
 		 return shapeMap.entrySet();
@@ -1325,8 +1343,6 @@ public class VisGraph implements Runnable{
 	                  break;
 			  }            
 		 }	
-	 
-	 
 	
 	/**
 	 *  When asking the reasoner for a property domain, it may return more than one answer
@@ -1640,8 +1656,8 @@ public class VisGraph implements Runnable{
 		// TODO Auto-generated method stub
 		try {
 			
-			HashSet<OWLClassExpression> topSet = new HashSet<>(); 
-			topSet.add(getActiveOntology().getOWLOntologyManager().getOWLDataFactory().getOWLThing());
+			HashSet<OWLClassExpression> topSet = new HashSet<>();   
+			topSet.add(getActiveOntology().getOWLOntologyManager().getOWLDataFactory().getOWLThing());  
 			System.out.println("-->buildReasonedGraph"); 
 			this.buildReasonedGraph(getActiveOntology(), getReasoner(), topSet, isExpanded());
 			System.out.println("-->storeDescendants"); 
