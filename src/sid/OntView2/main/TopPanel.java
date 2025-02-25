@@ -70,7 +70,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private TextField parentField, childField;
 	private VBox parentListBox, childListBox;
 	private Button helpButtonCE;
-	private ListView<CheckBox> childCheckBoxList;
+	private ListView<CheckBox> parentCheckBoxList , childCheckBoxList;
+	private VisClass selectedParent = null, selectedChild = null;
 
 
 	public TopPanel(Mine pparent) {
@@ -1075,14 +1076,14 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		TextField parentSearchField = new TextField();
 		parentSearchField.setPromptText("Search node...");
 
-		ListView<CheckBox> parentCheckBoxList = new ListView<>();
+		parentCheckBoxList = new ListView<>();
 		parentCheckBoxList.setPrefHeight(150);
 
 		ObservableList<CheckBox> checkBoxList = toCheckBoxList(getAllShapeMap());
 		parentCheckBoxList.setItems(checkBoxList);
 
 		for (CheckBox checkBox : checkBoxList) {
-			checkBox.setOnAction(event -> handleCheckBoxSelection(checkBox, checkBoxList, parentSearchField));
+			checkBox.setOnAction(event -> handleParentCheckBoxSelection(checkBox, checkBoxList, parentSearchField));
 		}
 
 		parentSearchField.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -1107,6 +1108,10 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		ObservableList<CheckBox> checkBoxList = toCheckBoxList(getAllShapeMap());
 		childCheckBoxList.setItems(checkBoxList);
 
+		for (CheckBox checkBox : checkBoxList) {
+			checkBox.setOnAction(event -> handleChildCheckBoxSelection(checkBox, checkBoxList, childSearchField));
+		}
+
 		childSearchField.textProperty().addListener((observable, oldValue, newValue) -> {
 			filterCheckBoxes(checkBoxList, newValue, childCheckBoxList);
 		});
@@ -1118,7 +1123,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	}
 
 
-	private void handleCheckBoxSelection(CheckBox selectedCheckBox, ObservableList<CheckBox> checkBoxList, TextField searchField) {
+	private void handleParentCheckBoxSelection(CheckBox selectedCheckBox, ObservableList<CheckBox> checkBoxList, TextField searchField) {
 		boolean isSelected = selectedCheckBox.isSelected();
 		for (CheckBox checkBox : checkBoxList) {
 			if (checkBox != selectedCheckBox) {
@@ -1128,14 +1133,58 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 		if (isSelected) {
 			searchField.setPromptText(selectedCheckBox.getText());
-			VisClass shape = getShapeByLabel(selectedCheckBox.getText());
-			if (shape != null) {
-				Set<Shape> descendants = shape.getDescendants();
-				childCheckBoxList.setItems(toCheckBoxList(descendants));
+			selectedParent = getShapeByLabel(selectedCheckBox.getText());
+			if (selectedParent != null) {
+				Set<Shape> descendants = selectedParent.getDescendants();
+				updateCheckBoxList(childCheckBoxList, descendants, searchField);
 			}
 		} else {
 			searchField.setPromptText("Search node...");
-			childCheckBoxList.setItems(toCheckBoxList(getAllShapeMap()));
+			selectedParent = null;
+			if (selectedChild == null) {
+				updateCheckBoxList(childCheckBoxList, getAllShapeMap(), searchField);
+			}
+		}
+	}
+
+	private void handleChildCheckBoxSelection(CheckBox selectedCheckBox, ObservableList<CheckBox> checkBoxList, TextField searchField) {
+		boolean isSelected = selectedCheckBox.isSelected();
+		for (CheckBox checkBox : checkBoxList) {
+			if (checkBox != selectedCheckBox) {
+				checkBox.setSelected(false);
+			}
+		}
+
+		if (isSelected) {
+			searchField.setPromptText(selectedCheckBox.getText());
+			selectedChild = getShapeByLabel(selectedCheckBox.getText());
+			if (selectedChild != null) {
+				Set<Shape> ancestors = selectedChild.getAncestors();
+				updateCheckBoxList(parentCheckBoxList, ancestors, searchField);
+			}
+		} else {
+			searchField.setPromptText("Search node...");
+			selectedChild = null;
+			if (selectedParent == null) {
+				updateCheckBoxList(parentCheckBoxList, getAllShapeMap(), searchField);
+			}
+		}
+	}
+
+	private void updateCheckBoxList(ListView<CheckBox> listView, Set<Shape> newNodes, TextField searchField) {
+		ObservableList<CheckBox> checkBoxList = listView.getItems();
+		checkBoxList.clear();
+
+		for (Shape node : newNodes) {
+			CheckBox checkBox = new CheckBox(node.getLabel());
+			checkBox.setOnAction(event -> {
+				if (listView == parentCheckBoxList) {
+					handleParentCheckBoxSelection(checkBox, checkBoxList, searchField);
+				} else {
+					handleChildCheckBoxSelection(checkBox, checkBoxList, searchField);
+				}
+			});
+			checkBoxList.add(checkBox);
 		}
 	}
 
