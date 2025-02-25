@@ -1080,10 +1080,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		parentCheckBoxList = new ListView<>();
 		parentCheckBoxList.setPrefHeight(150);
 
-		ObservableList<CheckBox> checkBoxList = toCheckBoxList2(getAllShapeMap());
+		ObservableList<CheckBox> checkBoxList = toCheckBoxList(getAllShapeMap(), true, parentSearchField);
 		parentCheckBoxList.setItems(checkBoxList);
-
-		checkBoxList.forEach(checkBox -> checkBox.setOnAction(event -> handleParentCheckBoxSelection(checkBox, checkBoxList, parentSearchField)));
 
 		parentSearchField.textProperty().addListener((observable, oldValue, newValue) -> {
 			filterCheckBoxes(checkBoxList, newValue, parentCheckBoxList);
@@ -1104,12 +1102,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		childCheckBoxList = new ListView<>();
 		childCheckBoxList.setPrefHeight(150);
 
-		ObservableList<CheckBox> checkBoxList = toCheckBoxList2(getAllShapeMap());
+		ObservableList<CheckBox> checkBoxList = toCheckBoxList(getAllShapeMap(), false, childSearchField);
 		childCheckBoxList.setItems(checkBoxList);
-
-		for (CheckBox checkBox : checkBoxList) {
-			checkBox.setOnAction(event -> handleChildCheckBoxSelection(checkBox, checkBoxList, childSearchField));
-		}
 
 		childSearchField.textProperty().addListener((observable, oldValue, newValue) -> {
 			filterCheckBoxes(checkBoxList, newValue, childCheckBoxList);
