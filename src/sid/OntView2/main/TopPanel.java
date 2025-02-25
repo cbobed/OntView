@@ -70,7 +70,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private Popup helpPopup;
 	private TextField parentField, childField;
 	private VBox parentListBox, childListBox;
-	private Button helpButtonCE;
+	private Button helpButtonCE, submitButtonCE;
 	private ListView<CheckBox> parentCheckBoxList , childCheckBoxList;
 	private VisClass selectedParent = null, selectedChild = null;
 
@@ -1055,6 +1055,77 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		}
 	}
 
+
+	/** class expression (query) */
+	private void selectNodesClassExpressionActionPerformed(ActionEvent event) {
+		Stage stage = new Stage();
+		stage.setMinWidth(800);
+		stage.setMaxHeight(400);
+		stage.setMinHeight(400);
+		stage.setTitle("Query (Class Expression)");
+
+		VBox classExpressionBox = new VBox(10);
+		classExpressionBox.setPadding(new Insets(10));
+
+		StackPane parentTitle = createTitlePane("Parent");
+		StackPane childTitle = createTitlePane("Child");
+		VBox parentBox = createContainerNoSize(parentTitle, getParentClassExpression(), childTitle, getChildClassExpression());
+
+		HBox bottomSection = new HBox(10);
+		bottomSection.setPadding(new Insets(10, 0, 0, 0));
+
+		VBox parentBoxContainer = selectParentCheckBox();
+		VBox childBoxContainer = selectChildCheckBox();
+		bottomSection.getChildren().addAll(parentBoxContainer, childBoxContainer);
+		HBox.setHgrow(parentBoxContainer, Priority.ALWAYS);
+		HBox.setHgrow(childBoxContainer, Priority.ALWAYS);
+
+		HBox submitHelp = new HBox(5);
+		Button helpButton = getHelpButtonCE();
+		Button submitButton = submitCE();
+
+		Region spacer = new Region();
+		HBox.setHgrow(spacer, Priority.ALWAYS);
+
+		submitHelp.getChildren().addAll(helpButton, spacer, submitButton);
+		submitHelp.setStyle("-fx-alignment: center-left;");
+
+		classExpressionBox.getChildren().addAll(parentBox, bottomSection, submitHelp);
+
+		Scene scene = new Scene(classExpressionBox, 800, 400);
+		ClassLoader c = Thread.currentThread().getContextClassLoader();
+		scene.getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
+		stage.setScene(scene);
+		stage.show();
+	}
+
+
+	private Button getHelpButtonCE(){
+		if (helpButtonCE == null) {
+			helpButtonCE = new Button("?");
+			helpButtonCE.getStyleClass().add("button");
+			helpButtonCE.setStyle(
+					"-fx-font-size: 14px; -fx-shape: 'M 0 50 a 50 50 0 1 1 100 0 a 50 50 0 1 1 -100 0'; " +
+							"-fx-background-radius: 50%; -fx-min-width: 35px; -fx-min-height: 35px; " +
+							"-fx-pref-width: 35px; -fx-pref-height: 35px;"
+			);
+			//helpButtonCE.setOnAction(this::helpButtonCEActionActionPerformed);
+		}
+		return helpButtonCE;
+	}
+
+	private Button submitCE(){
+		if (submitButtonCE == null) {
+			submitButtonCE = new Button("Submit");
+			submitButtonCE.getStyleClass().add("button");
+			submitButtonCE.setCursor(Cursor.HAND);
+			submitButtonCE.setMinWidth(40);
+
+			submitButtonCE.setOnAction(this::submitButtonCEActionActionPerformed);
+		}
+		return submitButtonCE;
+	}
+
 	private TextField getParentClassExpression() {
 		if (parentField == null) {
 			parentField = new TextField();
@@ -1123,6 +1194,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 				checkBox.setSelected(false);
 			}
 		}
+		if(selectedChild != null) return;
 
 		if (isSelected) {
 			searchField.setPromptText(selectedCheckBox.getText());
@@ -1134,6 +1206,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		} else {
 			searchField.setPromptText("Search node...");
 			selectedParent = null;
+			//selectedChild = null;
 			if (selectedChild == null) {
 				childCheckBoxList.setItems(toCheckBoxList(getAllShapeMap(), false, searchField));
 			}
@@ -1148,6 +1221,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			}
 		}
 
+		if(selectedParent != null) return;
+
 		if (isSelected) {
 			searchField.setPromptText(selectedCheckBox.getText());
 			selectedChild = getShapeByLabel(selectedCheckBox.getText());
@@ -1158,6 +1233,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		} else {
 			searchField.setPromptText("Search node...");
 			selectedChild = null;
+			//selectedParent = null;
 			if (selectedParent == null) {
 				parentCheckBoxList.setItems(toCheckBoxList(getAllShapeMap(), true, searchField));
 			}
@@ -1222,47 +1298,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		childCheckBoxList.setItems(filteredList);
 	}
 
-	private Button getHelpButtonCE(){
-		if (helpButtonCE == null) {
-			helpButtonCE = new Button("?");
-			helpButtonCE.getStyleClass().add("button");
-			helpButtonCE.setStyle(
-					"-fx-font-size: 14px; -fx-shape: 'M 0 50 a 50 50 0 1 1 100 0 a 50 50 0 1 1 -100 0'; " +
-							"-fx-background-radius: 50%; -fx-min-width: 35px; -fx-min-height: 35px; " +
-							"-fx-pref-width: 35px; -fx-pref-height: 35px;"
-			);
-			//helpButtonCE.setOnAction(this::helpButtonCEActionActionPerformed);
-		}
-		return helpButtonCE;
-
-	}
-
-	private void selectNodesClassExpressionActionPerformed(ActionEvent event) {
-		Stage stage = new Stage();
-		stage.setTitle("Query (Class Expression)");
-
-		VBox classExpressionBox = new VBox(10);
-		classExpressionBox.setPadding(new Insets(10));
-
-		StackPane parentTitle = createTitlePane("Parent");
-		StackPane childTitle = createTitlePane("Child");
-		VBox parentBox = createContainerNoSize(parentTitle, getParentClassExpression(), childTitle, getChildClassExpression());
-
-		HBox bottomSection = new HBox(10);
-		bottomSection.setPadding(new Insets(10, 0, 0, 0));
-
-		VBox parentBoxContainer = selectParentCheckBox();
-		VBox childBoxContainer = selectChildCheckBox();
-		bottomSection.getChildren().addAll(parentBoxContainer, childBoxContainer);
-		HBox.setHgrow(parentBoxContainer, Priority.ALWAYS);
-		HBox.setHgrow(childBoxContainer, Priority.ALWAYS);
-
-		classExpressionBox.getChildren().addAll(parentBox, bottomSection, getHelpButtonCE());
-
-		Scene scene = new Scene(classExpressionBox, 800, 400);
-		ClassLoader c = Thread.currentThread().getContextClassLoader();
-		scene.getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
-		stage.setScene(scene);
-		stage.show();
+	private void submitButtonCEActionActionPerformed(ActionEvent event) {
+		System.out.println("selectedChild " + selectedChild.getLabel() + " selectedParent " + selectedParent.getLabel());
 	}
 }
