@@ -326,11 +326,12 @@ public abstract class Shape {
         for (VisConnector c : inConnectors) {
             c.hide();
             c.from.hiddenDescendantsSet.add(this);
-            c.from.notifyHidden(this);
+            c.from.checkAndUpdateChildrenVisibilityStates();
         }
 
         for (VisConnector c : outConnectors) {
             c.hide();
+            c.to.checkAndUpdateParentVisibilityStates();
         }
 
         // Wake observer thread on hide event
@@ -357,30 +358,6 @@ public abstract class Shape {
             }
         }
         return count;
-    }
-
-    /**
-     * this is called by a hidden node
-     * it notifies parents that it's hidden
-     */
-    private void notifyHidden(Shape s) {
-
-        if (!(this instanceof VisConstraint)) {
-            if (allSubHidden()) {
-                setState(CLOSED);
-            } else {
-                setState(PARTIALLY_CLOSED);
-            }
-        } else {
-            for (VisConnector c : inConnectors) {
-                if (allSubHidden()) {
-                    this.visible = false;
-                }
-                c.hide();
-                //notify Parent
-                c.from.notifyHidden(this);
-            }
-        }
     }
 
     /**
