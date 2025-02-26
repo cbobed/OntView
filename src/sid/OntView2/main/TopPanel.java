@@ -23,10 +23,10 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.*;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import openllet.core.utils.Bool;
 import org.semanticweb.owlapi.model.IRI;
 import sid.OntView2.common.*;
 
@@ -73,6 +73,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private Button helpButtonCE, submitButtonCE;
 	private ListView<CheckBox> parentCheckBoxList , childCheckBoxList;
 	private VisClass selectedParent = null, selectedChild = null;
+	private TextField parentSearchField, childSearchField;
 
 
 	public TopPanel(Mine pparent) {
@@ -1060,9 +1061,10 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private void selectNodesClassExpressionActionPerformed(ActionEvent event) {
 		Stage stage = new Stage();
 		stage.setMinWidth(800);
-		stage.setMaxHeight(400);
-		stage.setMinHeight(400);
+		stage.setMinHeight(500);
+		stage.setMaxHeight(700);
 		stage.setTitle("Query (Class Expression)");
+		stage.initModality(Modality.APPLICATION_MODAL);
 
 		VBox classExpressionBox = new VBox(10);
 		classExpressionBox.setPadding(new Insets(10));
@@ -1092,7 +1094,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 		classExpressionBox.getChildren().addAll(parentBox, bottomSection, submitHelp);
 
-		Scene scene = new Scene(classExpressionBox, 800, 400);
+		Scene scene = new Scene(classExpressionBox, 800, 500);
 		ClassLoader c = Thread.currentThread().getContextClassLoader();
 		scene.getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
 		stage.setScene(scene);
@@ -1142,16 +1144,16 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		return childField;
 	}
 
+
 	private VBox selectParentCheckBox() {
 		parentListBox = new VBox(5);
 		StackPane parentTitle = createTitlePane("Parent");
-		TextField parentSearchField = new TextField();
+		parentSearchField = new TextField();
 		parentSearchField.setPromptText("Search node...");
 
 		parentCheckBoxList = new ListView<>();
-		parentCheckBoxList.setPrefHeight(150);
 
-		ObservableList<CheckBox> checkBoxList = toCheckBoxList(getAllShapeMap(), true, parentSearchField);
+		ObservableList<CheckBox> checkBoxList = toCheckBoxList(getAllShapeMap(), true);
 		parentCheckBoxList.setItems(checkBoxList);
 
 		parentSearchField.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -1167,13 +1169,12 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private VBox selectChildCheckBox() {
 		childListBox = new VBox(5);
 		StackPane childTitle = createTitlePane("Child");
-		TextField childSearchField = new TextField();
+		childSearchField = new TextField();
 		childSearchField.setPromptText("Search node...");
 
 		childCheckBoxList = new ListView<>();
-		childCheckBoxList.setPrefHeight(150);
 
-		ObservableList<CheckBox> checkBoxList = toCheckBoxList(getAllShapeMap(), false, childSearchField);
+		ObservableList<CheckBox> checkBoxList = toCheckBoxList(getAllShapeMap(), false);
 		childCheckBoxList.setItems(checkBoxList);
 
 		childSearchField.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -1187,33 +1188,33 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	}
 
 
-	private void handleParentCheckBoxSelection(CheckBox selectedCheckBox, ObservableList<CheckBox> checkBoxList, TextField searchField) {
+	private void handleParentCheckBoxSelection(CheckBox selectedCheckBox, ObservableList<CheckBox> checkBoxList) {
 		boolean isSelected = selectedCheckBox.isSelected();
 		for (CheckBox checkBox : checkBoxList) {
 			if (checkBox != selectedCheckBox) {
 				checkBox.setSelected(false);
 			}
 		}
-		if(selectedChild != null) return;
 
 		if (isSelected) {
-			searchField.setPromptText(selectedCheckBox.getText());
+			parentSearchField.setPromptText(selectedCheckBox.getText());
 			selectedParent = getShapeByLabel(selectedCheckBox.getText());
+			if (selectedChild != null) return;
 			if (selectedParent != null) {
 				Set<Shape> descendants = selectedParent.getDescendants();
-				childCheckBoxList.setItems(toCheckBoxList(descendants, false, searchField));
+				childCheckBoxList.setItems(toCheckBoxList(descendants, false));
 			}
 		} else {
-			searchField.setPromptText("Search node...");
+			parentSearchField.setPromptText("Search node...");
 			selectedParent = null;
-			//selectedChild = null;
 			if (selectedChild == null) {
-				childCheckBoxList.setItems(toCheckBoxList(getAllShapeMap(), false, searchField));
+				childCheckBoxList.setItems(toCheckBoxList(getAllShapeMap(), false));
+				parentCheckBoxList.setItems(toCheckBoxList(getAllShapeMap(), true));
 			}
 		}
 	}
 
-	private void handleChildCheckBoxSelection(CheckBox selectedCheckBox, ObservableList<CheckBox> checkBoxList, TextField searchField) {
+	private void handleChildCheckBoxSelection(CheckBox selectedCheckBox, ObservableList<CheckBox> checkBoxList) {
 		boolean isSelected = selectedCheckBox.isSelected();
 		for (CheckBox checkBox : checkBoxList) {
 			if (checkBox != selectedCheckBox) {
@@ -1221,21 +1222,20 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			}
 		}
 
-		if(selectedParent != null) return;
-
 		if (isSelected) {
-			searchField.setPromptText(selectedCheckBox.getText());
+			childSearchField.setPromptText(selectedCheckBox.getText());
 			selectedChild = getShapeByLabel(selectedCheckBox.getText());
+			if (selectedParent != null) return;
 			if (selectedChild != null) {
 				Set<Shape> ancestors = selectedChild.getAncestors();
-				parentCheckBoxList.setItems(toCheckBoxList(ancestors, true, searchField));
+				parentCheckBoxList.setItems(toCheckBoxList(ancestors, true));
 			}
 		} else {
-			searchField.setPromptText("Search node...");
+			childSearchField.setPromptText("Search node...");
 			selectedChild = null;
-			//selectedParent = null;
 			if (selectedParent == null) {
-				parentCheckBoxList.setItems(toCheckBoxList(getAllShapeMap(), true, searchField));
+				parentCheckBoxList.setItems(toCheckBoxList(getAllShapeMap(), true));
+				childCheckBoxList.setItems(toCheckBoxList(getAllShapeMap(), false));
 			}
 		}
 	}
@@ -1262,15 +1262,15 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		return checkBoxList;
 	}
 
-	private ObservableList<CheckBox> toCheckBoxList(Set<Shape> nodeList, Boolean isParent, TextField searchField) {
+	private ObservableList<CheckBox> toCheckBoxList(Set<Shape> nodeList, Boolean isParent) {
 		ObservableList<CheckBox> checkBoxList = FXCollections.observableArrayList();
 		for (Shape node : nodeList) {
 			CheckBox checkBox = new CheckBox(node.getLabel());
 			checkBoxList.add(checkBox);
 			if (isParent){
-				checkBox.setOnAction(event -> handleParentCheckBoxSelection(checkBox, checkBoxList, searchField));
+				checkBox.setOnAction(event -> handleParentCheckBoxSelection(checkBox, checkBoxList));
 			} else {
-				checkBox.setOnAction(event -> handleChildCheckBoxSelection(checkBox, checkBoxList, searchField));
+				checkBox.setOnAction(event -> handleChildCheckBoxSelection(checkBox, checkBoxList));
 			}
 		}
 		return checkBoxList;
@@ -1299,6 +1299,13 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	}
 
 	private void submitButtonCEActionActionPerformed(ActionEvent event) {
-		System.out.println("selectedChild " + selectedChild.getLabel() + " selectedParent " + selectedParent.getLabel());
+		if ( selectedChild == null) {
+			System.out.println("Please select a child node");
+		}
+		if ( selectedParent == null) {
+			System.out.println("Please select a parent node");
+		}
+		if (selectedChild != null && selectedParent != null)
+			System.out.println("selectedChild " + selectedChild.getLabel() + " selectedParent " + selectedParent.getLabel());
 	}
 }
