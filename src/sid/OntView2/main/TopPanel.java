@@ -406,11 +406,30 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	}
 
 	protected void kceItemItemStateChanged(ActionEvent event) {
-		// TODO Auto-generated method stub
-		if (parent.artPanel != null) {
-			parent.artPanel.setKceOption(kceComboBox.getSelectionModel().getSelectedItem());
-			parent.artPanel.doKceOptionAction();
-		}
+		Task<Void> task = new Task<>() {
+			@Override
+			protected Void call() {
+				// TODO Auto-generated method stub
+				if (parent.artPanel != null) {
+					parent.artPanel.setKceOption(kceComboBox.getSelectionModel().getSelectedItem());
+					parent.artPanel.doKceOptionAction();
+				}
+				return null;
+			}
+		};
+
+		Stage loadingStage = parent.artPanel.showLoadingStage(task);
+
+		task.setOnSucceeded(e -> loadingStage.close());
+		task.setOnFailed(e -> {
+			task.getException().printStackTrace();
+			parent.showAlertDialog("Error", "KCE could not be loaded.", "Try again.",
+					Alert.AlertType.ERROR);
+			loadingStage.close();
+		});
+
+		new Thread(task).start();
+
 	}
 
 	private Label getLabel0() {
