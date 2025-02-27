@@ -813,6 +813,11 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	}
 
 	void loadReasonerButtonActionTask(ActionEvent event) {
+		// Only use Custom mode once the graph is loaded
+		if (Objects.equals(getKceComboBox().getValue(), VisConstants.CUSTOMCOMBOOPTION3)){
+			getKceComboBox().setValue(VisConstants.NONECOMBOOPTION);
+		}
+
 		Task<Void> task = new Task<>() {
 			@Override
 			protected Void call() {
@@ -937,7 +942,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		temp = new ArrayList<>();
 
 		for (Entry<String, String> s : parent.artPanel.getVisGraph().getQualifiedLabelMap().entrySet()) {
-			if (!s.getValue().contains("SIDClass_"))
+			if (!s.getValue().contains(VisConstants.SIDCLASS))
 				temp.add(s.getKey());
 		}
 

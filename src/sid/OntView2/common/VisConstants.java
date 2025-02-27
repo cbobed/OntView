@@ -21,6 +21,7 @@ public class VisConstants {
 	final static int GENERALOBSERVER     = 2;
     final static String THING_ENTITY = "http://www.w3.org/2002/07/owl#Thing";
 	final static String NOTHING_ENTITY = "http://www.w3.org/2002/07/owl#Nothing";
+	public final static String SIDCLASS = "SIDClass_";
 
 
 	final int KEYCONCEPTNO = 10;

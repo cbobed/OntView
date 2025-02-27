@@ -733,7 +733,6 @@ public class PaintFrame extends Canvas {
 	 * Method to check if it needs to expand the canvas size
 	 */
 	public void checkAndResizeCanvas() {
-		System.out.println("altura - " + getHeight() + "     anchura - " + getWidth());
 		if (getHeight() >= MAX_SIZE) {
 			return;
 		}
@@ -1264,10 +1263,8 @@ public class PaintFrame extends Canvas {
 			}
 			case VisConstants.CUSTOMCOMBOOPTION3 -> { // "Custom"
 				getVisGraph().showAll();
-				showConceptSelectionPopup(getVisGraph().shapeMap);
-				if (getSelectedConcepts().isEmpty()) {
-					return;
-				}
+				Platform.runLater(() -> showConceptSelectionPopup(getVisGraph().shapeMap));
+				if (getSelectedConcepts().isEmpty()) return;
 				extractorCustom.hideNonKeyConcepts(activeOntology, this.getVisGraph(), getSelectedConcepts().size());
 
 			}

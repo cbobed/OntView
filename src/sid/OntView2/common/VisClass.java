@@ -116,7 +116,13 @@ public class VisClass extends Shape {
 	}
 
 	@Override
-	public String getLabel() { return label; }
+	public String getLabel() {
+		if (label.contains(VisConstants.SIDCLASS)) {
+			for (String defLabel : getVisibleDefinitionLabels()) {
+				return defLabel;
+			}
+		}
+		return label; }
 	
 	ArrayList<VisConnectorDisjoint> getDisjointConnectors(){
 		if (disjointList==null) {
