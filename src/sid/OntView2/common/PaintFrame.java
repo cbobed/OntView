@@ -1306,6 +1306,7 @@ public class PaintFrame extends Canvas {
 				currentY += shape.getHeight() + levelHeight + MIN_SPACE;
 			}
 		}
+		VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
 		setStateChanged(true);
 		Platform.runLater(relaxerRunnable);
 	}
