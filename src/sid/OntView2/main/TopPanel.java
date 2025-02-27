@@ -406,7 +406,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	}
 
 	protected void kceItemItemStateChanged(ActionEvent event) {
-		Task<Void> task = new Task<>() {
+		/*Task<Void> task = new Task<>() {
 			@Override
 			protected Void call() {
 				// TODO Auto-generated method stub
@@ -428,8 +428,11 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			loadingStage.close();
 		});
 
-		new Thread(task).start();
-
+		new Thread(task).start();*/
+		if (parent.artPanel != null) {
+			parent.artPanel.setKceOption(kceComboBox.getSelectionModel().getSelectedItem());
+			parent.artPanel.doKceOptionAction();
+		}
 	}
 
 	private Label getLabel0() {
@@ -1270,15 +1273,6 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			}
 		}
 		return allNodes;
-	}
-
-	private ObservableList<CheckBox> toCheckBoxList2(Set<Shape> nodeList) {
-		ObservableList<CheckBox> checkBoxList = FXCollections.observableArrayList();
-		for (Shape node : nodeList) {
-			CheckBox checkBox = new CheckBox(node.getLabel());
-			checkBoxList.add(checkBox);
-		}
-		return checkBoxList;
 	}
 
 	private ObservableList<CheckBox> toCheckBoxList(Set<Shape> nodeList, Boolean isParent) {

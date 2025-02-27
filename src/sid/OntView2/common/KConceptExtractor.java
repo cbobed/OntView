@@ -9,9 +9,6 @@ public abstract class KConceptExtractor {
 
     /**
      * Hides non-key concepts in the graph
-     * @param activeOntology
-     * @param shapeMap
-     * @param limitResultSize
      * @return Set<String>
      */
     public abstract Set<String> retrieveKeyConcepts(OWLOntology activeOntology, Map<String, Shape> shapeMap,
@@ -20,9 +17,6 @@ public abstract class KConceptExtractor {
     /**
      * Expanded condition. "concept" is a key concept if it's contained in keyConcepts,
      * or it's a definition of its contents.
-     * @param concept
-     * @param keyConcepts
-     * @param shapeMap
      * @return boolean
      */
     protected boolean isNonKeyConcept(String concept, Set<String> keyConcepts, Map<String, Shape> shapeMap) {
@@ -43,9 +37,7 @@ public abstract class KConceptExtractor {
     /**
      * Returns true if concept s is a definition of the comprised concepts
      * in keyConcepts
-     * @param s
-     * @param keyConcepts
-     * @return
+     * @return boolean
      */
     protected boolean isKeyConceptDefinition(Shape s, Set<String> keyConcepts, Map<String, Shape> shapeMap) {
         for (Shape childrenCandidate : s.asVisClass().getChildren()) {
