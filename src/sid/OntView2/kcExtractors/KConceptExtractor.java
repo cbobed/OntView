@@ -1,19 +1,35 @@
-package sid.OntView2.common;
+package sid.OntView2.kcExtractors;
 
 import org.semanticweb.owlapi.model.OWLOntology;
 
+import sid.OntView2.common.Shape;
+import sid.OntView2.common.VisClass;
+import sid.OntView2.common.VisGraph;
+
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 public abstract class KConceptExtractor {
 
-    /**
+	/**
      * Hides non-key concepts in the graph
      * @param activeOntology
      * @param shapeMap
      * @param limitResultSize
      * @return Set<String>
      */
+    
+    public abstract void hideNonKeyConcepts(OWLOntology activeOntology, VisGraph graph, int limitResultSize); 
+	
+    /**
+     * Retrieves the key concepts according to the implemented criteria
+     * @param activeOntology
+     * @param shapeMap
+     * @param limitResultSize
+     * @return Set<String>
+     */
+	
     public abstract Set<String> retrieveKeyConcepts(OWLOntology activeOntology, Map<String, Shape> shapeMap,
                                            int limitResultSize);
 
@@ -32,7 +48,7 @@ public abstract class KConceptExtractor {
             isNonKeyConcept = false;
         } else {
             if (s instanceof VisClass) {
-                if ((s.asVisClass().isAnonymous) && (isKeyConceptDefinition(s, keyConcepts, shapeMap))) {
+                if ((s.asVisClass().isAnonymous()) && (isKeyConceptDefinition(s, keyConcepts, shapeMap))) {
                     isNonKeyConcept = false;
                 }
             }
@@ -48,11 +64,13 @@ public abstract class KConceptExtractor {
      * @return
      */
     protected boolean isKeyConceptDefinition(Shape s, Set<String> keyConcepts, Map<String, Shape> shapeMap) {
-        for (Shape childrenCandidate : s.asVisClass().getChildren()) {
-            if (keyConcepts.contains(Shape.getKey(childrenCandidate.getLinkedClassExpression()))) {
-                return true;
-            }
-        }
-        return false;
+    	
+    	Set<String> auxDefinitions = new HashSet<>();  
+    	s.asVisClass().getDefinitions().forEach(x -> {auxDefinitions.add(Shape.getKey(x));}); 
+    	// intersection of definitions of the shape and the keyConcepts themselves 
+    	auxDefinitions.retainAll(keyConcepts); 
+    	
+    	return !auxDefinitions.isEmpty();  
+    	
     }
 }

@@ -1,8 +1,12 @@
-package sid.OntView2.common;
+package sid.OntView2.kcExtractors;
 
 import it.essepuntato.semanticweb.kce.engine.Engine;
 import it.essepuntato.taxonomy.HTaxonomy;
 import org.semanticweb.owlapi.model.OWLOntology;
+
+import sid.OntView2.common.Shape;
+import sid.OntView2.common.VisConstants;
+import sid.OntView2.common.VisGraph;
 import sid.OntView2.utils.OWLAPITaxonomyMakerExtended;
 
 import java.util.HashSet;
@@ -22,11 +26,7 @@ public class KCEConceptExtraction extends KConceptExtractor {
 			Shape shape = entry.getValue();
 			if (isNonKeyConcept(entry.getKey(), conceptSet, shapeMap)) {
 				shape.hide();
-			} else {
-				if (!(shape.getLabel().matches("Nothing"))) {
-					nonHiddenShape.add(shape);
-				}
-			}
+			} 
 		}
 		for (Shape s: nonHiddenShape){
 			if (s.getState()!=Shape.OPEN) {
@@ -52,6 +52,7 @@ public class KCEConceptExtraction extends KConceptExtractor {
 			e.run();
 			Set<String> conceptSet = e.getKeyConcepts();
 			conceptSet.add(VisConstants.THING_ENTITY);
+			conceptSet.add(VisConstants.NOTHING_ENTITY); 
 			return conceptSet;
 
 		} else {

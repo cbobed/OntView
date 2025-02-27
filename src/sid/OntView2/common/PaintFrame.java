@@ -35,6 +35,11 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 import reducer.StructuralReducer;
+import sid.OntView2.kcExtractors.KCEConceptExtraction;
+import sid.OntView2.kcExtractors.KConceptExtractor;
+import sid.OntView2.kcExtractors.KConceptExtractorFactory;
+import sid.OntView2.kcExtractors.PageRankConceptExtraction;
+import sid.OntView2.kcExtractors.RDFRankConceptExtraction;
 
 public class PaintFrame extends Canvas {
 	private static final long serialVersionUID = 1L;
@@ -1235,42 +1240,34 @@ public class PaintFrame extends Canvas {
 		if (getVisGraph() == null) {
 			return;
 		}
-		KCEConceptExtraction extractorKCE = new KCEConceptExtraction();
-		RDFRankConceptExtraction extractorRDFRank = new RDFRankConceptExtraction();
-		PageRankConceptExtraction extractorPageRank = new PageRankConceptExtraction();
-
-		switch (getKceOption()) {
-			case VisConstants.NONECOMBOOPTION -> { // "None"
-				getVisGraph().clearDashedConnectorList();
-				getVisGraph().showAll();
-			}
-			case VisConstants.KCECOMBOOPTION1 -> { // "KCE10"
-				getVisGraph().showAll();
-				extractorKCE.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 10);
-			}
-			case VisConstants.KCECOMBOOPTION2 -> { // "KCE20"
-				getVisGraph().showAll();
-				extractorKCE.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20);
-			}
-			case VisConstants.PAGERANKCOMBOOPTION1 -> { // "PageRank10"
-				getVisGraph().showAll();
-				extractorPageRank.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 10);
-			}
-			case VisConstants.PAGERANKCOMBOOPTION2 -> { // "PageRank20"
-				getVisGraph().showAll();
-				extractorPageRank.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20);
-			}
-			case VisConstants.RDFRANKCOMBOOPTION1 -> { // "RDFRank10"
-				getVisGraph().showAll();
-				extractorRDFRank.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 10);
-			}
-			case VisConstants.RDFRANKCOMBOOPTION2 -> { // "RDFRank20"
-				getVisGraph().showAll();
-				extractorRDFRank.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20);
-			}
+		
+		if (getKceOption() == VisConstants.NONECOMBOOPTION) {
+			getVisGraph().clearDashedConnectorList();
+			getVisGraph().showAll();
 		}
-		compactGraph();
+		else {
+			
+			KConceptExtractor extractor = KConceptExtractorFactory.getInstance(getKceOption()); 
+			
+			switch (getKceOption()) {
+				case VisConstants.KCECOMBOOPTION1, 
+					VisConstants.PAGERANKCOMBOOPTION1,
+					VisConstants.RDFRANKCOMBOOPTION1 -> { // "KCE10"
+					getVisGraph().showAll();
+					extractor.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 10);
+				}
+				case VisConstants.KCECOMBOOPTION2, 
+					VisConstants.PAGERANKCOMBOOPTION2, 
+					VisConstants.RDFRANKCOMBOOPTION2 -> { // "KCE20"
+					getVisGraph().showAll();
+					extractor.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20);
+				}
+			}
+			compactGraph();
+			
+		}	
 	}
+	
 
 	public void compactGraph() {
 		int currentY = BORDER_PANEL;
