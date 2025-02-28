@@ -79,6 +79,7 @@ public class Mine extends Application implements Embedable{
 		primaryStage.setMinWidth(1400);
 		primaryStage.setOnCloseRequest(event -> System.exit(0));
 		ClassLoader c = Thread.currentThread().getContextClassLoader(); 
+		
 		primaryStage.getIcons().add(new Image(Objects.requireNonNull(c.getResource("icon.png")).toExternalForm()));
 
 		Mine viewer = new Mine();
