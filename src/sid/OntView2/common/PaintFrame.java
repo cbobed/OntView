@@ -1356,13 +1356,9 @@ public class PaintFrame extends Canvas {
 
 	private Set<Shape> selectedConcepts = new HashSet<>();
 
-	public Set<Shape> getSelectedConcepts() {
-		return selectedConcepts;
-	}
+	public Set<Shape> getSelectedConcepts() { return selectedConcepts;	}
 
-	public void cleanSelectedConcepts() {
-		selectedConcepts.clear();
-	}
+	public void cleanSelectedConcepts() { selectedConcepts.clear(); }
 
 	public void showConceptSelectionPopup(Map<String, Shape> shapeMap) {
 		Stage popupStage = new Stage();
