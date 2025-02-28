@@ -1,5 +1,6 @@
 package sid.OntView2.common;
 
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
@@ -230,6 +231,7 @@ public class VisGraph implements Runnable{
     	VisLevel.adjustWidthAndPos(getLevelSet());
     	paintframe.getParentFrame().loadSearchCombo();
     	paintframe.setStateChanged(true);
+		Platform.runLater(paintframe.relaxerRunnable);
 	}
 
 	private void insertClassExpressions (OWLOntology activeOntology, 
