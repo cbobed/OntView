@@ -3,6 +3,7 @@ package sid.OntView2.common;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 //import org.apache.log4j.Level;
@@ -72,7 +73,7 @@ public class VisLevel {
 	    width = (levelShapes.size()>20 ? getWidth() + DININCREM *(levelShapes.size()-20) : getWidth());
 		int dwidth = newWidth -getWidth();
 			if (dwidth > 0){
-				for (VisLevel level : graph.levelSet){
+				for (VisLevel level : graph.levelSet.values()){
 					if (level.getID() > id){
 						level.setXpos(level.getXpos()+dwidth);
 					}
@@ -80,12 +81,8 @@ public class VisLevel {
 			}	
 	}
 	
-	public static VisLevel getLevelFromID(Set<VisLevel>set, int id){
-		for (VisLevel v : set){
-			if (v.getID()==id)
-				return v;
-		}
-		return null;
+	public static VisLevel getLevelFromID(Map<Integer, VisLevel>set, int id){
+		return set.get(id); 
 	}
 	
 	public void addShape(Shape shape){
@@ -105,7 +102,7 @@ public class VisLevel {
 	 * folds levelset and removes empty levels
 	 * @param set
 	 */
-	public static void shrinkLevelSet(Set<VisLevel> set){
+	public static void shrinkLevelSet(Map<Integer, VisLevel> set){
 		
 	//shrink
 		for (int i=firstLevel(set) ; i<lastLevel(set); i++){
@@ -116,13 +113,13 @@ public class VisLevel {
 		}
 		// remove empty levels
 		HashSet<VisLevel> emptyLevels = new HashSet<VisLevel>();
-		for (VisLevel lvl : set) {
+		for (VisLevel lvl : set.values()) {
 			if (lvl.levelShapes.isEmpty()){			
 				emptyLevels.add(lvl);
 			}	
 		}
 		for (VisLevel emptylvl : emptyLevels) {
-			for (VisLevel lvl : set){
+			for (VisLevel lvl : set.values()){
 				if (lvl.getID()> emptylvl.getID()) {
 					lvl.setID(lvl.getID()-1);
 				}
@@ -141,7 +138,7 @@ public class VisLevel {
 	 * @param set
 	 */
 	
-	private void fold(Set<VisLevel>set){
+	private void fold(Map<Integer, VisLevel>set){
 		int j = id+1;
 		boolean posible = true;
 		Set<Shape> movableSet = new HashSet<Shape>();
@@ -171,9 +168,9 @@ public class VisLevel {
 	 * @param set
 	 */
 	
-	public static void adjustWidthAndPos(Set<VisLevel> set){
+	public static void adjustWidthAndPos(Map<Integer, VisLevel> set){
 		int maxLevel=0;
-		for (VisLevel lvl : set) {
+		for (VisLevel lvl : set.values()) {
 			int maxShapeWidthInLevel = 0;
 			if (lvl.getID()> maxLevel)
 				maxLevel = lvl.getID();
@@ -214,7 +211,7 @@ public class VisLevel {
 	 * @param id
 	 * @param graph
 	 */
-	public static void insertLevel(Set<VisLevel> set, int id, VisGraph graph){
+	public static void insertLevel(Map<Integer, VisLevel> set, int id, VisGraph graph){
 	//creates a new Level
 		VisLevel newlvl = null;
 		if (id > 0){
@@ -226,12 +223,12 @@ public class VisLevel {
 				//shouldn't enter here though
 				newlvl = new VisLevel(graph, id, VisClass.FIRST_X_SEPARATION);
 			}
-			for (VisLevel lvl: set){
+			for (VisLevel lvl: set.values()){
 				if (lvl.getID() >= id){
 					lvl.setID(lvl.getID()+1);
 				}
 			}
-			set.add(newlvl);
+			set.put(id, newlvl);
 		}
 	}
 	
@@ -240,10 +237,10 @@ public class VisLevel {
 	 * @param set
 	 * @return
 	 */
-	public static int lastLevel(Set<VisLevel> set){
+	public static int lastLevel(Map<Integer, VisLevel> set){
 	//creates a new Level
 		int i = 0;
-		for (VisLevel lvl : set) 
+		for (VisLevel lvl : set.values()) 
 			i = (  lvl.getID()>i ? lvl.getID() : i );
 		return i;
 	}
@@ -253,10 +250,10 @@ public class VisLevel {
 	 * @param set
 	 * @return
 	 */
-	public static int firstLevel(Set<VisLevel> set){
+	public static int firstLevel(Map<Integer,VisLevel> set){
 	//creates a new Level
 		int i = 0;
-		for (VisLevel lvl : set) 
+		for (VisLevel lvl : set.values()) 
 			i = (  lvl.getID()<=i ? lvl.getID() : i );
 		return i;
 	}

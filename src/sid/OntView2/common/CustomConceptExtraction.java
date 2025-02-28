@@ -3,6 +3,7 @@ package sid.OntView2.common;
 import it.essepuntato.semanticweb.kce.engine.Engine;
 import it.essepuntato.taxonomy.HTaxonomy;
 import org.semanticweb.owlapi.model.OWLOntology;
+import sid.OntView2.kcExtractors.KConceptExtractor;
 import sid.OntView2.utils.OWLAPITaxonomyMakerExtended;
 
 import java.util.HashMap;

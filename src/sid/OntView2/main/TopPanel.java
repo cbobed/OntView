@@ -833,8 +833,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			task.getException().printStackTrace();
 			parent.showAlertDialog("Error", "Reasoner could not be loaded.",  "Try another reasoner.",
 					Alert.AlertType.ERROR);
-			//parent.showAlertDialog("Error", "Reasoner could not be loaded.",  task.getException().getMessage(),
-			//		Alert.AlertType.ERROR);
+
 			loadingStage.close();
 		});
 

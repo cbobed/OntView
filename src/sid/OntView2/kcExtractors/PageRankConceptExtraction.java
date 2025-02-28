@@ -1,12 +1,4 @@
-package sid.OntView2.common;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
-
+package sid.OntView2.kcExtractors;
 
 import org.jgrapht.alg.scoring.PageRank;
 import org.jgrapht.graph.DefaultDirectedGraph;
@@ -14,12 +6,20 @@ import org.jgrapht.graph.DefaultEdge;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLOntology;
 
+import sid.OntView2.common.Shape;
+import sid.OntView2.common.VisClass;
+import sid.OntView2.common.VisConstants;
+import sid.OntView2.common.VisGraph;
 import sid.OntView2.utils.PageRankScoreComparator;
 
-public class RDFRankConceptExtraction extends KConceptExtractor { //true
+
+import java.util.*;
+import java.util.Map.Entry;
+
+public class PageRankConceptExtraction extends KConceptExtractor {
     private final Set<Shape> nonHiddenShape = new HashSet<>();
 
-    public final static boolean RDFRankDebug = true;
+    public final static boolean PageRankRankGraph = true;
     public void hideNonKeyConcepts(OWLOntology activeOntology, VisGraph graph, int limitResultSize){
 
         //first retrieve Key Concepts
@@ -52,27 +52,25 @@ public class RDFRankConceptExtraction extends KConceptExtractor { //true
     public Set<String> retrieveKeyConcepts(OWLOntology activeOntology, Map<String, Shape> shapeMap,
                                            int limitResultSize) {
         // Implementation with JGraphT => clearer and cleaner
-        DefaultDirectedGraph<String, DefaultEdge> rdfRankGraph = new DefaultDirectedGraph<String, DefaultEdge>(DefaultEdge.class);
+        DefaultDirectedGraph<String, DefaultEdge> pageRankGraph = new DefaultDirectedGraph<String, DefaultEdge>(DefaultEdge.class);
 
         for (Entry<String, Shape> entry : shapeMap.entrySet()){
             VisClass node = entry.getValue().asVisClass();
             String nodeStr = Shape.getKey(node.getLinkedClassExpression());
-            rdfRankGraph.addVertex(nodeStr);
+            pageRankGraph.addVertex(nodeStr);
             for (Shape ch: node.getChildren()) {
                 String childNodeStr = Shape.getKey(ch.getLinkedClassExpression());
-                rdfRankGraph.addVertex(childNodeStr);
-                rdfRankGraph.addEdge(childNodeStr, nodeStr);
-                rdfRankGraph.addEdge(nodeStr, childNodeStr);
-
+                pageRankGraph.addVertex(childNodeStr);
+                pageRankGraph.addEdge(childNodeStr, nodeStr);
             }
         }
 
         Set<String> results = new HashSet<> ();
-        PageRank<String, DefaultEdge> pageRankScorer = new PageRank<>(rdfRankGraph);
+        PageRank<String, DefaultEdge> pageRankScorer = new PageRank<>(pageRankGraph);
 
-        if (RDFRankDebug) {
-            System.out.println("Vertices: "+rdfRankGraph.vertexSet().size());
-            System.out.println("Edges: "+rdfRankGraph.edgeSet().size());
+        if (PageRankRankGraph) {
+            System.out.println("Vertices: "+pageRankGraph.vertexSet().size());
+            System.out.println("Edges: "+pageRankGraph.edgeSet().size());
             System.out.println(PageRank.DAMPING_FACTOR_DEFAULT);
             System.out.println(PageRank.MAX_ITERATIONS_DEFAULT);
             System.out.println(PageRank.TOLERANCE_DEFAULT);
@@ -86,7 +84,7 @@ public class RDFRankConceptExtraction extends KConceptExtractor { //true
 
         int added = 0;
         for (int i=0; added<limitResultSize && i<scoreList.size(); i++) {
-            if (RDFRankDebug) {
+            if (PageRankRankGraph) {
                 System.out.println(scoreList.get(i).getKey()+" :: "+scoreList.get(i).getValue());
             }
             OWLClassExpression auxExp = shapeMap.get(scoreList.get(i).getKey()).asVisClass().getLinkedClassExpression();
@@ -97,4 +95,5 @@ public class RDFRankConceptExtraction extends KConceptExtractor { //true
         }
         return results;
     }
+
 }
