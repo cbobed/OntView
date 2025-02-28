@@ -703,11 +703,8 @@ public class VisGraph implements Runnable{
 	}
 	
 	private void createChildConnections(VisClass vis, Set<OWLClassExpression> subSet){
-
 		
 		for (OWLClassExpression child : subSet) {
-//			if ( (child instanceof OWLClass) && (hasAnonymousDefinition(child, reasoner)) )
-//				continue;
 			Shape val = getShapeFromOWLClassExpression(child);
 			if (val!= null){
 				connect(val.asVisClass(),vis, connectorList);
