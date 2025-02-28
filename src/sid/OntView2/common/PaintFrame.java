@@ -1227,6 +1227,7 @@ public class PaintFrame extends Canvas {
 		if (getVisGraph() == null) {
 			return;
 		}
+		cleanSelectedConcepts();
 		KCEConceptExtraction extractorKCE = new KCEConceptExtraction();
 		RDFRankConceptExtraction extractorRDFRank = new RDFRankConceptExtraction();
 		PageRankConceptExtraction extractorPageRank = new PageRankConceptExtraction();
@@ -1263,7 +1264,7 @@ public class PaintFrame extends Canvas {
 			}
 			case VisConstants.CUSTOMCOMBOOPTION3 -> { // "Custom"
 				getVisGraph().showAll();
-				Platform.runLater(() -> showConceptSelectionPopup(getVisGraph().shapeMap));
+				showConceptSelectionPopup(getVisGraph().shapeMap);
 				if (getSelectedConcepts().isEmpty()) return;
 				extractorCustom.hideNonKeyConcepts(activeOntology, this.getVisGraph(), getSelectedConcepts().size());
 
@@ -1357,6 +1358,10 @@ public class PaintFrame extends Canvas {
 
 	public Set<Shape> getSelectedConcepts() {
 		return selectedConcepts;
+	}
+
+	public void cleanSelectedConcepts() {
+		selectedConcepts.clear();
 	}
 
 	public void showConceptSelectionPopup(Map<String, Shape> shapeMap) {
