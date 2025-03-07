@@ -4,8 +4,10 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Point2D;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import javafx.stage.Screen;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.model.parameters.Imports;
@@ -134,12 +136,15 @@ public class VisGraph implements Runnable{
 		return lvl.getWidth()+lvl.getXpos()+VisConstants.WIDTH_MARGIN;
     }
     public int getHeight() {
-    	int maxy=0;
+		Rectangle2D screenBounds = Screen.getPrimary().getBounds();
+		return (int) screenBounds.getHeight();
+
+		/*int maxy=0;
 		for (Entry<String, Shape> entry : shapeMap.entrySet()) {
-			maxy = (entry.getValue().getPosY() > maxy ? entry.getValue().getPosY() : maxy);
+			maxy = (Math.max(entry.getValue().getPosY(), maxy));
 		}
 
-    	return maxy+VisConstants.HEIGHT_MARGIN;
+    	return maxy+VisConstants.HEIGHT_MARGIN;*/
     }
     
     public void adjustPanelSize(float factor){

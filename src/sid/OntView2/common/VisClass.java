@@ -229,8 +229,8 @@ public class VisClass extends Shape {
 		int x, y;
 		int roundCornerValue = 10;
 
-		x = posx + 1;
-        y = posy;
+		x = posx +1;
+		y = posy;
 
         Font oldFont=g.getFont();
 	    if (this.isDefined) {

@@ -183,7 +183,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		if (parent.artPanel != null) {
 			parent.artPanel.qualifiedNames = getQualifiedNames().isSelected();
 			parent.artPanel.getVisGraph().changeRenderMethod(parent.artPanel.renderLabel, parent.artPanel.qualifiedNames);
-			Platform.runLater(parent.artPanel.getDrawerRunnable());
+			Platform.runLater(parent.artPanel.getRedrawRunnable());
 		}
 	}
 
@@ -200,7 +200,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		if (parent.artPanel != null) {
 			parent.artPanel.renderLabel = getRenderLabel().isSelected();
 			parent.artPanel.getVisGraph().changeRenderMethod(parent.artPanel.renderLabel, parent.artPanel.qualifiedNames);
-			Platform.runLater(parent.artPanel.getDrawerRunnable());
+			Platform.runLater(parent.artPanel.getRedrawRunnable());
 		}
 	}
 
@@ -325,11 +325,11 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 				if (newValue) {
 					toggleSwitch.setText("Hide");
 					parent.artPanel.setShowConnectors(true);
-					Platform.runLater(parent.artPanel.getDrawerRunnable());
+					Platform.runLater(parent.artPanel.getRedrawRunnable());
 				} else {
 					toggleSwitch.setText("Show");
 					parent.artPanel.setShowConnectors(false);
-					Platform.runLater(parent.artPanel.getDrawerRunnable());
+					Platform.runLater(parent.artPanel.getRedrawRunnable());
 
 				}
 			});
@@ -890,7 +890,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 	private void cleanConnectorActionPerformed(ActionEvent event) {
 		parent.artPanel.cleanConnectors();
-		Platform.runLater(parent.artPanel.getDrawerRunnable());
+		Platform.runLater(parent.artPanel.getRedrawRunnable());
 	}
 
 	private void createButtonActionActionPerformed(ActionEvent event) {
@@ -957,14 +957,15 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		Task<Void> task = new Task<>() {
 			@Override
 			protected Void call() {
-				if (parent.artPanel.getHeight() >= PaintFrame.MAX_SIZE) {
+				// Temporary fix for the bug that causes the shapes to go out of the canvas
+				/*if (parent.artPanel.getHeight() >= PaintFrame.MAX_SIZE) {
 					isGraphTooLarge.set(true);
 					getPropertiesCheckBox().setDisable(true);
 					getPropertiesCheckBox().setSelected(false);
 
 					parent.showAlertDialog("Information Dialog", "Graph is too large to show properties.",
 							"We recommend displaying the node properties one at a time.", Alert.AlertType.INFORMATION);
-				} else {
+				} else {*/
 					for (Entry<String, Shape> entry : classesInGraph) {
 						if ((entry.getValue() instanceof VisClass) && (entry.getValue().asVisClass().getPropertyBox() != null)) {
 							entry.getValue().asVisClass().getPropertyBox().setVisible(getPropertiesCheckBox().isSelected());
@@ -978,7 +979,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 					parent.artPanel.setStateChanged(true);
 					Platform.runLater(parent.artPanel.getRelaxerRunnable());
 
-				}
+				//}
 				return null;
 			}
 		};

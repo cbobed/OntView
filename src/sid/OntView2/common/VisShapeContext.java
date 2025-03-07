@@ -6,7 +6,6 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.MouseEvent;
@@ -59,7 +58,7 @@ public class VisShapeContext extends ContextMenu {
 		hideItem.setOnAction(event -> {
 			shape.hide();
 			shape.updateParents();
-			Platform.runLater(parent.drawerRunnable);
+			Platform.runLater(parent.redrawRunnable);
 		});
 		
 		

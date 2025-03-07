@@ -57,6 +57,8 @@ public class Mine extends Application implements Embedable{
 	ScrollPane  scroll;
 	Mine         self= this;
 	boolean      check = true;
+	private static final int WORLD_WIDTH = 20000;
+	private static final int WORLD_HEIGHT = 50000;
 
 	/* Code for standalone app initialization */
 
@@ -81,18 +83,37 @@ public class Mine extends Application implements Embedable{
 		ClassLoader c = Thread.currentThread().getContextClassLoader();
 		primaryStage.getIcons().add(new Image(Objects.requireNonNull(c.getResource("icon.png")).toExternalForm()));
 
+		Rectangle2D screenBounds = Screen.getPrimary().getBounds();
+		double screenWidth = screenBounds.getWidth();
+		double screenHeight = screenBounds.getHeight();
+
 		Mine viewer = new Mine();
 		viewer.self = viewer;
 		viewer.primaryStage = primaryStage;
 
 		viewer.entityNameSet = new HashSet<>();
-		viewer.artPanel = new PaintFrame();
+		viewer.artPanel = new PaintFrame(screenWidth, screenHeight);
+		if (viewer.artPanel.getGraphicsContext2D() == null){
+			System.err.println("GraphicsContext is null");
+		}
 		viewer.artPanel.setParentFrame(viewer);
 
 		viewer.nTopPanel = new TopPanel(viewer);
 
 		viewer.scroll = new ScrollPane(viewer.artPanel);
+		viewer.scroll.setPrefSize(screenWidth, screenHeight);
+		viewer.scroll.setHmax(WORLD_WIDTH - screenWidth);
+		viewer.scroll.setVmax(WORLD_HEIGHT - screenHeight);
 		viewer.artPanel.scroll = viewer.scroll;
+
+		viewer.artPanel.scroll.hvalueProperty().addListener((obs, oldVal, newVal) -> viewer.artPanel.setOffsetX(newVal.doubleValue()));
+		viewer.artPanel.scroll.vvalueProperty().addListener((obs, oldVal, newVal) -> viewer.artPanel.setOffsetY(newVal.doubleValue()));
+
+
+		viewer.artPanel.scroll.setOnScroll(event -> {
+			viewer.artPanel.scroll.setHvalue(viewer.artPanel.scroll.getHvalue() + event.getDeltaX());
+			viewer.artPanel.scroll.setVvalue(viewer.artPanel.scroll.getVvalue() + event.getDeltaY());
+		});
 
 		VBox root = new VBox();
 		root.getChildren().addAll(viewer.nTopPanel.getMainPane(), viewer.scroll);
@@ -316,7 +337,7 @@ public class Mine extends Application implements Embedable{
 
 		task.setOnSucceeded(e -> {
 			loadingStage.close();
-			Platform.runLater(artPanel.getDrawerRunnable());
+			Platform.runLater(artPanel.getRedrawRunnable());
 		});
 		task.setOnFailed(e -> {
 			task.getException().printStackTrace();
