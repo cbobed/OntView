@@ -39,7 +39,7 @@ import reducer.StructuralReducer;
 public class PaintFrame extends Canvas {
 	private static final long serialVersionUID = 1L;
 	public ScrollPane scroll;
-	static final int BORDER_PANEL = 50;
+	static final int BORDER_PANEL = 70;
 	static final int MIN_SPACE = 20;
 	static final int MIN_INITIAL_SPACE = 40;
 	public static final int MAX_SIZE = 14700;
@@ -61,6 +61,10 @@ public class PaintFrame extends Canvas {
 	VisGraph visGraph, rVisGraph; // visGraph will handle both depending on which is currently selected
 	private VisShapeContext menuVisShapeContext = null;
 	private VisGeneralContext menuVisGeneralContext = null;
+	public int screenWidth;
+	public int screenHeight;
+	public int canvasWidth = 0;
+	public int canvasHeight = 0;
 
 	public boolean isStable() {
 		return stable;
@@ -109,6 +113,8 @@ public class PaintFrame extends Canvas {
 			prevSize = new Dimension2D(getWidth(), getHeight());
 			VisConfig.getInstance().setConstants();
 			addEventHandlers();
+			scroll = new ScrollPane(this);
+			visGraph = new VisGraph(this);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -139,7 +145,7 @@ public class PaintFrame extends Canvas {
 
 	private void redraw() {
 		GraphicsContext gc = getGraphicsContext2D();
-		if (gc != null) {
+		if (gc != null && this.getScene() != null) {
 			gc.clearRect(0, 0, getWidth(), getHeight());
 			gc.save();
 			gc.translate(-offsetX, -offsetY);
@@ -148,11 +154,9 @@ public class PaintFrame extends Canvas {
 		}
 	}
 
-	private void redrawConnector(VisConnector c) {
-		GraphicsContext gc = getGraphicsContext2D();
-		if (gc != null) {
+	private void redrawConnector(GraphicsContext gc, VisConnector c) {
+		if (gc != null && this.getScene() != null) {
 			gc.save();
-			gc.translate(-offsetX, -offsetY);
 			c.draw(gc);
 			gc.restore();
 		}
@@ -283,27 +287,28 @@ public class PaintFrame extends Canvas {
 
 	public void drawConnectorShape(Shape shape) {
 		if (this.getScene() != null && !this.isDisabled() && this.isVisible() && this.getGraphicsContext2D() != null) {
+			GraphicsContext gc = this.getGraphicsContext2D();
 			if (visGraph != null && shape != null) {
 				for (VisConnector c: shape.inConnectors) {
-					//System.out.println("inConnectors " + c.from.getLabel() + " " + c.from.getPosY() + " " + c.to.getLabel() + " " + " hasta " + c.to.getPosY());
-					redrawConnector(c);
+					redrawConnector(gc,c);
+					//c.draw(gc);
 				}
 				for (VisConnector c: shape.outConnectors) {
-					//System.out.println("outConnectors " + c.from.getLabel() + " " + c.from.getPosY() + " " + c.to.getLabel() + " " +" hasta " + c.to.getPosY());
-					redrawConnector(c);
+					redrawConnector(gc,c);
+					//c.draw(gc);
 				}
 				for (VisConnector c : shape.inDashedConnectors) {
 					if (c.from.isVisible()) {
-						redrawConnector(c);
+						redrawConnector(gc,c);
+						//c.draw(gc);
 					}
 				}
 				for (VisConnector c : shape.outDashedConnectors) {
 					if (c.to.isVisible()) {
-						redrawConnector(c);
+						redrawConnector(gc,c);
+						//c.draw(gc);
 					}
 				}
-				//System.out.println("\n");
-
 			}
 		}
 	}
@@ -322,7 +327,7 @@ public class PaintFrame extends Canvas {
 				// draw levels
 				g.setStroke(Color.LIGHTGRAY);
 				for (VisLevel lvl : visGraph.levelSet) {
-					(g).strokeLine(lvl.getXpos(), 0, lvl.getXpos(), (int) (getHeight() / factor));
+					g.strokeLine(lvl.getXpos(), 0, lvl.getXpos(), canvasHeight);
 					// Uncomment this to get a vertical line in every level
 					g.setStroke(Color.LIGHTGRAY);
 				}
@@ -496,7 +501,7 @@ public class PaintFrame extends Canvas {
 							stateChanged = true;
 							shapeRepulsion(s_i, DOWN);
 						}
-						//visGraph.adjustPanelSize((float) factor);
+						visGraph.adjustPanelSize((float) factor);
 						recentChange = true;
 					}
 				}
@@ -559,6 +564,7 @@ public class PaintFrame extends Canvas {
 		pressedShape = visGraph.findShape(p);
 
 		if (pressedShape != null) {
+			selectedShapes.add(pressedShape);
 			mouseLastY = (int) p.getY();
 		} else {
 			mouseLastX = (int) p.getX();
@@ -573,6 +579,8 @@ public class PaintFrame extends Canvas {
 			return;
 		}
 
+                //scroll.setPannable(false);
+                selectedShapes.remove(pressedShape);
 		pressedShape = null;
 		repulsion = true;
 		mouseLastY = 0;
@@ -621,7 +629,6 @@ public class PaintFrame extends Canvas {
 				}
 			}*/
 			pressedShape.setPosY(pressedShape.getPosY() + draggedY);
-			System.out.println("Shape: " + pressedShape.getLabel() + " y: " + pressedShape.getPosY());
 			stateChanged = true;
 			shapeRepulsion(pressedShape, direction);
 			mouseLastX = (int) p.getX();
@@ -629,8 +636,8 @@ public class PaintFrame extends Canvas {
 
 			Platform.runLater(canvasAdjusterRunnable);
 			Platform.runLater(redrawRunnable);
-			Platform.runLater(new ConnectorDrawer(pressedShape));
 		} else {
+                        //scroll.setPannable(true);
 			/*double scrollHValue, scrollVValue;
 			double contentWidth = scroll.getContent().getBoundsInLocal().getWidth();
 			double contentHeight = scroll.getContent().getBoundsInLocal().getHeight();
@@ -687,6 +694,7 @@ public class PaintFrame extends Canvas {
 		Point2D p = translatePoint(new Point2D(e.getX(), e.getY()));
 		int x = (int) p.getX();
 		int y = (int) p.getY();
+		System.out.println("x = " + x + " AND y = " + y);
 		Shape shape = visGraph.findShape(p);
 		if (shape != null) {
 			if (shape.getLabel().matches("Thing")){
@@ -935,7 +943,7 @@ public class PaintFrame extends Canvas {
 							Platform.runLater(redrawRunnable);
 						}
 
-						//paintFrame.focusOnShape(null, shape);
+						paintFrame.focusOnShape(null, shape);
 						break;
 					}
 				}
@@ -1060,7 +1068,7 @@ public class PaintFrame extends Canvas {
 				|| reasoner.isEntailed(dataFactory.getOWLSubObjectPropertyOfAxiom(relatedProperty.oPropExp, property.oPropExp));
 	}
 
-	public void focusOnShape(String shapeKey, Shape pshape) {
+	public void focusOnShape2(String shapeKey, Shape pshape) {
 		/*
 		 * focus the frame on the shape pos If shapeKey is null, it will look for it
 		 */
@@ -1082,6 +1090,27 @@ public class PaintFrame extends Canvas {
 			scroll.setVvalue(Math.max(0, Math.min(vValue, 1)));
 		}
 
+	}
+
+	public void focusOnShape(String shapeKey, Shape pshape) {
+		Shape shape = pshape != null ? pshape : visGraph.getShape(shapeKey);
+
+		if (shape != null) {
+                        double viewportWidth = scroll.getViewportBounds().getWidth();
+                        double viewportHeight = scroll.getViewportBounds().getHeight();
+
+			double x = (shape.getPosX() * factor) - (viewportWidth / 2);
+			double y = (shape.getPosY() * factor) - (viewportHeight / 2);
+
+                        double hMax = canvasWidth - viewportWidth;
+                        double vMax = canvasHeight - viewportHeight;
+
+                        x = Math.max(0, Math.min(x, hMax));
+                        y = Math.max(0, Math.min(y, vMax));
+
+			scroll.setHvalue(x);
+			scroll.setVvalue(y);
+		}
 	}
 
 	private boolean pressedRightOpen(Shape shape, int x, int y, MouseEvent e) {
@@ -1161,10 +1190,6 @@ public class PaintFrame extends Canvas {
 						if (upperShape == null) // it's the visible upper shape
 							return;
 
-						// Temporary fix for the bug that causes the shapes to go out of the canvas
-						//if (getHeight() >= MAX_SIZE && upperShape.getTopCorner() <= MIN_POS_SHAPE) // it's the visible upper shape
-						//	return;
-
 						int upperShapeHeight = (upperShape instanceof VisClass && upperShape.asVisClass().propertyBox != null
 								&& upperShape.asVisClass().propertyBox.visible)
 								? upperShape.getTotalHeight()
@@ -1189,10 +1214,6 @@ public class PaintFrame extends Canvas {
 						// it's the visible lower shape
 						if (lowerShape == null)
 							return;
-
-						// Temporary fix for the bug that causes the shapes to go out of the canvas
-						//if (lowerShape.getBottomCorner() >= MAX_SIZE)
-						//	return;
 
 						int lowerShapeHeight = (lowerShape instanceof VisClass && lowerShape.asVisClass().propertyBox != null
 								&& lowerShape.asVisClass().propertyBox.visible)
@@ -1343,10 +1364,15 @@ public class PaintFrame extends Canvas {
 
 	public void clearCanvas(){
 		visGraph = null;
-		Platform.runLater(redrawRunnable);
+		GraphicsContext gc = this.getGraphicsContext2D();
+		if ((canvasHeight != 0) && (canvasWidth != 0)) {
+			gc.clearRect(0, 0, canvasWidth, canvasWidth);
+		} else {
+			gc.clearRect(0, 0, getWidth(), getHeight());
+		}
 	}
 
-	private Set<Shape> selectedConcepts = new HashSet<>();
+	private final Set<Shape> selectedConcepts = new HashSet<>();
 
 	public Set<Shape> getSelectedConcepts() {
 		return selectedConcepts;

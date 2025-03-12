@@ -133,18 +133,18 @@ public class VisGraph implements Runnable{
 			System.err.println("VisLevel is null in getWidth method.");
 			return 0;
 		}
-		return lvl.getWidth()+lvl.getXpos()+VisConstants.WIDTH_MARGIN;
-    }
-    public int getHeight() {
-		Rectangle2D screenBounds = Screen.getPrimary().getBounds();
-		return (int) screenBounds.getHeight();
+		//return lvl.getWidth()+lvl.getXpos()+VisConstants.WIDTH_MARGIN;
+		return Math.max(((lvl.getWidth()+lvl.getXpos()+VisConstants.WIDTH_MARGIN) - paintframe.screenWidth), 0);
 
-		/*int maxy=0;
+	}
+    public int getHeight() {
+
+		int maxy=0;
 		for (Entry<String, Shape> entry : shapeMap.entrySet()) {
 			maxy = (Math.max(entry.getValue().getPosY(), maxy));
 		}
-
-    	return maxy+VisConstants.HEIGHT_MARGIN;*/
+		//return maxy + VisConstants.HEIGHT_MARGIN;
+		return Math.max(((maxy + VisConstants.HEIGHT_MARGIN) - paintframe.screenHeight), 0);
     }
     
     public void adjustPanelSize(float factor){
@@ -152,11 +152,18 @@ public class VisGraph implements Runnable{
 			System.err.println("paintframe is null in adjustPanelSize method.");
 			return;
 		}
-		
+		System.out.println("adjustPanelSize-------------------------------");
 		int x = (int) (getWidth() * factor);
 		int y = (int) (getHeight() * factor);
-		paintframe.setWidth(x);
-		paintframe.setHeight(y);
+		paintframe.canvasHeight = y + paintframe.screenHeight;
+		paintframe.canvasWidth = x + paintframe.screenWidth;
+
+		System.out.println("x: " + x + ", y: " + y);
+		System.out.println("----------------------------------------------\n");
+		//paintframe.setWidth(x);
+		paintframe.scroll.setHmax(x);
+		paintframe.scroll.setVmax(y);
+		//paintframe.setHeight(y);
 
     }
 
