@@ -62,8 +62,8 @@ public class Mine extends Application implements Embedable{
 	ScrollPane  scroll;
 	Mine         self= this;
 	boolean      check = true;
-	private static final int WORLD_WIDTH = 200;
-	private static final int WORLD_HEIGHT = 1000;
+	private static final int WORLD_WIDTH = 20000;
+	private static final int WORLD_HEIGHT = 10000;
 
 	/* Code for standalone app initialization */
 
@@ -105,23 +105,31 @@ public class Mine extends Application implements Embedable{
 
 		viewer.nTopPanel = new TopPanel(viewer);
 
-		viewer.scroll = new ScrollPane(viewer.artPanel);
-		/*viewer.scroll.setPrefSize(screenWidth, screenHeight);
-		viewer.scroll.setHmax(screenWidth);
-		viewer.scroll.setVmax(screenHeight);*/
+        viewer.scroll = new ScrollPane(viewer.artPanel);
+		viewer.scroll.setPrefSize(screenWidth, screenHeight - viewer.nTopPanel.getHeight());
+		viewer.scroll.setHmax(WORLD_WIDTH - screenWidth);
+		viewer.scroll.setVmax(screenHeight - viewer.nTopPanel.getHeight());
+        viewer.scroll.setFitToWidth(true);
+        viewer.scroll.setFitToHeight(true);
 		viewer.artPanel.scroll = viewer.scroll;
 
-		viewer.artPanel.scroll.hvalueProperty().addListener((obs, oldVal, newVal) -> viewer.artPanel.setOffsetX(newVal.doubleValue()));
-		viewer.artPanel.scroll.vvalueProperty().addListener((obs, oldVal, newVal) -> viewer.artPanel.setOffsetY(newVal.doubleValue()));
+		viewer.artPanel.scroll.hvalueProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal.doubleValue() < 0.0) newVal = 0;
+            viewer.artPanel.setOffsetX(newVal.doubleValue());
+        });
+		viewer.artPanel.scroll.vvalueProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal.doubleValue() < 0.0) newVal = 0;
+            viewer.artPanel.setOffsetY(newVal.doubleValue());
+        });
 
-		/*viewer.artPanel.scroll.setOnScroll(event -> {
-			viewer.artPanel.scroll.setHvalue(viewer.artPanel.scroll.getHvalue() + event.getDeltaX());
-			viewer.artPanel.scroll.setVvalue(viewer.artPanel.scroll.getVvalue() + event.getDeltaY());
-		});*/
+		viewer.artPanel.scroll.setOnScroll(event -> {
+            viewer.artPanel.scroll.setHvalue(viewer.artPanel.scroll.getHvalue());
+			viewer.artPanel.scroll.setVvalue(viewer.artPanel.scroll.getVvalue());
+		});
 
 		VBox root = new VBox();
 		root.getChildren().addAll(viewer.nTopPanel.getMainPane(), viewer.scroll);
-		VBox.setVgrow(viewer.scroll, Priority.ALWAYS);
+		//VBox.setVgrow(viewer.scroll, Priority.ALWAYS);
 
 		viewer.artPanel.setStyle("-fx-background-color: white;");
 		viewer.nTopPanel.setStyle("-fx-border-color: black; -fx-border-width: 1;");

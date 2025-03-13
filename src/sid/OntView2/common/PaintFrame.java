@@ -112,8 +112,8 @@ public class PaintFrame extends Canvas {
 			this.setHeight(height);
 			prevSize = new Dimension2D(getWidth(), getHeight());
 			VisConfig.getInstance().setConstants();
-			addEventHandlers();
-			scroll = new ScrollPane(this);
+			//addEventHandlers();
+			//scroll = new ScrollPane(this);
 			visGraph = new VisGraph(this);
 
 		} catch (Exception e) {
@@ -532,8 +532,10 @@ public class PaintFrame extends Canvas {
 	private final Tooltip tooltip = new Tooltip();
 	private final WebView web = new WebView();
 	private final WebEngine webEngine = web.getEngine();
+    private Point2D pinchPoint = null;
 
-	public void cleanConnectors() {
+
+    public void cleanConnectors() {
 		selectedShapes.clear();
 	}
 
@@ -567,10 +569,12 @@ public class PaintFrame extends Canvas {
 			selectedShapes.add(pressedShape);
 			mouseLastY = (int) p.getY();
 		} else {
-			mouseLastX = (int) p.getX();
+            pinchPoint = new Point2D(e.getX() + offsetX, e.getY() + offsetY);
+            mouseLastX = (int) p.getX();
 			mouseLastY = (int) p.getY();
-			setCursor(Cursor.MOVE);
-			Platform.runLater(new ConnectorDrawer(pressedShape));
+			setCursor(Cursor.CLOSED_HAND);
+			Platform.runLater(redrawRunnable);
+            //Platform.runLater(new ConnectorDrawer(pressedShape));
 		}
 	}
 
@@ -579,8 +583,8 @@ public class PaintFrame extends Canvas {
 			return;
 		}
 
-                //scroll.setPannable(false);
-                selectedShapes.remove(pressedShape);
+        selectedShapes.remove(pressedShape);
+        pinchPoint = null;
 		pressedShape = null;
 		repulsion = true;
 		mouseLastY = 0;
@@ -606,6 +610,7 @@ public class PaintFrame extends Canvas {
 		int direction;
 		repulsion = (e.getButton() != MouseButton.SECONDARY);
 		Point2D p = translatePoint(new Point2D(e.getX(), e.getY()));
+        System.out.println("Mouse dragged at: " + p);
 		if ((mouseLastX == 0) && (mouseLastY == 0)) {
 			draggedX = 0;
 			draggedY = 0;
@@ -615,19 +620,6 @@ public class PaintFrame extends Canvas {
 		}
 		if (pressedShape != null) {
 			direction = ((draggedY > 0) ? DOWN : UP);
-
-			// Check if the shape is not going out of the canvas
-			/*if (direction == DOWN) { // To be able to move upwards
-				if (pressedShape.getBottomCorner() >= MAX_SIZE) {
-					e.consume();
-					return;
-				}
-			} else {
-				if (getHeight() >= MAX_SIZE && pressedShape.getTopCorner() <= MIN_POS_SHAPE) {
-					e.consume();
-					return;
-				}
-			}*/
 			pressedShape.setPosY(pressedShape.getPosY() + draggedY);
 			stateChanged = true;
 			shapeRepulsion(pressedShape, direction);
@@ -637,20 +629,23 @@ public class PaintFrame extends Canvas {
 			Platform.runLater(canvasAdjusterRunnable);
 			Platform.runLater(redrawRunnable);
 		} else {
-                        //scroll.setPannable(true);
-			/*double scrollHValue, scrollVValue;
-			double contentWidth = scroll.getContent().getBoundsInLocal().getWidth();
-			double contentHeight = scroll.getContent().getBoundsInLocal().getHeight();
+            double newOffsetX = pinchPoint.getX() - e.getX();
+            double newOffsetY = pinchPoint.getY() - e.getY();
 
-			scrollHValue = scroll.getHvalue() - draggedX / contentWidth;
-			scrollVValue = scroll.getVvalue() - draggedY / contentHeight;
+            System.out.println("Before clamping -> newOffsetX: " + newOffsetX + ", newOffsetY: " + newOffsetY);
+            System.out.println("Scroll Hmax: " + scroll.getHmax() + ", Vmax: " + scroll.getVmax());
 
-			scrollHValue = Math.max(0, Math.min(scrollHValue, 1));
-			scrollVValue = Math.max(0, Math.min(scrollVValue, 1));
+            newOffsetX = Math.max(0, Math.min(newOffsetX, scroll.getHmax()));
+            newOffsetY = Math.max(0, Math.min(newOffsetY, scroll.getVmax()));
 
-			scroll.setHvalue(scrollHValue);
-			scroll.setVvalue(scrollVValue);*/
-		}
+            System.out.println("After -> newOffsetX: " + newOffsetX + ", newOffsetY: " + newOffsetY);
+
+            scroll.setHvalue(newOffsetX);
+            scroll.setVvalue(newOffsetY);
+
+            System.out.println("Scroll values set -> Hvalue: " + scroll.getHvalue() + ", Vvalue: " + scroll.getVvalue());
+
+        }
 	}
 
 	public void handleMouseMoved(MouseEvent e) {
@@ -963,7 +958,7 @@ public class PaintFrame extends Canvas {
 		return false;
 	}
 
-	private boolean clickedOnClosePropertyBox(int x, int y, Shape shape) {
+	private boolean clickedOnClosePropertyBox2(int x, int y, Shape shape) {
 		if (visGraph == null || shape == null) {
 			return false;
 		}
@@ -981,7 +976,7 @@ public class PaintFrame extends Canvas {
 		return false;
 	}
 
-	private boolean clickedOnClosePropertyBox2(int x, int y, Shape shape) {
+	private boolean clickedOnClosePropertyBox(int x, int y, Shape shape) {
 		if (visGraph == null || shape == null) {
 			return false;
 		}
@@ -1068,45 +1063,21 @@ public class PaintFrame extends Canvas {
 				|| reasoner.isEntailed(dataFactory.getOWLSubObjectPropertyOfAxiom(relatedProperty.oPropExp, property.oPropExp));
 	}
 
-	public void focusOnShape2(String shapeKey, Shape pshape) {
-		/*
-		 * focus the frame on the shape pos If shapeKey is null, it will look for it
-		 */
-		Shape shape = pshape != null ? pshape : visGraph.getShape(shapeKey);
-
-		if (shape != null) {
-			int x = (int) (shape.getPosX() * factor);
-			int y = (int) (shape.getPosY() * factor);
-
-			System.out.println("focusOnShape x: " + x + " y: " + y);
-
-			double scrollPaneWidth = scroll.getViewportBounds().getWidth();
-			double scrollPaneHeight = scroll.getViewportBounds().getHeight();
-
-			double hValue = (x - scrollPaneWidth / 2) / (getWidth() - scrollPaneWidth);
-			double vValue = (y - scrollPaneHeight / 2) / (getHeight() - scrollPaneHeight);
-
-			scroll.setHvalue(Math.max(0, Math.min(hValue, 1)));
-			scroll.setVvalue(Math.max(0, Math.min(vValue, 1)));
-		}
-
-	}
-
 	public void focusOnShape(String shapeKey, Shape pshape) {
 		Shape shape = pshape != null ? pshape : visGraph.getShape(shapeKey);
 
 		if (shape != null) {
-                        double viewportWidth = scroll.getViewportBounds().getWidth();
-                        double viewportHeight = scroll.getViewportBounds().getHeight();
+            double viewportWidth = scroll.getViewportBounds().getWidth();
+            double viewportHeight = scroll.getViewportBounds().getHeight();
 
 			double x = (shape.getPosX() * factor) - (viewportWidth / 2);
 			double y = (shape.getPosY() * factor) - (viewportHeight / 2);
 
-                        double hMax = canvasWidth - viewportWidth;
-                        double vMax = canvasHeight - viewportHeight;
+            double hMax = canvasWidth - viewportWidth;
+            double vMax = canvasHeight - viewportHeight;
 
-                        x = Math.max(0, Math.min(x, hMax));
-                        y = Math.max(0, Math.min(y, vMax));
+            x = Math.max(0, Math.min(x, hMax));
+            y = Math.max(0, Math.min(y, vMax));
 
 			scroll.setHvalue(x);
 			scroll.setVvalue(y);
