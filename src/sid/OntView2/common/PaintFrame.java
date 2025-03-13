@@ -112,7 +112,7 @@ public class PaintFrame extends Canvas {
 			this.setHeight(height);
 			prevSize = new Dimension2D(getWidth(), getHeight());
 			VisConfig.getInstance().setConstants();
-			//addEventHandlers();
+			addEventHandlers();
 			//scroll = new ScrollPane(this);
 			visGraph = new VisGraph(this);
 
@@ -632,7 +632,7 @@ public class PaintFrame extends Canvas {
             double newOffsetX = pinchPoint.getX() - e.getX();
             double newOffsetY = pinchPoint.getY() - e.getY();
 
-            System.out.println("Before clamping -> newOffsetX: " + newOffsetX + ", newOffsetY: " + newOffsetY);
+            System.out.println("Before -> newOffsetX: " + newOffsetX + ", newOffsetY: " + newOffsetY);
             System.out.println("Scroll Hmax: " + scroll.getHmax() + ", Vmax: " + scroll.getVmax());
 
             newOffsetX = Math.max(0, Math.min(newOffsetX, scroll.getHmax()));
@@ -643,7 +643,7 @@ public class PaintFrame extends Canvas {
             scroll.setHvalue(newOffsetX);
             scroll.setVvalue(newOffsetY);
 
-            System.out.println("Scroll values set -> Hvalue: " + scroll.getHvalue() + ", Vvalue: " + scroll.getVvalue());
+            System.out.println("Scroll values set -> Hvalue: " + scroll.getHvalue() + ", Vvalue: " + scroll.getVvalue() + "\n");
 
         }
 	}
@@ -1335,6 +1335,8 @@ public class PaintFrame extends Canvas {
 
 	public void clearCanvas(){
 		visGraph = null;
+        scroll.setHvalue(0);
+        scroll.setVvalue(0);
 		GraphicsContext gc = this.getGraphicsContext2D();
 		if ((canvasHeight != 0) && (canvasWidth != 0)) {
 			gc.clearRect(0, 0, canvasWidth, canvasWidth);

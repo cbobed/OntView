@@ -22,6 +22,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.*;
@@ -64,8 +65,11 @@ public class Mine extends Application implements Embedable{
 	boolean      check = true;
 	private static final int WORLD_WIDTH = 20000;
 	private static final int WORLD_HEIGHT = 10000;
+    private static final double SCROLL_INCREMENT = 10000;
+    private static final double SPEED = 100;
 
-	/* Code for standalone app initialization */
+
+    /* Code for standalone app initialization */
 
 	public static void main(String[] args) {
 		launch(args);
@@ -107,7 +111,7 @@ public class Mine extends Application implements Embedable{
 
         viewer.scroll = new ScrollPane(viewer.artPanel);
 		viewer.scroll.setPrefSize(screenWidth, screenHeight - viewer.nTopPanel.getHeight());
-		viewer.scroll.setHmax(WORLD_WIDTH - screenWidth);
+		viewer.scroll.setHmax(screenWidth);
 		viewer.scroll.setVmax(screenHeight - viewer.nTopPanel.getHeight());
         viewer.scroll.setFitToWidth(true);
         viewer.scroll.setFitToHeight(true);
@@ -126,6 +130,18 @@ public class Mine extends Application implements Embedable{
             viewer.artPanel.scroll.setHvalue(viewer.artPanel.scroll.getHvalue());
 			viewer.artPanel.scroll.setVvalue(viewer.artPanel.scroll.getVvalue());
 		});
+
+        viewer.artPanel.scroll.addEventFilter(ScrollEvent.SCROLL, event -> {
+            if (event.getDeltaY() != 0) {
+                double delta = event.getDeltaY() > 0 ? SCROLL_INCREMENT : -SCROLL_INCREMENT;
+                viewer.artPanel.scroll.setVvalue(viewer.artPanel.scroll.getVvalue() - delta / SPEED);
+            }
+            if (event.getDeltaX() != 0) {
+                double delta = event.getDeltaX() > 0 ? SCROLL_INCREMENT : -SCROLL_INCREMENT;
+                viewer.artPanel.scroll.setHvalue(viewer.artPanel.scroll.getHvalue() - delta / SPEED);
+            }
+            event.consume();
+        });
 
 		VBox root = new VBox();
 		root.getChildren().addAll(viewer.nTopPanel.getMainPane(), viewer.scroll);
