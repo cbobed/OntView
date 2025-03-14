@@ -148,6 +148,7 @@ public class PaintFrame extends Canvas {
 		if (gc != null && this.getScene() != null) {
 			gc.clearRect(0, 0, getWidth(), getHeight());
 			gc.save();
+            gc.scale(factor, factor);
 			gc.translate(-offsetX, -offsetY);
 			draw(gc);
 			gc.restore();
@@ -172,10 +173,16 @@ public class PaintFrame extends Canvas {
 
 	/**
 	 * sets scaling/zoom factor
-	 *
-	 * @param d d
 	 */
-	public void setFactor(double d) { factor = d; }
+	public void setFactor(double newFactor) {
+        double oldZoom = this.factor;
+        this.factor = newFactor;
+        offsetX = offsetX * oldZoom / newFactor;
+        offsetY = offsetY * oldZoom / newFactor;
+
+        Platform.runLater(redrawRunnable);
+
+    }
 
 	public void setOriginalSize(Dimension2D in) { oSize = in; }
 	
@@ -230,30 +237,7 @@ public class PaintFrame extends Canvas {
 	}
 
 	public CanvasAdjuster getCanvasAdjusterRunnable(){ return canvasAdjusterRunnable; }
-	
-	/**
-	 * scales by factor and adjusts panel size
-	 */
-	public void scale(double factor) {
-		GraphicsContext gc = this.getGraphicsContext2D();
-		if (gc != null) {
-			gc.restore();
-			gc.save();
-			gc.clearRect(0, 0, getWidth(), getHeight());
-			gc.scale(factor, factor);
-			Platform.runLater(redrawRunnable);
-		}
-	}
 
-	Pane canvasWrapper = new Pane(this);
-
-	public void applyZoom() {
-		Scale scale = new Scale(factor, factor, 0, 0);
-		canvasWrapper.getTransforms().setAll(scale);
-
-		Bounds bounds = canvasWrapper.getBoundsInParent();
-		canvasWrapper.setPrefSize(bounds.getWidth(), bounds.getHeight());
-	}
 
 	/*-*************************************************************/
 	public void drawDisjointShape() {
@@ -566,10 +550,14 @@ public class PaintFrame extends Canvas {
 		pressedShape = visGraph.findShape(p);
 
 		if (pressedShape != null) {
+            System.out.println("pressed shape");
+            if (pressedShape.getLabel().matches(""))
 			selectedShapes.add(pressedShape);
 			mouseLastY = (int) p.getY();
 		} else {
+            System.out.println("pressed elsewhere");
             pinchPoint = new Point2D(e.getX() + offsetX, e.getY() + offsetY);
+            System.out.println("pinchPoint x:" + pinchPoint.getX() + " , y:" + pinchPoint.getY());
             mouseLastX = (int) p.getX();
 			mouseLastY = (int) p.getY();
 			setCursor(Cursor.CLOSED_HAND);
@@ -606,17 +594,14 @@ public class PaintFrame extends Canvas {
 		}
 		isDragging = true;
 
-		int draggedY, draggedX;
+		int draggedY;
 		int direction;
 		repulsion = (e.getButton() != MouseButton.SECONDARY);
 		Point2D p = translatePoint(new Point2D(e.getX(), e.getY()));
-        System.out.println("Mouse dragged at: " + p);
 		if ((mouseLastX == 0) && (mouseLastY == 0)) {
-			draggedX = 0;
 			draggedY = 0;
 		} else {
 			draggedY = (int) p.getY() - mouseLastY;
-			draggedX = (int) p.getX() - mouseLastX;
 		}
 		if (pressedShape != null) {
 			direction = ((draggedY > 0) ? DOWN : UP);
@@ -632,19 +617,11 @@ public class PaintFrame extends Canvas {
             double newOffsetX = pinchPoint.getX() - e.getX();
             double newOffsetY = pinchPoint.getY() - e.getY();
 
-            System.out.println("Before -> newOffsetX: " + newOffsetX + ", newOffsetY: " + newOffsetY);
-            System.out.println("Scroll Hmax: " + scroll.getHmax() + ", Vmax: " + scroll.getVmax());
-
             newOffsetX = Math.max(0, Math.min(newOffsetX, scroll.getHmax()));
             newOffsetY = Math.max(0, Math.min(newOffsetY, scroll.getVmax()));
 
-            System.out.println("After -> newOffsetX: " + newOffsetX + ", newOffsetY: " + newOffsetY);
-
             scroll.setHvalue(newOffsetX);
             scroll.setVvalue(newOffsetY);
-
-            System.out.println("Scroll values set -> Hvalue: " + scroll.getHvalue() + ", Vvalue: " + scroll.getVvalue() + "\n");
-
         }
 	}
 
@@ -691,14 +668,6 @@ public class PaintFrame extends Canvas {
 		int y = (int) p.getY();
 		System.out.println("x = " + x + " AND y = " + y);
 		Shape shape = visGraph.findShape(p);
-		if (shape != null) {
-			if (shape.getLabel().matches("Thing")){
-				GraphicsContext gc = this.getGraphicsContext2D();
-				shape.setPosY(18000);
-				shape.drawShape(gc);
-				Platform.runLater(redrawRunnable);
-			}
-		}
 		if (clickedOnClosePropertyBox(x, y, shape) || clickedOnCloseDisjointBox(x, y)) {
 			return;
 		}
@@ -758,41 +727,54 @@ public class PaintFrame extends Canvas {
 	/**
 	 * Method to check if it needs to expand the canvas size
 	 */
-	public void checkAndResizeCanvas() {
-		if (getHeight() >= MAX_SIZE) {
-			return;
-		}
-/*
-		double maxY = Double.MIN_VALUE;
-		double minY = Double.MAX_VALUE;
-		double maxX = Double.MIN_VALUE;
+    public void checkAndResizeCanvas() {
+        double maxY = Double.MIN_VALUE;
+        double minY = Double.MAX_VALUE;
+        double maxX = Double.MIN_VALUE;
 
-		for (VisLevel level : visGraph.getLevelSet()) {
-			for (Shape shape : level.levelShapes) {
-				double shapeMaxY = shape.getPosY() * factor + shape.getHeight() * factor;
-				if (shapeMaxY > maxY) { maxY = shapeMaxY; }
+        //double currentHvalue = scroll.getHvalue();
+        //double currentVvalue = scroll.getVvalue();
 
-				double shapeMinY = shape.getPosY() * factor - shape.getHeight() / 2.0 * factor;
-				if (shapeMinY < minY) { minY = shapeMinY; }
+        for (VisLevel level : visGraph.getLevelSet()) {
+            for (Shape shape : level.levelShapes) {
+                double shapeMaxY = shape.getBottomCorner() * factor;
+                if (shapeMaxY > maxY) {
+                    maxY = shapeMaxY;
+                }
 
-				double shapeMaxX = shape.getPosX() * factor + shape.getWidth() * factor;
-				if (shapeMaxX > maxX) { maxX = shapeMaxX; }
-			}
-		}
+                double shapeMinY = shape.getTopCorner() * factor;
+                if (shapeMinY < minY) {
+                    minY = shapeMinY;
+                }
 
-		setHeight(maxY + BORDER_PANEL);
-		setWidth(maxX + BORDER_PANEL);
+                double shapeMaxX = shape.getRightCorner() * factor;
+                if (shapeMaxX > maxX) {
+                    maxX = shapeMaxX;
+                }
+            }
+        }
 
-		if (minY < 0) {
-			// Adjust the shape position
-			for (VisLevel level : visGraph.getLevelSet()) {
-				ArrayList<Shape> orderedShapeList = level.orderedList();
-				for (Shape shape : orderedShapeList) {
-					shape.setPosY((int) ((shape.getPosY() * factor - minY + BORDER_PANEL) / factor));
-				}
-			}
-		}*/
-	}
+        System.out.println("maxY " + maxY + " - minY " + minY + " - maxX " + maxX);
+
+        canvasHeight = (int) maxY + BORDER_PANEL;
+        canvasWidth = (int) maxX + BORDER_PANEL;
+
+        scroll.setVmax(canvasHeight - screenHeight);
+        scroll.setHmax(canvasWidth - screenWidth);
+
+        if (minY < 0) {
+            // Adjust the shape position
+            for (VisLevel level : visGraph.getLevelSet()) {
+                ArrayList<Shape> orderedShapeList = level.orderedList();
+                for (Shape shape : orderedShapeList) {
+                    shape.setPosY((int) ((shape.getPosY() * factor - minY + BORDER_PANEL) / factor));
+                }
+            }
+        }
+
+        //scroll.setHvalue(currentHvalue);
+        //scroll.setVvalue(currentVvalue);
+    }
 
 	/**
 	 * translates point to current zoom factor

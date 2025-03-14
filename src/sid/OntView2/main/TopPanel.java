@@ -1060,7 +1060,6 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	public void restoreSliderValue() {
 		if(size != null) {
 			parent.artPanel.setFactor(1.0);
-			parent.artPanel.scale(1.0);
 		}
 		getZoomSlider().setValue(5);
 	}
@@ -1081,7 +1080,6 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			parent.artPanel.getVisGraph().setZoomLevel((int) getZoomSlider().getValue());
 			parent.artPanel.setFactor(factor);
 			Platform.runLater(parent.artPanel.getCanvasAdjusterRunnable());
-			parent.artPanel.scale(factor);
 		}
 	}
 

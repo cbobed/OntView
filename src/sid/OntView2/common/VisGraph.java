@@ -152,19 +152,14 @@ public class VisGraph implements Runnable{
 			System.err.println("paintframe is null in adjustPanelSize method.");
 			return;
 		}
-		System.out.println("adjustPanelSize-------------------------------");
 		int x = (int) (getWidth() * factor);
 		int y = (int) (getHeight() * factor);
+
 		paintframe.canvasHeight = y + paintframe.screenHeight;
 		paintframe.canvasWidth = x + paintframe.screenWidth;
 
-		System.out.println("x: " + x + ", y: " + y);
-		System.out.println("----------------------------------------------\n");
-		//paintframe.setWidth(x);
 		paintframe.scroll.setHmax(x);
 		paintframe.scroll.setVmax(y);
-		//paintframe.setHeight(y);
-
     }
 
 	private OWLClassExpression getTopClass(OWLOntology activeOntology) {
