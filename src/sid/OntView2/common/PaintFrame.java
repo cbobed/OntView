@@ -754,7 +754,7 @@ public class PaintFrame extends Canvas {
             }
         }
 
-        System.out.println("maxY " + maxY + " - minY " + minY + " - maxX " + maxX);
+       // System.out.println("maxY " + maxY + " - minY " + minY + " - maxX " + maxX);
 
         canvasHeight = (int) maxY + BORDER_PANEL;
         canvasWidth = (int) maxX + BORDER_PANEL;

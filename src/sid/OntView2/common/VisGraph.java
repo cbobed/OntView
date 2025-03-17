@@ -233,6 +233,9 @@ public class VisGraph implements Runnable{
 			Shape shape = entry.getValue();
 
 			if ((shape instanceof VisClass)){
+                if (shape.asVisClass().getIndicatorSize() == -1) {
+                    shape.asVisClass().setMaxSizeHiddenNodesIndicator();
+                }
 				shape.asVisClass().setWidth(shape.asVisClass().calculateWidth());
 				//shape.asVisClass().setHeight(shape.asVisClass().calculateHeight());
 			}
@@ -645,27 +648,7 @@ public class VisGraph implements Runnable{
 	 *  If there's a visible shape in that point this will return a reference to it and null otherwise
 	 *  @return shape or null if not found
 	 */
-	public Shape findShape2(Point2D p) {
-		GraphicsContext g = paintframe.getGraphicsContext2D();
-        for (Entry<String, Shape> e : shapeMap.entrySet()) {
-            int x = e.getValue().getLeftCorner();
-            int y = e.getValue().getTopCorner();
-            int w = e.getValue().getWidth();
-            int h = e.getValue().getHeight();
-
-            if (isInShape(x,y,w,h,p) && e.getValue().visible){
-				g.setStroke(Color.RED);
-				g.strokeRect(x, y, w, h);
-				return e.getValue();
-			}
-        }
-	    return null;
-	}
-
 	public Shape findShape(Point2D p) {
-		GraphicsContext g = paintframe.getGraphicsContext2D();
-		int buttonMargin = 10; // Margen adicional para los botones laterales
-
 		for (Entry<String, Shape> e : shapeMap.entrySet()) {
 			int x = e.getValue().getLeftCorner();
 			int y = e.getValue().getTopCorner();
@@ -1442,6 +1425,7 @@ public class VisGraph implements Runnable{
 		Set<Shape> visitedNodes = new HashSet<>();
 
 		for (Shape child : childrenToProcess) {
+            // Store the nodes indicator bar size - needed in the future
 			traverseAndStoreDescendants(child, visitedNodes);
 		}
 	}

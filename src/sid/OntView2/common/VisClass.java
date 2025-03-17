@@ -11,6 +11,7 @@ import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import pedviz.graph.Graph;
 import sid.OntView2.expressionNaming.SIDClassExpressionNamer;
 import sid.OntView2.utils.ExpressionManager;
 
@@ -73,7 +74,7 @@ public class VisClass extends Shape {
 
 	boolean qualifiedRendering = false; 
 	boolean labelRendering = false;
-	public int topToBarDistance;
+	public int topToBarDistance = 0;
 
 
 	int tabSize = 15; 
@@ -461,11 +462,12 @@ public class VisClass extends Shape {
 		g.setFont(oldFont);
 	}
 
-	private void drawHiddenNodesIndicator(GraphicsContext g, int hiddenNodes, int x, int y) {
-		if (getIndicatorSize() == -1) {
-			setIndicatorSize(getIndicatorSize(g, graph.getShapeMap().size() - 2) + 8);
-		}
+    public void setMaxSizeHiddenNodesIndicator(){
+        GraphicsContext g = graph.paintframe.getGraphicsContext2D();
+        setIndicatorSize(getIndicatorSize(g, graph.getShapeMap().size() - 2) + 8);
+    }
 
+	private void drawHiddenNodesIndicator(GraphicsContext g, int hiddenNodes, int x, int y) {
 		double width = getIndicatorSize();
 		double height = 13;
 		double rectY = y - (double) currentHeight / 2 - height - 5;

@@ -9,9 +9,9 @@ import java.util.Set;
 
 public class VisLevel {
 
-
    /***************************/
-	final static int MIN_WIDTH=100;
+	final static int MIN_WIDTH=20;
+    final static int SPACE_BETWEEN_LEVELS= 50;
 	int id;
 	int width = MIN_WIDTH;
 	int shapeNo = 0;
@@ -70,14 +70,14 @@ public class VisLevel {
 		
 	    final int DININCREM = 5;
 	    width = (levelShapes.size()>20 ? getWidth() + DININCREM *(levelShapes.size()-20) : getWidth());
-		int dwidth = newWidth -getWidth();
-			if (dwidth > 0){
-				for (VisLevel level : graph.levelSet){
-					if (level.getID() > id){
-						level.setXpos(level.getXpos()+dwidth);
-					}
-				}
-			}	
+		int dwidth = newWidth - getWidth();
+        if (dwidth > 0){
+            for (VisLevel level : graph.levelSet){
+                if (level.getID() > id){
+                    level.setXpos(level.getXpos()+dwidth);
+                }
+            }
+        }
 	}
 	
 	public static VisLevel getLevelFromID(Set<VisLevel>set, int id){
@@ -181,12 +181,15 @@ public class VisLevel {
 				lvl.setWidth(0);
 			}
 			else {
-				for (Shape shape : lvl.levelShapes){
-					if (shape.getWidth() > maxShapeWidthInLevel){
-						maxShapeWidthInLevel = shape.getWidth();
-					}	
-					// enlarge
-				}
+                for (Shape shape : lvl.levelShapes){
+                    System.out.println(shape.getLabel() + " width: " + shape.getWidth() + " i: " + shape.getIndicatorSize());
+                    int shapeWidth = Math.max(shape.getWidth(), (int) shape.getIndicatorSize());
+                    if (shapeWidth > maxShapeWidthInLevel) {
+                        maxShapeWidthInLevel = shapeWidth;
+                    }
+                }
+                maxShapeWidthInLevel += SPACE_BETWEEN_LEVELS;
+                System.out.println(lvl.id + " final width " + maxShapeWidthInLevel + "\n");
 			}
 			lvl.setWidth(maxShapeWidthInLevel+MIN_WIDTH);
 			lvl.updateWidth(maxShapeWidthInLevel+MIN_WIDTH);
