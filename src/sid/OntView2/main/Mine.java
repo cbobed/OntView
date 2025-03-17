@@ -6,9 +6,6 @@ import java.util.*;
 
 import javax.imageio.ImageIO;
 
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -23,8 +20,8 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.ScrollEvent;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.*;
 import javafx.scene.control.Alert.AlertType;
 
@@ -410,31 +407,57 @@ public class Mine extends Application implements Embedable{
 	}
 
 	public void createImageFromVisibleRect(Canvas canvas) {
-		int w = (int) scroll.getWidth();
-		int h = (int) scroll.getHeight();
+		int w = (int) artPanel.getWidth();
+		int h = (int) artPanel.getHeight();
 
-		double xIni = scroll.getHvalue() * (canvas.getWidth() - w);
-		double yIni = scroll.getVvalue() * (canvas.getHeight() - h);
-
-		System.out.println(w + " " + h + " " + xIni + " " + yIni);
-
-		imageDialog(canvas, w, h, (int) xIni, (int) yIni);
+		imageDialog(artPanel, w, h, 0, 0);
 	}
+
+    public static void captureVisibleCanvas(PaintFrame paintFrame, String filename) {
+        WritableImage snapshot = new WritableImage(
+            (int) paintFrame.getWidth(),
+            (int) paintFrame.getHeight()
+        );
+
+        SnapshotParameters parameters = new SnapshotParameters();
+        paintFrame.snapshot(parameters, snapshot);
+
+        // Guardar como PNG
+        File file = new File(filename);
+        try {
+            ImageIO.write(SwingFXUtils.fromFXImage(snapshot, null), "png", file);
+            System.out.println("Captura guardada en: " + file.getAbsolutePath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 	// <CBL 25/9/13>
 	// wrapper for the method
 	private void imageDialog(Canvas panel,int w, int h){
-		imageDialog(panel, w, h, 0, 0);
+		//imageDialog(panel, w, h, 0, 0);
 	}
 
 	// <CBL 25/9/13>
 	// modified to take an offset as argument
 
-	private void imageDialog(Canvas panel,int w, int h, int xIni, int yIni){
+    private void imageDialog(PaintFrame panel,int w, int h, int xIni, int yIni) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG", "*.png"));
+        File file = fileChooser.showSaveDialog(primaryStage);
+        if (file != null) {
+            WritableImage snapshot = new WritableImage(w, h);
+            SnapshotParameters parameters = new SnapshotParameters();
+            parameters.setViewport(new Rectangle2D(xIni, yIni, w, h));
+
+            panel.snapshot(parameters, snapshot);
+            saveViewTask(snapshot, "png", file);
+        }
+    }
+
+    private void imageDialog2(Canvas panel,int w, int h, int xIni, int yIni){
 		File fl = null;
 		boolean done = false;
-		int answer;
-		//BufferedImage bi = new BufferedImage(w+xIni,h+yIni, BufferedImage.TYPE_INT_RGB);
 		ArrayList<String> valid = new ArrayList<>();
 		valid.add("png");
 

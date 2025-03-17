@@ -182,14 +182,12 @@ public class VisLevel {
 			}
 			else {
                 for (Shape shape : lvl.levelShapes){
-                    System.out.println(shape.getLabel() + " width: " + shape.getWidth() + " i: " + shape.getIndicatorSize());
                     int shapeWidth = Math.max(shape.getWidth(), (int) shape.getIndicatorSize());
                     if (shapeWidth > maxShapeWidthInLevel) {
                         maxShapeWidthInLevel = shapeWidth;
                     }
                 }
                 maxShapeWidthInLevel += SPACE_BETWEEN_LEVELS;
-                System.out.println(lvl.id + " final width " + maxShapeWidthInLevel + "\n");
 			}
 			lvl.setWidth(maxShapeWidthInLevel+MIN_WIDTH);
 			lvl.updateWidth(maxShapeWidthInLevel+MIN_WIDTH);
