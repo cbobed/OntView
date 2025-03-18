@@ -2,6 +2,9 @@ package sid.OntView2.main;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 import javax.imageio.ImageIO;
@@ -16,6 +19,7 @@ import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
@@ -44,6 +48,7 @@ import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
 import sid.OntView2.common.*;
 import sid.OntView2.expressionNaming.SIDClassExpressionNamer;
 import sid.OntView2.utils.ExpressionManager;
+import sid.OntView2.utils.ImageMerger;
 
 public class Mine extends Application implements Embedable{
 	private Stage primaryStage;
@@ -400,9 +405,7 @@ public class Mine extends Application implements Embedable{
 	}
 
 	public void createImage(Canvas canvas) {
-		int w = (int) canvas.getWidth();
-		int h = (int) canvas.getHeight();
-		imageDialog(canvas, w, h);
+        exportLargeCanvasAsPNGs(primaryStage);
 
 	}
 
@@ -412,25 +415,6 @@ public class Mine extends Application implements Embedable{
 
 		imageDialog(artPanel, w, h, 0, 0);
 	}
-
-    public static void captureVisibleCanvas(PaintFrame paintFrame, String filename) {
-        WritableImage snapshot = new WritableImage(
-            (int) paintFrame.getWidth(),
-            (int) paintFrame.getHeight()
-        );
-
-        SnapshotParameters parameters = new SnapshotParameters();
-        paintFrame.snapshot(parameters, snapshot);
-
-        // Guardar como PNG
-        File file = new File(filename);
-        try {
-            ImageIO.write(SwingFXUtils.fromFXImage(snapshot, null), "png", file);
-            System.out.println("Captura guardada en: " + file.getAbsolutePath());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
 	// <CBL 25/9/13>
 	// wrapper for the method
@@ -454,63 +438,62 @@ public class Mine extends Application implements Embedable{
             saveViewTask(snapshot, "png", file);
         }
     }
+    public void exportLargeCanvasAsPNGs(Stage stage) {
+        final int CHUNK_SIZE = 8000;
+        int columns = (int) Math.ceil((double) artPanel.canvasWidth / CHUNK_SIZE);
+        int rows = (int) Math.ceil((double) artPanel.canvasHeight / CHUNK_SIZE);
 
-    private void imageDialog2(Canvas panel,int w, int h, int xIni, int yIni){
-		File fl = null;
-		boolean done = false;
-		ArrayList<String> valid = new ArrayList<>();
-		valid.add("png");
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG files", "*.png"));
+        File directory = fileChooser.showSaveDialog(stage);
+        if (directory == null) return;
 
-		WritableImage writableImage = new WritableImage(w, h);
-		SnapshotParameters params = new SnapshotParameters();
-		params.setViewport(new Rectangle2D(xIni, yIni, w, h));
-		panel.snapshot(params, writableImage);
+        Path tempDir;
+        try {
+            Path projectDir = Paths.get("src").toAbsolutePath();
+            tempDir = projectDir.resolve("canvasImages");
+            if (Files.exists(tempDir)) {
+                ImageMerger.deleteDirectory(tempDir.toFile());
+            }
+            Files.createDirectories(tempDir);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
 
-		FileChooser fileChooser = new FileChooser();
-		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG", "*.png"));
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < columns; col++) {
+                int x = col * CHUNK_SIZE;
+                int y = row * CHUNK_SIZE;
+                int width = Math.min(CHUNK_SIZE, artPanel.canvasWidth - x);
+                int height = Math.min(CHUNK_SIZE, artPanel.canvasHeight - y);
 
-		while (!done) {
-			File file = fileChooser.showSaveDialog(primaryStage);
+                WritableImage snapshot = new WritableImage(width, height);
 
-			if (file != null) {
-				fl = file;
+                // Draw on the image without affecting the screen
+                GraphicsContext tempGc = new Canvas(width, height).getGraphicsContext2D();
+                tempGc.save();
+                tempGc.translate(-x, -y);
+                tempGc.setFill(Color.WHITE);
+                tempGc.fillRect(0, 0, width, height);
+                artPanel.draw(tempGc);
+                tempGc.restore();
 
-				if (fl.exists()){
-					Alert alert = new Alert(AlertType.CONFIRMATION, "Overwrite?", ButtonType.OK, ButtonType.CANCEL);
-					Optional<ButtonType> result = alert.showAndWait();
-					if (result.isPresent() && result.get() == ButtonType.CANCEL) {
-						continue;
-					}
-				}
-				String extension = valid.contains(fileChooser.getSelectedExtensionFilter().getDescription().toLowerCase()) ?
-						fileChooser.getSelectedExtensionFilter().getDescription().toLowerCase() : "png";
-				boolean hasSuffix = hasValidSuffix(fl.getName().toLowerCase());
+                tempGc.getCanvas().snapshot(null, snapshot);
+                File outputFile = tempDir.resolve("i_" + row + "_" + col + ".png").toFile();
+                try {
+                    ImageIO.write(SwingFXUtils.fromFXImage(snapshot, null), "png", outputFile);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        System.out.println("Done creating images");
+        ImageMerger.mergeImages("src/canvasImages/", directory.toString());
+    }
 
-				if (!hasSuffix){
-					String newName = fl.getPath() + "." + extension;
 
-					File fl2 = new File(newName);
-					if (fl2.exists()) {
-						Alert alert = new Alert(AlertType.CONFIRMATION, "Overwrite?", ButtonType.OK, ButtonType.CANCEL);
-						Optional<ButtonType> result = alert.showAndWait();
-						if (result.isPresent() && result.get() == ButtonType.CANCEL) {
-							continue;
-						}
-					}
-					saveViewTask(writableImage, extension, fl2);
-				}
-				else {
-                    saveViewTask(writableImage, extension, fl);
-				}
-				done = true;
-			}
-			else {
-				break;
-			}
-		}
-	}
-
-	private void saveViewTask(WritableImage writableImage, String extension, File finalFl) {
+    private void saveViewTask(WritableImage writableImage, String extension, File finalFl) {
 		Task<Void> task = new Task<>() {
 			@Override
 			protected Void call() throws IOException {
