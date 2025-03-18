@@ -53,9 +53,8 @@ import sid.OntView2.utils.ImageMerger;
 public class Mine extends Application implements Embedable{
 	private Stage primaryStage;
 	private static final long serialVersionUID = 1L;
-	boolean DEBUG=false;
 
-	OWLOntology activeOntology;
+    OWLOntology activeOntology;
 	OWLReasoner reasoner;
 	OWLOntologyManager manager;
 	HashSet<String> entityNameSet;
@@ -65,8 +64,6 @@ public class Mine extends Application implements Embedable{
 	ScrollPane  scroll;
 	Mine         self= this;
 	boolean      check = true;
-	private static final int WORLD_WIDTH = 20000;
-	private static final int WORLD_HEIGHT = 10000;
     private static final double SCROLL_INCREMENT = 10000;
     private static final double SPEED = 100;
 
@@ -85,9 +82,7 @@ public class Mine extends Application implements Embedable{
 
 	public Stage getPrimaryStage() { return primaryStage; }
 
-	public ScrollPane getScrollPane() { return scroll; }
-
-	public static void createAndShowGUI(Stage primaryStage) {
+    public static void createAndShowGUI(Stage primaryStage) {
 		primaryStage.setTitle("Viewer");
 		primaryStage.setMinWidth(1400);
 		primaryStage.setOnCloseRequest(event -> System.exit(0));
@@ -147,11 +142,9 @@ public class Mine extends Application implements Embedable{
 
 		VBox root = new VBox();
 		root.getChildren().addAll(viewer.nTopPanel.getMainPane(), viewer.scroll);
-		//VBox.setVgrow(viewer.scroll, Priority.ALWAYS);
 
 		viewer.artPanel.setStyle("-fx-background-color: white;");
 		viewer.nTopPanel.setStyle("-fx-border-color: black; -fx-border-width: 1;");
-
 
 		Scene scene = new Scene(root, 1500, 600);
 		scene.getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
@@ -213,8 +206,6 @@ public class Mine extends Application implements Embedable{
 		task.setOnFailed(e -> {
 			task.getException().printStackTrace();
 			loadingStage.close();
-			//showAlertDialog("Error", "Ontology could not be loaded.", "The ontology might be " +
-			//		"damaged or the URI may be incorrect.", Alert.AlertType.ERROR);
 			showAlertDialog("Error", "Ontology could not be loaded.", task.getException().getMessage(),
 					Alert.AlertType.ERROR);
 		});
@@ -278,7 +269,7 @@ public class Mine extends Application implements Embedable{
 			OWLReasonerConfiguration config = new SimpleConfiguration(progressMonitor);
 
 			try {
-				// Create a reasoner that will reason over our ontology and its imports closure.  Pass in the configuration.
+				// Create a reasoner that will reason over our ontology and its imports' closure.  Pass in the configuration.
 				reasoner = getReasonerFactory(reasonerString).createReasoner(activeOntology, config);
 
 				// between creating and precomputing
@@ -314,15 +305,6 @@ public class Mine extends Application implements Embedable{
 		else if (r.equalsIgnoreCase("HermiT")){
 			reasonerFactory = new ReasonerFactory();
 		}
-//		else if (r.equalsIgnoreCase("JFact")) {
-//			reasonerFactory = new JFactFactory();
-//		}
-//    	else if (r.equalsIgnoreCase("Elk")) {
-//    		reasonerFactory = new ElkReasonerFactory();
-//    	}
-//    	else if (r.equalsIgnoreCase("Jcel")) {
-//    		reasonerFactory = new JcelReasonerFactory();
-//    	}
 		return reasonerFactory;
 	}
 
@@ -447,7 +429,7 @@ public class Mine extends Application implements Embedable{
             parameters.setViewport(new Rectangle2D(0, 0, w, h));
 
             panel.snapshot(parameters, snapshot);
-            saveViewTask(snapshot, "png", file);
+            saveViewTask(snapshot, file);
         }
     }
     public void exportLargeCanvasAsPNGs(File directory) {
@@ -500,10 +482,8 @@ public class Mine extends Application implements Embedable{
 
                 File outputFile = tempDir.resolve("i_" + row + "_" + col + ".png").toFile();
                 try {
-                    System.out.println("aqui 5");
                     ImageIO.write(SwingFXUtils.fromFXImage(snapshot, null), "png", outputFile);
                 } catch (IOException e) {
-                    System.out.println("aqui error");
                     throw new RuntimeException(e);
                 }
             }
@@ -513,11 +493,11 @@ public class Mine extends Application implements Embedable{
     }
 
 
-    private void saveViewTask(WritableImage writableImage, String extension, File finalFl) {
+    private void saveViewTask(WritableImage writableImage, File finalFl) {
 		Task<Void> task = new Task<>() {
 			@Override
 			protected Void call() throws IOException {
-				ImageIO.write(SwingFXUtils.fromFXImage(writableImage, null), extension, finalFl);
+				ImageIO.write(SwingFXUtils.fromFXImage(writableImage, null), "png", finalFl);
 				return null;
 			}
 		};
@@ -532,13 +512,7 @@ public class Mine extends Application implements Embedable{
 		new Thread(task).start();
 	}
 
-	public boolean hasValidSuffix(String in){
-		if (in.endsWith("jpg")) return true;
-		if (in.endsWith("png")) return true;
-		return false;
-	}
-
-	@Override
+    @Override
 	public void loadSearchCombo() {
 		// TODO Auto-generated method stub
 		nTopPanel.loadSearchCombo();
@@ -555,8 +529,4 @@ public class Mine extends Application implements Embedable{
 		alert.showAndWait();
 	}
 
-
 }
-
-
-

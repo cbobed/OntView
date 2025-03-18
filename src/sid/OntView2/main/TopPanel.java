@@ -57,7 +57,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private VBox connectorPanel;
 	private ToggleButton toggleSwitch;
 	private Button cleanConnectorsButton;
-	private Mine parent;
+	private final Mine parent;
 	private CheckBox Properties;
 	private Button fileSystemButton;
 	private Slider zoomSlider;
@@ -76,12 +76,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private TextField parentSearchField, childSearchField;
 
 
-	public TopPanel(Mine pparent) {
-		parent = pparent;
-		initComponents();
-	}
-
-	public TopPanel() {
+	public TopPanel(Mine pParent) {
+		parent = pParent;
 		initComponents();
 	}
 
@@ -155,7 +151,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			saveImagePartialButton.setMinWidth(40);
 
 			ClassLoader c = Thread.currentThread().getContextClassLoader();
-			Image image = new Image(Objects.requireNonNull(c.getResourceAsStream("saveImageParcial.JPG")));
+			Image image = new Image(Objects.requireNonNull(c.getResourceAsStream("saveImagePartial.JPG")));
 			ImageView imageView = new ImageView(image);
 			imageView.setFitWidth(20);
 			imageView.setFitHeight(20);
@@ -217,30 +213,6 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			zoomSlider.setMinHeight(VisConstants.CONTAINER_SIZE);
 			zoomSlider.setMaxHeight(VisConstants.CONTAINER_SIZE);
 			zoomSlider.onMouseReleasedProperty().set((MouseEvent event) -> zoomSliderChangeStateChanged(zoomSlider.getValue()));
-
-		}
-		return zoomSlider;
-	}
-
-	private Slider getZoomSlider2() {
-		if (zoomSlider == null) {
-			zoomSlider = new Slider(0.5, 3, 1);
-			zoomSlider.setShowTickLabels(true);
-			zoomSlider.setShowTickMarks(true);
-			zoomSlider.setMajorTickUnit(0.5);
-			zoomSlider.setMinorTickCount(4);
-			zoomSlider.setBlockIncrement(0.1);
-			zoomSlider.setOrientation(Orientation.VERTICAL);
-
-
-			zoomSlider.getStyleClass().add("zoom-slider");
-			zoomSlider.setPrefHeight(VisConstants.CONTAINER_SIZE);
-			zoomSlider.setMinHeight(VisConstants.CONTAINER_SIZE);
-			zoomSlider.setMaxHeight(VisConstants.CONTAINER_SIZE);
-			zoomSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
-				//parent.artPanel.setFactor(newVal.doubleValue());
-				//parent.artPanel.applyZoom();
-			});
 
 		}
 		return zoomSlider;
@@ -365,7 +337,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			TextField editor = comboBox.getEditor();
 			editor.addEventHandler(KeyEvent.KEY_RELEASED, event -> handleAutoComplete(editor.getText(), items));
 
-			tooltipInfo(comboBox, "Search for a class onces the ontology is loaded");
+			tooltipInfo(comboBox, "Search for a class once the ontology is loaded");
 		}
 		return comboBox;
 	}
@@ -406,29 +378,6 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	}
 
 	protected void kceItemItemStateChanged(ActionEvent event) {
-		/*Task<Void> task = new Task<>() {
-			@Override
-			protected Void call() {
-				// TODO Auto-generated method stub
-				if (parent.artPanel != null) {
-					parent.artPanel.setKceOption(kceComboBox.getSelectionModel().getSelectedItem());
-					parent.artPanel.doKceOptionAction();
-				}
-				return null;
-			}
-		};
-
-		Stage loadingStage = parent.artPanel.showLoadingStage(task);
-
-		task.setOnSucceeded(e -> loadingStage.close());
-		task.setOnFailed(e -> {
-			task.getException().printStackTrace();
-			parent.showAlertDialog("Error", "KCE could not be loaded.", "Try again.",
-					Alert.AlertType.ERROR);
-			loadingStage.close();
-		});
-
-		new Thread(task).start();*/
 		if (parent.artPanel != null) {
 			parent.artPanel.setKceOption(kceComboBox.getSelectionModel().getSelectedItem());
 			parent.artPanel.doKceOptionAction();
@@ -834,8 +783,6 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			task.getException().printStackTrace();
 			parent.showAlertDialog("Error", "Reasoner could not be loaded.",  "Try another reasoner.",
 					Alert.AlertType.ERROR);
-			//parent.showAlertDialog("Error", "Reasoner could not be loaded.",  task.getException().getMessage(),
-			//		Alert.AlertType.ERROR);
 			loadingStage.close();
 		});
 
@@ -864,16 +811,16 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 					recent.add(item.toString());
 				}
 
-				FileOutputStream fout = new FileOutputStream("recent.txt");
-				PrintStream pstream = new PrintStream(fout);
-				pstream.println(selected);
+				FileOutputStream fOut = new FileOutputStream("recent.txt");
+				PrintStream pStream = new PrintStream(fOut);
+				pStream.println(selected);
 				for (String str : recent) {
 					if (!str.equals(selected)) {
-						pstream.println(str);
+						pStream.println(str);
 					}
 				}
-				pstream.flush();
-				pstream.close();
+				pStream.flush();
+				pStream.close();
 
 				// Needed to solve concurrency issue
 				PauseTransition pause = new PauseTransition(Duration.millis(100));
@@ -1183,9 +1130,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		ObservableList<CheckBox> checkBoxList = toCheckBoxList(getAllShapeMap(), true);
 		parentCheckBoxList.setItems(checkBoxList);
 
-		parentSearchField.textProperty().addListener((observable, oldValue, newValue) -> {
-			filterCheckBoxes(checkBoxList, newValue, parentCheckBoxList);
-		});
+		parentSearchField.textProperty().addListener((observable, oldValue, newValue) -> filterCheckBoxes(checkBoxList, newValue, parentCheckBoxList));
 
 		parentListBox.getChildren().addAll(parentTitle, parentSearchField, parentCheckBoxList);
 		parentListBox.setMaxWidth(Double.MAX_VALUE);
@@ -1204,9 +1149,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		ObservableList<CheckBox> checkBoxList = toCheckBoxList(getAllShapeMap(), false);
 		childCheckBoxList.setItems(checkBoxList);
 
-		childSearchField.textProperty().addListener((observable, oldValue, newValue) -> {
-			filterCheckBoxes(checkBoxList, newValue, childCheckBoxList);
-		});
+		childSearchField.textProperty().addListener((observable, oldValue, newValue) -> filterCheckBoxes(checkBoxList, newValue, childCheckBoxList));
 
 		childListBox.getChildren().addAll(childTitle, childSearchField, childCheckBoxList);
 		childListBox.setMaxWidth(Double.MAX_VALUE);
