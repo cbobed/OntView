@@ -42,7 +42,6 @@ public class PaintFrame extends Canvas {
 	static final int BORDER_PANEL = 70;
 	static final int MIN_SPACE = 20;
 	static final int MIN_INITIAL_SPACE = 40;
-	public static final int MAX_SIZE = 14700;
 	private final int MIN_POS_SHAPE = 30;
 	private static final int DOWN = 0;
 	private static final int UP = -1;
@@ -551,7 +550,6 @@ public class PaintFrame extends Canvas {
 
 		if (pressedShape != null) {
             System.out.println("pressed shape");
-            if (pressedShape.getLabel().matches(""))
 			selectedShapes.add(pressedShape);
 			mouseLastY = (int) p.getY();
 		} else {
@@ -666,7 +664,7 @@ public class PaintFrame extends Canvas {
 		Point2D p = translatePoint(new Point2D(e.getX(), e.getY()));
 		int x = (int) p.getX();
 		int y = (int) p.getY();
-		System.out.println("x = " + x + " AND y = " + y);
+		//System.out.println("x = " + x + " AND y = " + y);
 		Shape shape = visGraph.findShape(p);
 		if (clickedOnClosePropertyBox(x, y, shape) || clickedOnCloseDisjointBox(x, y)) {
 			return;
@@ -754,13 +752,21 @@ public class PaintFrame extends Canvas {
             }
         }
 
-       // System.out.println("maxY " + maxY + " - minY " + minY + " - maxX " + maxX);
+        System.out.println("maxY " + maxY + " - minY " + minY + " - maxX " + maxX);
 
-        canvasHeight = (int) maxY + BORDER_PANEL;
-        canvasWidth = (int) maxX + BORDER_PANEL;
+        double viewportHeight = scroll.getViewportBounds().getHeight();
+        //canvasHeight = (int) maxY ;//+ VisConstants.HEIGHT_MARGIN;
+        //canvasWidth = (int) maxX + VisConstants.WIDTH_MARGIN;
 
-        scroll.setVmax(canvasHeight - screenHeight);
-        scroll.setHmax(canvasWidth - screenWidth);
+        System.out.println("viewportHeight: " + viewportHeight);
+        System.out.println("screenHeight: " + screenHeight + " , screenWidth: " + screenWidth);
+        System.out.println("canvasHeight: " + canvasHeight + " , canvasWidth: " + canvasWidth);
+        System.out.println("canvasHeight- screenHeight: " + (canvasHeight- screenHeight) +
+            " , canvasWidth - screenWidth: " + (canvasWidth - screenWidth) + "\n");
+
+        //scroll.setVmax(Math.max(0, canvasHeight - viewportHeight));
+        //scroll.setVmax(canvasHeight - viewportHeight);
+        //scroll.setHmax(screenWidth - canvasWidth);
 
         if (minY < 0) {
             // Adjust the shape position

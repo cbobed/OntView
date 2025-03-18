@@ -15,8 +15,8 @@ public class VisConstants {
 
 	public static final int CONTAINER_SIZE = 65;
 	
-	final static int WIDTH_MARGIN        = 300;
-    final static int HEIGHT_MARGIN       = 300;
+	final static int WIDTH_MARGIN        = 30;
+    final static int HEIGHT_MARGIN       = 30;
 	final static int PROGRESSBAROBSERVER = 1;
 	final static int GENERALOBSERVER     = 2;
     final static String THING_ENTITY = "http://www.w3.org/2002/07/owl#Thing";
