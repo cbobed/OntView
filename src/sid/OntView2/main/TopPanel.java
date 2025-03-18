@@ -791,11 +791,11 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 
 	private void saveImageButtonActionActionPerformed(ActionEvent event) {
-		parent.createImage(parent.artPanel);
+		parent.createImage();
 	}
 
 	private void saveImageButtonPartialActionActionPerformed(ActionEvent event) {
-		parent.createImageFromVisibleRect(parent.artPanel);
+		parent.createImageFromVisibleRect();
 	}
 
 	private void applyCheckBoxFunctions(ActionEvent e) {

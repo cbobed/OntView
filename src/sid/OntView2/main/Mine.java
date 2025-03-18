@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
 
 import javax.imageio.ImageIO;
 
@@ -29,7 +30,6 @@ import javafx.scene.paint.Color;
 import javafx.stage.*;
 import javafx.scene.control.Alert.AlertType;
 
-import javafx.util.Duration;
 import openllet.owlapi.OpenlletReasonerFactory;
 import org.semanticweb.HermiT.ReasonerFactory;
 
@@ -404,49 +404,56 @@ public class Mine extends Application implements Embedable{
 		}
 	}
 
-	public void createImage(Canvas canvas) {
-        exportLargeCanvasAsPNGs(primaryStage);
+	public void createImage() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG files", "*.png"));
+        File directory = fileChooser.showSaveDialog(primaryStage);
+        if (directory == null) return;
 
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call(){
+                exportLargeCanvasAsPNGs(directory);
+                return null;
+            }
+        };
+        Stage loadingStage = artPanel.showLoadingStage(task);
+        task.setOnSucceeded(e -> loadingStage.close());
+        task.setOnFailed(e -> {
+            task.getException().printStackTrace();
+            Path path = Paths.get("src/canvasImages/");
+            ImageMerger.deleteDirectory(path.toFile());
+            loadingStage.close();
+            showAlertDialog("Error", "Unable to save the ontology view.", task.getException().getMessage(),
+                AlertType.ERROR);
+        });
+        new Thread(task).start();
 	}
 
-	public void createImageFromVisibleRect(Canvas canvas) {
+	public void createImageFromVisibleRect() {
 		int w = (int) artPanel.getWidth();
 		int h = (int) artPanel.getHeight();
 
-		imageDialog(artPanel, w, h, 0, 0);
+		imageDialog(artPanel, w, h);
 	}
 
-	// <CBL 25/9/13>
-	// wrapper for the method
-	private void imageDialog(Canvas panel,int w, int h){
-		//imageDialog(panel, w, h, 0, 0);
-	}
-
-	// <CBL 25/9/13>
-	// modified to take an offset as argument
-
-    private void imageDialog(PaintFrame panel,int w, int h, int xIni, int yIni) {
+    private void imageDialog(PaintFrame panel, int w, int h) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG", "*.png"));
         File file = fileChooser.showSaveDialog(primaryStage);
         if (file != null) {
             WritableImage snapshot = new WritableImage(w, h);
             SnapshotParameters parameters = new SnapshotParameters();
-            parameters.setViewport(new Rectangle2D(xIni, yIni, w, h));
+            parameters.setViewport(new Rectangle2D(0, 0, w, h));
 
             panel.snapshot(parameters, snapshot);
             saveViewTask(snapshot, "png", file);
         }
     }
-    public void exportLargeCanvasAsPNGs(Stage stage) {
+    public void exportLargeCanvasAsPNGs(File directory) {
         final int CHUNK_SIZE = 8000;
         int columns = (int) Math.ceil((double) artPanel.canvasWidth / CHUNK_SIZE);
         int rows = (int) Math.ceil((double) artPanel.canvasHeight / CHUNK_SIZE);
-
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG files", "*.png"));
-        File directory = fileChooser.showSaveDialog(stage);
-        if (directory == null) return;
 
         Path tempDir;
         try {
@@ -469,7 +476,6 @@ public class Mine extends Application implements Embedable{
                 int height = Math.min(CHUNK_SIZE, artPanel.canvasHeight - y);
 
                 WritableImage snapshot = new WritableImage(width, height);
-
                 // Draw on the image without affecting the screen
                 GraphicsContext tempGc = new Canvas(width, height).getGraphicsContext2D();
                 tempGc.save();
@@ -479,11 +485,25 @@ public class Mine extends Application implements Embedable{
                 artPanel.draw(tempGc);
                 tempGc.restore();
 
-                tempGc.getCanvas().snapshot(null, snapshot);
+                CountDownLatch latch = new CountDownLatch(1);
+                Platform.runLater(() -> {
+                    tempGc.getCanvas().snapshot(null, snapshot);
+                    latch.countDown();
+                });
+
+                try {
+                    latch.await();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    return;
+                }
+
                 File outputFile = tempDir.resolve("i_" + row + "_" + col + ".png").toFile();
                 try {
+                    System.out.println("aqui 5");
                     ImageIO.write(SwingFXUtils.fromFXImage(snapshot, null), "png", outputFile);
                 } catch (IOException e) {
+                    System.out.println("aqui error");
                     throw new RuntimeException(e);
                 }
             }
