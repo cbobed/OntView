@@ -39,7 +39,7 @@ import reducer.StructuralReducer;
 public class PaintFrame extends Canvas {
 	private static final long serialVersionUID = 1L;
 	public ScrollPane scroll;
-	static final int BORDER_PANEL = 70;
+	static final int BORDER_PANEL = 50;
 	static final int MIN_SPACE = 20;
 	static final int MIN_INITIAL_SPACE = 40;
 	private final int MIN_POS_SHAPE = 30;
@@ -64,6 +64,7 @@ public class PaintFrame extends Canvas {
 	public int screenHeight;
 	public int canvasWidth = 0;
 	public int canvasHeight = 0;
+    public int nTopPanelHeight = 0;
 
 	public boolean isStable() {
 		return stable;

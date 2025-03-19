@@ -105,7 +105,7 @@ public class Mine extends Application implements Embedable{
 		viewer.artPanel.screenHeight = (int) screenHeight;
 
 		viewer.nTopPanel = new TopPanel(viewer);
-
+        viewer.artPanel.nTopPanelHeight = (int) viewer.nTopPanel.getHeight();
         viewer.scroll = new ScrollPane(viewer.artPanel);
 		viewer.scroll.setPrefSize(screenWidth, screenHeight - viewer.nTopPanel.getHeight());
 		viewer.scroll.setHmax(screenWidth);
@@ -143,7 +143,7 @@ public class Mine extends Application implements Embedable{
 		VBox root = new VBox();
 		root.getChildren().addAll(viewer.nTopPanel.getMainPane(), viewer.scroll);
 
-		viewer.artPanel.setStyle("-fx-background-color: white;");
+        viewer.artPanel.setStyle("-fx-background-color: white;");
 		viewer.nTopPanel.setStyle("-fx-border-color: black; -fx-border-width: 1;");
 
 		Scene scene = new Scene(root, 1500, 600);

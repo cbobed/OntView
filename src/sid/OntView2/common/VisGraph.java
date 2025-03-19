@@ -133,7 +133,8 @@ public class VisGraph implements Runnable{
 			System.err.println("VisLevel is null in getWidth method.");
 			return 0;
 		}
-		return Math.max(((lvl.getWidth()+lvl.getXpos()+VisConstants.WIDTH_MARGIN) - paintframe.screenWidth), 0);
+        return (lvl.getWidth()+lvl.getXpos()+VisConstants.WIDTH_MARGIN);
+		//return Math.max(((lvl.getWidth()+lvl.getXpos()+VisConstants.WIDTH_MARGIN) - paintframe.screenWidth), 0);
 
 	}
     public int getHeight() {
@@ -141,8 +142,8 @@ public class VisGraph implements Runnable{
 		for (Entry<String, Shape> entry : shapeMap.entrySet()) {
             maxy = (Math.max(entry.getValue().getBottomCorner(), maxy));
 		}
-        System.out.println("getHeight maxy " + maxy);
-		return Math.max(((maxy + VisConstants.HEIGHT_MARGIN) - paintframe.screenHeight), 0);
+        return (maxy + VisConstants.HEIGHT_MARGIN);
+		//return Math.max(((maxy + VisConstants.HEIGHT_MARGIN) - paintframe.screenHeight), 0);
     }
     
     public void adjustPanelSize(float factor){
@@ -150,16 +151,14 @@ public class VisGraph implements Runnable{
 			System.err.println("paintframe is null in adjustPanelSize method.");
 			return;
 		}
-        System.out.println("-----------------------------------------");
-		int x = (int) (getWidth() * factor);
-		int y = (int) (getHeight() * factor);
-        System.out.println("y = " + y);
+        double viewPortHeight = paintframe.scroll.getViewportBounds().getHeight();
+        double viewPortWidth = paintframe.scroll.getViewportBounds().getWidth();
 
+        int x = Math.max((int) (getWidth() * factor - viewPortWidth), 0);
+        // viewPortHeight does not take into account TopPanel's height
+        int y = Math.max((int) (getHeight() * factor - viewPortHeight - paintframe.nTopPanelHeight), 0);//
 		paintframe.canvasHeight = y + paintframe.screenHeight;
 		paintframe.canvasWidth = x + paintframe.screenWidth;
-        System.out.println("paintframe.screenHeight = " + (paintframe.screenHeight));
-        System.out.println("paintframe.canvasHeight = " + (paintframe.canvasHeight));
-        System.out.println("-----------------------------------------\n");
 
 		paintframe.scroll.setHmax(x);
 		paintframe.scroll.setVmax(y);
