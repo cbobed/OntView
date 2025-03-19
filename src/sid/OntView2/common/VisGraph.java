@@ -160,6 +160,7 @@ public class VisGraph implements Runnable{
 		paintframe.canvasHeight = y + paintframe.screenHeight;
 		paintframe.canvasWidth = x + paintframe.screenWidth;
 
+        // deja un espacio de 164px
 		paintframe.scroll.setHmax(x);
 		paintframe.scroll.setVmax(y);
     }

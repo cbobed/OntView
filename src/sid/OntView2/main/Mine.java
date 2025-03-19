@@ -123,10 +123,10 @@ public class Mine extends Application implements Embedable{
             viewer.artPanel.setOffsetY(newVal.doubleValue());
         });
 
-		viewer.artPanel.scroll.setOnScroll(event -> {
+		/*viewer.artPanel.scroll.setOnScroll(event -> {
             viewer.artPanel.scroll.setHvalue(viewer.artPanel.scroll.getHvalue());
 			viewer.artPanel.scroll.setVvalue(viewer.artPanel.scroll.getVvalue());
-		});
+		});*/
 
         viewer.artPanel.scroll.addEventFilter(ScrollEvent.SCROLL, event -> {
             if (event.getDeltaY() != 0) {
