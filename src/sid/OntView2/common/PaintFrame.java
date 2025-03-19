@@ -549,13 +549,13 @@ public class PaintFrame extends Canvas {
 		pressedShape = visGraph.findShape(p);
 
 		if (pressedShape != null) {
-            System.out.println("********* PRESSED SHAPE " + pressedShape.getLabel() + " y: " + pressedShape.getPosY() + "*********");
+            //System.out.println("********* PRESSED SHAPE " + pressedShape.getLabel() + " y: " + pressedShape.getPosY() + "*********");
 			selectedShapes.add(pressedShape);
 			mouseLastY = (int) p.getY();
 		} else {
-            System.out.println("********* PRESSED ELSEWHERE *********");
+            //System.out.println("********* PRESSED ELSEWHERE *********");
             pinchPoint = new Point2D(e.getX() + offsetX, e.getY() + offsetY);
-            System.out.println("pinchPoint x:" + pinchPoint.getX() + " , y:" + pinchPoint.getY());
+            //System.out.println("pinchPoint x:" + pinchPoint.getX() + " , y:" + pinchPoint.getY());
             mouseLastX = (int) p.getX();
 			mouseLastY = (int) p.getY();
 			setCursor(Cursor.CLOSED_HAND);

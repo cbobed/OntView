@@ -582,7 +582,7 @@ public abstract class Shape {
 
         visitedNodes.clear();
         for (Shape child : descendantsToProcess) {
-            updateSameLevelParentsDescendants(child, visitedNodes);
+            updateSameLevelParentsDescendants(child, visitedNodes, descendantsToProcess);
         }
     }
 
@@ -605,12 +605,16 @@ public abstract class Shape {
     /**
      * Updates the descendants count for the first visible parent of node.
      */
-    private void updateSameLevelParentsDescendants(Shape currentNode, Set<Shape> visitedNodes) {
+    private void updateSameLevelParentsDescendants(Shape currentNode, Set<Shape> visitedNodes, Set<Shape> visibleDescendantsSet) {
         if (visitedNodes.contains(currentNode)) return;
         visitedNodes.add(currentNode);
 
         for (VisConnector inConnector : currentNode.inConnectors) {
             Shape parent = inConnector.from;
+
+            if(currentNode.getLabel().matches("Student") || parent.getLabel().matches("Student")){
+                System.out.println("Student");
+            }
             if (visitedNodes.contains(parent)) continue;
 
             if (parent.isVisible()) {
@@ -619,8 +623,9 @@ public abstract class Shape {
                     Shape childNode = outConnector.to;
                     addHiddenDescendants(childNode, parent.hiddenDescendantsSet);
                 }
+                parent.updateAncestorsForVisibleChildren(parent, new HashSet<>(), visibleDescendantsSet);
             } else {
-                updateSameLevelParentsDescendants(parent, visitedNodes);
+                updateSameLevelParentsDescendants(parent, visitedNodes, visibleDescendantsSet);
             }
         }
     }
@@ -647,7 +652,7 @@ public abstract class Shape {
         updateAncestorsForVisibleChildren(this, visitedNodes, descendantsToProcess);
 
         for (Shape child : descendantsToProcess) {
-            updateSameLevelParentsDescendants(child, visitedNodes);
+            updateSameLevelParentsDescendants(child, visitedNodes, visibleDescendantsSet);
         }
 
         visibleDescendantsSet.clear();
@@ -658,6 +663,15 @@ public abstract class Shape {
      */
     private void updateAncestorsForVisibleChildren(Shape currentNode, Set<Shape> visitedNodes, Set<Shape> visibleDescendantsSet) {
         if (visitedNodes.contains(currentNode)) return;
+
+        if(currentNode.getLabel().matches("Student")){
+            System.out.println("Student");
+        }
+
+        System.out.println(currentNode.getLabel());
+        for (Shape s: visibleDescendantsSet){
+            System.out.println(" - " + s.getLabel());
+        }
 
         visitedNodes.add(currentNode);
         for (VisConnector inConnector : currentNode.inConnectors) {
