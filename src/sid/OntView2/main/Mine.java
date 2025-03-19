@@ -184,7 +184,6 @@ public class Mine extends Application implements Embedable{
 				}
 			}
 			nTopPanel.restorePropertyCheckboxes();
-			nTopPanel.restoreSliderValue();
 			artPanel.start();
 		}
 	}

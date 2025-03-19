@@ -855,7 +855,7 @@ public class PaintFrame extends Canvas {
 		 * when scaling positions get messed up so to keep actions as in a 1,1 ratio I
 		 * need to scale down event points
 		 */
-		return new Point2D((int) ((p.getX() + offsetX) / factor), (int) ((p.getY() + offsetY) / factor));
+		return new Point2D((int) ((p.getX() / factor) + offsetX), (int) ((p.getY() / factor) + offsetY));
 
 	}
 

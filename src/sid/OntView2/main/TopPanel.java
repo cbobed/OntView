@@ -763,6 +763,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 	void loadReasonerButtonActionTask(ActionEvent event) {
 		// Only use Custom mode once the graph is loaded
+        restoreSliderValue();
 		parent.artPanel.clearCanvas();
 		if (Objects.equals(getKceComboBox().getValue(), VisConstants.CUSTOMCOMBOOPTION3)){
 			getKceComboBox().setValue(VisConstants.NONECOMBOOPTION);
