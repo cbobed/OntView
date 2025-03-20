@@ -355,10 +355,10 @@ public class Mine extends Application implements Embedable{
 			loadingStage.close();
 			artPanel.clearCanvas();
 			Platform.runLater(artPanel.getRedrawRunnable());
-			String message = """
-				  • Ontology loading ✔
-				  • Reasoner loading ✔
-				  • View loading ❌
+            String message = """
+				  • Ontology loading \u2714
+				  • Reasoner loading \u2714
+				  • View loading \u274C
 				""";
 			showAlertDialog("Error", "Failed to load view.", message +
 					"\nView might be corrupted.", Alert.AlertType.ERROR);

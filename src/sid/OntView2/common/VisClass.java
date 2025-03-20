@@ -519,7 +519,7 @@ public class VisClass extends Shape {
 		g.fillRoundRect(x - (double) getWidth()/2 + 5, y - (double) currentHeight / 2 + 6, 19, 14, roundCornerValue, roundCornerValue);
 		g.setFill(Color.BLACK);
 		g.strokeRoundRect(x - (double) getWidth()/2 + 5, y - (double) currentHeight / 2 + 6, 19, 14, roundCornerValue, roundCornerValue);
-		g.fillText("P▼", x - (double) getWidth()/2 + 7, y - (double) currentHeight / 2 + 17);
+		g.fillText("P\u25BC", x - (double) getWidth()/2 + 7, y - (double) currentHeight / 2 + 17);
 	}
 
 	private void disjointDraw(GraphicsContext g, int x, int y, int roundCornerValue, Color colorD) {

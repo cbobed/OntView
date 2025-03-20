@@ -1493,7 +1493,7 @@ public class PaintFrame extends Canvas {
 	}
 
 	private Button createAddButton(ListView<Shape> allConceptsView, ObservableList<Shape> selectedConceptsList) {
-		Button addButton = new Button("→");
+		Button addButton = new Button("\u2192");
 		addButton.setOnAction(e -> {
 			Shape selected = allConceptsView.getSelectionModel().getSelectedItem();
 			if (selected != null && !selectedConceptsList.contains(selected)) {
@@ -1504,7 +1504,7 @@ public class PaintFrame extends Canvas {
 	}
 
 	private Button createRemoveButton(ListView<Shape> selectedConceptsView, ObservableList<Shape> selectedConceptsList) {
-		Button removeButton = new Button("←");
+		Button removeButton = new Button("\u2190");
 		removeButton.setOnAction(e -> {
 			Shape selected = selectedConceptsView.getSelectionModel().getSelectedItem();
 			if (selected != null) {
