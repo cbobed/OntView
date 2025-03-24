@@ -16,13 +16,11 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.Cursor;
 
 import javafx.scene.text.Font;
-import javafx.scene.transform.Scale;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Modality;
@@ -42,7 +40,6 @@ public class PaintFrame extends Canvas {
 	static final int BORDER_PANEL = 50;
 	static final int MIN_SPACE = 20;
 	static final int MIN_INITIAL_SPACE = 40;
-	private final int MIN_POS_SHAPE = 30;
 	private static final int DOWN = 0;
 	private static final int UP = -1;
 	boolean stable = false;
@@ -196,16 +193,6 @@ public class PaintFrame extends Canvas {
 		}
 	}
 	
-	public class ConnectorDrawer implements Runnable {
-		Shape s = null;
-		public ConnectorDrawer (Shape s) {
-			this.s = s;
-		}
-		public void run() {
-			drawConnectorShape(s);
-		}
-	}
-	
 	public class GlobalRedraw implements Runnable {
 		public void run() {
 			redraw();
@@ -217,6 +204,7 @@ public class PaintFrame extends Canvas {
 			compactGraph();
 		}
 	}
+
 	public class CanvasAdjuster implements Runnable {
 		public void run() {
 			checkAndResizeCanvas();
@@ -420,9 +408,7 @@ public class PaintFrame extends Canvas {
 			}
 		};
 
-		task.setOnSucceeded(e -> {
-			paintFrame.setCursor(Cursor.DEFAULT);
-		});
+		task.setOnSucceeded(e -> paintFrame.setCursor(Cursor.DEFAULT));
 
 		task.setOnFailed(e -> {
 			paintFrame.setCursor(Cursor.DEFAULT);
@@ -580,7 +566,7 @@ public class PaintFrame extends Canvas {
 	}
 
 	/*
-	 * MOUSEMOTIONLISTENER
+	 * MOUSE MOTION LISTENER
 	 */
 
 	private boolean isDragging = false;
@@ -740,13 +726,10 @@ public class PaintFrame extends Canvas {
             }
         }
 
-        //System.out.println("maxY " + maxY + " - minY " + minY + " - maxX " + maxX);
-
         double viewportHeight = scroll.getViewportBounds().getHeight();
         double viewportWidth = scroll.getViewportBounds().getWidth();
         canvasHeight = (int) ((maxY + VisConstants.NEEDED_HEIGHT) / factor);
         canvasWidth = (int) maxX + VisConstants.WIDTH_MARGIN;
-        printScrollAttributes();
 
         scroll.setVmax(Math.max(0, maxY - viewportHeight));
         scroll.setHmax(Math.max(0, maxX - viewportWidth));
@@ -765,9 +748,9 @@ public class PaintFrame extends Canvas {
 
     public void printScrollAttributes() {
         System.out.println("ScrollPane Attributes:--------------------------------------");
-        System.out.println("Hvalue: " + scroll.getHvalue() + " Vvalue: " + scroll.getVvalue());
-        System.out.println("Hmin: " + scroll.getHmin() + " Hmax: " + scroll.getHmax());
-        System.out.println("Vmin: " + scroll.getVmin() + " Vmax: " + scroll.getVmax());
+        System.out.println("HValue: " + scroll.getHvalue() + " VValue: " + scroll.getVvalue());
+        System.out.println("HMin: " + scroll.getHmin() + " HMax: " + scroll.getHmax());
+        System.out.println("VMin: " + scroll.getVmin() + " VMax: " + scroll.getVmax());
         System.out.println("Viewport Bounds: " + scroll.getViewportBounds());
         System.out.println("Content Bounds: " + scroll.getContent().getBoundsInParent());
         System.out.println("PrefWidth: " + scroll.getPrefWidth() + " PrefHeight: " + scroll.getPrefHeight());
@@ -936,24 +919,6 @@ public class PaintFrame extends Canvas {
 		}
 
 		getVisGraph().updateObservers(VisConstants.GENERALOBSERVER);
-		return false;
-	}
-
-	private boolean clickedOnClosePropertyBox2(int x, int y, Shape shape) {
-		if (visGraph == null || shape == null) {
-			return false;
-		}
-
-		if(shape.asVisClass().propertyBox != null){
-			if (shape.asVisClass().onCloseBox(x, y)) {
-				boolean b = shape.asVisClass().propertyBox.visible;
-				shape.asVisClass().propertyBox.setVisible(!b);
-				showRelatedProperties(shape.asVisClass(), visGraph, !b);
-				setStateChanged(true);
-				Platform.runLater(relaxerRunnable);
-				return true;
-			}
-		}
 		return false;
 	}
 
@@ -1306,8 +1271,8 @@ public class PaintFrame extends Canvas {
 		StructuralReducer.applyStructuralReduction(getOntology());
 	}
 
-	public void setParentFrame(Embedable pemb) {
-		parentFrame = pemb;
+	public void setParentFrame(Embedable pEmb) {
+		parentFrame = pEmb;
 	}
 
 	public Embedable getParentFrame() {
@@ -1397,7 +1362,7 @@ public class PaintFrame extends Canvas {
 
 	private ListView<Shape> createConceptListView(ObservableList<Shape> concepts) {
 		ListView<Shape> listView = new ListView<>(concepts);
-		listView.setCellFactory(param -> new ListCell<Shape>() {
+		listView.setCellFactory(param -> new ListCell<>() {
 			@Override
 			protected void updateItem(Shape item, boolean empty) {
 				super.updateItem(item, empty);
@@ -1414,9 +1379,8 @@ public class PaintFrame extends Canvas {
 	private TextField createSearchField(ObservableList<Shape> concepts, ListView<Shape> listView) {
 		TextField searchField = new TextField();
 		searchField.setPromptText("Search nodes");
-		searchField.textProperty().addListener((observable, oldValue, newValue) -> {
-			listView.setItems(concepts.filtered(item -> item.getLabel().toLowerCase().contains(newValue.toLowerCase())));
-		});
+		searchField.textProperty().addListener((observable, oldValue, newValue) ->
+            listView.setItems(concepts.filtered(item -> item.getLabel().toLowerCase().contains(newValue.toLowerCase()))));
 		return searchField;
 	}
 
