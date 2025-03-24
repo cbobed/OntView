@@ -474,11 +474,11 @@ public class VisClass extends Shape {
 
 		if (isDefined && !label.startsWith(SIDClassExpressionNamer.className)) rectY -= 5;
 
-		double hiddenPercentage = (double) hiddenNodes / descendants.size();
-		double visiblePercentage = 1.0 - hiddenPercentage;
+		double visiblePercentage = (double) (descendants.size() - hiddenNodes) / descendants.size();
+		double hiddenPercentage = 1.0 - visiblePercentage;
 
-		double visibleWidth = width * hiddenPercentage;
-		double hiddenWidth = width * visiblePercentage;
+        double visibleWidth = width * visiblePercentage;
+        double hiddenWidth = width * hiddenPercentage;
 
 		g.setFill(Color.MEDIUMSEAGREEN); // visible nodes
 		g.fillRect(x, rectY, visibleWidth, height);
@@ -487,12 +487,16 @@ public class VisClass extends Shape {
 		g.setStroke(Color.BLACK);
 		g.strokeRect(x, rectY, width, height);
 
-		if (hiddenNodes == 0) {
-			drawCenteredText(g, hiddenNodes + " hidden descendants", x, rectY, width, height);
-		} else {
-			drawCenteredText(g, hiddenNodes + " / " + descendants.size() + " hidden desc.", x, rectY, width, height);
-		}
-		topToBarDistance = (int) ((y - (double) currentHeight / 2) - rectY);
+		String text;
+        if (hiddenNodes == 0) {
+            text = (descendants.size() == 1) ? "1 visible descendant" : descendants.size() + " visible descendants";
+        } else {
+            text = (descendants.size() - hiddenNodes) + " / " + descendants.size() + " visible desc.";
+        }
+        drawCenteredText(g, text, x, rectY, width, height);
+
+
+        topToBarDistance = (int) ((y - (double) currentHeight / 2) - rectY);
 	}
 
 	private void drawCenteredText(GraphicsContext g, String text, double rectX, double rectY, double rectWidth, double rectHeight) {
@@ -508,7 +512,7 @@ public class VisClass extends Shape {
 	}
 
 	private double getIndicatorSize(GraphicsContext g, int totalNodes) {
-		Text textNode = new Text(totalNodes + "hidden descendants");
+		Text textNode = new Text(totalNodes + "visible descendants");
 		textNode.setFont(g.getFont());
 		return textNode.getLayoutBounds().getWidth();
 	}

@@ -22,6 +22,7 @@ public class VisConstants {
     final static String THING_ENTITY = "http://www.w3.org/2002/07/owl#Thing";
 	final static String NOTHING_ENTITY = "http://www.w3.org/2002/07/owl#Nothing";
 	public final static String SIDCLASS = "SIDClass_";
+    public final static int NEEDED_HEIGHT = 245; // TODO
 
 
 	final int KEYCONCEPTNO = 10;

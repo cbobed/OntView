@@ -753,7 +753,7 @@ public class PaintFrame extends Canvas {
         //System.out.println("maxY " + maxY + " - minY " + minY + " - maxX " + maxX);
 
         double viewportHeight = scroll.getViewportBounds().getHeight();
-        canvasHeight = (int) maxY + 245;// + VisConstants.HEIGHT_MARGIN;
+        canvasHeight = (int) maxY + VisConstants.NEEDED_HEIGHT;
         //canvasWidth = (int) maxX + VisConstants.WIDTH_MARGIN;
 
        // printScrollAttributes();
