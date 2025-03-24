@@ -612,9 +612,6 @@ public abstract class Shape {
         for (VisConnector inConnector : currentNode.inConnectors) {
             Shape parent = inConnector.from;
 
-            if(currentNode.getLabel().matches("Student") || parent.getLabel().matches("Student")){
-                System.out.println("Student");
-            }
             if (visitedNodes.contains(parent)) continue;
 
             if (parent.isVisible()) {

@@ -743,7 +743,7 @@ public class VisGraph implements Runnable{
 		   if (vlevel.getWidth() < (vis.getWidth()+20)){
 	    	   vlevel.setWidth(vis.getWidth()+20);
 		   }
-	    	vlevel.updateWidth(vis.getWidth()+20);		   
+           //vlevel.updateWidth(vis.getWidth()+20);
 		   //return the created class
 	       if (e instanceof OWLClass){
     		   getQualifiedLabelMap().put(vis.label, e.asOWLClass().getIRI().toString());

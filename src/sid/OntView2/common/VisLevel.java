@@ -1,8 +1,8 @@
 package sid.OntView2.common;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 //import org.apache.log4j.Level;
@@ -14,18 +14,15 @@ public class VisLevel {
     final static int SPACE_BETWEEN_LEVELS= 50;
 	int id;
 	int width = MIN_WIDTH;
-	int shapeNo = 0;
-	int posx = 0;
+	int posx;
 	VisGraph graph;
     HashSet<Shape> levelShapes;
-    ArrayList<Shape> shapeAsList;
-    boolean changed;
    /***************************/
 	
-	public VisLevel(VisGraph pgraph, int pid, int pposx){
-		posx= pposx;
+	public VisLevel(VisGraph pGraph, int pid, int pPosx){
+		posx= pPosx;
 		id = pid;
-		graph = pgraph;
+		graph = pGraph;
 		levelShapes = new HashSet<>();
 	}
  
@@ -52,7 +49,6 @@ public class VisLevel {
 	
 	/**
 	 * Updates position of shapes that are in the level
-	 * @param x
 	 */
 	public void setXpos(int x){
 		posx=x;
@@ -70,11 +66,11 @@ public class VisLevel {
 		
 	    final int DININCREM = 5;
 	    width = (levelShapes.size()>20 ? getWidth() + DININCREM *(levelShapes.size()-20) : getWidth());
-		int dwidth = newWidth - getWidth();
-        if (dwidth > 0){
+		int dWidth = newWidth - getWidth();
+        if (dWidth > 0){
             for (VisLevel level : graph.levelSet){
                 if (level.getID() > id){
-                    level.setXpos(level.getXpos()+dwidth);
+                    level.setXpos(level.getXpos()+dWidth);
                 }
             }
         }
@@ -89,9 +85,9 @@ public class VisLevel {
 	}
 	
 	public void addShape(Shape shape){
-		VisLevel oldl= shape.getVisLevel();
-		if (oldl !=null) {
-			oldl.levelShapes.remove(shape);
+		VisLevel oldL= shape.getVisLevel();
+		if (oldL !=null) {
+			oldL.levelShapes.remove(shape);
 		}
 		levelShapes.add(shape);
 	    shape.vdepthlevel=this;
@@ -102,33 +98,32 @@ public class VisLevel {
 	
 
 	/**
-	 * folds levelset and removes empty levels
-	 * @param set
+	 * folds levelSet and removes empty levels
 	 */
 	public static void shrinkLevelSet(Set<VisLevel> set){
 		
 	//shrink
 		for (int i=firstLevel(set) ; i<lastLevel(set); i++){
 			VisLevel currentLevel = getLevelFromID(set, i);
-			if (!currentLevel.isConstraintLevel()){
+            assert currentLevel != null;
+            if (!currentLevel.isConstraintLevel()){
 				currentLevel.fold(set);
 			}
 		}
 		// remove empty levels
-		HashSet<VisLevel> emptyLevels = new HashSet<VisLevel>();
+		HashSet<VisLevel> emptyLevels = new HashSet<>();
 		for (VisLevel lvl : set) {
 			if (lvl.levelShapes.isEmpty()){			
 				emptyLevels.add(lvl);
 			}	
 		}
-		for (VisLevel emptylvl : emptyLevels) {
+		for (VisLevel emptyLvl : emptyLevels) {
 			for (VisLevel lvl : set){
-				if (lvl.getID()> emptylvl.getID()) {
+				if (lvl.getID()> emptyLvl.getID()) {
 					lvl.setID(lvl.getID()-1);
 				}
 			}
-			set.remove(emptylvl);
-			emptylvl = null;
+			set.remove(emptyLvl);
 		}
 		
 	}
@@ -138,22 +133,24 @@ public class VisLevel {
 	 * When expanding, adding constraints results in adding to many nearly empty
 	 * levels. By calling fold, we merge those levels as much as possible.
 	 * From level i+1 to the last one moves shapes to level i if possible
-	 * @param set
 	 */
 	
 	private void fold(Set<VisLevel>set){
 		int j = id+1;
-		boolean posible = true;
-		Set<Shape> movableSet = new HashSet<Shape>();
-		while ( (getLevelFromID(set, j).isConstraintLevel())  ||  (j!=lastLevel(set))) {
+		boolean possible = true;
+		Set<Shape> movableSet = new HashSet<>();
+		while ( (Objects.requireNonNull(getLevelFromID(set, j)).isConstraintLevel())  ||  (j!=lastLevel(set))) {
 			VisLevel lvl = getLevelFromID(set, j);
-			for (Shape shape : lvl.levelShapes){
-			    posible = true;
+            assert lvl != null;
+            for (Shape shape : lvl.levelShapes){
+			    possible = true;
 				for (VisConnector c : shape.inConnectors){
-					if (c.from.getVisLevel().getID() >= id)
-						posible=false;
+                    if (c.from.getVisLevel().getID() >= id) {
+                        possible = false;
+                        break;
+                    }
 				}
-				if (posible)
+				if (possible)
 					movableSet.add(shape);
 			}
 			for (Shape movable : movableSet){
@@ -166,9 +163,8 @@ public class VisLevel {
 	
 	/**
 	 * Adjusts level width and position 
-	 * After changes made by shrinklevelSet position and size
-	 * information could be outdated. Hence this method
-	 * @param set
+	 * After changes made by shrinkLevelSet position and size
+	 * information could be outdated. Hence, this method
 	 */
 	
 	public static void adjustWidthAndPos(Set<VisLevel> set){
@@ -192,73 +188,64 @@ public class VisLevel {
 			lvl.setWidth(maxShapeWidthInLevel+MIN_WIDTH);
 			lvl.updateWidth(maxShapeWidthInLevel+MIN_WIDTH);
 			
-			
 		}
-		for (int i=firstLevel(set)+1;i<=maxLevel;i++){
+		for (int i=firstLevel(set)+1 ; i<=maxLevel; i++){
 			VisLevel lvl = VisLevel.getLevelFromID(set, i);
-			VisLevel prevlvl = VisLevel.getLevelFromID(set, i-1);
-            assert prevlvl != null;
+			VisLevel prevLvl = VisLevel.getLevelFromID(set, i-1);
+            assert prevLvl != null;
             assert lvl != null;
-            lvl.setXpos(prevlvl.getXpos()+prevlvl.getWidth());
+            lvl.setXpos(prevLvl.getXpos()+prevLvl.getWidth());
 		}
 		VisLevel lvl = VisLevel.getLevelFromID(set, 0);
         assert lvl != null;
         lvl.setXpos(lvl.getXpos());
-		
 	}
 	
 	/**
 	 * creates a new level with the specified id
 	 * Looks for the previous level to get its data
 	 * and pushes levels with id greater or equal than specified
-	 * @param set
-	 * @param id
-	 * @param graph
 	 */
 	public static void insertLevel(Set<VisLevel> set, int id, VisGraph graph){
-	//creates a new Level
-		VisLevel newlvl = null;
+	    //creates a new Level
+		VisLevel newLvl = null;
 		if (id > 0){
 			VisLevel prevLevel = VisLevel.getLevelFromID(set, id-1);
 			if (prevLevel!= null) {
-				newlvl = new VisLevel(graph, id, prevLevel.posx+prevLevel.width);
+				newLvl = new VisLevel(graph, id, prevLevel.posx+prevLevel.width);
 			}
 			else { 
 				//shouldn't enter here though
-				newlvl = new VisLevel(graph, id, VisClass.FIRST_X_SEPARATION);
+				newLvl = new VisLevel(graph, id, VisClass.FIRST_X_SEPARATION);
 			}
 			for (VisLevel lvl: set){
 				if (lvl.getID() >= id){
 					lvl.setID(lvl.getID()+1);
 				}
 			}
-			set.add(newlvl);
+			set.add(newLvl);
 		}
 	}
 	
 	/**
 	 * Returns last level if from the specified set
-	 * @param set
-	 * @return
 	 */
 	public static int lastLevel(Set<VisLevel> set){
 	//creates a new Level
 		int i = 0;
 		for (VisLevel lvl : set) 
-			i = (  lvl.getID()>i ? lvl.getID() : i );
+			i = (Math.max(lvl.getID(), i));
 		return i;
 	}
 	
 	/**
 	 * Returns first level if from the specified set
-	 * @param set
-	 * @return
 	 */
 	public static int firstLevel(Set<VisLevel> set){
 	//creates a new Level
 		int i = 0;
 		for (VisLevel lvl : set) 
-			i = (  lvl.getID()<=i ? lvl.getID() : i );
+			i = (Math.min(lvl.getID(), i));
 		return i;
 	}
 	
@@ -301,12 +288,12 @@ public class VisLevel {
 	
 	/**
 	 * If all shapes in level are hidden return true. False otherwise
-	 * @return
 	 */
 	public boolean allLevelShapesHidden(){
 		for (Shape s : this.getShapeSet()){
-			if (s.isVisible())
-				return false;
+			if (s.isVisible()) {
+                return false;
+            }
 		}
 		return true;
 	}

@@ -452,13 +452,10 @@ public class PaintFrame extends Canvas {
 				System.out.println("relax");
 				stateChanged = false;
 
-				// Faster version
 				for (VisLevel level: visGraph.levelSet) {
 					for (Shape s_i: level.getShapeSet()) {
                         if (s_i.getTopCorner() < BORDER_PANEL) {
-                            System.out.println(s_i.getLabel() + " " + s_i.getHeight() + " " + s_i.getPosY() + " " + s_i.getTopCorner());
                             s_i.setPosY(BORDER_PANEL + (s_i.getHeight() / 2));
-                           // s_i.setPosY(BORDER_PANEL + MIN_SPACE);
                             stateChanged = true;
                             shapeRepulsion(s_i, DOWN);
                         }
@@ -733,7 +730,7 @@ public class PaintFrame extends Canvas {
         canvasHeight = (int) ((maxY + VisConstants.NEEDED_HEIGHT));
         canvasWidth = (int) maxX + VisConstants.WIDTH_MARGIN;
 
-        scroll.setVmax(Math.max(0, canvasHeight*factor - viewportHeight));
+        scroll.setVmax(Math.max(0, maxY * factor - viewportHeight));
         scroll.setHmax(Math.max(0, maxX - viewportWidth));
 
         if (minY < 0) {
