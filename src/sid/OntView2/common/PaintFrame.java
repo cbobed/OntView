@@ -455,6 +455,14 @@ public class PaintFrame extends Canvas {
 				// Faster version
 				for (VisLevel level: visGraph.levelSet) {
 					for (Shape s_i: level.getShapeSet()) {
+                        if (s_i.getTopCorner() < BORDER_PANEL) {
+                            System.out.println(s_i.getLabel() + " " + s_i.getHeight() + " " + s_i.getPosY() + " " + s_i.getTopCorner());
+                            s_i.setPosY(BORDER_PANEL + (s_i.getHeight() / 2));
+                           // s_i.setPosY(BORDER_PANEL + MIN_SPACE);
+                            stateChanged = true;
+                            shapeRepulsion(s_i, DOWN);
+                        }
+
 						for (Shape shape_j: level.getShapeSet()) {
 							if (s_i.getVisLevel() == shape_j.getVisLevel()) {
 								if ((s_i != shape_j) && (s_i.visible) && (shape_j.visible)) {
@@ -465,11 +473,6 @@ public class PaintFrame extends Canvas {
 									}
 								}
 							}
-						}
-						if (s_i.getPosY() < BORDER_PANEL) {
-							s_i.setPosY(BORDER_PANEL + MIN_SPACE);
-							stateChanged = true;
-							shapeRepulsion(s_i, DOWN);
 						}
 						visGraph.adjustPanelSize((float) factor);
 						recentChange = true;
@@ -648,7 +651,6 @@ public class PaintFrame extends Canvas {
 		Point2D p = translatePoint(new Point2D(e.getX(), e.getY()));
 		int x = (int) p.getX();
 		int y = (int) p.getY();
-		//System.out.println("x = " + x + " AND y = " + y);
 		Shape shape = visGraph.findShape(p);
 		if (clickedOnClosePropertyBox(x, y, shape) || clickedOnCloseDisjointBox(x, y)) {
 			return;
