@@ -762,6 +762,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	void loadReasonerButtonActionTask(ActionEvent event) {
 		// Only use Custom mode once the graph is loaded
         restoreSliderValue();
+        resetConnectorsSwitch();
 		parent.artPanel.clearCanvas();
 		if (Objects.equals(getKceComboBox().getValue(), VisConstants.CUSTOMCOMBOOPTION3)){
 			getKceComboBox().setValue(VisConstants.NONECOMBOOPTION);
@@ -1010,7 +1011,16 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		getZoomSlider().setValue(1);
 	}
 
-	Dimension2D size = null;
+    private void resetConnectorsSwitch() {
+        if (toggleSwitch != null) {
+            toggleSwitch.setSelected(false);
+            toggleSwitch.setText("Show");
+            parent.artPanel.setShowConnectors(false);
+        }
+    }
+
+
+    Dimension2D size = null;
 	private CheckBox renderLabel;
 	private CheckBox qualifiedNames;
 	private VBox snapshotPanel;
