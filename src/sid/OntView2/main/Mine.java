@@ -110,8 +110,8 @@ public class Mine extends Application implements Embedable{
 		viewer.scroll.setPrefSize(screenWidth, screenHeight - viewer.nTopPanel.getHeight());
 		viewer.scroll.setHmax(screenWidth);
 		viewer.scroll.setVmax(screenHeight - viewer.nTopPanel.getHeight());
-        viewer.scroll.setFitToWidth(true);
-        viewer.scroll.setFitToHeight(true);
+        viewer.scroll.setFitToWidth(false);
+        viewer.scroll.setFitToHeight(false);
 		viewer.artPanel.scroll = viewer.scroll;
 
 		viewer.artPanel.scroll.hvalueProperty().addListener((obs, oldVal, newVal) -> {
@@ -122,11 +122,6 @@ public class Mine extends Application implements Embedable{
             if (newVal.doubleValue() < 0.0) newVal = 0;
             viewer.artPanel.setOffsetY(newVal.doubleValue());
         });
-
-		/*viewer.artPanel.scroll.setOnScroll(event -> {
-            viewer.artPanel.scroll.setHvalue(viewer.artPanel.scroll.getHvalue());
-			viewer.artPanel.scroll.setVvalue(viewer.artPanel.scroll.getVvalue());
-		});*/
 
         viewer.artPanel.scroll.addEventFilter(ScrollEvent.SCROLL, event -> {
             if (event.getDeltaY() != 0) {

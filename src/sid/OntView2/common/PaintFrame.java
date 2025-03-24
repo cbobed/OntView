@@ -725,19 +725,18 @@ public class PaintFrame extends Canvas {
             }
         }
 
-        double viewportHeight = scroll.getViewportBounds().getHeight();
-        double viewportWidth = scroll.getViewportBounds().getWidth();
-        canvasHeight = (int) ((maxY + VisConstants.NEEDED_HEIGHT));
+        double viewportHeight = scroll.getViewportBounds().getHeight() / factor;
+        double viewportWidth = scroll.getViewportBounds().getWidth() / factor;
+        canvasHeight = (int) (maxY + VisConstants.NEEDED_HEIGHT);
         canvasWidth = (int) maxX + VisConstants.WIDTH_MARGIN;
 
-        scroll.setVmax(Math.max(0, maxY * factor - viewportHeight));
+        scroll.setVmax(Math.max(0, maxY - viewportHeight));
         scroll.setHmax(Math.max(0, maxX - viewportWidth));
 
         if (minY < 0) {
             // Adjust the shape position
             for (VisLevel level : visGraph.getLevelSet()) {
-                ArrayList<Shape> orderedShapeList = level.orderedList();
-                for (Shape shape : orderedShapeList) {
+                for (Shape shape : level.orderedList()) {
                     shape.setPosY((int) ((shape.getPosY() * factor - minY + BORDER_PANEL) / factor));
                 }
             }
