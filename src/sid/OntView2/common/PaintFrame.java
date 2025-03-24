@@ -545,22 +545,20 @@ public class PaintFrame extends Canvas {
 			pressedShape = null;
 			return;
 		}
+        System.out.println("********* PRESSED *********");
+        System.out.println("x:" + p.getX() + " , y:" + p.getY() + "\n");
 
 		pressedShape = visGraph.findShape(p);
 
 		if (pressedShape != null) {
-            //System.out.println("********* PRESSED SHAPE " + pressedShape.getLabel() + " y: " + pressedShape.getPosY() + "*********");
 			selectedShapes.add(pressedShape);
 			mouseLastY = (int) p.getY();
 		} else {
-            //System.out.println("********* PRESSED ELSEWHERE *********");
             pinchPoint = new Point2D(e.getX() + offsetX, e.getY() + offsetY);
-            //System.out.println("pinchPoint x:" + pinchPoint.getX() + " , y:" + pinchPoint.getY());
             mouseLastX = (int) p.getX();
 			mouseLastY = (int) p.getY();
 			setCursor(Cursor.CLOSED_HAND);
 			Platform.runLater(redrawRunnable);
-            //Platform.runLater(new ConnectorDrawer(pressedShape));
 		}
 	}
 
@@ -726,7 +724,6 @@ public class PaintFrame extends Canvas {
 	 * Method to check if it needs to expand the canvas size
 	 */
     public void checkAndResizeCanvas() {
-        // deja un espacio de 245px
         double maxY = Double.MIN_VALUE;
         double minY = Double.MAX_VALUE;
         double maxX = Double.MIN_VALUE;
@@ -734,31 +731,25 @@ public class PaintFrame extends Canvas {
         for (VisLevel level : visGraph.getLevelSet()) {
             for (Shape shape : level.levelShapes) {
                 double shapeMaxY = shape.getBottomCorner() * factor;
-                if (shapeMaxY > maxY) {
-                    maxY = shapeMaxY;
-                }
-
                 double shapeMinY = shape.getTopCorner() * factor;
-                if (shapeMinY < minY) {
-                    minY = shapeMinY;
-                }
-
                 double shapeMaxX = shape.getRightCorner() * factor;
-                if (shapeMaxX > maxX) {
-                    maxX = shapeMaxX;
-                }
+
+                maxY = Math.max(maxY, shapeMaxY);
+                minY = Math.min(minY, shapeMinY);
+                maxX = Math.max(maxX, shapeMaxX);
             }
         }
 
         //System.out.println("maxY " + maxY + " - minY " + minY + " - maxX " + maxX);
 
         double viewportHeight = scroll.getViewportBounds().getHeight();
-        canvasHeight = (int) maxY + VisConstants.NEEDED_HEIGHT;
-        //canvasWidth = (int) maxX + VisConstants.WIDTH_MARGIN;
-
-       // printScrollAttributes();
+        double viewportWidth = scroll.getViewportBounds().getWidth();
+        canvasHeight = (int) ((maxY + VisConstants.NEEDED_HEIGHT) / factor);
+        canvasWidth = (int) maxX + VisConstants.WIDTH_MARGIN;
+        printScrollAttributes();
 
         scroll.setVmax(Math.max(0, maxY - viewportHeight));
+        scroll.setHmax(Math.max(0, maxX - viewportWidth));
 
         if (minY < 0) {
             // Adjust the shape position
@@ -774,78 +765,15 @@ public class PaintFrame extends Canvas {
 
     public void printScrollAttributes() {
         System.out.println("ScrollPane Attributes:--------------------------------------");
-        System.out.println("Hvalue: " + scroll.getHvalue());
-        System.out.println("Vvalue: " + scroll.getVvalue());
-        System.out.println("Hmin: " + scroll.getHmin());
-        System.out.println("Hmax: " + scroll.getHmax());
-        System.out.println("Vmin: " + scroll.getVmin());
-        System.out.println("Vmax: " + scroll.getVmax());
+        System.out.println("Hvalue: " + scroll.getHvalue() + " Vvalue: " + scroll.getVvalue());
+        System.out.println("Hmin: " + scroll.getHmin() + " Hmax: " + scroll.getHmax());
+        System.out.println("Vmin: " + scroll.getVmin() + " Vmax: " + scroll.getVmax());
         System.out.println("Viewport Bounds: " + scroll.getViewportBounds());
         System.out.println("Content Bounds: " + scroll.getContent().getBoundsInParent());
-        System.out.println("Pannable: " + scroll.isPannable());
-        System.out.println("FitToWidth: " + scroll.isFitToWidth());
-        System.out.println("FitToHeight: " + scroll.isFitToHeight());
-        System.out.println("PrefWidth: " + scroll.getPrefWidth());
-        System.out.println("PrefHeight: " + scroll.getPrefHeight());
-        System.out.println("Width: " + scroll.getWidth());
-        System.out.println("Height: " + scroll.getHeight()  + "\n");
+        System.out.println("PrefWidth: " + scroll.getPrefWidth() + " PrefHeight: " + scroll.getPrefHeight());
+        System.out.println("Width: " + scroll.getWidth() + " Height: " + scroll.getHeight()  + "\n");
     }
 
-
-
-    public void checkAndResizeCanvas3() {
-        double maxY = Double.MIN_VALUE;
-        double minY = Double.MAX_VALUE;
-        double maxX = Double.MIN_VALUE;
-
-        //double currentHvalue = scroll.getHvalue();
-        //double currentVvalue = scroll.getVvalue();
-
-        for (VisLevel level : visGraph.getLevelSet()) {
-            for (Shape shape : level.levelShapes) {
-                double shapeMaxY = shape.getBottomCorner() * factor;
-                if (shapeMaxY > maxY) {
-                    maxY = shapeMaxY;
-                }
-
-                double shapeMinY = shape.getTopCorner() * factor;
-                if (shapeMinY < minY) {
-                    minY = shapeMinY;
-                }
-
-                double shapeMaxX = shape.getRightCorner() * factor;
-                if (shapeMaxX > maxX) {
-                    maxX = shapeMaxX;
-                }
-            }
-        }
-
-        System.out.println("maxY " + maxY + " - minY " + minY + " - maxX " + maxX);
-
-        double viewportHeight = scroll.getViewportBounds().getHeight();
-        canvasHeight = (int) maxY + VisConstants.HEIGHT_MARGIN;
-        //canvasWidth = (int) maxX + VisConstants.WIDTH_MARGIN;
-
-        System.out.println("screenHeight: " + screenHeight + " , screenWidth: " + screenWidth + " canvasHeight: " + canvasHeight + " , canvasWidth: " + canvasWidth);
-        System.out.println("canvasHeight - viewportHeight: " + (canvasHeight- viewportHeight) + "\n");
-
-        scroll.setVmax(Math.max(0, canvasHeight - viewportHeight));
-        //scroll.setVmax(canvasHeight - viewportHeight);
-        //scroll.setHmax(screenWidth - canvasWidth);
-
-        if (minY < 0) {
-            // Adjust the shape position
-            for (VisLevel level : visGraph.getLevelSet()) {
-                ArrayList<Shape> orderedShapeList = level.orderedList();
-                for (Shape shape : orderedShapeList) {
-                    shape.setPosY((int) ((shape.getPosY() * factor - minY + BORDER_PANEL) / factor));
-                }
-            }
-        }
-
-        //scroll.setHvalue(currentHvalue);
-        //scroll.setVvalue(currentVvalue);
-    }
 
 	/**
 	 * translates point to current zoom factor

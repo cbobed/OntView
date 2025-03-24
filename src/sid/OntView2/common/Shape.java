@@ -664,14 +664,7 @@ public abstract class Shape {
     private void updateAncestorsForVisibleChildren(Shape currentNode, Set<Shape> visitedNodes, Set<Shape> visibleDescendantsSet) {
         if (visitedNodes.contains(currentNode)) return;
 
-        if(currentNode.getLabel().matches("Student")){
-            System.out.println("Student");
-        }
 
-        System.out.println(currentNode.getLabel());
-        for (Shape s: visibleDescendantsSet){
-            System.out.println(" - " + s.getLabel());
-        }
 
         visitedNodes.add(currentNode);
         for (VisConnector inConnector : currentNode.inConnectors) {
