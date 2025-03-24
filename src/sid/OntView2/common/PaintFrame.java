@@ -716,9 +716,9 @@ public class PaintFrame extends Canvas {
 
         for (VisLevel level : visGraph.getLevelSet()) {
             for (Shape shape : level.levelShapes) {
-                double shapeMaxY = shape.getBottomCorner() * factor;
-                double shapeMinY = shape.getTopCorner() * factor;
-                double shapeMaxX = shape.getRightCorner() * factor;
+                double shapeMaxY = shape.getBottomCorner();
+                double shapeMinY = shape.getTopCorner();
+                double shapeMaxX = shape.getRightCorner();
 
                 maxY = Math.max(maxY, shapeMaxY);
                 minY = Math.min(minY, shapeMinY);
@@ -728,10 +728,10 @@ public class PaintFrame extends Canvas {
 
         double viewportHeight = scroll.getViewportBounds().getHeight();
         double viewportWidth = scroll.getViewportBounds().getWidth();
-        canvasHeight = (int) ((maxY + VisConstants.NEEDED_HEIGHT) / factor);
+        canvasHeight = (int) ((maxY + VisConstants.NEEDED_HEIGHT));
         canvasWidth = (int) maxX + VisConstants.WIDTH_MARGIN;
 
-        scroll.setVmax(Math.max(0, maxY - viewportHeight));
+        scroll.setVmax(Math.max(0, canvasHeight*factor - viewportHeight));
         scroll.setHmax(Math.max(0, maxX - viewportWidth));
 
         if (minY < 0) {
@@ -1011,13 +1011,14 @@ public class PaintFrame extends Canvas {
 
 	public void focusOnShape(String shapeKey, Shape pshape) {
 		Shape shape = pshape != null ? pshape : visGraph.getShape(shapeKey);
+        System.out.println("********* FOCUS ********* " + factor);
 
 		if (shape != null) {
-            double viewportWidth = scroll.getViewportBounds().getWidth();
-            double viewportHeight = scroll.getViewportBounds().getHeight();
+            double viewportWidth = scroll.getViewportBounds().getWidth() / factor;
+            double viewportHeight = scroll.getViewportBounds().getHeight() / factor;
 
-			double x = (shape.getPosX() * factor) - (viewportWidth / 2);
-			double y = (shape.getPosY() * factor) - (viewportHeight / 2);
+			double x = (shape.getPosX()) - (viewportWidth / 2);
+			double y = (shape.getPosY()) - (viewportHeight / 2);
 
             double hMax = canvasWidth - viewportWidth;
             double vMax = canvasHeight - viewportHeight;

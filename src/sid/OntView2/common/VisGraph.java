@@ -44,7 +44,6 @@ public class VisGraph implements Runnable{
 	HashMap<String, VisDataProperty> dPropertyMap;
 	HashMap<String, OWLSubPropertyChainOfAxiom> chainPropertiesMap;
 	GraphReorder reorder;
-	private int zoomLevel = 1;
 	PaintFrame paintframe;
     VisGraph   unexpandedGraph = null;
     boolean    expanded = false;
@@ -61,8 +60,6 @@ public class VisGraph implements Runnable{
 	public List<VisConnector> getConnectorList(){ return connectorList;}
 	public int getProgress(){return progress;}
     private void setProgress(int p){progress = p;}
-    public int getZoomLevel(){return zoomLevel;}
-    public void setZoomLevel(int z){zoomLevel=z;}
     public Map<String,Shape> getShapeMap() {return shapeMap;}
     public PaintFrame getPaintFrame(){return paintframe;}
     public HashSet<VisLevel> getLevelSet(){return levelSet;}

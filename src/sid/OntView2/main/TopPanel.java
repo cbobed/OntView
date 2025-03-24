@@ -202,11 +202,9 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 	private Slider getZoomSlider() {
 		if (zoomSlider == null) {
-			zoomSlider = new Slider();
-			zoomSlider.setMin(0);
-			zoomSlider.setMax(20);
+			zoomSlider = new Slider(0.5, 2.0, 1.0);
 			zoomSlider.setOrientation(Orientation.VERTICAL);
-			zoomSlider.setValue(5);
+            zoomSlider.setShowTickLabels(true);
 
 			zoomSlider.getStyleClass().add("zoom-slider");
 			zoomSlider.setPrefHeight(VisConstants.CONTAINER_SIZE);
@@ -1009,7 +1007,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		if(size != null) {
 			parent.artPanel.setFactor(1.0);
 		}
-		getZoomSlider().setValue(5);
+		getZoomSlider().setValue(1);
 	}
 
 	Dimension2D size = null;
@@ -1019,14 +1017,11 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 	private void zoomSliderChangeStateChanged(Number newValue) {
 		if (parent.artPanel != null) {
-			double factor = (0.5 + (double) newValue / 10.0);
-			factor = Math.round(factor * 100.0) / 100.0;
 			if (size == null) {
 				size = new Dimension2D(parent.artPanel.getWidth(), parent.artPanel.getHeight());
 				parent.artPanel.setOriginalSize(size);
 			}
-			parent.artPanel.getVisGraph().setZoomLevel((int) getZoomSlider().getValue());
-			parent.artPanel.setFactor(factor);
+			parent.artPanel.setFactor(newValue.doubleValue());
 			Platform.runLater(parent.artPanel.getCanvasAdjusterRunnable());
 		}
 	}
