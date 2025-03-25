@@ -1,10 +1,6 @@
 package sid.OntView2.common;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.Map.Entry;
 
 
@@ -67,7 +63,7 @@ public class RDFRankConceptExtraction extends KConceptExtractor { //true
             }
         }
 
-        Set<String> results = new HashSet<> ();
+        Set<String> results = new LinkedHashSet<> ();
         PageRank<String, DefaultEdge> pageRankScorer = new PageRank<>(rdfRankGraph);
 
         if (RDFRankDebug) {
@@ -79,10 +75,9 @@ public class RDFRankConceptExtraction extends KConceptExtractor { //true
         }
 
         Map<String, Double> scoreMap = pageRankScorer.getScores();
-        ArrayList<Entry<String, Double>> scoreList = new ArrayList<>();
 
-        scoreMap.entrySet().stream().forEach(entry -> scoreList.add(entry));
-        Collections.sort(scoreList, Collections.reverseOrder(new PageRankScoreComparator()));
+        ArrayList<Entry<String, Double>> scoreList = new ArrayList<>(scoreMap.entrySet());
+        scoreList.sort(Collections.reverseOrder(new PageRankScoreComparator()));
 
         int added = 0;
         for (int i=0; added<limitResultSize && i<scoreList.size(); i++) {
@@ -97,4 +92,20 @@ public class RDFRankConceptExtraction extends KConceptExtractor { //true
         }
         return results;
     }
+
+    public Set<Shape> getShapesOrderedByRDFRank(OWLOntology activeOntology, VisGraph graph, int limitResultSize) {
+        Map<String, Shape> shapeMap = graph.getShapeMap();
+        Set<String> rankedKeys = retrieveKeyConcepts(activeOntology, shapeMap, limitResultSize);
+
+        Set<Shape> orderedShapes = new LinkedHashSet<>();
+        for (String key : rankedKeys) {
+            Shape shape = shapeMap.get(key);
+            if (shape != null) {
+                orderedShapes.add(shape);
+            }
+        }
+
+        return orderedShapes;
+    }
+
 }

@@ -63,6 +63,8 @@ public class PaintFrame extends Canvas {
 	public int canvasHeight = 0;
     public int nTopPanelHeight = 0;
 
+    public Set<Shape> orderedShapesByRDF = new HashSet<>();
+
 	public boolean isStable() {
 		return stable;
 	}

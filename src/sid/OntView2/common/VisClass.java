@@ -36,8 +36,11 @@ public class VisClass extends Shape {
 	ArrayList<Shape>   parents;
 
 	Set<Shape> descendants = new HashSet<>();
+    Set<Shape> orderedDescendants = new HashSet<>();
 	Set<Shape> ancestors = new HashSet<>();
-	ArrayList<VisConnectorDisjoint> disjointList;
+    Set<Shape> orderedAncestors = new HashSet<>();
+
+    ArrayList<VisConnectorDisjoint> disjointList;
 	ArrayList<VisConnectorEquiv> equivList;
 	ArrayList<String>  properties; // those that have this class as its domain  
 	VisPropertyBox propertyBox;

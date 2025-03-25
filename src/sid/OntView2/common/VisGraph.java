@@ -1424,7 +1424,6 @@ public class VisGraph implements Runnable{
 		Set<Shape> visitedNodes = new HashSet<>();
 
 		for (Shape child : childrenToProcess) {
-            // Store the nodes indicator bar size - needed in the future
 			traverseAndStoreDescendants(child, visitedNodes);
 		}
 	}
@@ -1478,6 +1477,38 @@ public class VisGraph implements Runnable{
 		currentNode.asVisClass().ancestors.addAll(allAncestors);
 	}
 
+    /**
+     * Stores the ordered descendants and ancestors for each shape based on RDFRank.
+     */
+     public void storeOrderedDescendantsByRDFRank() {
+         for (Shape shape : shapeMap.values()) {
+             Set<Shape> orderedDescendants = new LinkedHashSet<>();
+             Set<Shape> orderedAncestors = new LinkedHashSet<>();
+
+             for (Shape candidate : paintframe.orderedShapesByRDF) {
+                 if (shape.asVisClass().descendants.contains(candidate)) {
+                     orderedDescendants.add(candidate);
+                 }
+
+                 if (shape.asVisClass().ancestors.contains(candidate)) {
+                     orderedAncestors.add(candidate);
+                 }
+             }
+             shape.asVisClass().orderedDescendants = orderedDescendants;
+             shape.asVisClass().orderedAncestors = orderedAncestors;
+         }
+    }
+
+
+    /**
+     * Gets the shapes ordered by RDFRank.
+     */
+    public void getShapeOrderedByRDFRank() {
+        RDFRankConceptExtraction extractorRDFRank = new RDFRankConceptExtraction();
+        paintframe.orderedShapesByRDF = extractorRDFRank.getShapesOrderedByRDFRank(activeOntology, this, shapeMap.size());
+        storeOrderedDescendantsByRDFRank();
+    }
+
 
 	@Override
 	public void run() {
@@ -1489,6 +1520,7 @@ public class VisGraph implements Runnable{
 			this.buildReasonedGraph(getActiveOntology(), getReasoner(), topSet, isExpanded());
 			storeDescendants();
 			storeAncestors();
+            getShapeOrderedByRDFRank();
 		} catch (XPathExpressionException | ParserConfigurationException | SAXException | IOException e) {
 			e.printStackTrace();
 		} finally {
