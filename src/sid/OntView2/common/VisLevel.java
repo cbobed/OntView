@@ -58,24 +58,6 @@ public class VisLevel {
 		}
     }
 	
-	
-	/**
-	 * Updates posx due to level width expansion 
-	 */
-	public void updateWidth(int newWidth) {
-		
-	    final int DININCREM = 5;
-	    width = (levelShapes.size()>20 ? getWidth() + DININCREM *(levelShapes.size()-20) : getWidth());
-		int dWidth = newWidth - getWidth();
-        if (dWidth > 0){
-            for (VisLevel level : graph.levelSet){
-                if (level.getID() > id){
-                    level.setXpos(level.getXpos()+dWidth);
-                }
-            }
-        }
-	}
-	
 	public static VisLevel getLevelFromID(Set<VisLevel>set, int id){
 		for (VisLevel v : set){
 			if (v.getID()==id)
@@ -186,8 +168,6 @@ public class VisLevel {
                 maxShapeWidthInLevel += SPACE_BETWEEN_LEVELS;
 			}
 			lvl.setWidth(maxShapeWidthInLevel+MIN_WIDTH);
-			lvl.updateWidth(maxShapeWidthInLevel+MIN_WIDTH);
-			
 		}
 		for (int i=firstLevel(set)+1 ; i<=maxLevel; i++){
 			VisLevel lvl = VisLevel.getLevelFromID(set, i);
