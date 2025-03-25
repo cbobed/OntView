@@ -1205,6 +1205,9 @@ public class PaintFrame extends Canvas {
 	}
 
 	public void compactGraph() {
+        if (visGraph == null) return;
+        System.out.println(visGraph);
+
 		int currentY = BORDER_PANEL;
 		int minY = -1; 
 		int maxY = -1; 

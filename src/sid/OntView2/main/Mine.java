@@ -237,6 +237,7 @@ public class Mine extends Application implements Embedable{
 
 		nTopPanel.getLoadReasonerButton().setDisable(false);
 		nTopPanel.getReasonerCombo().setDisable(false);
+        nTopPanel.getKceComboBox().setDisable(false);
 	}
 
 	protected void loadActiveOntology(String source){

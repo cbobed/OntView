@@ -91,10 +91,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		mainPane.setStyle("-fx-border-color: #404472; -fx-background-color: #f9f9f9; -fx-border-width: 1; -fx-border-style: solid;");
 		mainPane.setStyle("-fx-border-style: solid;");
 
-		VBox loadOntologyRow = createLoadOntologyRow();
-		HBox otherComponentsRow = createOtherComponentsRow();
-
-		mainPane.getChildren().addAll(loadOntologyRow, otherComponentsRow);
+		mainPane.getChildren().addAll(createLoadOntologyRow(), createOtherComponentsRow());
 		mainPane.setAlignment(Pos.CENTER);
 		mainPane.setSpacing(10);
 
@@ -113,7 +110,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	}
 
 	private HBox createOtherComponentsRow() {
-		HBox row = new HBox(20,
+		HBox row = new HBox(10,
 				createLoadOntologyOptions(),
 				createShowClassExpressionButton(),
 				getPanelCheckBox(),
@@ -340,7 +337,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		return comboBox;
 	}
 
-	private ComboBox<String> getKceComboBox() {
+	public ComboBox<String> getKceComboBox() {
 		if (kceComboBox == null) {
 			kceComboBox = new ComboBox<>();
 			AutoCompletion.enable(kceComboBox);
@@ -362,6 +359,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			HBox.setHgrow(kceComboBox, Priority.ALWAYS);
 			kceComboBox.setMaxWidth(Double.MAX_VALUE);
 			kceComboBox.setPrefWidth(130);
+            kceComboBox.setDisable(true);
 
 			if (!items.isEmpty()) {
 				kceComboBox.setValue(items.get(0));
@@ -572,7 +570,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 			loadReasonerCombo.getStyleClass().add("custom-combo-box");
 			loadReasonerCombo.setMaxWidth(Double.MAX_VALUE);
-			loadReasonerCombo.setPrefWidth(130);
+			loadReasonerCombo.setPrefWidth(100);
 			loadReasonerCombo.setDisable(true);
 		}
 		return loadReasonerCombo;
