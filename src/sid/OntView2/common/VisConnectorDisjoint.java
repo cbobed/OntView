@@ -4,7 +4,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-public class VisConnectorDisjoint extends VisConnectorEquiv {
+public class VisConnectorDisjoint extends VisConnector {
 
 	Color color= Color.RED;
 	

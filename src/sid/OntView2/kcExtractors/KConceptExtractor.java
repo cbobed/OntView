@@ -66,7 +66,7 @@ public abstract class KConceptExtractor {
     protected boolean isKeyConceptDefinition(Shape s, Set<String> keyConcepts, Map<String, Shape> shapeMap) {
     	
     	Set<String> auxDefinitions = new HashSet<>();  
-    	s.asVisClass().getDefinitions().forEach(x -> {auxDefinitions.add(Shape.getKey(x));}); 
+    	s.asVisClass().getEquivalentClasses().forEach(x -> {auxDefinitions.add(Shape.getKey(x));}); 
     	// intersection of definitions of the shape and the keyConcepts themselves 
     	auxDefinitions.retainAll(keyConcepts); 
     	

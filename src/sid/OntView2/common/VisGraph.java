@@ -44,7 +44,6 @@ public class VisGraph implements Runnable{
 	ArrayList<VisConnector> dashedConnectorList;
 	
     final public Map<String, Shape>    shapeMap;
-	HashMap<String, Shape>           tempMap;
 	HashMap<String, VisObjectProperty>     propertyMap;
 	HashMap<String, VisDataProperty> dPropertyMap;
 	HashMap<String, OWLSubPropertyChainOfAxiom> chainPropertiesMap;
@@ -80,10 +79,6 @@ public class VisGraph implements Runnable{
 	public void setReasoner(OWLReasoner preasoner) {reasoner = preasoner;}
 	public OWLReasoner getReasoner(){return reasoner;}
 	public boolean isCreated(){return created;}
-	
-	//<CBL 25/9/13> 
-	// Added a field to handle the aliases of the different shapes
-	public HashMap<String, Shape> definitionsMap = null;
 
 	private CountDownLatch latch;
 	public void setLatch(CountDownLatch latch) { this.latch = latch; }
@@ -94,8 +89,6 @@ public class VisGraph implements Runnable{
 	 */
     public  VisGraph(PaintFrame pframe) {
 		shapeMap     = new ConcurrentHashMap<>();
-		definitionsMap = new HashMap<>();
-		tempMap      = new HashMap<>();
 		propertyMap  = new HashMap<>();
 		dPropertyMap = new HashMap<>();
 		connectorList 		= new ArrayList<>();
@@ -111,8 +104,6 @@ public class VisGraph implements Runnable{
 	 */
 	public void clearShapeMap() {
 		shapeMap.clear();
-		definitionsMap.clear();
-		tempMap.clear();
 		propertyMap.clear();
 		dPropertyMap.clear();
 		connectorList.clear();
@@ -177,21 +168,19 @@ public class VisGraph implements Runnable{
 	 */
 	public void buildReasonedGraph(OWLOntology activeOntology,OWLReasoner reasoner, Set<OWLClassExpression> rootCpts, boolean check) throws XPathExpressionException, ParserConfigurationException, SAXException, IOException {
 		
+		System.out.println("-->buildReasonedGraph"); 
 		//It's important to set config constants before creating 
 		//will have to move this elsewhere
-		updateProgressBarObserver(0);
 		clearAll();
 		set.stream().forEach(x->System.err.println("Build 1st set: "+x));
 		OWLClass topClass = activeOntology.getOWLOntologyManager().getOWLDataFactory().getOWLThing(); 
 		addVisClass(Shape.getKey(topClass), topClass, activeOntology, reasoner); 
 		this.reasonedTraversal(activeOntology,reasoner, null, rootCpts);
 		
-		updateProgressBarObserver(70);
 		linkDefinitionsToDefinedClasses(activeOntology,reasoner);
 		
 		if (!VisConfig.APPLY_RENAMING_DEBUG_PURPOSES) {
 			OWLDataFactory dFactory = activeOntology.getOWLOntologyManager().getOWLDataFactory();
-//			OWLClass aux = dFactory.getOWLClass(IRI.create("http://www.co-ode.org/ontologies/pizza/pizza.owl#Pizza"));
 			OWLClass topDetailedCpt = dFactory.getOWLThing(); 
 			OWLClass bottomDetailedCpt = dFactory.getOWLNothing();  
 			insertClassExpressions(activeOntology, reasoner, topDetailedCpt, bottomDetailedCpt);
@@ -201,46 +190,38 @@ public class VisGraph implements Runnable{
 		arrangePos();
 		VisLevel.shrinkLevelSet(levelSet);  
 		
-		updateProgressBarObserver(75);
 		VisLevel.adjustWidthAndPos(levelSet);
 		
 		// here, we should add the 
-		
-		// createConnections(vis,superSet,subSet,equivSet,reasoner,activeOntology);
-		System.out.println("Disjoint and equivalence ... "); 
-
+		System.out.println("Disjointness ... "); 
 		for (Entry<String, Shape> entry : shapeMap.entrySet()){
 			Shape shape = entry.getValue();
 			if (shape instanceof VisClass) {
-				shape.asVisClass().addAssertedDisjointConnectors();
-				shape.asVisClass().addEquivalentConnectors();
+				shape.asVisClass().addAssertedDisjointConnectors(); 
 			}
 		}
-
-		updateProgressBarObserver(80);
+		
 		placeProperties(activeOntology,reasoner,set);
     	arrangePos();
 		VisLevel.shrinkLevelSet(levelSet);
     	VisLevel.adjustWidthAndPos(levelSet);
 
-    	updateProgressBarObserver(85);
     	System.out.println("Redundant ... "); 
     	removeRedundantConnector();
     	System.gc();
         reorder = new GraphReorder(this);
+    	System.out.println("Visual reordering ... "); 
     	reorder.visualReorder();
     	adjustPanelSize((float) 1.0);
-    	updateProgressBarObserver(90);
     	clearDashedConnectorList();
 		updateXposition();
-
+		System.out.println("Applying KCE Option if required ..."); 
 		paintframe.doKceOptionAction();
 		//showAll();
-
     	VisLevel.adjustWidthAndPos(getLevelSet());
     	paintframe.getParentFrame().loadSearchCombo();
-    	updateProgressBarObserver(100);
     	paintframe.setStateChanged(true);
+    	System.out.println("<--buildReasonedGraph"); 
 	}
 
 	private void insertClassExpressions (OWLOntology activeOntology, 
@@ -265,16 +246,15 @@ public class VisGraph implements Runnable{
 			
 			if ( (startingPoint.isOWLThing() || subsumes(startingPoint, ce, activeOntology, reasoner, dFactory)) && 
 					(endPoint.isOWLNothing() || subsumes(ce, endPoint, activeOntology, reasoner, dFactory )) ){
-				System.out.println("Inserting ..."); 
 				HashSet<OWLClassExpression> superset = new HashSet<>();
 				superset.add(startingPoint); 
 				addGatheredClassExpression(ce, superset, reasoner, activeOntology, dFactory);
 				i++; 
-				System.out.println(i+" out of "+renamer.getClassesToAdd().size()+" ... "); 
+				if (i%5==0) 
+					System.out.println(i+" out of "+renamer.getClassesToAdd().size()+" ... "); 
 			}else {
 				System.out.println("Skipping ..."); 
 			}
-			System.out.println(ce);
 		}
 	}
 	
@@ -322,7 +302,6 @@ public class VisGraph implements Runnable{
 
 			// we have to make sure that the children do not subsume each other
 			Set<Node<OWLClass>> directChildren = reasoner.getSubClasses(e, true).nodes().collect(Collectors.toSet());
-			System.out.println("PotentialChildren before: "+potentialChildren.size()); 
 			directChildren.forEach(x-> {
 				Set<Shape> toRemove = new HashSet<>(); 
 				for (Shape auxShape: potentialChildren) {
@@ -332,9 +311,7 @@ public class VisGraph implements Runnable{
 				}
 				potentialChildren.removeAll(toRemove); 
 			}); 
-			System.out.println("PotentialChildren after: "+potentialChildren.size()); 
 			
-			System.out.println("directChildren before: "+directChildren.size()); 
 			potentialChildren.forEach (x ->  {
 				HashSet<Node<OWLClass>> toRemove = new HashSet<>(); 
 				for (Node<OWLClass> auxExp: directChildren) {
@@ -344,7 +321,6 @@ public class VisGraph implements Runnable{
 				}
 				directChildren.removeAll(toRemove); 
 			}); 
-			System.out.println("directChildren after: "+directChildren.size()); 
 			
 			HashSet<OWLClassExpression> auxChildren = new HashSet<>(); 
 			potentialChildren.forEach(x->auxChildren.add(x.getLinkedClassExpression()) );
@@ -455,8 +431,6 @@ public class VisGraph implements Runnable{
 		connectorList.clear();
 		dashedConnectorList.clear();
 		levelSet.clear();
-		// <CBL> 
-		definitionsMap.clear(); 
 	}
 	
 	
@@ -481,17 +455,8 @@ public class VisGraph implements Runnable{
 							if (definition.isAnonymous()) {
 								// <CBL 25/9/13>
 								// We also add the definition to the aliases handling
-								shape.asVisClass().addDefinition(definition);
-								definitionsMap.put(Shape.getKey(definition), shape);
-								// <CBL 24/9/13>
-								// the definitions are now displayed along with the name
-								// in the same shape
-								// we don't need to create this connector any longer
-								//									Shape definitionShape =  shapeMap.get(definition.toString());
-								//									connect(definitionShape,defClassShape);
-								//									((VisClass) definitionShape).addSon((VisClass)defClassShape);
-								//									defClassShape.addParent((VisClass)definitionShape);
-								//									</CBL>
+								shape.asVisClass().addEquivalentExpression(definition);
+								shapeMap.put(Shape.getKey(definition), shape); 
 							}
 						}
 					);
@@ -511,7 +476,6 @@ public class VisGraph implements Runnable{
 			placeChainProperties(activeOntology2, reasoner2, set2);
 			placeObjectProperties(activeOntology2, reasoner2, set2);
 			placeDataProperties(activeOntology2, reasoner2, set2);
-			
 		}
 	
 	private void placeObjectProperties(OWLOntology activeOntology,OWLReasoner reasoner, HashSet<OWLClassExpression> set) {
@@ -616,7 +580,6 @@ public class VisGraph implements Runnable{
 		System.out.println("previousCELevel: "+((previousCELevel != null)?previousCELevel.size():"null")); 
 		System.out.println("currentCELevel: "+currentCELevel.size()); 
 		for (OWLClassExpression ce: currentCELevel) {
-			System.out.println("Adding ..."+ce); 
 			// all the Shapes in currentCELevel :: AlreadyCreated 
 			// this implies that TOP must be created outside
 			VisClass vis = getShapeFromOWLClassExpression(ce).asVisClass(); 
@@ -631,19 +594,9 @@ public class VisGraph implements Runnable{
 						}
 					}
 			); 
-			reasoner.getEquivalentClasses(ce).entities().forEach(equivSet::add);
-
 			if (!subSet.isEmpty()) {
 				createShapes(subSet);
 				createChildConnections(vis, subSet); 
-			}
-			
-			if (!equivSet.isEmpty()) {
-				createShapes(equivSet);
-				createEquivConnections(vis, equivSet);
-				if (subSet.isEmpty()) {
-					createChildConnections(vis,subSet); 
-				}
 			}
 		}
 		
@@ -689,7 +642,6 @@ public class VisGraph implements Runnable{
 	private void createParentConnections(VisClass vis,Set<OWLClassExpression> superSet){
 
 		for (OWLClassExpression e : superSet){
-			System.out.println("connecting "+vis.getLinkedClassExpression() + " with " + e); 
 			connect(vis,(VisClass) getShapeFromOWLClassExpression(e),connectorList);
 		}
 	}
@@ -710,21 +662,6 @@ public class VisGraph implements Runnable{
 				connect(val.asVisClass(),vis, connectorList);
 			}	
 		}
-	}
-	
-	
-	/**
-	 *   has an anonymous definition ?
-	 *   @return boolean
-	 */
-	private boolean hasAnonymousDefinition(OWLClassExpression e,OWLReasoner reasoner){
-
-		for (OWLClass equ : reasoner.getEquivalentClasses(e)){
-			if (equ.isAnonymous()) {
-				return true;
-			}
-		}
-		return false;
 	}
 	
 	/**
@@ -751,19 +688,7 @@ public class VisGraph implements Runnable{
 	 *  Given an OWLClassExpression returns its shape class 	
 	 */
 	public VisClass getVisualExtension(OWLClassExpression o){
-		if (o  instanceof OWLClass) {
-			return (VisClass)shapeMap.get(o.asOWLClass().getIRI().toString());
-		}		
-		if (o  instanceof OWLClassExpression) {
-			// <CBL 25/9/13> 
-			// we now check also in the definition aliases for the shapes
-			// to deal indisticntly with both representations of the same shape
-			if (definitionsMap.containsKey(Shape.getKey(o)))
-				return (VisClass) definitionsMap.get(Shape.getKey(o)); 
-			else 
-				return (VisClass) shapeMap.get(Shape.getKey(o));
-		}
-		return null;
+		return (VisClass) shapeMap.get(Shape.getKey(o)); 
 	}
 	
 	
@@ -817,85 +742,85 @@ public class VisGraph implements Runnable{
 	 * Creates a new visclass instance and adds it to the set(hashmap) of visclasses
 	 * Creates or adjusts new Vislevels width
 	 */
-	public VisClass addVisClassOld(String label,int depthlevel,OWLClassExpression e,OWLOntology activeOntology, OWLReasoner reasoner) {
+//	public VisClass addVisClassOld(String label,int depthlevel,OWLClassExpression e,OWLOntology activeOntology, OWLReasoner reasoner) {
+//
+//	       VisLevel vlevel;
+//	       int levelPosx = VisClass.FIRST_X_SEPARATION;
+//	       String auxQLabel = ""; 
+//	       //creating level and adding it
+//	       // posx = prevLevel posx + width
+//	       vlevel = VisLevel.getLevelFromID(levelSet, depthlevel);
+//	       if (vlevel==null) {
+//	    	   for (VisLevel l : levelSet.values()){
+//		    	   VisLevel auxlevel;
+//		    	   auxlevel = VisLevel.getLevelFromID(levelSet,depthlevel-1);
+//		    	   if (auxlevel != null) {
+//		    		 levelPosx  = auxlevel.getXpos()+auxlevel.getWidth()+30;
+//		    	   }
+//		       }
+//	    	   vlevel = new VisLevel(this,depthlevel, levelPosx);
+//	    	   levelSet.put(depthlevel, vlevel);
+//	       }		   
+//	       
+//	       //actual add of the visclass to both the graph and the level
+//	       VisClass vis = new VisClass(depthlevel,e,label,this);
+//	       if (e instanceof OWLClass){
+//			   for (OWLAnnotation  an : EntitySearcher.getAnnotations(e.asOWLClass(), activeOntology).toList() ){
+//				   if (an.getProperty().toString().equals("rdfs:label")){
+//					   vis.explicitLabel = an.getValue().toString();
+//					   vis.explicitLabel.replaceAll("\"", "");
+//					   vis.explicitLabel = replaceString(vis.explicitLabel);
+//					   auxQLabel = qualifyLabel(e.asOWLClass(), vis.explicitLabel);
+//					   if (auxQLabel != null && !"null".equalsIgnoreCase(auxQLabel)) {
+//						   vis.explicitQualifiedLabel = auxQLabel;
+//					   }
+//					   else {
+//						   vis.explicitQualifiedLabel = vis.explicitLabel;
+//					   }
+//				   }
+//			   }
+//	       }
+//	       
+//	       // CBL: label is the IRI of the element, not to  
+//	       shapeMap.put(label, vis);
+//	      
+//	       vis.label = ExpressionManager.getReducedClassExpression(e);
+//	       vis.visibleLabel = vis.label; 
+//	       auxQLabel = ExpressionManager.getReducedQualifiedClassExpression(e); 
+//	       if (auxQLabel != null && !"null".equalsIgnoreCase(auxQLabel))
+//	    	   vis.qualifiedLabel = auxQLabel; 
+//	       else 
+//	    	   vis.qualifiedLabel = vis.label;
+//
+//	       vlevel.addShape(vis);
+//		   vis.setVisLevel(vlevel);
+//		   if (e.isAnonymous()) {
+//	           vis.isAnonymous = true;
+//		   }
+//		   if ((e instanceof OWLClass) && (EntitySearcher.isDefined(e.asOWLClass(), activeOntology) )) {
+//	           vis.isDefined = true;
+//		   }
+//	       if (reasoner != null){
+//	    	   Node<OWLClass> equivClasses = reasoner.getEquivalentClasses(e);
+//	    	   for (OWLClass entity : equivClasses.getEntities())
+//	    		   if (entity.isOWLNothing())
+//	    			   		vis.isBottom= true;
+//	       }
+//	       vis.setWidth(vis.calculateWidth());
+//	       vis.setHeight(vis.calculateHeight());
+//		   if (vlevel.getWidth() < (vis.getWidth()+20)){
+//	    	   vlevel.setWidth(vis.getWidth()+20);
+//		   }
+//	    	vlevel.updateWidth(vis.getWidth()+20);		   
+//		   //return the created class
+//	       if (e instanceof OWLClass){
+//    		   getQualifiedLabelMap().put(vis.label, e.asOWLClass().getIRI().toString());
+//	       }
+//	       return vis;
+//	}
 
-	       VisLevel vlevel;
-	       int levelPosx = VisClass.FIRST_X_SEPARATION;
-	       String auxQLabel = ""; 
-	       //creating level and adding it
-	       // posx = prevLevel posx + width
-	       vlevel = VisLevel.getLevelFromID(levelSet, depthlevel);
-	       if (vlevel==null) {
-	    	   for (VisLevel l : levelSet.values()){
-		    	   VisLevel auxlevel;
-		    	   auxlevel = VisLevel.getLevelFromID(levelSet,depthlevel-1);
-		    	   if (auxlevel != null) {
-		    		 levelPosx  = auxlevel.getXpos()+auxlevel.getWidth()+30;
-		    	   }
-		       }
-	    	   vlevel = new VisLevel(this,depthlevel, levelPosx);
-	    	   levelSet.put(depthlevel, vlevel);
-	       }		   
-	       
-	       //actual add of the visclass to both the graph and the level
-	       VisClass vis = new VisClass(depthlevel,e,label,this);
-	       if (e instanceof OWLClass){
-			   for (OWLAnnotation  an : EntitySearcher.getAnnotations(e.asOWLClass(), activeOntology).toList() ){
-				   if (an.getProperty().toString().equals("rdfs:label")){
-					   vis.explicitLabel = an.getValue().toString();
-					   vis.explicitLabel.replaceAll("\"", "");
-					   vis.explicitLabel = replaceString(vis.explicitLabel);
-					   auxQLabel = qualifyLabel(e.asOWLClass(), vis.explicitLabel);
-					   if (auxQLabel != null && !"null".equalsIgnoreCase(auxQLabel)) {
-						   vis.explicitQualifiedLabel = auxQLabel;
-					   }
-					   else {
-						   vis.explicitQualifiedLabel = vis.explicitLabel;
-					   }
-				   }
-			   }
-	       }
-	       
-	       // CBL: label is the IRI of the element, not to  
-	       shapeMap.put(label, vis);
-	      
-	       vis.label = ExpressionManager.getReducedClassExpression(e);
-	       vis.visibleLabel = vis.label; 
-	       auxQLabel = ExpressionManager.getReducedQualifiedClassExpression(e); 
-	       if (auxQLabel != null && !"null".equalsIgnoreCase(auxQLabel))
-	    	   vis.qualifiedLabel = auxQLabel; 
-	       else 
-	    	   vis.qualifiedLabel = vis.label;
-
-	       vlevel.addShape(vis);
-		   vis.setVisLevel(vlevel);
-		   if (e.isAnonymous()) {
-	           vis.isAnonymous = true;
-		   }
-		   if ((e instanceof OWLClass) && (EntitySearcher.isDefined(e.asOWLClass(), activeOntology) )) {
-	           vis.isDefined = true;
-		   }
-	       if (reasoner != null){
-	    	   Node<OWLClass> equivClasses = reasoner.getEquivalentClasses(e);
-	    	   for (OWLClass entity : equivClasses.getEntities())
-	    		   if (entity.isOWLNothing())
-	    			   		vis.isBottom= true;
-	       }
-	       vis.setWidth(vis.calculateWidth());
-	       vis.setHeight(vis.calculateHeight());
-		   if (vlevel.getWidth() < (vis.getWidth()+20)){
-	    	   vlevel.setWidth(vis.getWidth()+20);
-		   }
-	    	vlevel.updateWidth(vis.getWidth()+20);		   
-		   //return the created class
-	       if (e instanceof OWLClass){
-    		   getQualifiedLabelMap().put(vis.label, e.asOWLClass().getIRI().toString());
-	       }
-	       return vis;
-	}
-	
 	public VisClass addVisClass(String label, OWLClassExpression ce, OWLOntology activeOntology, OWLReasoner reasoner) {
-		System.out.println("Adding "+label+" "+ce);
+
 		String auxQLabel = ""; 
 		VisClass vis = new VisClass(0, ce, label, this); 
 		shapeMap.put(label, vis);
@@ -933,6 +858,10 @@ public class VisGraph implements Runnable{
     	   Node<OWLClass> equivClasses = reasoner.getEquivalentClasses(ce);
     	   equivClasses.entities().forEach(x-> {
     		   if (x.isOWLNothing()) vis.isBottom=true; 
+    		   if (!x.equals(ce)) {
+    			   vis.addEquivalentExpression(x);
+    			   shapeMap.put(Shape.getKey(ce), vis); 
+    		   }
     	   }); 
        }
        
@@ -1039,467 +968,10 @@ public class VisGraph implements Runnable{
 		}
 	}
 	
-	private void flushConstraintsToShapeMap(){
-		for (Entry<String,Shape> entry : tempMap.entrySet()){
-			shapeMap.put(entry.getKey(),entry.getValue());
-		}
-		tempMap.clear();
-	}
-	
-	 public void expandNestedClassExpressions(OWLReasoner reasoner,OWLOntology activeOntology){
-	 /*
-	  * Expands anonymous class expressions that appeared in step 1 
-	  * Makes use of the private method 'expand' which should be right below
-	  */
-		OWLClassExpression exp;
-		HashSet<Shape> setOfExpanded = new HashSet<Shape>();
-		HashSet<Shape> children      = new HashSet<Shape>();
-		for (Entry<String,Shape> entry : shapeMap.entrySet() ) {
-			if (entry.getValue() instanceof VisClass){
-				exp = entry.getValue().asVisClass().getLinkedClassExpression();
-				if (exp.isAnonymous()){
-			    	setOfExpanded.add(entry.getValue());
-			    	for (Shape child :entry.getValue().asVisClass().children){
-			    		children.add(child);
-			    	}
-                    expand(exp,entry.getValue().getVisLevel().getID(),children,activeOntology,reasoner,false);
-                    children.clear();
-			     }	
-		     } 
-	     } 
-		 removeAnnonymousClassExpressionShape(setOfExpanded);
-
-		 flushConstraintsToShapeMap();
-		 setOfExpanded.clear();
-     }
-	 
-	 /**
-	  * Expands anonymous nodes into contraint nodes
-	  * @param exp
-	  * @param depth
-	  * @param rightShapes
-	  * @param activeOntology
-	  * @param reasoner
-	  * @param first
-	  */
-	 private void expand(OWLClassExpression exp,int depth,HashSet<Shape> rightShapes,OWLOntology activeOntology,OWLReasoner reasoner,boolean first){
-
-		 	
-		    ClassExpressionType type = exp.getClassExpressionType();
-			List<OWLClassExpression> listOps;
-			VisConstraint constraint;
-			HashSet<Shape> expandedSet = new HashSet<Shape>();
-	 	    Set<OWLClassExpression> auxSet= new HashSet<OWLClassExpression>();
-	 	    OWLClassExpression selectedDomain;
-
-			int cardinality = 0;
-			switch (type) {
-
-		         case OWL_CLASS:
-		        	Shape s = getShapeFromOWLClassExpression(exp);
-		    		 for (Shape rightShape : rightShapes){
-		    			 if (s!=null){
-		    			 	connect(s, rightShape);	
-		    			 }	
-	    		     }
-		             break;
-		
-		         case OBJECT_INTERSECTION_OF:
-		                 OWLObjectIntersectionOf andExp = (OWLObjectIntersectionOf)exp;
-		                 listOps = andExp.getOperandsAsList();
-		                 makeRoomForConstraint(first, depth);
-		                 constraint = addVisConstraint(OntViewConstants.AND, exp,type,depth);
-			    		 for (Shape rightShape : rightShapes) connect(constraint,rightShape);
-			    		 expandedSet.add(constraint);		  
-			    		 for (OWLClassExpression op: listOps) { 
-		                	 expand(op, depth,expandedSet, activeOntology, reasoner,false); 
-		                 }	 
-	                     break;
-	                   
-	              case OBJECT_UNION_OF:
-	            	  	 OWLObjectUnionOf orExp = (OWLObjectUnionOf) exp;
-		                 listOps = orExp.getOperandsAsList();
-		                 makeRoomForConstraint(first, depth);
-		                 constraint = addVisConstraint(OntViewConstants.OR, exp,type,depth);
-		                 // if it's a definition, connect defined class to the definition (constraint)
-		                 Node<OWLClass> equiv = reasoner.getEquivalentClasses(orExp);
-		                 for (OWLClass defined : equiv){
-		                	 getVisualExtension(defined).removeAllChildren();
-		                	 connect(getVisualExtension(defined),constraint);
-		                 }
-		                 for (OWLClassExpression operand : listOps){
-		                	 //connect to the operands if not found, it's probably related to an anonymous class to be expanded
-		                	 Shape to = getShapeFromOWLClassExpression(operand);
-		                	 if (to == null) {
-		                		 expand(operand, depth, new HashSet<Shape>(), activeOntology, reasoner, false);
-		                	 	 to = getShapeFromOWLClassExpression(operand);
-		                	 }	 
-		                 	 if (to!=null)
-		                 		connect(constraint,to);
-		                 }
-		                 break;
-	              
-	              case OBJECT_ALL_VALUES_FROM:
-	                    OWLObjectAllValuesFrom allExp = (OWLObjectAllValuesFrom) exp;
-	                    //allExp.getFiller();
-	                    makeRoomForConstraint(first, depth);
-	                    constraint = addVisConstraint(OntViewConstants.FOR_ALL, exp,type,depth);
-			    	    for (Shape f : rightShapes) { connect(constraint,f); }  
-	     	    	    expandedSet.add(constraint);		 
-	     	    	    for (Node<OWLClass> nodes : reasoner.getObjectPropertyDomains(allExp.getProperty(), false).getNodes()){
-			    		  for (OWLClassExpression domain: nodes.getEntities()){
-			    			  if (!(reasoner.getEquivalentClasses(allExp).contains((OWLClass) domain)))
-			    				 auxSet.add(domain);
-			    		  }
-			    	    }
-			    	    selectedDomain = getDomain(reasoner,auxSet);
-			            expand(selectedDomain, depth, expandedSet, activeOntology, reasoner,false);
-	                    break;
-	                  
-	              case OBJECT_COMPLEMENT_OF:
-	                   OWLObjectComplementOf notExp = (OWLObjectComplementOf) exp;
-	                   makeRoomForConstraint(first, depth);
-	                   constraint = addVisConstraint("¬", exp,type,depth);
-			    	   for (Shape f : rightShapes) { connect(constraint,f); } 
-			    	   expandedSet.add(constraint);		 
-	                   expand(notExp.getOperand(),depth,expandedSet,activeOntology, reasoner, first);
-	                   break;
-	                  
-	              case OBJECT_SOME_VALUES_FROM:
-	            	   OWLObjectSomeValuesFrom someExp = (OWLObjectSomeValuesFrom) exp;
-	            	   makeRoomForConstraint(first, depth);
-		               constraint = addVisConstraint(OntViewConstants.SOME, exp,type,depth);
-			    	   for (Shape f : rightShapes) { connect(constraint,f); }  
-	    	    	   expandedSet.add(constraint);		 
-	    	    	   for (Node<OWLClass> nodes : reasoner.getObjectPropertyDomains(someExp.getProperty(), false).getNodes()){
-	 		    		  for (OWLClassExpression domain: nodes.getEntities()){
-	 		    			  if (!(reasoner.getEquivalentClasses(someExp).contains((OWLClass) domain)))
-	 		    				 auxSet.add(domain);
-	 		    		  }
-	 		    	  }
-	 		    	   selectedDomain = getDomain(reasoner,auxSet);
-	 		           expand(selectedDomain, depth, expandedSet, activeOntology, reasoner,false);	    	  
-	                   break;
-	                  
-	              case OBJECT_HAS_VALUE:
-	                   OWLObjectHasValue hasValueExp = (OWLObjectHasValue) exp;
-	            	   makeRoomForConstraint(first, depth);
-		               constraint = addVisConstraint(OntViewConstants.HASVALUE, exp,type,depth);
-			    	   for (Shape f : rightShapes) { connect(constraint,f); }  
-	    	    	   expandedSet.add(constraint);		 
-	            	   for (Node<OWLClass> nodes : reasoner.getObjectPropertyDomains(hasValueExp.getProperty(), false).getNodes()){
-	 		    		  for (OWLClassExpression domain: nodes.getEntities()){
-	 		    			  if (!(reasoner.getEquivalentClasses(hasValueExp).contains((OWLClass) domain)))
-	 		    				 auxSet.add(domain);
-	 		    		  }
-	 		    	   }
-	 		    	   selectedDomain = getDomain(reasoner,auxSet);
-	 		           expand(selectedDomain, depth, expandedSet, activeOntology, reasoner,false);   	  
-	                  break;
-	              
-	              case OBJECT_ONE_OF:
-	                   	OWLObjectOneOf oneOfExp = (OWLObjectOneOf) exp;
-	                   	makeRoomForConstraint(first, depth);
-			            constraint = addVisConstraint("OneOf", exp,type,depth);
-			            for (Shape f : rightShapes) { connect(constraint,f); }  
-			               expandedSet.add(constraint);
-			               for (OWLClassExpression e : oneOfExp.getClassesInSignature()){
-			 		           expand(e, depth, expandedSet, activeOntology, reasoner,false);
-			               }   	
-	                  break;
-	                  
-		          case OBJECT_HAS_SELF:
-	                   OWLObjectHasSelf hasSelfExp = (OWLObjectHasSelf) exp;
-	                   makeRoomForConstraint(first, depth);
-		               constraint = addVisConstraint("Self", exp,type,depth);
-			    	   for (Shape f : rightShapes) { connect(constraint,f); }  
-	    	    	   expandedSet.add(constraint);		 
-	    	    	   for (Node<OWLClass> nodes : reasoner.getObjectPropertyDomains(hasSelfExp.getProperty(), false).getNodes()){
-	 		    		  for (OWLClassExpression domain: nodes.getEntities()){
-	 		    			  if (!(reasoner.getEquivalentClasses(hasSelfExp).contains((OWLClass) domain)))
-	 		    				 auxSet.add(domain);
-	 		    		  }
-	 		    	   }
-	 		    	   selectedDomain = getDomain(reasoner,auxSet);
-	 		           expand(selectedDomain, depth, expandedSet, activeOntology, reasoner,false);    	  
-	                   break;
-		                  
-		          case OBJECT_EXACT_CARDINALITY:
-	        	  	   OWLObjectExactCardinality exactCardExp = (OWLObjectExactCardinality) exp;
-	        	  	   makeRoomForConstraint(first, depth);
-	        	  	   cardinality = exactCardExp.getCardinality();
-		               constraint = addVisConstraint("="+String.valueOf(cardinality), exp,type,depth);
-		               for (Shape f : rightShapes) { connect(constraint,f); } 
-			    	   expandedSet.add(constraint);		 
-	    	    	   for (Node<OWLClass> nodes : reasoner.getObjectPropertyDomains(exactCardExp.getProperty(), false).getNodes()){
-	 		    		  for (OWLClassExpression domain: nodes.getEntities()){
-	 		    			  if (!(reasoner.getEquivalentClasses(exactCardExp).contains((OWLClass) domain)))
-	 		    				 auxSet.add(domain);
-	 		    		  }
-	 		    	  }
-	 		    	   selectedDomain = getDomain(reasoner,auxSet);
-	 		           expand(selectedDomain, depth, expandedSet, activeOntology, reasoner,false);	    	  
-			    	   break;
-	                  
-		          case OBJECT_MAX_CARDINALITY:
-		        	    try{
-			        	   OWLObjectMaxCardinality maxCardExp = (OWLObjectMaxCardinality) exp;
-		                   cardinality = maxCardExp.getCardinality();
-		                   makeRoomForConstraint(first, depth);
-			               constraint = addVisConstraint(OntViewConstants.GREATER_EQUAL+String.valueOf(cardinality), exp,type,depth);
-			               for (Shape f : rightShapes) { connect(constraint,f); }
-				    	   expandedSet.add(constraint);
-				    	   for (Node<OWLClass> nodes : reasoner.getObjectPropertyDomains(maxCardExp.getProperty(), false).getNodes()){
-				    		  for (OWLClassExpression domain: nodes.getEntities()){
-				    			  if (!(reasoner.getEquivalentClasses(maxCardExp).contains((OWLClass) domain)))
-				    				  auxSet.add(domain);
-				    		  }
-				    	   }
-				    	   selectedDomain = getDomain(reasoner,auxSet);
-
-				           expand(selectedDomain, depth, expandedSet, activeOntology, reasoner,false);
-		        	   }
-	                   catch(Exception e ){e.printStackTrace();}
-			           break;
-		        	   
-		                  
-		          case OBJECT_MIN_CARDINALITY:
-
-		        	   OWLObjectMinCardinality minCardExp = (OWLObjectMinCardinality) exp;
-	                   cardinality = minCardExp.getCardinality();
-	                   makeRoomForConstraint(first, depth);
-		               constraint = addVisConstraint(OntViewConstants.GREATER_EQUAL+String.valueOf(cardinality), exp,type,depth);
-		               for (Shape f : rightShapes) { connect(constraint,f); } 
-			    	   expandedSet.add(constraint);		
-			    	   for (Node<OWLClass> nodes : reasoner.getObjectPropertyDomains(minCardExp.getProperty(), false).getNodes()){
-			    		  for (OWLClassExpression domain: nodes.getEntities()){
-			    			  if (!(reasoner.getEquivalentClasses(minCardExp).contains((OWLClass) domain)))
-			    				  auxSet.add(domain);
-			    		  }
-			    	   }
-			    	   selectedDomain = getDomain(reasoner,auxSet);
-			           expand(selectedDomain, depth, expandedSet, activeOntology, reasoner,false);
-	                   break;
-	                  
-		          case DATA_ALL_VALUES_FROM:
-	                   OWLDataAllValuesFrom dAllExp = (OWLDataAllValuesFrom) exp;
-	                   makeRoomForConstraint(first, depth);
-	                   constraint = addVisConstraint(OntViewConstants.FOR_ALL, exp,type,depth);
-			    	   for (Shape f : rightShapes) { connect(constraint,f); }  
-	     	    	   expandedSet.add(constraint);		 
-	     	    	   for (Node<OWLClass> nodes : reasoner.getDataPropertyDomains((OWLDataProperty) dAllExp.getProperty(), false).getNodes()){
-			    		  for (OWLClassExpression domain: nodes.getEntities()){
-			    			  if (!(reasoner.getEquivalentClasses(dAllExp).contains((OWLClass) domain)))
-			    				  auxSet.add(domain);
-			    		  }
-			    	   }
-			    	   selectedDomain = getDomain(reasoner,auxSet);
-			           expand(selectedDomain, depth, expandedSet, activeOntology, reasoner,false);
-	                   break;
-	                  
-		          case DATA_SOME_VALUES_FROM:
-		        	   OWLDataSomeValuesFrom dSomeExp = (OWLDataSomeValuesFrom) exp;
-		               makeRoomForConstraint(first, depth);
-		               constraint = addVisConstraint(OntViewConstants.SOME, exp,type,depth);
-			    	   for (Shape f : rightShapes) { connect(constraint,f); }  
-		 	    	   expandedSet.add(constraint);		 
-		 	    	   for (Node<OWLClass> nodes : reasoner.getDataPropertyDomains((OWLDataProperty) dSomeExp.getProperty(), false).getNodes()){
-			    		  for (OWLClassExpression domain: nodes.getEntities()){
-			    			  if (!(reasoner.getEquivalentClasses(dSomeExp).contains((OWLClass) domain)))
-			    				  auxSet.add(domain);
-			    		  }
-			    	   }
-			    	   selectedDomain = getDomain(reasoner,auxSet);
-			           expand(selectedDomain, depth, expandedSet, activeOntology, reasoner,false);
-	                   break;
-	                   
-		          case DATA_HAS_VALUE:
-	                   OWLDataHasValue dFillExp = (OWLDataHasValue) exp;
-	                   makeRoomForConstraint(first, depth);
-//	                   constraint = (VisConstraint) shapeMap.get("C_"+exp.toString()); 
-                	   constraint = addVisConstraint(OntViewConstants.HASVALUE, exp,type,depth);
-	                   for (Shape f : rightShapes) { connect(constraint,f); }
-		 	    	   expandedSet.add(constraint);		 
-		 	    	   for (Node<OWLClass> nodes : reasoner.getDataPropertyDomains((OWLDataProperty) dFillExp.getProperty(), false).getNodes()){
-			    		  for (OWLClassExpression domain: nodes.getEntities()){
-			    			  if (!(reasoner.getEquivalentClasses(dFillExp).contains((OWLClass) domain)))
-			    				  auxSet.add(domain);
-			    		  }
-			    	   }
-			    	   selectedDomain = getDomain(reasoner,auxSet);
-			           expand(selectedDomain, depth, expandedSet, activeOntology, reasoner,false);
-	                   break;
-	                  
-		          case DATA_EXACT_CARDINALITY:
-	                   OWLDataExactCardinality dExactlyExp = (OWLDataExactCardinality) exp;
-	                   makeRoomForConstraint(first, depth);
-		               constraint = addVisConstraint("=", exp,type,depth);
-			    	   for (Shape f : rightShapes) { connect(constraint,f); }  
-		 	    	   expandedSet.add(constraint);		 
-		 	    	   for (Node<OWLClass> nodes : reasoner.getDataPropertyDomains((OWLDataProperty) dExactlyExp.getProperty(), false).getNodes()){
-			    		  for (OWLClassExpression domain: nodes.getEntities()){
-			    			  if (!(reasoner.getEquivalentClasses(dExactlyExp).contains((OWLClass) domain)))
-			    				  auxSet.add(domain);
-			    		  }
-			    	   }
-			    	   selectedDomain = getDomain(reasoner,auxSet);
-			           expand(selectedDomain, depth, expandedSet, activeOntology, reasoner,false);
-	                   break;
-	                  
-		          case DATA_MAX_CARDINALITY:
-	                   OWLDataMaxCardinality dMaxCardExp = (OWLDataMaxCardinality) exp;
-	                   makeRoomForConstraint(first, depth);
-		               constraint = addVisConstraint(OntViewConstants.LOWER_EQUAL, exp,type,depth);
-			    	   for (Shape f : rightShapes) { connect(constraint,f); }  
-		 	    	   expandedSet.add(constraint);		 
-		 	    	   for (Node<OWLClass> nodes : reasoner.getDataPropertyDomains((OWLDataProperty) dMaxCardExp.getProperty(), false).getNodes()){
-			    		  for (OWLClassExpression domain: nodes.getEntities()){
-			    			  if (!(reasoner.getEquivalentClasses(dMaxCardExp).contains((OWLClass) domain)))
-			    				  auxSet.add(domain);
-			    		  }
-			    	   }
-			    	   selectedDomain = getDomain(reasoner,auxSet);
-			           expand(selectedDomain, depth, expandedSet, activeOntology, reasoner,false);
-	                   break;
-		          
-		          case DATA_MIN_CARDINALITY:
-	                   OWLDataMinCardinality dMinCardExp = (OWLDataMinCardinality) exp;
-	                   makeRoomForConstraint(first, depth);
-		               constraint = addVisConstraint(OntViewConstants.GREATER_EQUAL, exp,type,depth);
-			    	   for (Shape f : rightShapes) { connect(constraint,f); }  
-		 	    	   expandedSet.add(constraint);		
-		 	    	   for (Node<OWLClass> nodes : reasoner.getDataPropertyDomains((OWLDataProperty) dMinCardExp.getProperty(), false).getNodes()){
-			    		  for (OWLClassExpression domain: nodes.getEntities()){
-			    			  if (!(reasoner.getEquivalentClasses(dMinCardExp).contains((OWLClass) domain)))
-			    				  auxSet.add(domain);
-			    		  }
-			    	   }
-			    	   selectedDomain = getDomain(reasoner,auxSet);
-			           expand(selectedDomain, depth, expandedSet, activeOntology, reasoner,false);
-	                  // has to be completed with the generic range
-	                  break;
-	          default:	                  
-	                  break;
-			  }            
-		 }	
-	
-	/**
-	 *  When asking the reasoner for a property domain, it may return more than one answer
-	 * @param reasoner
-	 * @param set
-	 * @return
-	 */
-	private OWLClassExpression getDomain(OWLReasoner reasoner,
-			Set<OWLClassExpression> set) {
-
-		Set<OWLClassExpression> copy = new HashSet<OWLClassExpression>();
-		for ( OWLClassExpression e1 : set){
-			copy.add(e1);
-		}
-		for (OWLClassExpression e1 : set){
-			for (OWLClassExpression e2 : set){
-				if (e1!=e2){
-					boolean discard = false;
-					for (Node<OWLClass> subclassNode: reasoner.getSubClasses(e1, false).getNodes()) {
-						for (OWLClass subclass : subclassNode.getEntities()){
-							discard = discard || (set.contains(subclass));
-						}
-						if (discard)
-							copy.remove(e1);
-						if (copy.size()==1)
-							break;
-					}
-				}
-			}
-		}
-		OWLClassExpression result = null;
-		for ( OWLClassExpression e : copy){
-			result = e;
-		}
-        if (result == null) {
-        	result = getTopClass(this.paintframe.getOntology());
-        }
-		return result;
-	}
-	 
-    private void makeRoomForConstraint(boolean first,int depth){
-    	VisLevel current = VisLevel.getLevelFromID(levelSet, depth);
-    	if (!current.isConstraintLevel() && !first){
-			 VisLevel.insertLevel(levelSet, depth, this);
-    	}
-    }
-
-	public  VisConstraint  addVisConstraint(String label,OWLClassExpression nested,ClassExpressionType type,int depth) {
-	/*
-	 * When adding constraints to the graph, we're iterating through the shapeMap
-	 * That's why I use a tempMap; to flush them later
-	 */
-		
-		VisConstraint constraint = null;
-		VisLevel currentLevel = VisLevel.getLevelFromID(levelSet, depth);
-		constraint = (VisConstraint)tempMap.get(nested.toString());
-		if (constraint == null){
-			constraint = new VisConstraint(currentLevel, nested, label,this);
-			tempMap.put(nested.toString(),constraint);
-
-		}
-		return constraint;
-		}
-	    
-	private void connect(Shape parent,Shape vis) {
-
-        if (parent == null) 
-        	System.out.println("parent null");
-        if (vis == null)
-        	System.out.println("vis null");
-		VisConnector con = new VisConnectorIsA(parent, vis);
-        connectorList.add(con);
-        vis.inConnectors.add(con);
-        parent.outConnectors.add(con);
-	}
-		
-	 private void removeAnnonymousClassExpressionShape(Set<Shape> set){
-		 //only if it was previously added
-		 
-		 for (Shape s : set){
-			 shapeMap.remove(s.asVisClass().label);
-			 s.getVisLevel().getShapeSet().remove(s);
-			 
-			 s.visible = false;
-			 s.asVisClass().children.clear();
-			 s.asVisClass().parents.clear();
-			 for (VisConnector v : s.outConnectors){
-				 v.to.inConnectors.remove(v);
-				 if (v.to instanceof VisClass) {
-					 v.to.asVisClass().parents.remove(v);
-				 }
-				 connectorList.remove(v);
-			 }
-			 for (VisConnector v : s.inConnectors){
-				 v.from.outConnectors.remove(v);
-				 connectorList.remove(v);
-				 if (v.from instanceof VisClass) {
-					 v.from.asVisClass().children.remove(v);
-				 }
-				 connectorList.remove(v);
-	
-			 }
-			 s.outConnectors.clear();
-			 s.inConnectors.clear();
-			 s.inDashedConnectors.clear();
-			 s.outDashedConnectors.clear();
-		 }	 
-	 }
-	 
 	 public Shape getShapeFromOWLClassExpression (OWLClassExpression e){
 		String key = Shape.getKey(e); 
 		Shape retShape = shapeMap.get(key);
-		if (retShape != null){
-		    return retShape;
-	 	}
-		else { //is it a constraint waiting to be placed in shapeMap?
-			return tempMap.get(key);
-		}
+		return retShape;
 	 }
 
 	 // TODO: another candidate to check performance issues 
@@ -1517,6 +989,7 @@ public class VisGraph implements Runnable{
 			 parents.clear();
 			 
 		 }
+		 System.out.println("--> Exit redundancy removal ... "); 
 		 
 	 }
 	 
@@ -1540,12 +1013,12 @@ public class VisGraph implements Runnable{
 	 
 	 private void removeImplicitConnectorsBySubsumption(Shape son,HashSet<Shape> parents,OWLOntology ontology,
 			 											OWLReasoner reasoner,OWLDataFactory dFactory ){
-		
+		 Shape OWLThingShape = getShapeFromOWLClassExpression(dFactory.getOWLThing()); 
 		 //if a subsumes b  remove conector(a,son), as it's implicit
 		 for (Shape pi : parents){
 			 for (Shape pj : parents){
 				 if (pi!=pj){
-					 if ((subsumes(pi, pj, ontology, reasoner, dFactory)) && (subsumes(pj, pi, ontology, reasoner, dFactory))){
+					 if (existSubsumptionPath(pi,pj, OWLThingShape) && existSubsumptionPath(pj,pi, OWLThingShape)) {
 						 if (pi.getVisLevel().getID() != pj.getVisLevel().getID()){
 	
 							 Shape candidate = (pi.getVisLevel().getID() < pj.getVisLevel().getID() ? pi:pj);
@@ -1558,7 +1031,7 @@ public class VisGraph implements Runnable{
 							 }	 
 						 }
 					 }
-					 else if (subsumes(pi, pj, ontology, reasoner, dFactory)){
+					 else if (existSubsumptionPath(pi,pj, OWLThingShape)) {
 						 VisConnector c = VisConnector.getConnector(connectorList, pi, son);
 						 if ( (son instanceof VisConstraint)||(pi instanceof VisConstraint)){
 							 c.setRedundant();
@@ -1567,13 +1040,31 @@ public class VisGraph implements Runnable{
 							 VisConnector.removeConnector(connectorList, pi, son);
 						 }	 
 					 }
-					
-					 
 				 }
 			 }
 		 }
 	 }	 
-	 
+	 private boolean existSubsumptionPath(Shape potentialSon, Shape potentialParent, Shape OWLThingShape) {
+		 boolean result = false; 
+		 for (VisConnector nextLevelConnector: potentialSon.inConnectors) {
+			if (nextLevelConnector instanceof VisConnectorIsA) {
+				if (nextLevelConnector.from == potentialParent) {
+					return true; 
+				}
+				else {
+					if (nextLevelConnector.from != OWLThingShape) {   
+						result = result || existSubsumptionPath(nextLevelConnector.from, potentialParent, OWLThingShape); 
+					}
+					else {
+						System.out.println("reached OWLThing"); 
+					}
+				}
+			}
+			// early termination if at any time this is evaluated to true
+			if (result) break; 
+		 }
+		 return result; 
+	 }
 	 /**
 	  * returns the result of the operation classA subsumes classB
 	  * @return
@@ -1592,16 +1083,12 @@ public class VisGraph implements Runnable{
 	 		return reasoner.isEntailed(s);
 	 }
 		 
-	 
 	 /**
 	 * looks up for the shape or creates if not found
 	 * @param e
 	 * @return
 	 */
 	 public Shape lookUpOrCreate(OWLClassExpression e){
-		  //looks up for the shape or creates if not found
-//		 CBL::Changing the keys
-//		  Shape sup = getShape(ExpressionManager.getReducedClassExpression(e));
 		 Shape sup = getShape(Shape.getKey(e));
 		  if (sup!= null){
 			  return sup;
@@ -1650,49 +1137,8 @@ public class VisGraph implements Runnable{
 		currentNode.asVisClass().descendants.addAll(allDescendants);
 	}
 
-
-	/**
-	 * Processes supernodes by grouping equivalent nodes into a single supernode.
-	 */
-	public void processSuperNodes() {
-		Map<VisClass, SuperNode> superNodeMap = new HashMap<>();
-
-		for (Entry<String, Shape> entry : shapeMap.entrySet()) {
-			Shape shape = entry.getValue();
-			if (shape instanceof VisClass) {
-				VisClass visClass = shape.asVisClass();
-
-				if (visClass.getEquivConnectors().isEmpty()) {
-					continue;
-				}
-
-				/*if (superNodeMap.containsKey(visClass)) {
-					continue;
-				}*/
-
-				SuperNode superNode = new SuperNode();
-				superNode.addSubNode(visClass);
-				superNodeMap.put(visClass, superNode);
-
-				for (VisConnectorEquiv connector : visClass.getEquivConnectors()) {
-					Shape otherShape = connector.getOtherEnd(visClass);
-					if (otherShape instanceof VisClass equivalentNode) {
-						superNode.addSubNode(equivalentNode);
-						superNodeMap.put(equivalentNode, superNode);
-					}
-				}
-
-				shapeMap.put("SN_" + superNode.hashCode(), superNode);
-			}
-		}
-
-	}
-
-
-
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
 		try {
 			
 			HashSet<OWLClassExpression> topSet = new HashSet<>();   
@@ -1715,8 +1161,6 @@ public class VisGraph implements Runnable{
 			System.out.println("-->releasing the latch "); 
 			latch.countDown();
 		}
-		updateProgressBarObserver(100);
-
 	}
 	
 	
@@ -1732,64 +1176,5 @@ public class VisGraph implements Runnable{
 			s.resetHiddenChildrenCount();
 			s.setVisible(true);
 		}
-	}
-	
-	
-
-	/*-**************************************************************************************
-	 * Graph Observer methods
-	 *
-	 ****************************************************************************************/
-
-	private final BooleanProperty progressBarObserver = new SimpleBooleanProperty();
-	private final BooleanProperty generalObserver = new SimpleBooleanProperty();
-
-	/** Adds a listener to the progress bar observer.
-	 * The listener will be notified whenever the progress bar observer changes.
-	 */
-	public void addProgressBarObserver(ChangeListener<Boolean> listener) {
-		progressBarObserver.addListener(listener);
-	}
-
-	/**
-	 * Adds a listener to the general observer.
-	 * The listener will be notified whenever the general observer changes.
-	 */
-	public void addGeneralObserver(ChangeListener<Boolean> listener) {
-		generalObserver.addListener(listener);
-	}
-
-	/**
-	 * Updates the progress bar observer with the given progress percentage.
-	 * This method sets the progress value and triggers the progress bar observer.
-	 */
-	private void updateProgressBarObserver(int percent) {
-		setProgress(percent);
-		progressBarObserver.set(!progressBarObserver.get());
-	}
-
-	/**
-	 * Updates the appropriate observer based on the specified observer type.
-	 * This method triggers either the progress bar observer or the general observer.
-	 */
-	public void updateObservers(int observerType) {
-		if (observerType == VisConstants.PROGRESSBAROBSERVER) {
-			progressBarObserver.set(!progressBarObserver.get());
-		} else if (observerType == VisConstants.GENERALOBSERVER) {
-			generalObserver.set(!generalObserver.get());
-		}
-	}
-
-	/**
-	 * Calculates the progress from the number of shapes in the shape map.
-	 * The progress is calculated as a percentage of the total number of classes in the active ontology.
-	 * This method then updates the progress bar observer with the calculated progress.
-	 */
-	private void setProgressFromShapeNumber() {
-		int prev = (int) (70.0f * ((float) getShapeMap().size() /
-				(float) getActiveOntology().getClassesInSignature(true).size()));
-		int progress = Math.min(prev, 70);
-		setProgress(progress);
-		updateProgressBarObserver(progress);
 	}
 }

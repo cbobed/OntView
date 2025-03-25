@@ -365,12 +365,10 @@ public class VisObjectProperty extends VisProperty {
 		}
 		// CBL: the range should not be added to the new shape 
 		// it is only the new Shape that is connected
-//		
-//		intersection.properties.add(property.getIRI().getFragment());
+
 		if (intersection.getPropertyBox() == null) {
 			intersection.createPropertyBox();
 		}	
-//		intersection.getPropertyBox().add(property,range,ontology);	
 		
 		return intersection; 
 

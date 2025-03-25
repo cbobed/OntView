@@ -334,7 +334,6 @@ public abstract class Shape {
         }
 
         // Wake observer thread on hide event
-        graph.updateObservers(VisConstants.GENERALOBSERVER);
         graph.getDashedConnectorList().clear();
         graph.addDashedConnectors();
     }

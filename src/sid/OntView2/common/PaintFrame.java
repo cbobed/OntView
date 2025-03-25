@@ -407,9 +407,6 @@ public class PaintFrame extends Canvas {
 
 		paintFrame.setCursor(Cursor.WAIT);
 
-		VisGraphObserver graphObserver = new VisGraphObserver(this.getVisGraph());
-		visGraph.addGeneralObserver((observable, oldValue, newValue) -> graphObserver.update());
-
 		stable = true;
 		stateChanged = true;
 		factor = 1.0;
@@ -935,7 +932,6 @@ public class PaintFrame extends Canvas {
 						break;
 					}
 				}
-				getVisGraph().updateObservers(VisConstants.GENERALOBSERVER);
 				return true;
 			}
 		} else {
@@ -947,7 +943,6 @@ public class PaintFrame extends Canvas {
 			}
 		}
 
-		getVisGraph().updateObservers(VisConstants.GENERALOBSERVER);
 		return false;
 	}
 
