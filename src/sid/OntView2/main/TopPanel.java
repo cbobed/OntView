@@ -27,7 +27,6 @@ import javafx.stage.Modality;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import javafx.util.converter.IntegerStringConverter;
 import org.semanticweb.owlapi.model.IRI;
 import sid.OntView2.common.*;
 
@@ -39,44 +38,24 @@ import java.util.concurrent.atomic.AtomicBoolean;
 //VS4E -- DO NOT REMOVE THIS LINE!
 public class TopPanel extends Canvas implements ControlPanelInterface {
 
-	private static final long serialVersionUID = 1L;
-	private Button loadOntologyButton;
+	//private static final long serialVersionUID = 1L;
+	private Button loadOntologyButton, loadReasonerButton, saveViewButton, restoreViewButton,
+        saveImageButton, saveImagePartialButton, cleanConnectorsButton, fileSystemButton, helpButton,
+        helpButtonCE, submitButtonCE, expressionButton;
 	private ComboBox<Object> loadOntologyCombo;
-	private ComboBox<String> loadReasonerCombo;
-	private Button loadReasonerButton;
-	private VBox panelLoad;
-	private VBox panelCheckBox;
-	private Button saveViewButton;
-	private Button restoreViewButton;
-	private VBox viewPanel;
-	private Button saveImageButton;
-	private Button saveImagePartialButton;
+	private ComboBox<String> loadReasonerCombo, comboBox, kceComboBox;
+	private VBox mainPane, panelLoad, panelCheckBox, viewPanel, panel0, connectorPanel, helpPanel,
+        classExpressionPanel, percentagePanel, parentListBox, childListBox;
 	private Label label0;
-	private ComboBox<String> comboBox;
-	private ComboBox<String> kceComboBox;
-	private VBox panel0;
-	private VBox connectorPanel;
 	private ToggleButton toggleSwitch;
-	private Button cleanConnectorsButton;
-	private final Mine parent;
-	private CheckBox Properties;
-	private Button fileSystemButton;
+	private CheckBox Properties, reduceCheckBox;
 	private Slider zoomSlider;
-	private CheckBox reduceCheckBox;
-	private VBox mainPane;
-	private VBox helpPanel;
-	private Button helpButton;
-	private VBox classExpressionPanel;
-    private VBox percentagePanel;
-	private Button expressionButton;
     private Spinner<Integer> percentageSpinner;
 	private Popup helpPopup;
-	private TextField parentField, childField;
-	private VBox parentListBox, childListBox;
-	private Button helpButtonCE, submitButtonCE;
+	private TextField parentField, childField, parentSearchField, childSearchField;
 	private ListView<CheckBox> parentCheckBoxList , childCheckBoxList;
 	private VisClass selectedParent = null, selectedChild = null;
-	private TextField parentSearchField, childSearchField;
+    private final Mine parent;
 
 
 	public TopPanel(Mine pParent) {
