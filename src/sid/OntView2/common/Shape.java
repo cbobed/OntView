@@ -375,7 +375,7 @@ public abstract class Shape {
         return true;
     }
 
-    public Set<Shape> getStrategyOption(boolean toHide){
+    public Set<Shape> getShapesFromStrategy(boolean toHide){
         RDFRankSelectionStrategy RDFStrategy = new RDFRankSelectionStrategy(graph.paintframe.getPercentageShown(),
             asVisClass().orderedDescendants);
 
@@ -389,7 +389,7 @@ public abstract class Shape {
     /**************************************************************/
 
     public void openRight() {
-        showSubLevels(getStrategyOption(false));
+        showSubLevels(getShapesFromStrategy(false));
     }
 
     public void openLeft() {
@@ -398,7 +398,10 @@ public abstract class Shape {
     }
 
     public void show(Set<Shape> visibleDescendantsSet) {
-        if (visibleDescendantsSet.contains(this)) this.visible = true;
+        if (visibleDescendantsSet.contains(this)) {
+            this.visible = true;
+            System.out.println("Visible: " + this.getLabel() + " hiddenDescendants: " + getHiddenDescendantsSet());
+        }
 
         /*if (visibleDescendantsSet.isEmpty() && graph.paintframe.getPercentageShown() != 0) {
             for (VisConnector connector : outConnectors) connector.show();
@@ -444,10 +447,10 @@ public abstract class Shape {
         for (Shape s: visibleDescendantsSet){
             s.checkAndUpdateChildrenVisibilityStates();
             s.updateHiddenDescendants();
+            s.removeFromAncestors(visibleDescendantsSet);
         }
         hiddenDescendantsSet.removeAll(visibleDescendantsSet);
         checkAndUpdateChildrenVisibilityStates();
-
     }
 
     public void showParentLevels() {
@@ -591,6 +594,23 @@ public abstract class Shape {
         }
     }
 
+    /**
+     * Recursively traverses all ancestors of the given node and removes the nodes
+     * from visibleDescendantsSet in the hiddenDescendantsSet of each ancestor.
+     */
+    private void removeFromAncestors(Set<Shape> visibleDescendantsSet) {
+        for (VisConnector connector : inConnectors) {
+            Shape parent = connector.from;
+            if (parent != null) {
+                parent.hiddenDescendantsSet.removeAll(visibleDescendantsSet);
+                parent.checkAndUpdateChildrenVisibilityStates();
+                parent.removeFromAncestors(visibleDescendantsSet);
+            }
+        }
+    }
+
+
+
 
 
     /**
@@ -717,8 +737,6 @@ public abstract class Shape {
      */
     private void updateAncestorsForVisibleChildren(Shape currentNode, Set<Shape> visitedNodes, Set<Shape> visibleDescendantsSet) {
         if (visitedNodes.contains(currentNode)) return;
-
-
 
         visitedNodes.add(currentNode);
         for (VisConnector inConnector : currentNode.inConnectors) {
