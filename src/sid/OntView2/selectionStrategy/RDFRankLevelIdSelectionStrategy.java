@@ -15,12 +15,12 @@ public class RDFRankLevelIdSelectionStrategy implements SelectionStrategy {
     }
 
     @Override
-    public Set<Shape> getShapesToVisualize(Set<Shape> shapes) {
+    public Set<Shape> getShapesToVisualize() {
         return null;
     }
 
     @Override
-    public Set<Shape> getShapesToHide(Set<Shape> shapes) {
+    public Set<Shape> getShapesToHide() {
         return null;
     }
 }

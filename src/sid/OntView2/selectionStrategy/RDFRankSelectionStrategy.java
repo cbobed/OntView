@@ -8,9 +8,9 @@ import java.util.List;
 
 public class RDFRankSelectionStrategy implements SelectionStrategy {
     private final int limit;
-    private final List<Shape> orderedShapesByRDF;
+    private final Set<Shape> orderedShapesByRDF;
 
-    public RDFRankSelectionStrategy(int limit, List<Shape> orderedShapesByRDF) {
+    public RDFRankSelectionStrategy(int limit, Set<Shape> orderedShapesByRDF) {
         this.limit = limit;
         this.orderedShapesByRDF = orderedShapesByRDF;
     }
@@ -19,7 +19,7 @@ public class RDFRankSelectionStrategy implements SelectionStrategy {
      * Returns a set of hidden shapes to be visualized based on the specified percentage limit.
      */
     @Override
-    public Set<Shape> getShapesToVisualize(Set<Shape> shapes) {
+    public Set<Shape> getShapesToVisualize() {
         int totalNodes = orderedShapesByRDF.size();
         int numberToShow = (int) Math.ceil((limit / 100.0) * totalNodes);
 
@@ -40,7 +40,7 @@ public class RDFRankSelectionStrategy implements SelectionStrategy {
      * Returns a set of visual shapes to be hidden based on the specified percentage limit.
      */
     @Override
-    public Set<Shape> getShapesToHide(Set<Shape> shapes) {
+    public Set<Shape> getShapesToHide() {
         int totalNodes = orderedShapesByRDF.size();
         int numberToShow = (int) Math.ceil((limit / 100.0) * totalNodes);
 

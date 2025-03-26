@@ -612,6 +612,9 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
             percentageSpinner = new Spinner<>(values);
             percentageSpinner.setEditable(true);
             percentageSpinner.getStyleClass().add("spinner");
+            percentageSpinner.valueProperty().addListener((obs, oldValue, newValue) -> {
+                savePercentageValue(newValue);
+            });
 
             // Only numbers allow [0-100]
             TextField editor = percentageSpinner.getEditor();
@@ -769,6 +772,9 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		}
 	}
 
+    void savePercentageValue(Integer value) {
+        parent.artPanel.setPercentageShown(value);
+    }
 
 	private void saveImageButtonActionActionPerformed(ActionEvent event) {
 		parent.createImage();
@@ -796,6 +802,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		// Only use Custom mode once the graph is loaded
         restoreSliderValue();
         resetConnectorsSwitch();
+        parent.artPanel.cleanConnectors();
 		parent.artPanel.clearCanvas();
 		if (Objects.equals(getKceComboBox().getValue(), VisConstants.CUSTOMCOMBOOPTION3)){
 			getKceComboBox().setValue(VisConstants.NONECOMBOOPTION);

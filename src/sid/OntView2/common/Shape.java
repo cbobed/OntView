@@ -5,8 +5,11 @@ import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
+import sid.OntView2.selectionStrategy.RDFRankSelectionStrategy;
+import sid.OntView2.selectionStrategy.SelectionStrategy;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class Shape {
 
@@ -26,9 +29,9 @@ public abstract class Shape {
     Point2D connectionPointsL;
     Point2D connectionPointsR;
     ArrayList<VisConnector> inConnectors,
-            outConnectors,
-            inDashedConnectors,
-            outDashedConnectors;
+        outConnectors,
+        inDashedConnectors,
+        outDashedConnectors;
 
     //when showing I need to keep track of those that were closed
 
@@ -372,11 +375,21 @@ public abstract class Shape {
         return true;
     }
 
+    public Set<Shape> getStrategyOption(boolean toHide){
+        RDFRankSelectionStrategy RDFStrategy = new RDFRankSelectionStrategy(graph.paintframe.getPercentageShown(),
+            asVisClass().orderedDescendants);
+
+        return switch (SelectionStrategy.getStrategyOption()) {
+            case "RDFRank" -> toHide ? RDFStrategy.getShapesToHide() : RDFStrategy.getShapesToVisualize();
+            case "RDFRankLevelId" -> null;
+            default -> null;
+        };
+    }
+
     /**************************************************************/
 
     public void openRight() {
-        setState(OPEN);
-        showSubLevels();
+        showSubLevels(getStrategyOption(false));
     }
 
     public void openLeft() {
@@ -384,23 +397,19 @@ public abstract class Shape {
         showParentLevels();
     }
 
-    public void show(Shape parent, Set<Shape> openDescendantsSet) {
-        if (!this.isVisible()) openDescendantsSet.add(this);
-        this.visible = true;
+    public void show(Set<Shape> visibleDescendantsSet) {
+        if (visibleDescendantsSet.contains(this)) this.visible = true;
 
-        switch (getState()) {
-            case CLOSED:
-                break;
-
-            case OPEN, PARTIALLY_CLOSED:
-                for (VisConnector connector : outConnectors) {
-                    if (connector.isVisible()) continue;
-                    connector.show();
-                    connector.to.show(this, openDescendantsSet);
-                    connector.to.checkAndUpdateParentVisibilityStates();
-                    connector.to.checkAndUpdateChildrenVisibilityStates();
-                }
-                break; //if it's not a previously hidden node we'll show it
+        /*if (visibleDescendantsSet.isEmpty() && graph.paintframe.getPercentageShown() != 0) {
+            for (VisConnector connector : outConnectors) connector.show();
+        }*/
+        for (VisConnector connector : outConnectors) {
+            if (visibleDescendantsSet.contains(connector.to)) {
+                connector.show();
+                connector.to.checkAndUpdateParentVisibilityStates();
+                connector.to.checkAndUpdateChildrenVisibilityStates();
+            }
+            connector.to.show(visibleDescendantsSet);
         }
     }
 
@@ -423,18 +432,21 @@ public abstract class Shape {
         }
     }
 
-    public void showSubLevels() {
-        for (VisConnector c : outConnectors) {
-            if (c.isVisible()) continue;
-            c.to.show(this, visibleDescendantsSet);
-            c.show();
-            c.to.checkAndUpdateParentVisibilityStates();
-            c.to.checkAndUpdateChildrenVisibilityStates();
-        }
+    public void showSubLevels(Set<Shape> visibleDescendantsSet) {
+        System.out.println("Visible descendants: ----------");
         for (Shape s: visibleDescendantsSet){
+            System.out.println(" - " + s.getLabel());
+        }
+        System.out.println("-------------------------------");
+
+        this.show(visibleDescendantsSet);
+
+        for (Shape s: visibleDescendantsSet){
+            s.checkAndUpdateChildrenVisibilityStates();
             s.updateHiddenDescendants();
         }
         hiddenDescendantsSet.removeAll(visibleDescendantsSet);
+        checkAndUpdateChildrenVisibilityStates();
 
     }
 
@@ -472,16 +484,16 @@ public abstract class Shape {
     }
 
     public static final Comparator<Shape> POSY_ORDER =
-            new Comparator<Shape>() {
-                public int compare(Shape s1, Shape s2) {
-                    return s1.getTopCorner() - s2.getTopCorner();
-                }
-            };
+        new Comparator<Shape>() {
+            public int compare(Shape s1, Shape s2) {
+                return s1.getTopCorner() - s2.getTopCorner();
+            }
+        };
 
     /**
      * Updates the state of the shape based on the visibility of its children.
      */
-    public void checkAndUpdateChildrenVisibilityStates() {
+    public void checkAndUpdateChildrenVisibilityStates2() {
         // Check children visibility
         boolean allChildrenHidden = true;
         boolean allChildrenVisible = true;
@@ -535,6 +547,51 @@ public abstract class Shape {
             setLeftState(LEFT_PARTIALLY_CLOSED);
         }
     }
+
+    /**
+     * Checks and updates the visibility state of the shape based on the visibility of its descendants.
+     */
+    public void checkAndUpdateChildrenVisibilityStates() {
+        Set<Shape> visitedNodes = new HashSet<>();
+        AtomicBoolean hasVisibleDescendants = new AtomicBoolean(false);
+        AtomicBoolean hasHiddenDescendants = new AtomicBoolean(false);
+
+        traverseAndCheckVisibility(this, visitedNodes, hasVisibleDescendants, hasHiddenDescendants);
+
+        if (hasVisibleDescendants.get() && hasHiddenDescendants.get()) {
+            setState(PARTIALLY_CLOSED);
+        } else if (hasVisibleDescendants.get()) {
+            setState(OPEN);
+        } else {
+            setState(CLOSED);
+        }
+    }
+
+    private void traverseAndCheckVisibility(Shape currentNode, Set<Shape> visitedNodes,
+                                            AtomicBoolean hasVisibleDescendants, AtomicBoolean hasHiddenDescendants) {
+        if (visitedNodes.contains(currentNode)) {
+            return;
+        }
+        visitedNodes.add(currentNode);
+
+        for (VisConnector outConnector : currentNode.outConnectors) {
+            Shape childNode = outConnector.to;
+
+            if (childNode.isVisible()) {
+                hasVisibleDescendants.set(true);
+            } else {
+                hasHiddenDescendants.set(true);
+            }
+
+            if (hasVisibleDescendants.get() && hasHiddenDescendants.get()) {
+                return;
+            }
+
+            traverseAndCheckVisibility(childNode, visitedNodes, hasVisibleDescendants, hasHiddenDescendants);
+        }
+    }
+
+
 
     /**
      * Checks and updates the hidden descendants of a specific shape.

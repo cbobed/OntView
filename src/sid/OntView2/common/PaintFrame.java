@@ -62,8 +62,14 @@ public class PaintFrame extends Canvas {
 	public int canvasWidth = 0;
 	public int canvasHeight = 0;
     public int nTopPanelHeight = 0;
-
     public Set<Shape> orderedShapesByRDF = new HashSet<>();
+    private int percentageShown = 0;
+    public int getPercentageShown() {
+        return percentageShown;
+    }
+    public void setPercentageShown(int percentageShown) {
+        this.percentageShown = percentageShown;
+    }
 
 	public boolean isStable() {
 		return stable;
@@ -533,8 +539,6 @@ public class PaintFrame extends Canvas {
 			pressedShape = null;
 			return;
 		}
-        System.out.println("********* PRESSED *********");
-        System.out.println("x:" + p.getX() + " , y:" + p.getY() + "\n");
 
 		pressedShape = visGraph.findShape(p);
 
@@ -1011,7 +1015,6 @@ public class PaintFrame extends Canvas {
 
 	public void focusOnShape(String shapeKey, Shape pshape) {
 		Shape shape = pshape != null ? pshape : visGraph.getShape(shapeKey);
-        System.out.println("********* FOCUS ********* " + factor);
 
 		if (shape != null) {
             double viewportWidth = scroll.getViewportBounds().getWidth() / factor;
