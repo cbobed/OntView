@@ -27,6 +27,7 @@ import javafx.stage.Modality;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import javafx.util.converter.IntegerStringConverter;
 import org.semanticweb.owlapi.model.IRI;
 import sid.OntView2.common.*;
 
@@ -66,7 +67,9 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private VBox helpPanel;
 	private Button helpButton;
 	private VBox classExpressionPanel;
+    private VBox percentagePanel;
 	private Button expressionButton;
+    private Spinner<Integer> percentageSpinner;
 	private Popup helpPopup;
 	private TextField parentField, childField;
 	private VBox parentListBox, childListBox;
@@ -113,6 +116,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		HBox row = new HBox(10,
 				createLoadOntologyOptions(),
 				createShowClassExpressionButton(),
+                createVisibilityPercentageSelector(),
 				getPanelCheckBox(),
 				getZoomSlider(),
 				getViewPanel(),
@@ -202,6 +206,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			zoomSlider = new Slider(0.5, 2.0, 1.0);
 			zoomSlider.setOrientation(Orientation.VERTICAL);
             zoomSlider.setShowTickLabels(true);
+            zoomSlider.setMinWidth(30);
 
 			zoomSlider.getStyleClass().add("zoom-slider");
 			zoomSlider.setPrefHeight(VisConstants.CONTAINER_SIZE);
@@ -285,7 +290,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		if (toggleSwitch == null) {
 			toggleSwitch = new ToggleButton("Show");
 			toggleSwitch.getStyleClass().add("button");
-			toggleSwitch.setMinWidth(70);
+			toggleSwitch.setMinWidth(60);
 
 			// Add a listener to handle the switch state
 			toggleSwitch.selectedProperty().addListener((observable, oldValue, newValue) -> {
@@ -309,7 +314,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		if (cleanConnectorsButton == null) {
 			cleanConnectorsButton = new Button("Clean");
 			cleanConnectorsButton.getStyleClass().add("button");
-			cleanConnectorsButton.setMinWidth(70);
+			cleanConnectorsButton.setMinWidth(60);
 			cleanConnectorsButton.setOnAction(this::cleanConnectorActionPerformed);
 		}
 
@@ -396,7 +401,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	public Button getLoadReasonerButton() {
 		if (loadReasonerButton == null) {
 			loadReasonerButton = new Button("Sync");
-			loadReasonerButton.setMinWidth(80);
+			loadReasonerButton.setMinWidth(60);
 			loadReasonerButton.setCursor(Cursor.HAND);
 			loadReasonerButton.setFont(Font.font("DejaVu Sans", FontWeight.NORMAL, 10));
 			loadReasonerButton.getStyleClass().add("button");
@@ -505,7 +510,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		if (restoreViewButton == null) {
 			restoreViewButton = new Button("Restore");
 			restoreViewButton.getStyleClass().add("button");
-			restoreViewButton.setMinWidth(70);
+			restoreViewButton.setMinWidth(60);
 			restoreViewButton.setCursor(Cursor.HAND);
 
 			restoreViewButton.setOnAction(this::restoreViewButtonActionActionPerformed);
@@ -519,7 +524,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		if (saveViewButton == null) {
 			saveViewButton = new Button("Save");
 			saveViewButton.getStyleClass().add("button");
-			saveViewButton.setMinWidth(70);
+			saveViewButton.setMinWidth(60);
 			saveViewButton.setCursor(Cursor.HAND);
 
 			saveViewButton.setOnAction(this::saveViewButtonActionActionPerformed);
@@ -602,12 +607,63 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			expressionButton.getStyleClass().add("button");
 			expressionButton.setOnAction(this::selectNodesClassExpressionActionPerformed);
 
-
-
 			classExpressionPanel = createContainer(titlePane, expressionButton);
 		}
 		return classExpressionPanel;
 	}
+
+    private VBox createVisibilityPercentageSelector() {
+        if (percentagePanel == null) {
+            percentagePanel = new VBox();
+            percentagePanel.setPadding(new Insets(5));
+            percentagePanel.setSpacing(5);
+
+            StackPane titlePane = createTitlePane("Visibility");
+            HBox row = createRow(createTitlePane("%"), getVisibilitySpinner());
+
+            percentagePanel = createContainer(titlePane, row);
+        }
+        return percentagePanel;
+    }
+
+    public Spinner<Integer> getVisibilitySpinner() {
+        if (percentageSpinner == null) {
+            SpinnerValueFactory<Integer> values =
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 100, 0, 1);
+            percentageSpinner = new Spinner<>(values);
+            percentageSpinner.setEditable(true);
+            percentageSpinner.getStyleClass().add("spinner");
+
+            // Only numbers allow [0-100]
+            TextField editor = percentageSpinner.getEditor();
+            editor.textProperty().addListener((obs, oldValue, newValue) -> {
+                if (newValue.isEmpty()) {
+                    return;
+                }
+                if (!newValue.matches("\\d*")) {
+                    editor.setText(oldValue);
+                } else {
+                    try {
+                        int value = Integer.parseInt(newValue);
+                        if (value < 0 || value > 100) {
+                            editor.setText(oldValue);
+                        }
+                    } catch (NumberFormatException e) {
+                        editor.setText(oldValue);
+                    }
+                }
+            });
+            editor.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {
+                if (!isNowFocused && editor.getText().isEmpty()) {
+                    editor.setText("0");
+                    percentageSpinner.getValueFactory().setValue(0);
+                }
+            });
+
+            percentageSpinner.setPrefWidth(60);
+        }
+        return percentageSpinner;
+    }
 
 	private VBox createHelpButton() {
 		if (helpPanel == null) {
