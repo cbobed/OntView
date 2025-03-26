@@ -57,14 +57,12 @@ public class VisGraph implements Runnable{
 	private HashSet<OWLClassExpression> set;
 	private boolean check;
 	private OWLReasoner reasoner;
-	private LinkedHashSet<Observer> observers;
 	private HashMap<String,String> qualifiedLabelMap;
 	
     public HashMap<String, String> getQualifiedLabelMap(){return qualifiedLabelMap;}
 	public List<VisConnector> getDashedConnectorList(){ return dashedConnectorList;}
 	public List<VisConnector> getConnectorList(){ return connectorList;}
 	public int getProgress(){return progress;}
-    private void setProgress(int p){progress = p;}
     public int getZoomLevel(){return zoomLevel;}
     public void setZoomLevel(int z){zoomLevel=z;}
     public Map<String,Shape> getShapeMap() {return shapeMap;}
@@ -95,7 +93,6 @@ public class VisGraph implements Runnable{
 		dashedConnectorList = new ArrayList<>();
 		levelSet 			= new Hashtable<>();
 		paintframe = pframe;
-		observers  = new LinkedHashSet<>();
 		qualifiedLabelMap = new HashMap<>();
 	}
 
@@ -109,7 +106,6 @@ public class VisGraph implements Runnable{
 		connectorList.clear();
 		dashedConnectorList.clear();
 		levelSet.clear();
-		observers.clear();
 		qualifiedLabelMap.clear();
 	}
 
@@ -152,15 +148,6 @@ public class VisGraph implements Runnable{
 		paintframe.setHeight(y);
 
     }
-
-	private OWLClassExpression getTopClass(OWLOntology activeOntology) {
-		for(OWLClassExpression e : activeOntology.getClassesInSignature()){
-			if (e.isTopEntity())
-				return e;
-		}
-		return null;	
-	}
-	
 	
 	/**
 	 *  builds the complete graph
@@ -174,6 +161,7 @@ public class VisGraph implements Runnable{
 		clearAll();
 		set.stream().forEach(x->System.err.println("Build 1st set: "+x));
 		OWLClass topClass = activeOntology.getOWLOntologyManager().getOWLDataFactory().getOWLThing(); 
+		// we start from a fresh graph, so it is safe to create OWLThing directly 
 		addVisClass(Shape.getKey(topClass), topClass, activeOntology, reasoner); 
 		this.reasonedTraversal(activeOntology,reasoner, null, rootCpts);
 		
@@ -183,7 +171,7 @@ public class VisGraph implements Runnable{
 			OWLDataFactory dFactory = activeOntology.getOWLOntologyManager().getOWLDataFactory();
 			OWLClass topDetailedCpt = dFactory.getOWLThing(); 
 			OWLClass bottomDetailedCpt = dFactory.getOWLNothing();  
-			insertClassExpressions(activeOntology, reasoner, topDetailedCpt, bottomDetailedCpt);
+			//insertClassExpressions(activeOntology, reasoner, topDetailedCpt, bottomDetailedCpt);
 		}
 		
 		createLevels(activeOntology); 
@@ -583,8 +571,6 @@ public class VisGraph implements Runnable{
 			// all the Shapes in currentCELevel :: AlreadyCreated 
 			// this implies that TOP must be created outside
 			VisClass vis = getShapeFromOWLClassExpression(ce).asVisClass(); 
-			
-			HashSet<OWLClassExpression> equivSet = new HashSet<>();
 			HashSet<OWLClassExpression> subSet = new HashSet<> ();
 			reasoner.getSubClasses(ce, true).entities().forEach(subSet::add); 
 			subSet.forEach(
@@ -621,7 +607,7 @@ public class VisGraph implements Runnable{
 			if(auxValue != null){
 				continue;
 			}
-			VisClass auxVis = addVisClass(auxKey, ce, activeOntology, reasoner);
+			addVisClass(auxKey, ce, activeOntology, reasoner);
 		}
 	}
 
@@ -860,7 +846,11 @@ public class VisGraph implements Runnable{
     		   if (x.isOWLNothing()) vis.isBottom=true; 
     		   if (!x.equals(ce)) {
     			   vis.addEquivalentExpression(x);
-    			   shapeMap.put(Shape.getKey(ce), vis); 
+    			   shapeMap.put(Shape.getKey(x), vis);
+    			   // to make it appear in the SearchCombo
+    			   if (x instanceof OWLClass) {    				   
+    				   getQualifiedLabelMap().put(ExpressionManager.getReducedClassExpression(x), x.asOWLClass().getIRI().toString());
+    			   }
     		   }
     	   }); 
        }
