@@ -1458,7 +1458,7 @@ public class PaintFrame extends Canvas {
 		return loadingStage;
 	}
 
-    void showAlertDialog(String title, String header, String content, Alert.AlertType type) {
+    public void showAlertDialog(String title, String header, String content, Alert.AlertType type) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
         alert.setHeaderText(header);

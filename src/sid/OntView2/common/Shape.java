@@ -389,7 +389,6 @@ public abstract class Shape {
         RDFRankSelectionStrategy RDFStrategy = new RDFRankSelectionStrategy(graph.paintframe.getPercentageShown(),
             asVisClass().orderedDescendants);
 
-        // AQUI?
         if (graph.paintframe.getPercentageShown() == 0) {
             graph.paintframe.showAlertDialog("Warning",
                 "Please note that the visibility percentage for showing \nor hiding nodes is currently set to 0.",

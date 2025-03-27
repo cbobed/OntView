@@ -200,7 +200,7 @@ public class Mine extends Application implements Embedable{
 		task.setOnFailed(e -> {
 			task.getException().printStackTrace();
 			loadingStage.close();
-			showAlertDialog("Error", "Ontology could not be loaded.", task.getException().getMessage(),
+            artPanel.showAlertDialog("Error", "Ontology could not be loaded.", task.getException().getMessage(),
 					Alert.AlertType.ERROR);
 		});
 
@@ -274,13 +274,13 @@ public class Mine extends Application implements Embedable{
 				return true;
 			} catch (Exception e) {
 				e.printStackTrace();
-				Platform.runLater(() -> showAlertDialog("Error", "Failed to load reasoner.",
+				Platform.runLater(() -> artPanel.showAlertDialog("Error", "Failed to load reasoner.",
 						e.getMessage(), AlertType.ERROR));
 				return false;
 			}
 		} else {
 			artPanel.stop();
-			Platform.runLater(() -> showAlertDialog("Error", "No active ontology.",
+			Platform.runLater(() -> artPanel.showAlertDialog("Error", "No active ontology.",
 				"Please load an ontology before loading a reasoner.", AlertType.ERROR));
 
 			return false;
@@ -356,7 +356,7 @@ public class Mine extends Application implements Embedable{
 				  • Reasoner loading \u2714
 				  • View loading \u274C
 				""";
-			showAlertDialog("Error", "Failed to load view.", message +
+			artPanel.showAlertDialog("Error", "Failed to load view.", message +
 					"\nView might be corrupted.", Alert.AlertType.ERROR);
 
 		});
@@ -401,7 +401,7 @@ public class Mine extends Application implements Embedable{
             Path path = Paths.get("src/canvasImages/");
             ImageMerger.deleteDirectory(path.toFile());
             loadingStage.close();
-            showAlertDialog("Error", "Unable to save the ontology view.", task.getException().getMessage(),
+            artPanel.showAlertDialog("Error", "Unable to save the ontology view.", task.getException().getMessage(),
                 AlertType.ERROR);
         });
         new Thread(task).start();
@@ -501,7 +501,7 @@ public class Mine extends Application implements Embedable{
 		task.setOnFailed(e -> {
 			task.getException().printStackTrace();
 			loadingStage.close();
-			showAlertDialog("Error", "Unable to save the ontology view.", task.getException().getMessage(),
+			artPanel.showAlertDialog("Error", "Unable to save the ontology view.", task.getException().getMessage(),
 					AlertType.ERROR);
 		});
 		new Thread(task).start();
@@ -512,16 +512,4 @@ public class Mine extends Application implements Embedable{
 		// TODO Auto-generated method stub
 		nTopPanel.loadSearchCombo();
 	}
-
-	void showAlertDialog(String title, String header, String content, AlertType type) {
-		Alert alert = new Alert(type);
-		alert.setTitle(title);
-		alert.setHeaderText(header);
-		alert.setContentText(content);
-		ClassLoader c = Thread.currentThread().getContextClassLoader();
-		alert.getDialogPane().getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
-		alert.getDialogPane().getStyleClass().add("custom-alert");
-		alert.showAndWait();
-	}
-
 }

@@ -767,7 +767,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		if ((x != null) && (!x.isEmpty())) {
 			parent.loadActiveOntologyTask(IRI.create(x));
 		} else {
-			parent.showAlertDialog("Error", "No ontology selected.",
+			parent.artPanel.showAlertDialog("Error", "No ontology selected.",
 					"Please select an ontology first.", Alert.AlertType.ERROR);
 		}
 	}
@@ -821,7 +821,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		task.setOnSucceeded(e -> loadingStage.close());
 		task.setOnFailed(e -> {
 			task.getException().printStackTrace();
-			parent.showAlertDialog("Error", "Reasoner could not be loaded.",  "Try another reasoner.",
+			parent.artPanel.showAlertDialog("Error", "Reasoner could not be loaded.",  "Try another reasoner.",
 					Alert.AlertType.ERROR);
 			loadingStage.close();
 		});
@@ -869,7 +869,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 			} catch (Exception e) {
 				e.printStackTrace();
-				parent.showAlertDialog("Error", "Reasoner could not be loaded.", e.getMessage(),
+				parent.artPanel.showAlertDialog("Error", "Reasoner could not be loaded.", e.getMessage(),
 						Alert.AlertType.ERROR);
 				throw new RuntimeException(e);
 			}
@@ -951,7 +951,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 					getPropertiesCheckBox().setDisable(true);
 					getPropertiesCheckBox().setSelected(false);
 
-					parent.showAlertDialog("Information Dialog", "Graph is too large to show properties.",
+					parent.artPanel.showAlertDialog("Information Dialog", "Graph is too large to show properties.",
 							"We recommend displaying the node properties one at a time.", Alert.AlertType.INFORMATION);
 				} else {*/
 					for (Entry<String, Shape> entry : classesInGraph) {
@@ -984,10 +984,10 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			loadingStage.close();
 			getPropertiesCheckBox().setSelected(false);
 			if (isGraphTooLarge.get()) {
-				parent.showAlertDialog("Information Dialog", "Graph is too large to show properties.",
+				parent.artPanel.showAlertDialog("Information Dialog", "Graph is too large to show properties.",
 						"We recommend displaying the node properties one at a time.", Alert.AlertType.INFORMATION);
 			} else {
-				parent.showAlertDialog("Error", "Properties could not be loaded.", "Try again.",
+				parent.artPanel.showAlertDialog("Error", "Properties could not be loaded.", "Try again.",
 						Alert.AlertType.ERROR);
 			}
 		});
@@ -1011,7 +1011,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 					getReduceCheckBox().setSelected(false);
 				}
 			} else {
-				parent.showAlertDialog("Information Dialog", null,
+				parent.artPanel.showAlertDialog("Information Dialog", null,
 						"Please load an ontology first.", Alert.AlertType.INFORMATION);
 			}
 		}

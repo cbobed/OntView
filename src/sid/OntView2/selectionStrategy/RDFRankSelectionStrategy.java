@@ -2,9 +2,7 @@ package sid.OntView2.selectionStrategy;
 
 import sid.OntView2.common.Shape;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.List;
+import java.util.*;
 
 public class RDFRankSelectionStrategy implements SelectionStrategy {
     private final int limit;
@@ -20,8 +18,7 @@ public class RDFRankSelectionStrategy implements SelectionStrategy {
      */
     @Override
     public Set<Shape> getShapesToVisualize() {
-        int totalNodes = orderedShapesByRDF.size();
-        int numberToShow = (int) Math.ceil((limit / 100.0) * totalNodes);
+        int numberToShow = (int) Math.ceil((limit / 100.0) * orderedShapesByRDF.size());
 
         Set<Shape> selectedShapes = new LinkedHashSet<>();
 
@@ -41,12 +38,13 @@ public class RDFRankSelectionStrategy implements SelectionStrategy {
      */
     @Override
     public Set<Shape> getShapesToHide() {
-        int totalNodes = orderedShapesByRDF.size();
-        int numberToShow = (int) Math.ceil((limit / 100.0) * totalNodes);
+        int numberToShow = (int) Math.ceil((limit / 100.0) * orderedShapesByRDF.size());
 
         Set<Shape> selectedShapes = new LinkedHashSet<>();
+        List<Shape> reversedShapes = new ArrayList<>(orderedShapesByRDF);
+        Collections.reverse(reversedShapes);
 
-        for (Shape candidate : orderedShapesByRDF) {
+        for (Shape candidate : reversedShapes) {
             if (selectedShapes.size() >= numberToShow) {
                 break;
             }
