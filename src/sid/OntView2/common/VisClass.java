@@ -11,7 +11,6 @@ import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
-import pedviz.graph.Graph;
 import sid.OntView2.expressionNaming.SIDClassExpressionNamer;
 import sid.OntView2.utils.ExpressionManager;
 
@@ -79,9 +78,13 @@ public class VisClass extends Shape {
 	boolean qualifiedRendering = false; 
 	boolean labelRendering = false;
 	public int topToBarDistance = 0;
+	int tabSize = 15;
 
-
-	int tabSize = 15; 
+    Color mini = Color.rgb(224, 224, 224);
+    Color lightgray = Color.rgb(234, 234, 234);
+    Color lightBlue = Color.rgb(212, 238, 247);
+    Color lightGreen = Color.rgb(212, 247, 212);
+    Color barGreen = Color.rgb(120, 190, 145);
 	
 	public String getClassExpressionFragment (){
 		return classExpressionFragment == null ? getLinkedClassExpression().asOWLClass().getIRI().getFragment() :
@@ -262,11 +265,6 @@ public class VisClass extends Shape {
 
 	    if (visible){
 
-			Color mini = Color.rgb(224, 224, 224);
-			Color lightgray = Color.rgb(234, 234, 234);
-			Color lightBlue = Color.rgb(212, 238, 247);
-			Color lightGreen = Color.rgb(212, 247, 212);
-
 			int propertySpace = (propertyBox != null) ? 20 : 0;
 
 	    	if (!isDefined) {
@@ -287,10 +285,10 @@ public class VisClass extends Shape {
 			    g.setFill(Color.BLACK);
 				// Square for properties
 				if (propertyBox != null) {
-					propertyDraw(g, x, y, roundCornerValue, lightBlue);
+					propertyDraw(g, x, y, roundCornerValue);
 				}
 				if (!getDisjointConnectors().isEmpty()) {
-					disjointDraw(g, x, y, roundCornerValue, Color.LIGHTYELLOW);
+					disjointDraw(g, x, y, roundCornerValue);
 				}
 			    g.setFill(Color.BLACK);
 	
@@ -330,10 +328,10 @@ public class VisClass extends Shape {
 		    		}
 
 					if (propertyBox != null) {
-						propertyDraw(g, x + 5, y - 5, roundCornerValue, lightBlue);
+						propertyDraw(g, x + 5, y - 5, roundCornerValue);
 					}
 					if (!getDisjointConnectors().isEmpty()) {
-						disjointDraw(g, x-5, y - 5, roundCornerValue, Color.LIGHTYELLOW);
+						disjointDraw(g, x-5, y - 5, roundCornerValue);
 					}
 					g.setFill(Color.BLACK);
 				}
@@ -352,11 +350,11 @@ public class VisClass extends Shape {
 				    g.strokeRoundRect(x - (double) getWidth()/2, y - (double) currentHeight /2,  getWidth()-1, currentHeight-1, roundCornerValue, roundCornerValue);
 				    g.setFill(Color.BLACK);
 				    if (propertyBox!=null){
-						propertyDraw(g, x, y, roundCornerValue, lightBlue);
+						propertyDraw(g, x, y, roundCornerValue);
 						propertySpace += 5;
 				    }
 					if (!getDisjointConnectors().isEmpty()) {
-						disjointDraw(g, x, y, roundCornerValue, Color.LIGHTYELLOW);
+						disjointDraw(g, x, y, roundCornerValue);
 					}
 
 				    g.setStroke(Color.BLACK);
@@ -484,7 +482,7 @@ public class VisClass extends Shape {
         double visibleWidth = width * visiblePercentage;
         double hiddenWidth = width * hiddenPercentage;
 
-		g.setFill(Color.MEDIUMSEAGREEN); // visible nodes
+		g.setFill(barGreen); // visible nodes
 		g.fillRect(x, rectY, visibleWidth, height);
 		g.setFill(Color.LIGHTGRAY); // hidden nodes
 		g.fillRect((double) x + visibleWidth, rectY, hiddenWidth, height);
@@ -522,16 +520,16 @@ public class VisClass extends Shape {
 	}
 
 
-	private void propertyDraw(GraphicsContext g, int x, int y, int roundCornerValue, Color colorP) {
-		g.setFill(colorP);
+	private void propertyDraw(GraphicsContext g, int x, int y, int roundCornerValue) {
+		g.setFill(lightBlue);
 		g.fillRoundRect(x - (double) getWidth()/2 + 5, y - (double) currentHeight / 2 + 6, 19, 14, roundCornerValue, roundCornerValue);
 		g.setFill(Color.BLACK);
 		g.strokeRoundRect(x - (double) getWidth()/2 + 5, y - (double) currentHeight / 2 + 6, 19, 14, roundCornerValue, roundCornerValue);
 		g.fillText("P\u25BC", x - (double) getWidth()/2 + 7, y - (double) currentHeight / 2 + 17);
 	}
 
-	private void disjointDraw(GraphicsContext g, int x, int y, int roundCornerValue, Color colorD) {
-		g.setFill(colorD);
+	private void disjointDraw(GraphicsContext g, int x, int y, int roundCornerValue) {
+		g.setFill(Color.LIGHTYELLOW);
 		g.fillRoundRect(x + (double) getWidth() / 2 - 20, y - (double) currentHeight / 2 + 6, 14, 14, roundCornerValue, roundCornerValue);
 		g.setFill(Color.BLACK);
 		g.strokeRoundRect(x + (double) getWidth() / 2 - 20, y - (double) currentHeight / 2 + 6, 14, 14, roundCornerValue, roundCornerValue);

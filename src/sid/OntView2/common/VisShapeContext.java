@@ -21,7 +21,7 @@ import org.semanticweb.owlapi.reasoner.NodeSet;
 import java.util.ArrayList;
 
 public class VisShapeContext extends ContextMenu {
-	MenuItem hideItem, hideProperties, showInstances;
+	MenuItem hideItem, hideProperties, showInstances, showSliderPercentage;
 	Shape shape;
 	PaintFrame parent;
 	OWLClassExpression expression;
@@ -63,6 +63,7 @@ public class VisShapeContext extends ContextMenu {
 		
 		
 		this.getItems().add(getShowInstancesItem());
+        this.getItems().add(getSliderPercentage());
 		this.getItems().add(hideProperties);
 		this.getItems().add(hideItem);
 	}
@@ -74,6 +75,14 @@ public class VisShapeContext extends ContextMenu {
 		}
 		return showInstances;
 	}
+
+    private MenuItem getSliderPercentage(){
+        if (showSliderPercentage == null) {
+            showSliderPercentage = new MenuItem("Show Percentage Visibility");
+        }
+        return showSliderPercentage;
+    }
+
 
 	private MenuItem getMenuHideProperties(){
 		if (hideProperties==null) {
