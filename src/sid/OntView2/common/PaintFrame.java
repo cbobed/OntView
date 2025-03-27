@@ -333,9 +333,7 @@ public class PaintFrame extends Canvas {
 
 				for (Entry<String, Shape> entry : visGraph.shapeMap.entrySet()) {
 					Shape shape = entry.getValue();
-					if (!(shape instanceof SuperNode)) {
-						shape.drawShape(g);
-					}
+					shape.drawShape(g);
 				}
 				drawPropertyBoxes(g);
 			} else {
