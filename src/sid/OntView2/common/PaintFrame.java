@@ -1458,4 +1458,15 @@ public class PaintFrame extends Canvas {
 		return loadingStage;
 	}
 
+    void showAlertDialog(String title, String header, String content, Alert.AlertType type) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        ClassLoader c = Thread.currentThread().getContextClassLoader();
+        alert.getDialogPane().getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
+        alert.getDialogPane().getStyleClass().add("custom-alert");
+        alert.showAndWait();
+    }
+
 }

@@ -3,6 +3,7 @@ package sid.OntView2.common;
 
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Alert;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import sid.OntView2.selectionStrategy.RDFRankSelectionStrategy;
@@ -171,7 +172,6 @@ public abstract class Shape {
      * Then looks for those remaining visible nodes and adds a reference (dashed line)
      */
     public void closeRight() {
-        //setState(CLOSED);
         hideSubLevels(getShapesFromStrategy(true));
     }
 
@@ -231,18 +231,17 @@ public abstract class Shape {
      * hides outConnectors and checks if children need to be hidden
      */
     private void hideSubLevels(Set<Shape> hiddenDescendants) {
-        System.out.println("Hidden descendants: ----------");
+        /*System.out.println("Hidden descendants: ----------");
         for (Shape s: hiddenDescendants){
             System.out.println(" - " + s.getLabel());
         }
-        System.out.println("-------------------------------");
+        System.out.println("-------------------------------");*/
 
         this.hideDescendants(hiddenDescendants);
 
+        Set<Shape> visited = new HashSet<>();
         for (Shape s: hiddenDescendants) {
-           // s.checkAndUpdateChildrenVisibilityStates();
-            s.updateHiddenDescendants();
-            s.addFromAncestors(hiddenDescendants);
+            s.addFromAncestors(hiddenDescendants, visited);
         }
         hiddenDescendantsSet.addAll(hiddenDescendants);
         checkAndUpdateChildrenVisibilityStates();
@@ -390,6 +389,14 @@ public abstract class Shape {
         RDFRankSelectionStrategy RDFStrategy = new RDFRankSelectionStrategy(graph.paintframe.getPercentageShown(),
             asVisClass().orderedDescendants);
 
+        // AQUI?
+        if (graph.paintframe.getPercentageShown() == 0) {
+            graph.paintframe.showAlertDialog("Warning",
+                "Please note that the visibility percentage for showing \nor hiding nodes is currently set to 0.",
+                "Consider selecting a different percentage to adjust the visibility appropriately.",
+                Alert.AlertType.INFORMATION);
+        }
+
         return switch (SelectionStrategy.getStrategyOption()) {
             case "RDFRank" -> toHide ? RDFStrategy.getShapesToHide() : RDFStrategy.getShapesToVisualize();
             case "RDFRankLevelId" -> null;
@@ -413,18 +420,19 @@ public abstract class Shape {
             this.visible = true;
 
             for (VisConnector c : inConnectors) {
-                c.show();
+                if (c.from.isVisible() && c instanceof VisConnectorIsA) c.show();
+                else if (!c.from.isVisible() && c instanceof VisConnectorDashed) c.show();
+
                 c.from.checkAndUpdateChildrenVisibilityStates();
             }
             for (VisConnector c : outConnectors) {
-                c.show();
+                if (c.to.isVisible() && c instanceof VisConnectorIsA) c.show();
+                else if (!c.to.isVisible() && c instanceof VisConnectorDashed) c.show();
+
                 c.to.checkAndUpdateParentVisibilityStates();
             }
         }
 
-        /*if (visibleDescendantsSet.isEmpty() && graph.paintframe.getPercentageShown() != 0) {
-            for (VisConnector connector : outConnectors) connector.show();
-        }*/
         for (VisConnector connector : outConnectors) {
             connector.to.show(visibleDescendantsSet);
         }
@@ -458,10 +466,11 @@ public abstract class Shape {
 
         this.show(visibleDescendants);
 
+        Set<Shape> visited = new HashSet<>();
         for (Shape s: visibleDescendants){
-            s.checkAndUpdateChildrenVisibilityStates();
-            s.updateHiddenDescendants();
-            s.removeFromAncestors(visibleDescendants);
+            //s.checkAndUpdateChildrenVisibilityStates();
+            //s.updateHiddenDescendants();
+            s.removeFromAncestors(visibleDescendants, visited);
         }
         hiddenDescendantsSet.removeAll(visibleDescendants);
         checkAndUpdateChildrenVisibilityStates();
@@ -612,34 +621,44 @@ public abstract class Shape {
      * Recursively traverses all ancestors of the given node and removes the nodes
      * from visibleDescendantsSet in the hiddenDescendantsSet of each ancestor.
      */
-    private void removeFromAncestors(Set<Shape> visibleDescendantsSet) {
+    private void removeFromAncestors(Set<Shape> visibleDescendantsSet, Set<Shape> visited) {
+        if (visited.contains(this)) return;
+        visited.add(this);
+
         for (VisConnector connector : inConnectors) {
             Shape parent = connector.from;
             if (parent != null) {
+                if (visited.contains(parent)) return;
+
                 parent.hiddenDescendantsSet.removeAll(visibleDescendantsSet);
                 parent.checkAndUpdateChildrenVisibilityStates();
-                parent.removeFromAncestors(visibleDescendantsSet);
+                parent.removeFromAncestors(visibleDescendantsSet, visited);
             }
         }
     }
 
     /**
      * Recursively traverses all ancestors of the given node and adds the nodes
-     * from visibleDescendantsSet in the hiddenDescendantsSet of each ancestor.
+     * from visibleDescendantsSet in the hiddenDescendantsSet of each ancestor,
+     * only if the node is its descendant.
      */
-    private void addFromAncestors(Set<Shape> visibleDescendantsSet) {
+    private void addFromAncestors(Set<Shape> visibleDescendantsSet, Set<Shape> visited) {
+        if (visited.contains(this)) return;
+        visited.add(this);
+
         for (VisConnector connector : inConnectors) {
             Shape parent = connector.from;
             if (parent != null) {
-                parent.hiddenDescendantsSet.addAll(visibleDescendantsSet);
+                if (visited.contains(parent)) return;
+
+                Set<Shape> relevantDescendants = new HashSet<>(visibleDescendantsSet);
+                relevantDescendants.retainAll(parent.asVisClass().orderedDescendants);
+                parent.hiddenDescendantsSet.addAll(relevantDescendants);
                 parent.checkAndUpdateChildrenVisibilityStates();
-                parent.removeFromAncestors(visibleDescendantsSet);
+                parent.addFromAncestors(visibleDescendantsSet, visited);
             }
         }
     }
-
-
-
 
 
     /**
