@@ -7,10 +7,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.ListView;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.Slider;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.*;
@@ -24,6 +21,7 @@ import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class VisShapeContext extends ContextMenu {
 	MenuItem hideItem, hideProperties, showInstances, showSliderPercentage;
@@ -143,10 +141,13 @@ public class VisShapeContext extends ContextMenu {
 	}
 
     private int getPercentage(){
-        System.out.println("Percentage: " + (shape.asVisClass().descendants.size() - shape.asVisClass().getHiddenDescendantsSet())
-                / shape.asVisClass().descendants.size());
-        return (shape.asVisClass().descendants.size() - shape.asVisClass().getHiddenDescendantsSet())
-            / shape.asVisClass().descendants.size();
+
+        System.out.println(shape.getLabel() + " percentage: " + (100*(shape.asVisClass().descendants.size() - shape.asVisClass().getHiddenDescendantsSet())
+                / shape.asVisClass().descendants.size()));
+        System.out.println("Descendants: " + shape.asVisClass().descendants.size());
+        System.out.println("Hidden Descendants: " + shape.asVisClass().getHiddenDescendantsSet());
+        return 100 * ((shape.asVisClass().descendants.size() - shape.asVisClass().getHiddenDescendantsSet())
+            / shape.asVisClass().descendants.size());
     }
 
     private void showSliderAction() {
@@ -158,38 +159,46 @@ public class VisShapeContext extends ContextMenu {
         sliderStage.initStyle(StageStyle.UNDECORATED);
         sliderStage.setAlwaysOnTop(true);
 
-        Slider slider = new Slider(0, 100, getPercentage());
+        Slider slider = new Slider(0,100, getPercentage());
         slider.setShowTickLabels(true);
         slider.setShowTickMarks(true);
         slider.setMajorTickUnit(10);
         slider.setMinorTickCount(5);
         slider.setBlockIncrement(1);
         slider.setSnapToTicks(true);
+        slider.getStyleClass().add("custom-slider");
 
-        slider.valueProperty().addListener((obs, oldVal, newVal) -> {
+        /*slider.valueProperty().addListener((obs, oldVal, newVal) -> {
             int intValue = newVal.intValue();
             if (newVal.doubleValue() != intValue) {
-                slider.setValue(intValue);
+                //slider.setValue(intValue);
             }
-            jaja(intValue);
+            changeValue(intValue);
+        });*/
+
+        slider.setOnMouseReleased(event -> {
+            changeValue((int) slider.getValue());
         });
 
         VBox vbox = new VBox(slider);
         vbox.setPadding(new Insets(20));
         vbox.setAlignment(Pos.CENTER);
+        vbox.getStyleClass().add("custom-vbox-slider");
         handleDragged(vbox, sliderStage); // to be able to move the stage
 
+        ClassLoader c = Thread.currentThread().getContextClassLoader();
         Scene scene = new Scene(vbox, 450, 70);
+        scene.getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
         sliderStage.setScene(scene);
 
         Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
         sliderStage.setX(screenBounds.getMaxX() - scene.getWidth() - 100);
-        sliderStage.setY(200);
+        sliderStage.setY(300);
 
         sliderStage.show();
     }
 
-    private void jaja(double valor) {
+    private void changeValue(double valor) {
         System.out.println("Valor del slider: " + valor);
     }
 

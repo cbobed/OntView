@@ -232,3 +232,20 @@
 .combo-box .arrow-button:pressed {
     -fx-background-color: linear-gradient(to bottom, #b0c4de, #a2b9cc);
 }
+
+.custom-slider {
+    -fx-control-inner-background: #fefefe;
+    -fx-tick-label-fill: blue;
+    -fx-tick-mark-fill: blue;
+    -fx-track-color: linear-gradient(to bottom, #99bad8, #5679a2);
+    -fx-thumb-color: #005cbf;
+    -fx-cursor: default;
+    -fx-font-size: 14px;
+}
+
+.custom-vbox-slider {
+    -fx-border-color: blue;
+    -fx-border-width: 1.5;
+    -fx-background-color: #f0f0f0;
+    -fx-cursor: hand;
+}
