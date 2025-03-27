@@ -516,35 +516,6 @@ public abstract class Shape {
         };
 
     /**
-     * Updates the state of the shape based on the visibility of its children.
-     */
-    public void checkAndUpdateChildrenVisibilityStates2() {
-        // Check children visibility
-        boolean allChildrenHidden = true;
-        boolean allChildrenVisible = true;
-
-        for (VisConnector connector : outConnectors) {
-            if (connector.isVisible()) {
-                allChildrenHidden = false;
-            } else {
-                allChildrenVisible = false;
-            }
-
-            if (!allChildrenHidden && !allChildrenVisible) {
-                break;
-            }
-        }
-
-        if (allChildrenHidden) {
-            setState(CLOSED);
-        } else if (allChildrenVisible) {
-            setState(OPEN);
-        } else {
-            setState(PARTIALLY_CLOSED);
-        }
-    }
-
-    /**
      * Updates the state of the shape based on the visibility of its parents.
      */
     public void checkAndUpdateParentVisibilityStates() {
@@ -631,6 +602,7 @@ public abstract class Shape {
 
                 parent.hiddenDescendantsSet.removeAll(visibleDescendantsSet);
                 parent.checkAndUpdateChildrenVisibilityStates();
+                parent.checkAndUpdateParentVisibilityStates();
                 parent.removeFromAncestors(visibleDescendantsSet, visited);
             }
         }
