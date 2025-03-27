@@ -386,21 +386,27 @@ public abstract class Shape {
     }
 
     public Set<Shape> getShapesFromStrategy(boolean toHide){
-        RDFRankSelectionStrategy RDFStrategy = new RDFRankSelectionStrategy(graph.paintframe.getPercentageShown(),
-            asVisClass().orderedDescendants);
-
         if (graph.paintframe.getPercentageShown() == 0) {
             graph.paintframe.showAlertDialog("Warning",
                 "Please note that the visibility percentage for showing \nor hiding nodes is currently set to 0.",
                 "Consider selecting a different percentage to adjust the visibility appropriately.",
                 Alert.AlertType.INFORMATION);
         }
-
-        return switch (SelectionStrategy.getStrategyOption()) {
-            case "RDFRank" -> toHide ? RDFStrategy.getShapesToHide() : RDFStrategy.getShapesToVisualize();
-            case "RDFRankLevelId" -> null;
-            default -> null;
-        };
+        switch (SelectionStrategy.getStrategyOption()) {
+            case "RDFRank" -> {
+                RDFRankSelectionStrategy RDFStrategy = new RDFRankSelectionStrategy(graph.paintframe.getPercentageShown(),
+                    asVisClass().orderedDescendants);
+                return toHide ? RDFStrategy.getShapesToHide() : RDFStrategy.getShapesToVisualize();
+            }
+            case "RDFRankLevelId" -> {
+                RDFRankSelectionStrategy RDFLevelIDStrategy = new RDFRankSelectionStrategy(graph.paintframe.getPercentageShown(),
+                    asVisClass().orderedChildren);
+                return toHide ? RDFLevelIDStrategy.getShapesToHide() : RDFLevelIDStrategy.getShapesToVisualize();
+            }
+            default -> {
+                return null;
+            }
+        }
     }
 
     /**************************************************************/

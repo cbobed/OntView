@@ -865,7 +865,6 @@ public class PaintFrame extends Canvas {
 						if (shape.getState() == Shape.OPEN || shape.getState() == Shape.PARTIALLY_CLOSED) {
 							// if [-] clicked, close the node
 							shape.closeRight();
-							//shape.updateHiddenDescendantsForParents();
 							refreshDashedConnectors();
 							VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
 							setStateChanged(true);

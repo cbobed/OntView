@@ -33,6 +33,7 @@ public class VisClass extends Shape {
 	HashSet<OWLObjectProperty> aplicable;
 	HashSet<OWLDataProperty> dAplicable;
 	ArrayList<Shape>   children;
+    Set<Shape> orderedChildren = new HashSet<>();
 	ArrayList<Shape>   parents;
 
 	Set<Shape> descendants = new HashSet<>();

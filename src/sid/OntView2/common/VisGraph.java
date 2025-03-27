@@ -1484,6 +1484,7 @@ public class VisGraph implements Runnable{
          for (Shape shape : shapeMap.values()) {
              Set<Shape> orderedDescendants = new LinkedHashSet<>();
              Set<Shape> orderedAncestors = new LinkedHashSet<>();
+             Set<Shape> orderedChildren = new LinkedHashSet<>();
 
              for (Shape candidate : paintframe.orderedShapesByRDF) {
                  if (shape.asVisClass().descendants.contains(candidate)) {
@@ -1493,9 +1494,14 @@ public class VisGraph implements Runnable{
                  if (shape.asVisClass().ancestors.contains(candidate)) {
                      orderedAncestors.add(candidate);
                  }
+
+                 if (shape.asVisClass().children.contains(candidate)) {
+                     orderedChildren.add(candidate);
+                 }
              }
              shape.asVisClass().orderedDescendants = orderedDescendants;
              shape.asVisClass().orderedAncestors = orderedAncestors;
+             shape.asVisClass().orderedChildren = orderedChildren;
          }
     }
 
