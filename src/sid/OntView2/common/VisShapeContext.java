@@ -4,16 +4,21 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.Slider;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.*;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.scene.layout.VBox;
 
+import javafx.stage.StageStyle;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.reasoner.NodeSet;
@@ -34,12 +39,12 @@ public class VisShapeContext extends ContextMenu {
 		posx = e.getScreenX();
 		posy = e.getScreenY();
 		parent = parentFrame;
-		boolean visc = shape instanceof VisClass;
+		boolean visC = shape instanceof VisClass;
 		expression = shape.asVisClass().getLinkedClassExpression();
        
 		hideProperties = getMenuHideProperties();
 		
-		if ((!visc) || (visc && shape.asVisClass().getPropertyBox() ==null))
+		if (!visC || shape.asVisClass().getPropertyBox() == null)
 			hideProperties.setDisable(true);
 
 		hideProperties.setOnAction(event -> {
@@ -60,8 +65,7 @@ public class VisShapeContext extends ContextMenu {
 			shape.updateParents();
 			Platform.runLater(parent.redrawRunnable);
 		});
-		
-		
+
 		this.getItems().add(getShowInstancesItem());
         this.getItems().add(getSliderPercentage());
 		this.getItems().add(hideProperties);
@@ -79,6 +83,10 @@ public class VisShapeContext extends ContextMenu {
     private MenuItem getSliderPercentage(){
         if (showSliderPercentage == null) {
             showSliderPercentage = new MenuItem("Show Percentage Visibility");
+            if (shape.asVisClass().descendants.isEmpty()) {
+                showSliderPercentage.setDisable(true);
+            }
+            showSliderPercentage.setOnAction(event -> showSliderAction());
         }
         return showSliderPercentage;
     }
@@ -88,7 +96,7 @@ public class VisShapeContext extends ContextMenu {
 		if (hideProperties==null) {
 			hideProperties = new MenuItem();
 			if (shape.asVisClass().getPropertyBox() != null) {
-				boolean b =shape.asVisClass().getPropertyBox().visible;
+				boolean b = shape.asVisClass().getPropertyBox().visible;
 				hideProperties.setText(b ? "Hide Properties" : "Show Properties");
 			}
 			else {
@@ -133,5 +141,76 @@ public class VisShapeContext extends ContextMenu {
 		
 		}
 	}
+
+    private int getPercentage(){
+        System.out.println("Percentage: " + (shape.asVisClass().descendants.size() - shape.asVisClass().getHiddenDescendantsSet())
+                / shape.asVisClass().descendants.size());
+        return (shape.asVisClass().descendants.size() - shape.asVisClass().getHiddenDescendantsSet())
+            / shape.asVisClass().descendants.size();
+    }
+
+    private void showSliderAction() {
+        Stage sliderStage = new Stage();
+        sliderStage.setTitle("Slider Percentage");
+        sliderStage.setMinHeight(70);
+        sliderStage.setMaxHeight(70);
+        sliderStage.setMinWidth(460);
+        sliderStage.initStyle(StageStyle.UNDECORATED);
+        sliderStage.setAlwaysOnTop(true);
+
+        Slider slider = new Slider(0, 100, getPercentage());
+        slider.setShowTickLabels(true);
+        slider.setShowTickMarks(true);
+        slider.setMajorTickUnit(10);
+        slider.setMinorTickCount(5);
+        slider.setBlockIncrement(1);
+        slider.setSnapToTicks(true);
+
+        slider.valueProperty().addListener((obs, oldVal, newVal) -> {
+            int intValue = newVal.intValue();
+            if (newVal.doubleValue() != intValue) {
+                slider.setValue(intValue);
+            }
+            jaja(intValue);
+        });
+
+        VBox vbox = new VBox(slider);
+        vbox.setPadding(new Insets(20));
+        vbox.setAlignment(Pos.CENTER);
+        handleDragged(vbox, sliderStage); // to be able to move the stage
+
+        Scene scene = new Scene(vbox, 450, 70);
+        sliderStage.setScene(scene);
+
+        Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+        sliderStage.setX(screenBounds.getMaxX() - scene.getWidth() - 100);
+        sliderStage.setY(200);
+
+        sliderStage.show();
+    }
+
+    private void jaja(double valor) {
+        System.out.println("Valor del slider: " + valor);
+    }
+
+    /**
+     * Method to handle the dragging of the slider stage.
+     * Since the stage is set to UNDECORATED, we need to add a listener for dragging.
+     */
+    private void handleDragged(VBox vbox, Stage sliderStage) {
+        final Delta dragDelta = new Delta(); // helper class to store the offset during dragging
+        vbox.setOnMousePressed(event -> {
+            dragDelta.x = sliderStage.getX() - event.getScreenX();
+            dragDelta.y = sliderStage.getY() - event.getScreenY();
+        });
+        vbox.setOnMouseDragged(event -> {
+            sliderStage.setX(event.getScreenX() + dragDelta.x);
+            sliderStage.setY(event.getScreenY() + dragDelta.y);
+        });
+    }
+
+    private static class Delta {
+        double x, y;
+    }
 	
 }
