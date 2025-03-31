@@ -604,7 +604,6 @@ public class VisClass extends Shape {
 	    	   qualifiedDefinitionLabels.add(label); 
 	       
 		   visibleDefinitionLabels = definitionLabels;
-		   
 		}
 	   
 	}
