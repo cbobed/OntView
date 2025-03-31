@@ -178,15 +178,16 @@ public class VisShapeContext extends ContextMenu {
         slider.setSnapToTicks(true);
         slider.getStyleClass().add("custom-slider");
 
-        slider.setOnMousePressed(event -> {
-            oldValue = (int) slider.getValue();
+         oldValue = (int) slider.getValue();
+
+        slider.valueProperty().addListener((obs, oldVal, newVal) -> {
+            int intValue = newVal.intValue();
+            if (intValue != oldValue) {
+                changeSliderValue(oldValue, intValue);
+                oldValue = intValue;
+            }
         });
 
-        slider.setOnMouseReleased(event -> {
-            int newValue = (int) slider.getValue();
-            changeSliderValue(newValue);
-            oldValue = newValue;
-        });
         return slider;
     }
 
@@ -238,12 +239,13 @@ public class VisShapeContext extends ContextMenu {
         sliderStage.show();
     }
 
-    private void changeSliderValue(int valor) {
-        if (oldValue > valor) {
-            shape.hideSubLevels(shape.getShapesFromStrategy(true, valor));
+    private void changeSliderValue(int oldValue, int newValue) {
+        if (newValue < oldValue) {
+            shape.hideSubLevels(shape.getShapesFromStrategy(true, newValue));
         } else {
-            shape.showSubLevels(shape.getShapesFromStrategy(false, valor));
+            shape.showSubLevels(shape.getShapesFromStrategy(false, newValue));
         }
+
         parent.refreshDashedConnectors();
         VisLevel.adjustWidthAndPos(parent.visGraph.getLevelSet());
         parent.setStateChanged(true);

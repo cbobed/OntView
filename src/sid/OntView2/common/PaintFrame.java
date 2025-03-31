@@ -65,8 +65,8 @@ public class PaintFrame extends Canvas {
     public int nTopPanelHeight = 0;
     public Set<Shape> orderedShapesByRDF = new HashSet<>();
     private int percentageShown = 0;
-    private String strategyOption = VisConstants.PARTIALSTRATEGY_RDF_LEVEL;
-    private String strategyOptionSlider = VisConstants.FULLSTRATEGY_RDF_LEVEL;
+    private String strategyOption = VisConstants.PARTIALSTRATEGY_RDFRANK;
+    private String strategyOptionSlider = VisConstants.FULLSTRATEGY_RDFRANK;
     public String getStrategyOption() { return strategyOption; }
     public void setStrategyOption(String strategyOption) { this.strategyOption = strategyOption; }
     public String getStrategyOptionSlider() { return strategyOptionSlider; }
