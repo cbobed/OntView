@@ -9,11 +9,11 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.*;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import javafx.scene.layout.VBox;
 
 import javafx.stage.StageStyle;
 import org.semanticweb.owlapi.model.OWLClassExpression;
@@ -153,11 +153,25 @@ public class VisShapeContext extends ContextMenu {
     private void showSliderAction() {
         Stage sliderStage = new Stage();
         sliderStage.setTitle("Slider Percentage");
-        sliderStage.setMinHeight(70);
-        sliderStage.setMaxHeight(70);
-        sliderStage.setMinWidth(460);
+        sliderStage.setMinHeight(100);
+        sliderStage.setMaxHeight(100);
+        sliderStage.setMinWidth(470);
         sliderStage.initStyle(StageStyle.UNDECORATED);
         sliderStage.setAlwaysOnTop(true);
+
+        Label titleLabel = new Label("Slider Percentage");
+        titleLabel.getStyleClass().add("title-label");
+        Button closeButton = new Button("X");
+        closeButton.getStyleClass().add("round-button");
+        closeButton.setOnAction(event -> sliderStage.close());
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        HBox titleBar = new HBox(titleLabel, spacer, closeButton);
+        titleBar.getStyleClass().add("custom-title-bar");
+        titleBar.setAlignment(Pos.CENTER_RIGHT);
+        titleBar.setPadding(new Insets(5));
 
         Slider slider = new Slider(0,100, getPercentage());
         slider.setShowTickLabels(true);
@@ -168,19 +182,11 @@ public class VisShapeContext extends ContextMenu {
         slider.setSnapToTicks(true);
         slider.getStyleClass().add("custom-slider");
 
-        /*slider.valueProperty().addListener((obs, oldVal, newVal) -> {
-            int intValue = newVal.intValue();
-            if (newVal.doubleValue() != intValue) {
-                //slider.setValue(intValue);
-            }
-            changeValue(intValue);
-        });*/
-
         slider.setOnMouseReleased(event -> {
             changeValue((int) slider.getValue());
         });
 
-        VBox vbox = new VBox(slider);
+        VBox vbox = new VBox(titleBar, slider);
         vbox.setPadding(new Insets(20));
         vbox.setAlignment(Pos.CENTER);
         vbox.getStyleClass().add("custom-vbox-slider");

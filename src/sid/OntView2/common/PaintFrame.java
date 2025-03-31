@@ -600,14 +600,16 @@ public class PaintFrame extends Canvas {
 
 			Platform.runLater(redrawRunnable);
 		} else {
-            double newOffsetX = pinchPoint.getX() - e.getX();
-            double newOffsetY = pinchPoint.getY() - e.getY();
+            if (pinchPoint != null) {
+                double newOffsetX = pinchPoint.getX() - e.getX();
+                double newOffsetY = pinchPoint.getY() - e.getY();
 
-            newOffsetX = Math.max(0, Math.min(newOffsetX, scroll.getHmax()));
-            newOffsetY = Math.max(0, Math.min(newOffsetY, scroll.getVmax()));
+                newOffsetX = Math.max(0, Math.min(newOffsetX, scroll.getHmax()));
+                newOffsetY = Math.max(0, Math.min(newOffsetY, scroll.getVmax()));
 
-            scroll.setHvalue(newOffsetX);
-            scroll.setVvalue(newOffsetY);
+                scroll.setHvalue(newOffsetX);
+                scroll.setVvalue(newOffsetY);
+            }
         }
 	}
 

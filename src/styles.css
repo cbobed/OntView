@@ -11,11 +11,29 @@
     -fx-cursor: hand;
 }
 
-.button:hover {
+.round-button {
+    -fx-text-fill: blue;
+    -fx-background-color: linear-gradient(to bottom, #f0f8ff, #d3e3f1);
+    -fx-border-color: #8186d0;
+    -fx-border-width: 1px;
+    -fx-background-radius: 50%;
+    -fx-border-radius: 50%;
+    -fx-font-size: 12px;
+    -fx-cursor: hand;
+    -fx-alignment: center;
+    -fx-pref-width: 30px;
+    -fx-pref-height: 40px;
+}
+
+.button .text {
+    -fx-alignment: center;
+}
+
+.button:hover, .round-button:hover {
     -fx-background-color: linear-gradient(to bottom, #d3e3f1, #b0c4de);
 }
 
-.button:pressed {
+.button:pressed, .round-button:pressed {
     -fx-background-color: linear-gradient(to bottom, #b0c4de, #a2b9cc);
 }
 
@@ -240,7 +258,7 @@
     -fx-track-color: linear-gradient(to bottom, #99bad8, #5679a2);
     -fx-thumb-color: #005cbf;
     -fx-cursor: default;
-    -fx-font-size: 14px;
+    -fx-font-size: 15px;
 }
 
 .custom-vbox-slider {
@@ -248,4 +266,12 @@
     -fx-border-width: 1.5;
     -fx-background-color: #f0f0f0;
     -fx-cursor: hand;
+}
+
+.title-label {
+    -fx-text-fill: blue;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-font-style: italic;
+    -fx-font-family: "DejaVu Sans";
 }
