@@ -4,11 +4,11 @@ import sid.OntView2.common.Shape;
 
 import java.util.*;
 
-public class RDFRankSelectionStrategy implements SelectionStrategy {
+public class RDFRankSelectionStrategyFull implements SelectionStrategy {
     private final int limit;
     private final Set<Shape> orderedShapesByRDF;
 
-    public RDFRankSelectionStrategy(int limit, Set<Shape> orderedShapesByRDF) {
+    public RDFRankSelectionStrategyFull(int limit, Set<Shape> orderedShapesByRDF) {
         this.limit = limit;
         this.orderedShapesByRDF = orderedShapesByRDF;
     }

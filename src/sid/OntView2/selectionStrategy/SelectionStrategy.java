@@ -16,12 +16,4 @@ public interface SelectionStrategy {
      * according to the specific strategy.
      */
     Set<Shape> getShapesToHide();
-
-    public static String getStrategyOption(){
-        return "RDFRankPartial";
-    }
-
-    public static String getStrategyOptionSlider(){
-        return "RDFRank";
-    }
 }

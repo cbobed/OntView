@@ -6,7 +6,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
-import sid.OntView2.selectionStrategy.RDFRankSelectionStrategy;
+import sid.OntView2.selectionStrategy.RDFRankSelectionStrategyFull;
 import sid.OntView2.selectionStrategy.RDFRankSelectionStrategyPartial;
 import sid.OntView2.selectionStrategy.SelectionStrategy;
 
@@ -391,13 +391,14 @@ public abstract class Shape {
     }
 
     public Set<Shape> getShapesFromStrategyPartial(boolean toHide, int limit){
-        switch (SelectionStrategy.getStrategyOption()) {
-            case "RDFRankPartial" -> {
+        switch (graph.paintframe.getStrategyOption()) {
+            case VisConstants.PARTIALSTRATEGY_RDFRANK -> {
                 RDFRankSelectionStrategyPartial RDFStrategy = new RDFRankSelectionStrategyPartial(limit,
                     asVisClass().orderedDescendants);
                 return toHide ? RDFStrategy.getShapesToHide() : RDFStrategy.getShapesToVisualize();
             }
-            case "RDFRankLevelPartial" -> {
+
+            case VisConstants.PARTIALSTRATEGY_RDF_LEVEL -> {
                 RDFRankSelectionStrategyPartial RDFStrategy = new RDFRankSelectionStrategyPartial(limit,
                     asVisClass().orderedChildren);
                 return toHide ? RDFStrategy.getShapesToHide() : RDFStrategy.getShapesToVisualize();
@@ -409,14 +410,15 @@ public abstract class Shape {
     }
 
     public Set<Shape> getShapesFromStrategy(boolean toHide, int limit){
-        switch (SelectionStrategy.getStrategyOptionSlider()) {
-            case "RDFRank" -> {
-                RDFRankSelectionStrategy RDFStrategy = new RDFRankSelectionStrategy(limit,
+        switch (graph.paintframe.getStrategyOptionSlider()) {
+            case VisConstants.FULLSTRATEGY_RDFRANK -> {
+                RDFRankSelectionStrategyFull RDFStrategy = new RDFRankSelectionStrategyFull(limit,
                     asVisClass().orderedDescendants);
                 return toHide ? RDFStrategy.getShapesToHide() : RDFStrategy.getShapesToVisualize();
             }
-            case "RDFRankLevel" -> {
-                RDFRankSelectionStrategy RDFStrategy = new RDFRankSelectionStrategy(limit,
+
+            case VisConstants.FULLSTRATEGY_RDF_LEVEL -> {
+                RDFRankSelectionStrategyFull RDFStrategy = new RDFRankSelectionStrategyFull(limit,
                     asVisClass().orderedChildren);
                 return toHide ? RDFStrategy.getShapesToHide() : RDFStrategy.getShapesToVisualize();
             }

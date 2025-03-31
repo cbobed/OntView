@@ -11,6 +11,12 @@ public class VisConstants {
 	public static final String RDFRANKCOMBOOPTION1 = "RDFRank 10";
 	public static final String RDFRANKCOMBOOPTION2 = "RDFRank 20";
 	public static final String CUSTOMCOMBOOPTION3 = "Custom";
+    public static final String PARTIALSTRATEGY_RDFRANK = "RDFRankPartial";
+    public static final String PARTIALSTRATEGY_RDF_LEVEL = "RDFRankLevelPartial";
+
+    public static final String FULLSTRATEGY_RDFRANK = "RDFRank";
+    public static final String FULLSTRATEGY_RDF_LEVEL = "RDFLevel";
+
 	public static final int CONNECTOROFFSET = 7;
 
 	public static final int CONTAINER_SIZE = 65;

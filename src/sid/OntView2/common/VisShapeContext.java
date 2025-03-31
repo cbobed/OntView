@@ -198,8 +198,14 @@ public class VisShapeContext extends ContextMenu {
     }
 
     private int getPercentage(){
-        return (100 * (shape.asVisClass().descendants.size() - shape.asVisClass().getHiddenDescendantsSet()))
-            / shape.asVisClass().descendants.size();
+        if (parent.getStrategyOptionSlider().matches(VisConstants.FULLSTRATEGY_RDFRANK)) {
+            return (100 * (shape.asVisClass().descendants.size() - shape.asVisClass().getHiddenDescendantsSet()))
+                / shape.asVisClass().descendants.size();
+        } else { // by level
+            return (100 * (shape.asVisClass().children.size() - shape.asVisClass().getHiddenDescendantsSet()))
+                / shape.asVisClass().children.size();
+        }
+
     }
 
     private void showSliderAction() {
