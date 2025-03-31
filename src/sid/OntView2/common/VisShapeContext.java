@@ -184,7 +184,7 @@ public class VisShapeContext extends ContextMenu {
 
         slider.setOnMouseReleased(event -> {
             int newValue = (int) slider.getValue();
-            changeValue(newValue);
+            changeSliderValue(newValue);
             oldValue = newValue;
         });
         return slider;
@@ -193,7 +193,6 @@ public class VisShapeContext extends ContextMenu {
     public void updateSliderView(){
         if (sliderStage != null && sliderStage.isShowing()) {
             slider.setValue(getPercentage());
-            //((Slider) ((VBox) sliderStage.getScene().getRoot()).getChildren().get(1)).setValue(getPercentage());
         }
     }
 
@@ -239,12 +238,13 @@ public class VisShapeContext extends ContextMenu {
         sliderStage.show();
     }
 
-    private void changeValue(int valor) {
+    private void changeSliderValue(int valor) {
         if (oldValue > valor) {
             shape.hideSubLevels(shape.getShapesFromStrategy(true, valor));
         } else {
             shape.showSubLevels(shape.getShapesFromStrategy(false, valor));
         }
+        parent.refreshDashedConnectors();
         VisLevel.adjustWidthAndPos(parent.visGraph.getLevelSet());
         parent.setStateChanged(true);
         Platform.runLater(parent.relaxerRunnable);
