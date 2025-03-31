@@ -191,8 +191,11 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			zoomSlider.setPrefHeight(VisConstants.CONTAINER_SIZE);
 			zoomSlider.setMinHeight(VisConstants.CONTAINER_SIZE);
 			zoomSlider.setMaxHeight(VisConstants.CONTAINER_SIZE);
-			zoomSlider.onMouseReleasedProperty().set((MouseEvent event) -> zoomSliderChangeStateChanged(zoomSlider.getValue()));
 
+			//zoomSlider.onMouseReleasedProperty().set((MouseEvent event) -> zoomSliderChangeStateChanged(zoomSlider.getValue()));
+            zoomSlider.valueProperty().addListener((obs, oldVal, newVal) ->
+                zoomSliderChangeStateChanged(newVal.doubleValue())
+            );
 		}
 		return zoomSlider;
 	}
