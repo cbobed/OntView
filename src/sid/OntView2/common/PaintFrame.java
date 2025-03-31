@@ -861,6 +861,9 @@ public class PaintFrame extends Canvas {
 							VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
 							setStateChanged(true);
 							Platform.runLater(relaxerRunnable);
+                            if (menuVisShapeContext != null) {
+                                menuVisShapeContext.updateSliderView();
+                            }
 						}
 					}
 					// Right: Click on the close symbol
@@ -872,6 +875,9 @@ public class PaintFrame extends Canvas {
 							VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
 							setStateChanged(true);
 							Platform.runLater(relaxerRunnable);
+                            if (menuVisShapeContext != null) {
+                                menuVisShapeContext.updateSliderView();
+                            }
 						}
 					}
 					// Left: Click on the open symbol

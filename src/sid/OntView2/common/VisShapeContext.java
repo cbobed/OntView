@@ -26,6 +26,7 @@ import java.util.Objects;
 public class VisShapeContext extends ContextMenu {
 	MenuItem hideItem, hideProperties, showInstances, showSliderPercentage;
     HBox titleBar;
+    Slider slider;
     private Stage sliderStage = null;
 	Shape shape;
 	PaintFrame parent;
@@ -168,7 +169,7 @@ public class VisShapeContext extends ContextMenu {
     }
 
     private Slider getSlider(){
-        Slider slider = new Slider(0,100, getPercentage());
+        slider = new Slider(0,100, getPercentage());
         slider.setShowTickLabels(true);
         slider.setShowTickMarks(true);
         slider.setMajorTickUnit(10);
@@ -187,6 +188,13 @@ public class VisShapeContext extends ContextMenu {
             oldValue = newValue;
         });
         return slider;
+    }
+
+    public void updateSliderView(){
+        if (sliderStage != null && sliderStage.isShowing()) {
+            slider.setValue(getPercentage());
+            //((Slider) ((VBox) sliderStage.getScene().getRoot()).getChildren().get(1)).setValue(getPercentage());
+        }
     }
 
     private int getPercentage(){

@@ -18,6 +18,10 @@ public interface SelectionStrategy {
     Set<Shape> getShapesToHide();
 
     public static String getStrategyOption(){
+        return "RDFRankPartial";
+    }
+
+    public static String getStrategyOptionSlider(){
         return "RDFRank";
     }
 }

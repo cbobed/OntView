@@ -174,7 +174,7 @@ public abstract class Shape {
      */
     public void closeRight() {
         showWarning();
-        hideSubLevels(getShapesFromStrategy(true, graph.paintframe.getPercentageShown()));
+        hideSubLevels(getShapesFromStrategyPartial(true, graph.paintframe.getPercentageShown()));
     }
 
     public void closeLeft() {
@@ -233,12 +233,6 @@ public abstract class Shape {
      * hides outConnectors and checks if children need to be hidden
      */
     protected void hideSubLevels(Set<Shape> hiddenDescendants) {
-        /*System.out.println("Hidden descendants: ----------");
-        for (Shape s: hiddenDescendants){
-            System.out.println(" - " + s.getLabel());
-        }
-        System.out.println("-------------------------------");*/
-
         this.hideDescendants(hiddenDescendants);
 
         Set<Shape> visited = new HashSet<>();
@@ -396,7 +390,7 @@ public abstract class Shape {
         }
     }
 
-    public Set<Shape> getShapesFromStrategy(boolean toHide, int limit){
+    public Set<Shape> getShapesFromStrategyPartial(boolean toHide, int limit){
         switch (SelectionStrategy.getStrategyOption()) {
             case "RDFRankPartial" -> {
                 RDFRankSelectionStrategyPartial RDFStrategy = new RDFRankSelectionStrategyPartial(limit,
@@ -408,9 +402,22 @@ public abstract class Shape {
                     asVisClass().orderedChildren);
                 return toHide ? RDFStrategy.getShapesToHide() : RDFStrategy.getShapesToVisualize();
             }
+            default -> {
+                return null;
+            }
+        }
+    }
+
+    public Set<Shape> getShapesFromStrategy(boolean toHide, int limit){
+        switch (SelectionStrategy.getStrategyOptionSlider()) {
             case "RDFRank" -> {
                 RDFRankSelectionStrategy RDFStrategy = new RDFRankSelectionStrategy(limit,
                     asVisClass().orderedDescendants);
+                return toHide ? RDFStrategy.getShapesToHide() : RDFStrategy.getShapesToVisualize();
+            }
+            case "RDFRankLevel" -> {
+                RDFRankSelectionStrategy RDFStrategy = new RDFRankSelectionStrategy(limit,
+                    asVisClass().orderedChildren);
                 return toHide ? RDFStrategy.getShapesToHide() : RDFStrategy.getShapesToVisualize();
             }
             default -> {
@@ -423,7 +430,7 @@ public abstract class Shape {
 
     public void openRight() {
         showWarning();
-        showSubLevels(getShapesFromStrategy(false, graph.paintframe.getPercentageShown()));
+        showSubLevels(getShapesFromStrategyPartial(false, graph.paintframe.getPercentageShown()));
     }
 
     public void openLeft() {
@@ -474,12 +481,6 @@ public abstract class Shape {
     }
 
     public void showSubLevels(Set<Shape> visibleDescendants) {
-        System.out.println("Visible descendants: ----------");
-        for (Shape s: visibleDescendants){
-            System.out.println(" - " + s.getLabel());
-        }
-        System.out.println("-------------------------------");
-
         this.show(visibleDescendants);
 
         Set<Shape> visited = new HashSet<>();
