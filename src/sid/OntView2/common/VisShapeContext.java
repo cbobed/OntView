@@ -25,6 +25,7 @@ import java.util.Objects;
 
 public class VisShapeContext extends ContextMenu {
 	MenuItem hideItem, hideProperties, showInstances, showSliderPercentage;
+    HBox titleBar;
 	Shape shape;
 	PaintFrame parent;
 	OWLClassExpression expression;
@@ -140,39 +141,28 @@ public class VisShapeContext extends ContextMenu {
 		}
 	}
 
-    private int getPercentage(){
+    /*
+     * SLIDER PERCENTAGE METHODS
+     */
+    private HBox sliderHeader(Stage sliderStage) {
+        if (titleBar == null) {
+            Label titleLabel = new Label("Slider Percentage");
+            titleLabel.getStyleClass().add("title-label");
+            Button closeButton = new Button("X");
+            closeButton.getStyleClass().add("round-button");
+            closeButton.setOnAction(event -> sliderStage.close());
 
-        System.out.println(shape.getLabel() + " percentage: " + (100*(shape.asVisClass().descendants.size() - shape.asVisClass().getHiddenDescendantsSet())
-                / shape.asVisClass().descendants.size()));
-        System.out.println("Descendants: " + shape.asVisClass().descendants.size());
-        System.out.println("Hidden Descendants: " + shape.asVisClass().getHiddenDescendantsSet());
-        return 100 * ((shape.asVisClass().descendants.size() - shape.asVisClass().getHiddenDescendantsSet())
-            / shape.asVisClass().descendants.size());
+            Region spacer = new Region();
+            HBox.setHgrow(spacer, Priority.ALWAYS);
+            titleBar = new HBox(titleLabel, spacer, closeButton);
+            titleBar.getStyleClass().add("custom-title-bar");
+            titleBar.setAlignment(Pos.CENTER_RIGHT);
+            titleBar.setPadding(new Insets(5));
+        }
+        return titleBar;
     }
 
-    private void showSliderAction() {
-        Stage sliderStage = new Stage();
-        sliderStage.setTitle("Slider Percentage");
-        sliderStage.setMinHeight(100);
-        sliderStage.setMaxHeight(100);
-        sliderStage.setMinWidth(470);
-        sliderStage.initStyle(StageStyle.UNDECORATED);
-        sliderStage.setAlwaysOnTop(true);
-
-        Label titleLabel = new Label("Slider Percentage");
-        titleLabel.getStyleClass().add("title-label");
-        Button closeButton = new Button("X");
-        closeButton.getStyleClass().add("round-button");
-        closeButton.setOnAction(event -> sliderStage.close());
-
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-
-        HBox titleBar = new HBox(titleLabel, spacer, closeButton);
-        titleBar.getStyleClass().add("custom-title-bar");
-        titleBar.setAlignment(Pos.CENTER_RIGHT);
-        titleBar.setPadding(new Insets(5));
-
+    private Slider getSlider(){
         Slider slider = new Slider(0,100, getPercentage());
         slider.setShowTickLabels(true);
         slider.setShowTickMarks(true);
@@ -185,8 +175,26 @@ public class VisShapeContext extends ContextMenu {
         slider.setOnMouseReleased(event -> {
             changeValue((int) slider.getValue());
         });
+        return slider;
+    }
 
-        VBox vbox = new VBox(titleBar, slider);
+    private int getPercentage(){
+        System.out.println(shape.getLabel() + " percentage: " + (100*(shape.asVisClass().descendants.size() - shape.asVisClass().getHiddenDescendantsSet())
+                / shape.asVisClass().descendants.size()));
+        return (100 * (shape.asVisClass().descendants.size() - shape.asVisClass().getHiddenDescendantsSet()))
+            / shape.asVisClass().descendants.size();
+    }
+
+    private void showSliderAction() {
+        Stage sliderStage = new Stage();
+        sliderStage.setTitle("Slider Percentage");
+        sliderStage.setMinHeight(110);
+        sliderStage.setMaxHeight(110);
+        sliderStage.setMinWidth(470);
+        sliderStage.initStyle(StageStyle.UNDECORATED);
+        sliderStage.setAlwaysOnTop(true);
+
+        VBox vbox = new VBox(sliderHeader(sliderStage), getSlider());
         vbox.setPadding(new Insets(20));
         vbox.setAlignment(Pos.CENTER);
         vbox.getStyleClass().add("custom-vbox-slider");
