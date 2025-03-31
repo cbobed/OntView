@@ -1,6 +1,6 @@
 https://protege.stanford.edu/ontologies/koala.owl
-file:/home/carlota/Desktop/OntView/onts/dbpedia_3.8.owl
 https://protege.stanford.edu/ontologies/pizza/pizza.owl
+file:/home/carlota/Desktop/OntView/onts/dbpedia_3.8.owl
 file:/home/carlota/Desktop/OntView/onts/proyectos.owl
 file:/home/carlota/Desktop/OntView/onts/animals.owl
 file:/home/carlota/Desktop/OntView/onts/core-plus-office.owl

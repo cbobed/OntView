@@ -57,6 +57,7 @@ public class PaintFrame extends Canvas {
 	VisGraph visGraph, rVisGraph; // visGraph will handle both depending on which is currently selected
 	private VisShapeContext menuVisShapeContext = null;
 	private VisGeneralContext menuVisGeneralContext = null;
+    private Stage sliderStage = null;
 	public int screenWidth;
 	public int screenHeight;
 	public int canvasWidth = 0;
@@ -109,6 +110,8 @@ public class PaintFrame extends Canvas {
 	private boolean showConnectors = false;
 	public void setShowConnectors(boolean b) { showConnectors = b; }
 	public boolean getShowConnectors() { return showConnectors; }
+    public Stage getSliderStage() { return sliderStage; }
+    public void setSliderStage(Stage stage) { sliderStage = stage; }
 
 	public PaintFrame(double width, double height) {
 		super();

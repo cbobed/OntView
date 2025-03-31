@@ -26,10 +26,12 @@ import java.util.Objects;
 public class VisShapeContext extends ContextMenu {
 	MenuItem hideItem, hideProperties, showInstances, showSliderPercentage;
     HBox titleBar;
+    private Stage sliderStage = null;
 	Shape shape;
 	PaintFrame parent;
 	OWLClassExpression expression;
 	double posx,posy;
+    int oldValue;
 
 	public VisShapeContext(Shape s, PaintFrame parentFrame, MouseEvent e){
 		
@@ -144,13 +146,16 @@ public class VisShapeContext extends ContextMenu {
     /*
      * SLIDER PERCENTAGE METHODS
      */
-    private HBox sliderHeader(Stage sliderStage) {
+    private HBox sliderHeader() {
         if (titleBar == null) {
-            Label titleLabel = new Label("Slider Percentage");
+            Label titleLabel = new Label("Slider Percentage: " + shape.getLabel());
             titleLabel.getStyleClass().add("title-label");
             Button closeButton = new Button("X");
             closeButton.getStyleClass().add("round-button");
-            closeButton.setOnAction(event -> sliderStage.close());
+            closeButton.setOnAction(event -> {
+                sliderStage.close();
+                parent.setSliderStage(null);
+            });
 
             Region spacer = new Region();
             HBox.setHgrow(spacer, Priority.ALWAYS);
@@ -172,29 +177,36 @@ public class VisShapeContext extends ContextMenu {
         slider.setSnapToTicks(true);
         slider.getStyleClass().add("custom-slider");
 
+        slider.setOnMousePressed(event -> {
+            oldValue = (int) slider.getValue();
+        });
+
         slider.setOnMouseReleased(event -> {
-            changeValue((int) slider.getValue());
+            int newValue = (int) slider.getValue();
+            changeValue(newValue);
+            oldValue = newValue;
         });
         return slider;
     }
 
     private int getPercentage(){
-        System.out.println(shape.getLabel() + " percentage: " + (100*(shape.asVisClass().descendants.size() - shape.asVisClass().getHiddenDescendantsSet())
-                / shape.asVisClass().descendants.size()));
         return (100 * (shape.asVisClass().descendants.size() - shape.asVisClass().getHiddenDescendantsSet()))
             / shape.asVisClass().descendants.size();
     }
 
     private void showSliderAction() {
-        Stage sliderStage = new Stage();
-        sliderStage.setTitle("Slider Percentage");
+        if (parent.getSliderStage() != null && parent.getSliderStage().isShowing()) {
+            parent.getSliderStage().close();
+        }
+
+        sliderStage = new Stage();
         sliderStage.setMinHeight(110);
         sliderStage.setMaxHeight(110);
         sliderStage.setMinWidth(470);
         sliderStage.initStyle(StageStyle.UNDECORATED);
         sliderStage.setAlwaysOnTop(true);
 
-        VBox vbox = new VBox(sliderHeader(sliderStage), getSlider());
+        VBox vbox = new VBox(sliderHeader(), getSlider());
         vbox.setPadding(new Insets(20));
         vbox.setAlignment(Pos.CENTER);
         vbox.getStyleClass().add("custom-vbox-slider");
@@ -209,11 +221,19 @@ public class VisShapeContext extends ContextMenu {
         sliderStage.setX(screenBounds.getMaxX() - scene.getWidth() - 100);
         sliderStage.setY(300);
 
+        parent.setSliderStage(sliderStage);
         sliderStage.show();
     }
 
-    private void changeValue(double valor) {
-        System.out.println("Valor del slider: " + valor);
+    private void changeValue(int valor) {
+        if (oldValue > valor) {
+            shape.hideSubLevels(shape.getShapesFromStrategy(true, valor));
+        } else {
+            shape.showSubLevels(shape.getShapesFromStrategy(false, valor));
+        }
+        VisLevel.adjustWidthAndPos(parent.visGraph.getLevelSet());
+        parent.setStateChanged(true);
+        Platform.runLater(parent.relaxerRunnable);
     }
 
     /**

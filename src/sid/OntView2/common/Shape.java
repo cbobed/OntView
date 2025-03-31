@@ -7,6 +7,7 @@ import javafx.scene.control.Alert;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import sid.OntView2.selectionStrategy.RDFRankSelectionStrategy;
+import sid.OntView2.selectionStrategy.RDFRankSelectionStrategyPartial;
 import sid.OntView2.selectionStrategy.SelectionStrategy;
 
 import java.util.*;
@@ -172,7 +173,8 @@ public abstract class Shape {
      * Then looks for those remaining visible nodes and adds a reference (dashed line)
      */
     public void closeRight() {
-        hideSubLevels(getShapesFromStrategy(true));
+        showWarning();
+        hideSubLevels(getShapesFromStrategy(true, graph.paintframe.getPercentageShown()));
     }
 
     public void closeLeft() {
@@ -230,7 +232,7 @@ public abstract class Shape {
     /**
      * hides outConnectors and checks if children need to be hidden
      */
-    private void hideSubLevels(Set<Shape> hiddenDescendants) {
+    protected void hideSubLevels(Set<Shape> hiddenDescendants) {
         /*System.out.println("Hidden descendants: ----------");
         for (Shape s: hiddenDescendants){
             System.out.println(" - " + s.getLabel());
@@ -385,23 +387,31 @@ public abstract class Shape {
         return true;
     }
 
-    public Set<Shape> getShapesFromStrategy(boolean toHide){
+    private void showWarning() {
         if (graph.paintframe.getPercentageShown() == 0) {
             graph.paintframe.showAlertDialog("Warning",
                 "Please note that the visibility percentage for showing \nor hiding nodes is currently set to 0.",
                 "Consider selecting a different percentage to adjust the visibility appropriately.",
                 Alert.AlertType.INFORMATION);
         }
+    }
+
+    public Set<Shape> getShapesFromStrategy(boolean toHide, int limit){
         switch (SelectionStrategy.getStrategyOption()) {
-            case "RDFRank" -> {
-                RDFRankSelectionStrategy RDFStrategy = new RDFRankSelectionStrategy(graph.paintframe.getPercentageShown(),
+            case "RDFRankPartial" -> {
+                RDFRankSelectionStrategyPartial RDFStrategy = new RDFRankSelectionStrategyPartial(limit,
                     asVisClass().orderedDescendants);
                 return toHide ? RDFStrategy.getShapesToHide() : RDFStrategy.getShapesToVisualize();
             }
-            case "RDFRankLevelId" -> {
-                RDFRankSelectionStrategy RDFLevelIDStrategy = new RDFRankSelectionStrategy(graph.paintframe.getPercentageShown(),
+            case "RDFRankLevelPartial" -> {
+                RDFRankSelectionStrategyPartial RDFStrategy = new RDFRankSelectionStrategyPartial(limit,
                     asVisClass().orderedChildren);
-                return toHide ? RDFLevelIDStrategy.getShapesToHide() : RDFLevelIDStrategy.getShapesToVisualize();
+                return toHide ? RDFStrategy.getShapesToHide() : RDFStrategy.getShapesToVisualize();
+            }
+            case "RDFRank" -> {
+                RDFRankSelectionStrategy RDFStrategy = new RDFRankSelectionStrategy(limit,
+                    asVisClass().orderedDescendants);
+                return toHide ? RDFStrategy.getShapesToHide() : RDFStrategy.getShapesToVisualize();
             }
             default -> {
                 return null;
@@ -412,7 +422,8 @@ public abstract class Shape {
     /**************************************************************/
 
     public void openRight() {
-        showSubLevels(getShapesFromStrategy(false));
+        showWarning();
+        showSubLevels(getShapesFromStrategy(false, graph.paintframe.getPercentageShown()));
     }
 
     public void openLeft() {
@@ -463,11 +474,11 @@ public abstract class Shape {
     }
 
     public void showSubLevels(Set<Shape> visibleDescendants) {
-        /*System.out.println("Visible descendants: ----------");
+        System.out.println("Visible descendants: ----------");
         for (Shape s: visibleDescendants){
             System.out.println(" - " + s.getLabel());
         }
-        System.out.println("-------------------------------");*/
+        System.out.println("-------------------------------");
 
         this.show(visibleDescendants);
 
