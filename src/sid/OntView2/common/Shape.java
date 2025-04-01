@@ -279,21 +279,6 @@ public abstract class Shape {
     /**
      * Checks references
      * Before setting invisible a shape we need to check if there's still
-     * any reference ( an in Connector)
-     */
-   /* public void checkAndHide(Shape closedShape, Set<Shape> countedChildren) {
-        if (getVisibleInReferences() == 0) {
-            this.visible = false;
-            countedChildren.add(this);
-            hideSubLevels(closedShape, countedChildren);
-            return;
-        }
-        hideSubLevels(closedShape, countedChildren);
-    }*/
-
-    /**
-     * Checks references
-     * Before setting invisible a shape we need to check if there's still
      * any reference ( an out Connector)
      */
     public void checkAndHideParents(Shape closedShape, Set<Shape> countedParents) {
