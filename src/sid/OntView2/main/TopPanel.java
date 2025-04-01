@@ -41,7 +41,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	//private static final long serialVersionUID = 1L;
 	private Button loadOntologyButton, loadReasonerButton, saveViewButton, restoreViewButton,
         saveImageButton, saveImagePartialButton, cleanConnectorsButton, fileSystemButton, helpButton,
-        helpButtonCE, submitButtonCE, expressionButton;
+        helpButtonCE, submitButtonCE, expressionButton, changeSelectionStrategy;
 	private ComboBox<Object> loadOntologyCombo;
 	private ComboBox<String> loadReasonerCombo, comboBox, kceComboBox;
 	private VBox mainPane, panelLoad, panelCheckBox, viewPanel, panel0, connectorPanel, helpPanel,
@@ -601,14 +601,58 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
             percentagePanel.setSpacing(5);
 
             StackPane titlePane = createTitlePane("Visibility");
-            HBox row = createRow(createTitlePane("%"), getVisibilitySpinner());
+            HBox row = createRow(createTitlePane("%"), getVisibilitySpinner(), changeSelectionStrategy());
 
             percentagePanel = createContainer(titlePane, row);
         }
         return percentagePanel;
     }
 
-    public Spinner<Integer> getVisibilitySpinner() {
+    private Button changeSelectionStrategy() {
+        if (changeSelectionStrategy == null) {
+            changeSelectionStrategy = new Button("\u22EE");
+            changeSelectionStrategy.setStyle("-fx-font-size: 20px; -fx-padding: -2 5 0 5;");
+
+            ContextMenu contextMenu = new ContextMenu();
+            MenuItem item1 = createMenuItemWithTooltip("PageRank", "Apply PageRank strategy to all descendants of the node");
+            MenuItem item2 = createMenuItemWithTooltip("PageRank + Level", "Apply PageRank strategy to the direct children of the node");
+            contextMenu.getStyleClass().add("context-menu-custom");
+
+            item1.setOnAction(e -> {
+                parent.artPanel.setStrategyOption(VisConstants.PARTIALSTRATEGY_RDFRANK);
+                contextMenu.hide();
+            });
+            item2.setOnAction(e -> {
+                parent.artPanel.setStrategyOption(VisConstants.PARTIALSTRATEGY_RDF_LEVEL);
+                contextMenu.hide();
+            });
+
+            contextMenu.getItems().addAll(item1, item2);
+
+            changeSelectionStrategy.setOnAction(e -> {
+                if (contextMenu.isShowing()) {
+                    contextMenu.hide();
+                } else {
+                    contextMenu.show(changeSelectionStrategy, changeSelectionStrategy.localToScreen(0, changeSelectionStrategy.getHeight()).getX(),
+                        changeSelectionStrategy.localToScreen(0, changeSelectionStrategy.getHeight()).getY());
+                }
+            });
+
+            tooltipInfo(changeSelectionStrategy, "Select strategy to determine how nodes are displayed or hidden");
+        }
+        return changeSelectionStrategy;
+    }
+
+    private MenuItem createMenuItemWithTooltip(String text, String tooltipText) {
+        Label label = new Label(text);
+        Tooltip tooltip = new Tooltip(tooltipText);
+        Tooltip.install(label, tooltip);
+        label.setFont(new Font("DejaVu Sans", 13));
+
+        return new CustomMenuItem(label, false);
+    }
+
+    private Spinner<Integer> getVisibilitySpinner() {
         if (percentageSpinner == null) {
             SpinnerValueFactory<Integer> values =
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 100, 0, 1);

@@ -256,7 +256,6 @@
     -fx-tick-label-fill: blue;
     -fx-tick-mark-fill: blue;
     -fx-track-color: linear-gradient(to bottom, #99bad8, #5679a2);
-    -fx-thumb-color: #005cbf;
     -fx-cursor: default;
     -fx-font-size: 15px;
 }
@@ -269,7 +268,7 @@
 }
 
 .custom-vbox-slider {
-    -fx-border-color: blue;
+    -fx-border-color: #8186d0;
     -fx-border-width: 1.5;
     -fx-background-color: #f0f0f0;
     -fx-cursor: hand;
@@ -282,3 +281,15 @@
     -fx-font-style: italic;
     -fx-font-family: "DejaVu Sans";
 }
+
+.context-menu-custom {
+    -fx-background-color: #f0f0f0;
+    -fx-border-color: #8186d0;
+    -fx-border-width: 1px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-font-size: 13px;
+}
+
+
+
