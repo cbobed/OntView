@@ -36,9 +36,7 @@ public class VisClass extends Shape {
 	Set<Shape> descendants = new HashSet<>();
     Set<Shape> orderedDescendants = new HashSet<>();
 	Set<Shape> ancestors = new HashSet<>();
-    Set<Shape> orderedDescendantsByLevelLR = new HashSet<>();
-    Set<Shape> orderedDescendantsByLevelRL = new HashSet<>();
-
+    Set<Shape> orderedDescendantsByLevel = new HashSet<>();
     ArrayList<VisConnectorDisjoint> disjointList;
 	ArrayList<VisConnectorEquiv> equivList;
 	ArrayList<String>  properties; // those that have this class as its domain  

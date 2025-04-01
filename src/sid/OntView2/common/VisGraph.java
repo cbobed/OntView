@@ -1479,12 +1479,7 @@ public class VisGraph implements Runnable{
     public void storeOrderedDescendantsByRDFRank() {
         for (Shape shape : shapeMap.values()) {
             Set<Shape> orderedDescendants = new LinkedHashSet<>();
-
             List<Shape> descendantsListLR = new ArrayList<>();
-            List<Shape> descendantsListRL = new ArrayList<>();
-            List<Shape> reversedShapes = new ArrayList<>(paintframe.orderedShapesByRDF);
-            Collections.reverse(reversedShapes);
-
 
             for (Shape candidate : paintframe.orderedShapesByRDF) {
                 if (shape.asVisClass().descendants.contains(candidate)) {
@@ -1492,21 +1487,15 @@ public class VisGraph implements Runnable{
                     descendantsListLR.add(candidate);
                 }
             }
-            for (Shape candidate : reversedShapes) {
-                if (shape.asVisClass().descendants.contains(candidate)) {
-                    descendantsListRL.add(candidate);
-                }
-            }
 
             descendantsListLR.sort(Comparator.comparingInt(s -> s.depthlevel));
-            descendantsListRL.sort(Comparator.comparingInt(s -> s.depthlevel));
 
             shape.asVisClass().orderedDescendants = orderedDescendants;
-            shape.asVisClass().orderedDescendantsByLevelLR = new LinkedHashSet<>(descendantsListLR); 
+            shape.asVisClass().orderedDescendantsByLevel = new LinkedHashSet<>(descendantsListLR);
            // shape.asVisClass().orderedDescendantsByLevelRL = new LinkedHashSet<>(descendantsListRL);
 
-            System.out.println("LR for " + shape.getLabel() + ": " + shape.asVisClass().orderedDescendantsByLevelLR.size());
-            for (Shape s : shape.asVisClass().orderedDescendantsByLevelLR) {
+            System.out.println("LR for " + shape.getLabel() + ": " + shape.asVisClass().orderedDescendantsByLevel.size());
+            for (Shape s : shape.asVisClass().orderedDescendantsByLevel) {
                 System.out.println(" - " + s.getLabel() + " (" + s.depthlevel + ")");
             }
 

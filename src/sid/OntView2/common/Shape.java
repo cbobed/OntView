@@ -9,6 +9,7 @@ import org.semanticweb.owlapi.model.OWLClassExpression;
 import sid.OntView2.selectionStrategy.RDFRankSelectionStrategyGlobal;
 import sid.OntView2.selectionStrategy.RDFRankSelectionStrategySteps;
 import sid.OntView2.selectionStrategy.RDFRankSelectionStrategyStepsLR;
+import sid.OntView2.selectionStrategy.RDFRankSelectionStrategyStepsRL;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -173,7 +174,7 @@ public abstract class Shape {
      */
     public void closeRight() {
         showWarning();
-        hideSubLevels(getShapesFromStrategyPartial(true, graph.paintframe.getPercentageShown()));
+        hideSubLevels(getShapesFromStrategySteps(true, graph.paintframe.getPercentageShown()));
     }
 
     public void closeLeft() {
@@ -374,7 +375,7 @@ public abstract class Shape {
         }
     }
 
-    public Set<Shape> getShapesFromStrategyPartial(boolean toHide, int limit){
+    public Set<Shape> getShapesFromStrategySteps(boolean toHide, int limit){
         switch (graph.paintframe.getStrategyOptionStep()) {
             case VisConstants.STEPSTRATEGY_RDFRANK -> {
                 RDFRankSelectionStrategySteps RDFStrategy = new RDFRankSelectionStrategySteps(limit,
@@ -384,12 +385,12 @@ public abstract class Shape {
 
             case VisConstants.STEPSTRATEGY_RDF_LEVEL_LR -> {
                 RDFRankSelectionStrategyStepsLR RDFStrategy = new RDFRankSelectionStrategyStepsLR(limit,
-                    asVisClass().orderedDescendantsByLevelLR);
+                    asVisClass().orderedDescendantsByLevel);
                 return toHide ? RDFStrategy.getShapesToHide() : RDFStrategy.getShapesToVisualize();
             }
             case VisConstants.STEPSTRATEGY_RDF_LEVEL_RL -> {
-                RDFRankSelectionStrategySteps RDFStrategy = new RDFRankSelectionStrategySteps(limit,
-                    asVisClass().orderedDescendantsByLevelRL);
+                RDFRankSelectionStrategyStepsRL RDFStrategy = new RDFRankSelectionStrategyStepsRL(limit,
+                    asVisClass().orderedDescendantsByLevel);
                 return toHide ? RDFStrategy.getShapesToHide() : RDFStrategy.getShapesToVisualize();
             }
             default -> {
@@ -408,7 +409,7 @@ public abstract class Shape {
 
             case VisConstants.GLOBALSTRATEGY_RDF_LEVEL -> {
                 RDFRankSelectionStrategyGlobal RDFStrategy = new RDFRankSelectionStrategyGlobal(limit,
-                    asVisClass().orderedDescendantsByLevelLR);
+                    asVisClass().orderedDescendantsByLevel);
                 return toHide ? RDFStrategy.getShapesToHide() : RDFStrategy.getShapesToVisualize();
             }
             default -> {
@@ -421,7 +422,7 @@ public abstract class Shape {
 
     public void openRight() {
         showWarning();
-        showSubLevels(getShapesFromStrategyPartial(false, graph.paintframe.getPercentageShown()));
+        showSubLevels(getShapesFromStrategySteps(false, graph.paintframe.getPercentageShown()));
     }
 
     public void openLeft() {
