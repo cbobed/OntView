@@ -6,10 +6,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
-import sid.OntView2.selectionStrategy.RDFRankSelectionStrategyGlobal;
-import sid.OntView2.selectionStrategy.RDFRankSelectionStrategySteps;
-import sid.OntView2.selectionStrategy.RDFRankSelectionStrategyStepsLR;
-import sid.OntView2.selectionStrategy.RDFRankSelectionStrategyStepsRL;
+import sid.OntView2.selectionStrategy.*;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -382,7 +379,6 @@ public abstract class Shape {
                     asVisClass().orderedDescendants);
                 return toHide ? RDFStrategy.getShapesToHide() : RDFStrategy.getShapesToVisualize();
             }
-
             case VisConstants.STEPSTRATEGY_RDF_LEVEL_LR -> {
                 RDFRankSelectionStrategyStepsLR RDFStrategy = new RDFRankSelectionStrategyStepsLR(limit,
                     asVisClass().orderedDescendantsByLevel);
@@ -406,9 +402,13 @@ public abstract class Shape {
                     asVisClass().orderedDescendants);
                 return toHide ? RDFStrategy.getShapesToHide() : RDFStrategy.getShapesToVisualize();
             }
-
-            case VisConstants.GLOBALSTRATEGY_RDF_LEVEL -> {
-                RDFRankSelectionStrategyGlobal RDFStrategy = new RDFRankSelectionStrategyGlobal(limit,
+            case VisConstants.STEPSTRATEGY_RDF_LEVEL_LR -> {
+                RDFRankSelectionStrategyGlobalLR RDFStrategy = new RDFRankSelectionStrategyGlobalLR(limit,
+                    asVisClass().orderedDescendantsByLevel);
+                return toHide ? RDFStrategy.getShapesToHide() : RDFStrategy.getShapesToVisualize();
+            }
+            case VisConstants.STEPSTRATEGY_RDF_LEVEL_RL -> {
+                RDFRankSelectionStrategyGlobalRL RDFStrategy = new RDFRankSelectionStrategyGlobalRL(limit,
                     asVisClass().orderedDescendantsByLevel);
                 return toHide ? RDFStrategy.getShapesToHide() : RDFStrategy.getShapesToVisualize();
             }

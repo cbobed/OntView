@@ -27,6 +27,7 @@ public class VisShapeContext extends ContextMenu {
 	MenuItem hideItem, hideProperties, showInstances, showSliderPercentage;
     HBox titleBar;
     Slider slider;
+    private Button changeSelectionStrategy;
     private Stage sliderStage = null;
 	Shape shape;
 	PaintFrame parent;
@@ -149,7 +150,7 @@ public class VisShapeContext extends ContextMenu {
      */
     private HBox sliderHeader() {
         if (titleBar == null) {
-            Label titleLabel = new Label("Slider Percentage: " + shape.getLabel());
+            Label titleLabel = new Label(" Slider Percentage: " + shape.getLabel());
             titleLabel.getStyleClass().add("title-label");
             Button closeButton = new Button("X");
             closeButton.getStyleClass().add("round-button");
@@ -160,7 +161,7 @@ public class VisShapeContext extends ContextMenu {
 
             Region spacer = new Region();
             HBox.setHgrow(spacer, Priority.ALWAYS);
-            titleBar = new HBox(titleLabel, spacer, closeButton);
+            titleBar = new HBox(changeSelectionStrategy(), titleLabel, spacer, closeButton);
             titleBar.getStyleClass().add("custom-title-bar");
             titleBar.setAlignment(Pos.CENTER_RIGHT);
             titleBar.setPadding(new Insets(5));
@@ -250,6 +251,45 @@ public class VisShapeContext extends ContextMenu {
         VisLevel.adjustWidthAndPos(parent.visGraph.getLevelSet());
         parent.setStateChanged(true);
         Platform.runLater(parent.relaxerRunnable);
+    }
+
+    private Button changeSelectionStrategy() {
+        if (changeSelectionStrategy == null) {
+            changeSelectionStrategy = new Button("\u22EE");
+            changeSelectionStrategy.setStyle("-fx-font-size: 20px; -fx-padding: -2 5 0 5;");
+
+            ContextMenu contextMenu = new ContextMenu();
+            MenuItem item1 = new MenuItem(VisConstants.STEPSTRATEGY_RDFRANK);
+            MenuItem item2 = new MenuItem(VisConstants.STEPSTRATEGY_RDF_LEVEL_LR);
+            MenuItem item3 = new MenuItem(VisConstants.STEPSTRATEGY_RDF_LEVEL_RL);
+            contextMenu.getStyleClass().add("context-menu-custom");
+
+            item1.setOnAction(e -> {
+                parent.setStrategyOptionGlobal(VisConstants.STEPSTRATEGY_RDFRANK);
+                contextMenu.hide();
+            });
+            item2.setOnAction(e -> {
+                parent.setStrategyOptionGlobal(VisConstants.STEPSTRATEGY_RDF_LEVEL_LR);
+                contextMenu.hide();
+            });
+            item3.setOnAction(e -> {
+                parent.setStrategyOptionGlobal(VisConstants.STEPSTRATEGY_RDF_LEVEL_RL);
+                contextMenu.hide();
+            });
+
+            contextMenu.getItems().addAll(item1, item2, item3);
+
+            changeSelectionStrategy.setOnAction(e -> {
+                if (contextMenu.isShowing()) {
+                    contextMenu.hide();
+                } else {
+                    contextMenu.show(changeSelectionStrategy, changeSelectionStrategy.localToScreen(0, changeSelectionStrategy.getHeight()).getX(),
+                        changeSelectionStrategy.localToScreen(0, changeSelectionStrategy.getHeight()).getY());
+                }
+            });
+
+        }
+        return changeSelectionStrategy;
     }
 
     /**

@@ -1492,13 +1492,6 @@ public class VisGraph implements Runnable{
 
             shape.asVisClass().orderedDescendants = orderedDescendants;
             shape.asVisClass().orderedDescendantsByLevel = new LinkedHashSet<>(descendantsListLR);
-           // shape.asVisClass().orderedDescendantsByLevelRL = new LinkedHashSet<>(descendantsListRL);
-
-            System.out.println("LR for " + shape.getLabel() + ": " + shape.asVisClass().orderedDescendantsByLevel.size());
-            for (Shape s : shape.asVisClass().orderedDescendantsByLevel) {
-                System.out.println(" - " + s.getLabel() + " (" + s.depthlevel + ")");
-            }
-
         }
     }
 
