@@ -18,7 +18,6 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.*;
@@ -619,11 +618,11 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
             contextMenu.getStyleClass().add("context-menu-custom");
 
             item1.setOnAction(e -> {
-                parent.artPanel.setStrategyOption(VisConstants.PARTIALSTRATEGY_RDFRANK);
+                parent.artPanel.setStrategyOptionStep(VisConstants.STEPSTRATEGY_RDFRANK);
                 contextMenu.hide();
             });
             item2.setOnAction(e -> {
-                parent.artPanel.setStrategyOption(VisConstants.PARTIALSTRATEGY_RDF_LEVEL);
+                parent.artPanel.setStrategyOptionStep(VisConstants.STEPSTRATEGY_RDF_LEVEL);
                 contextMenu.hide();
             });
 

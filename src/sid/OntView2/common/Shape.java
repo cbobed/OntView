@@ -6,9 +6,8 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
-import sid.OntView2.selectionStrategy.RDFRankSelectionStrategyFull;
-import sid.OntView2.selectionStrategy.RDFRankSelectionStrategyPartial;
-import sid.OntView2.selectionStrategy.SelectionStrategy;
+import sid.OntView2.selectionStrategy.RDFRankSelectionStrategyGlobal;
+import sid.OntView2.selectionStrategy.RDFRankSelectionStrategySteps;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -376,15 +375,15 @@ public abstract class Shape {
     }
 
     public Set<Shape> getShapesFromStrategyPartial(boolean toHide, int limit){
-        switch (graph.paintframe.getStrategyOption()) {
-            case VisConstants.PARTIALSTRATEGY_RDFRANK -> {
-                RDFRankSelectionStrategyPartial RDFStrategy = new RDFRankSelectionStrategyPartial(limit,
+        switch (graph.paintframe.getStrategyOptionStep()) {
+            case VisConstants.STEPSTRATEGY_RDFRANK -> {
+                RDFRankSelectionStrategySteps RDFStrategy = new RDFRankSelectionStrategySteps(limit,
                     asVisClass().orderedDescendants);
                 return toHide ? RDFStrategy.getShapesToHide() : RDFStrategy.getShapesToVisualize();
             }
 
-            case VisConstants.PARTIALSTRATEGY_RDF_LEVEL -> {
-                RDFRankSelectionStrategyPartial RDFStrategy = new RDFRankSelectionStrategyPartial(limit,
+            case VisConstants.STEPSTRATEGY_RDF_LEVEL -> {
+                RDFRankSelectionStrategySteps RDFStrategy = new RDFRankSelectionStrategySteps(limit,
                     asVisClass().orderedChildren);
                 return toHide ? RDFStrategy.getShapesToHide() : RDFStrategy.getShapesToVisualize();
             }
@@ -395,15 +394,15 @@ public abstract class Shape {
     }
 
     public Set<Shape> getShapesFromStrategy(boolean toHide, int limit){
-        switch (graph.paintframe.getStrategyOptionSlider()) {
-            case VisConstants.FULLSTRATEGY_RDFRANK -> {
-                RDFRankSelectionStrategyFull RDFStrategy = new RDFRankSelectionStrategyFull(limit,
+        switch (graph.paintframe.getStrategyOptionGlobal()) {
+            case VisConstants.GLOBALSTRATEGY_RDFRANK -> {
+                RDFRankSelectionStrategyGlobal RDFStrategy = new RDFRankSelectionStrategyGlobal(limit,
                     asVisClass().orderedDescendants);
                 return toHide ? RDFStrategy.getShapesToHide() : RDFStrategy.getShapesToVisualize();
             }
 
-            case VisConstants.FULLSTRATEGY_RDF_LEVEL -> {
-                RDFRankSelectionStrategyFull RDFStrategy = new RDFRankSelectionStrategyFull(limit,
+            case VisConstants.GLOBALSTRATEGY_RDF_LEVEL -> {
+                RDFRankSelectionStrategyGlobal RDFStrategy = new RDFRankSelectionStrategyGlobal(limit,
                     asVisClass().orderedChildren);
                 return toHide ? RDFStrategy.getShapesToHide() : RDFStrategy.getShapesToVisualize();
             }

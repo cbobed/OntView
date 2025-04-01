@@ -198,7 +198,7 @@ public class VisShapeContext extends ContextMenu {
     }
 
     private int getPercentage(){
-        if (parent.getStrategyOptionSlider().matches(VisConstants.FULLSTRATEGY_RDFRANK)) {
+        if (parent.getStrategyOptionGlobal().matches(VisConstants.GLOBALSTRATEGY_RDFRANK)) {
             return (100 * (shape.asVisClass().descendants.size() - shape.asVisClass().getHiddenDescendantsSet()))
                 / shape.asVisClass().descendants.size();
         } else { // by level
