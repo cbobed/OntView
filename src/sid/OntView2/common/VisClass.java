@@ -32,13 +32,12 @@ public class VisClass extends Shape {
 	HashSet<OWLObjectProperty> aplicable;
 	HashSet<OWLDataProperty> dAplicable;
 	ArrayList<Shape>   children;
-    Set<Shape> orderedChildren = new HashSet<>();
 	ArrayList<Shape>   parents;
-
 	Set<Shape> descendants = new HashSet<>();
     Set<Shape> orderedDescendants = new HashSet<>();
 	Set<Shape> ancestors = new HashSet<>();
-    Set<Shape> orderedAncestors = new HashSet<>();
+    Set<Shape> orderedDescendantsByLevelLR = new HashSet<>();
+    Set<Shape> orderedDescendantsByLevelRL = new HashSet<>();
 
     ArrayList<VisConnectorDisjoint> disjointList;
 	ArrayList<VisConnectorEquiv> equivList;

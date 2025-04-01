@@ -613,8 +613,9 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
             changeSelectionStrategy.setStyle("-fx-font-size: 20px; -fx-padding: -2 5 0 5;");
 
             ContextMenu contextMenu = new ContextMenu();
-            MenuItem item1 = createMenuItemWithTooltip("PageRank", "Apply PageRank strategy to all descendants of the node");
-            MenuItem item2 = createMenuItemWithTooltip("PageRank + Level", "Apply PageRank strategy to the direct children of the node");
+            MenuItem item1 = createMenuItemWithTooltip(VisConstants.STEPSTRATEGY_RDFRANK, "Apply PageRank strategy to all descendants of the node");
+            MenuItem item2 = createMenuItemWithTooltip(VisConstants.STEPSTRATEGY_RDF_LEVEL_LR, "Apply PageRank strategy by progressively hiding nodes level by level from left to right");
+            MenuItem item3 = createMenuItemWithTooltip(VisConstants.STEPSTRATEGY_RDF_LEVEL_RL, "Apply PageRank strategy by progressively hiding nodes level by level from right to left");
             contextMenu.getStyleClass().add("context-menu-custom");
 
             item1.setOnAction(e -> {
@@ -622,11 +623,15 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
                 contextMenu.hide();
             });
             item2.setOnAction(e -> {
-                parent.artPanel.setStrategyOptionStep(VisConstants.STEPSTRATEGY_RDF_LEVEL);
+                parent.artPanel.setStrategyOptionStep(VisConstants.STEPSTRATEGY_RDF_LEVEL_LR);
+                contextMenu.hide();
+            });
+            item3.setOnAction(e -> {
+                parent.artPanel.setStrategyOptionStep(VisConstants.STEPSTRATEGY_RDF_LEVEL_RL);
                 contextMenu.hide();
             });
 
-            contextMenu.getItems().addAll(item1, item2);
+            contextMenu.getItems().addAll(item1, item2, item3);
 
             changeSelectionStrategy.setOnAction(e -> {
                 if (contextMenu.isShowing()) {
@@ -646,7 +651,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
         Label label = new Label(text);
         Tooltip tooltip = new Tooltip(tooltipText);
         Tooltip.install(label, tooltip);
-        label.setFont(new Font("DejaVu Sans", 13));
+        tooltip.setFont(new Font("DejaVu Sans", 12));
 
         return new CustomMenuItem(label, false);
     }

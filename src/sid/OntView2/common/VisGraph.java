@@ -4,10 +4,6 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Point2D;
-import javafx.geometry.Rectangle2D;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
-import javafx.stage.Screen;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.model.parameters.Imports;
@@ -1480,31 +1476,42 @@ public class VisGraph implements Runnable{
     /**
      * Stores the ordered descendants and ancestors for each shape based on RDFRank.
      */
-     public void storeOrderedDescendantsByRDFRank() {
-         for (Shape shape : shapeMap.values()) {
-             Set<Shape> orderedDescendants = new LinkedHashSet<>();
-             Set<Shape> orderedAncestors = new LinkedHashSet<>();
-             Set<Shape> orderedChildren = new LinkedHashSet<>();
+    public void storeOrderedDescendantsByRDFRank() {
+        for (Shape shape : shapeMap.values()) {
+            Set<Shape> orderedDescendants = new LinkedHashSet<>();
 
-             for (Shape candidate : paintframe.orderedShapesByRDF) {
-                 if (shape.asVisClass().descendants.contains(candidate)) {
-                     orderedDescendants.add(candidate);
-                 }
+            List<Shape> descendantsListLR = new ArrayList<>();
+            List<Shape> descendantsListRL = new ArrayList<>();
+            List<Shape> reversedShapes = new ArrayList<>(paintframe.orderedShapesByRDF);
+            Collections.reverse(reversedShapes);
 
-                 if (shape.asVisClass().ancestors.contains(candidate)) {
-                     orderedAncestors.add(candidate);
-                 }
 
-                 if (shape.asVisClass().children.contains(candidate)) {
-                     orderedChildren.add(candidate);
-                 }
-             }
-             shape.asVisClass().orderedDescendants = orderedDescendants;
-             shape.asVisClass().orderedAncestors = orderedAncestors;
-             shape.asVisClass().orderedChildren = orderedChildren;
-         }
+            for (Shape candidate : paintframe.orderedShapesByRDF) {
+                if (shape.asVisClass().descendants.contains(candidate)) {
+                    orderedDescendants.add(candidate);
+                    descendantsListLR.add(candidate);
+                }
+            }
+            for (Shape candidate : reversedShapes) {
+                if (shape.asVisClass().descendants.contains(candidate)) {
+                    descendantsListRL.add(candidate);
+                }
+            }
+
+            descendantsListLR.sort(Comparator.comparingInt(s -> s.depthlevel));
+            descendantsListRL.sort(Comparator.comparingInt(s -> s.depthlevel));
+
+            shape.asVisClass().orderedDescendants = orderedDescendants;
+            shape.asVisClass().orderedDescendantsByLevelLR = new LinkedHashSet<>(descendantsListLR); 
+           // shape.asVisClass().orderedDescendantsByLevelRL = new LinkedHashSet<>(descendantsListRL);
+
+            System.out.println("LR for " + shape.getLabel() + ": " + shape.asVisClass().orderedDescendantsByLevelLR.size());
+            for (Shape s : shape.asVisClass().orderedDescendantsByLevelLR) {
+                System.out.println(" - " + s.getLabel() + " (" + s.depthlevel + ")");
+            }
+
+        }
     }
-
 
     /**
      * Gets the shapes ordered by RDFRank.

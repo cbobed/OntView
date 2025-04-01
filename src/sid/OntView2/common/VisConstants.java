@@ -11,8 +11,9 @@ public class VisConstants {
 	public static final String RDFRANKCOMBOOPTION1 = "RDFRank 10";
 	public static final String RDFRANKCOMBOOPTION2 = "RDFRank 20";
 	public static final String CUSTOMCOMBOOPTION3 = "Custom";
-    public static final String STEPSTRATEGY_RDFRANK = "RDFRankPartial";
-    public static final String STEPSTRATEGY_RDF_LEVEL = "RDFRankLevelPartial";
+    public static final String STEPSTRATEGY_RDFRANK = "RDFRank";
+    public static final String STEPSTRATEGY_RDF_LEVEL_LR = "RDFRank + Level: left to right"; // muestra de izquierda a derecha y oculta de derecha a izquierda
+    public static final String STEPSTRATEGY_RDF_LEVEL_RL = "RDFRank + Level: right to left"; // muestra de derecha a izquierda y oculta de izquierda a derecha
 
     public static final String GLOBALSTRATEGY_RDFRANK = "RDFRank";
     public static final String GLOBALSTRATEGY_RDF_LEVEL = "RDFLevel";

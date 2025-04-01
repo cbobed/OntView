@@ -8,6 +8,7 @@ import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import sid.OntView2.selectionStrategy.RDFRankSelectionStrategyGlobal;
 import sid.OntView2.selectionStrategy.RDFRankSelectionStrategySteps;
+import sid.OntView2.selectionStrategy.RDFRankSelectionStrategyStepsLR;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -21,10 +22,9 @@ public abstract class Shape {
     public static final int LEFTOPEN = 4;
     public static final int LEFT_PARTIALLY_CLOSED = 5;
 
-
     public int posx, posy;
     private int height, width;
-    int depthlevel;
+    public int depthlevel;
     VisLevel vdepthlevel;
     VisGraph graph;
     Point2D connectionPointsL;
@@ -382,9 +382,14 @@ public abstract class Shape {
                 return toHide ? RDFStrategy.getShapesToHide() : RDFStrategy.getShapesToVisualize();
             }
 
-            case VisConstants.STEPSTRATEGY_RDF_LEVEL -> {
+            case VisConstants.STEPSTRATEGY_RDF_LEVEL_LR -> {
+                RDFRankSelectionStrategyStepsLR RDFStrategy = new RDFRankSelectionStrategyStepsLR(limit,
+                    asVisClass().orderedDescendantsByLevelLR);
+                return toHide ? RDFStrategy.getShapesToHide() : RDFStrategy.getShapesToVisualize();
+            }
+            case VisConstants.STEPSTRATEGY_RDF_LEVEL_RL -> {
                 RDFRankSelectionStrategySteps RDFStrategy = new RDFRankSelectionStrategySteps(limit,
-                    asVisClass().orderedChildren);
+                    asVisClass().orderedDescendantsByLevelRL);
                 return toHide ? RDFStrategy.getShapesToHide() : RDFStrategy.getShapesToVisualize();
             }
             default -> {
@@ -403,7 +408,7 @@ public abstract class Shape {
 
             case VisConstants.GLOBALSTRATEGY_RDF_LEVEL -> {
                 RDFRankSelectionStrategyGlobal RDFStrategy = new RDFRankSelectionStrategyGlobal(limit,
-                    asVisClass().orderedChildren);
+                    asVisClass().orderedDescendantsByLevelLR);
                 return toHide ? RDFStrategy.getShapesToHide() : RDFStrategy.getShapesToVisualize();
             }
             default -> {
