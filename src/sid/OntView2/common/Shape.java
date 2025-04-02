@@ -234,7 +234,7 @@ public abstract class Shape {
 
         Set<Shape> visited = new HashSet<>();
         for (Shape s: hiddenDescendants) {
-            s.addFromAncestors(hiddenDescendants, visited);
+            s.addHiddenDescendantsToAncestors(hiddenDescendants, visited);
         }
         hiddenDescendantsSet.addAll(hiddenDescendants);
         checkAndUpdateChildrenVisibilityStates();
@@ -479,7 +479,7 @@ public abstract class Shape {
         for (Shape s: visibleDescendants){
             //s.checkAndUpdateChildrenVisibilityStates();
             //s.updateHiddenDescendants();
-            s.removeFromAncestors(visibleDescendants, visited);
+            s.removeHiddenDescendantsFromAncestors(visibleDescendants, visited);
         }
         hiddenDescendantsSet.removeAll(visibleDescendants);
         checkAndUpdateChildrenVisibilityStates();
@@ -601,19 +601,17 @@ public abstract class Shape {
      * Recursively traverses all ancestors of the given node and removes the nodes
      * from visibleDescendantsSet in the hiddenDescendantsSet of each ancestor.
      */
-    private void removeFromAncestors(Set<Shape> visibleDescendantsSet, Set<Shape> visited) {
+    private void removeHiddenDescendantsFromAncestors(Set<Shape> visibleDescendantsSet, Set<Shape> visited) {
         if (visited.contains(this)) return;
         visited.add(this);
 
         for (VisConnector connector : inConnectors) {
             Shape parent = connector.from;
             if (parent != null) {
-                if (visited.contains(parent)) return;
-
                 parent.hiddenDescendantsSet.removeAll(visibleDescendantsSet);
-                parent.checkAndUpdateChildrenVisibilityStates();
-                parent.checkAndUpdateParentVisibilityStates();
-                parent.removeFromAncestors(visibleDescendantsSet, visited);
+                //parent.checkAndUpdateChildrenVisibilityStates();
+                //parent.checkAndUpdateParentVisibilityStates();
+                parent.removeHiddenDescendantsFromAncestors(visibleDescendantsSet, visited);
             }
         }
     }
@@ -623,7 +621,7 @@ public abstract class Shape {
      * from visibleDescendantsSet in the hiddenDescendantsSet of each ancestor,
      * only if the node is its descendant.
      */
-    private void addFromAncestors(Set<Shape> visibleDescendantsSet, Set<Shape> visited) {
+    private void addHiddenDescendantsToAncestors(Set<Shape> visibleDescendantsSet, Set<Shape> visited) {
         if (visited.contains(this)) return;
         visited.add(this);
 
@@ -635,8 +633,8 @@ public abstract class Shape {
                 Set<Shape> relevantDescendants = new HashSet<>(visibleDescendantsSet);
                 relevantDescendants.retainAll(parent.asVisClass().orderedDescendants);
                 parent.hiddenDescendantsSet.addAll(relevantDescendants);
-                parent.checkAndUpdateChildrenVisibilityStates();
-                parent.addFromAncestors(visibleDescendantsSet, visited);
+                //parent.checkAndUpdateChildrenVisibilityStates();
+                parent.addHiddenDescendantsToAncestors(visibleDescendantsSet, visited);
             }
         }
     }
