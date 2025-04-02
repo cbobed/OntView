@@ -7,10 +7,12 @@ import java.util.*;
 public class RDFRankSelectionStrategyGlobalLR implements SelectionStrategy {
     private final int limit;
     private final Set<Shape> orderedShapesByRDFLevel;
+    private final Shape parentShape;
 
-    public RDFRankSelectionStrategyGlobalLR(int limit, Set<Shape> orderedShapesByRDFLevel) {
+    public RDFRankSelectionStrategyGlobalLR(int limit, Set<Shape> orderedShapesByRDFLevel, Shape parentShape) {
         this.limit = limit;
         this.orderedShapesByRDFLevel = orderedShapesByRDFLevel;
+        this.parentShape = parentShape;
     }
 
     /**
@@ -19,6 +21,12 @@ public class RDFRankSelectionStrategyGlobalLR implements SelectionStrategy {
     @Override
     public Set<Shape> getShapesToVisualize() {
         int numberToShow = (int) Math.ceil((limit / 100.0) * orderedShapesByRDFLevel.size());
+        int alreadyShown = orderedShapesByRDFLevel.size() - parentShape.getHiddenDescendantsSet();
+
+        if (alreadyShown >= numberToShow){
+            return new LinkedHashSet<>();
+        }
+        numberToShow -= alreadyShown;
 
         Set<Shape> selectedShapes = new LinkedHashSet<>();
 
@@ -26,18 +34,12 @@ public class RDFRankSelectionStrategyGlobalLR implements SelectionStrategy {
             if (selectedShapes.size() >= numberToShow) {
                 break;
             }
-            selectedShapes.add(candidate);
+            if(!candidate.isVisible())
+                selectedShapes.add(candidate);
 
         }
 
-        Set<Shape> hiddenShapes = new LinkedHashSet<>();
-        for (Shape shape : selectedShapes) {
-            if (!shape.isVisible()) {
-                hiddenShapes.add(shape);
-            }
-        }
-
-        return hiddenShapes;
+        return selectedShapes;
     }
 
     /**
@@ -45,8 +47,13 @@ public class RDFRankSelectionStrategyGlobalLR implements SelectionStrategy {
      */
     @Override
     public Set<Shape> getShapesToHide() {
-        int numberToShow = (int) Math.floor((limit / 100.0) * orderedShapesByRDFLevel.size());
-        numberToShow = orderedShapesByRDFLevel.size() - numberToShow;
+        int numberToHide = (int) Math.floor((100 - limit) / 100.0 * orderedShapesByRDFLevel.size());
+        int alreadyHidden = parentShape.getHiddenDescendantsSet();
+
+        if (alreadyHidden >= numberToHide){
+            return new LinkedHashSet<>();
+        }
+        numberToHide -= alreadyHidden;
 
         Map<Integer, List<Shape>> shapesByLevel = new HashMap<>();
         for (Shape shape : orderedShapesByRDFLevel) {
@@ -61,20 +68,15 @@ public class RDFRankSelectionStrategyGlobalLR implements SelectionStrategy {
 
         Set<Shape> selectedShapes = new LinkedHashSet<>();
         for (Shape candidate : reversedShapes) {
-            if (selectedShapes.size() >= numberToShow) {
+            if (selectedShapes.size() >= numberToHide) {
                 break;
             }
-            selectedShapes.add(candidate);
-
-        }
-
-        Set<Shape> visibleShapes = new LinkedHashSet<>();
-        for (Shape shape : selectedShapes) {
-            if (shape.isVisible()) {
-                visibleShapes.add(shape);
+            if (candidate.isVisible()) {
+                selectedShapes.add(candidate);
             }
+
         }
 
-        return visibleShapes;
+        return selectedShapes;
     }
 }
