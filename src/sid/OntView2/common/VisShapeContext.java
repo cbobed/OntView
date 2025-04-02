@@ -179,7 +179,7 @@ public class VisShapeContext extends ContextMenu {
         slider.setSnapToTicks(true);
         slider.getStyleClass().add("custom-slider");
 
-         oldValue = (int) slider.getValue();
+        oldValue = (int) slider.getValue();
 
         slider.valueProperty().addListener((obs, oldVal, newVal) -> {
             int intValue = newVal.intValue();

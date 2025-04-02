@@ -54,6 +54,7 @@ public class RDFRankSelectionStrategyGlobalRL implements SelectionStrategy {
     @Override
     public Set<Shape> getShapesToHide() {
         int numberToShow = (int) Math.ceil((limit / 100.0) * orderedShapesByRDFLevel.size());
+        numberToShow = orderedShapesByRDFLevel.size() - numberToShow;
 
         Set<Shape> selectedShapes = new LinkedHashSet<>();
         List<Shape> reversedShapes = new ArrayList<>(orderedShapesByRDFLevel);
