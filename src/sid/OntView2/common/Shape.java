@@ -437,14 +437,10 @@ public abstract class Shape {
             for (VisConnector c : inConnectors) {
                 if (c.from.isVisible() && c instanceof VisConnectorIsA) c.show();
                 else if (!c.from.isVisible() && c instanceof VisConnectorDashed) c.show();
-
-                c.from.checkAndUpdateChildrenVisibilityStates();
             }
             for (VisConnector c : outConnectors) {
                 if (c.to.isVisible() && c instanceof VisConnectorIsA) c.show();
                 else if (!c.to.isVisible() && c instanceof VisConnectorDashed) c.show();
-
-                c.to.checkAndUpdateParentVisibilityStates();
             }
         }
 
@@ -477,8 +473,6 @@ public abstract class Shape {
 
         Set<Shape> visited = new HashSet<>();
         for (Shape s: visibleDescendants){
-            //s.checkAndUpdateChildrenVisibilityStates();
-            //s.updateHiddenDescendants();
             s.removeHiddenDescendantsFromAncestors(visibleDescendants, visited);
         }
         hiddenDescendantsSet.removeAll(visibleDescendants);
@@ -609,8 +603,8 @@ public abstract class Shape {
             Shape parent = connector.from;
             if (parent != null) {
                 parent.hiddenDescendantsSet.removeAll(visibleDescendantsSet);
-                //parent.checkAndUpdateChildrenVisibilityStates();
-                //parent.checkAndUpdateParentVisibilityStates();
+                parent.checkAndUpdateChildrenVisibilityStates();
+                parent.checkAndUpdateParentVisibilityStates();
                 parent.removeHiddenDescendantsFromAncestors(visibleDescendantsSet, visited);
             }
         }
