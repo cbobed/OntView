@@ -442,6 +442,7 @@ public abstract class Shape {
                 if (c.to.isVisible() && c instanceof VisConnectorIsA) c.show();
                 else if (!c.to.isVisible() && c instanceof VisConnectorDashed) c.show();
             }
+            checkAndUpdateParentVisibilityStates();
         }
 
         for (VisConnector connector : outConnectors) {
@@ -477,6 +478,7 @@ public abstract class Shape {
         }
         hiddenDescendantsSet.removeAll(visibleDescendants);
         checkAndUpdateChildrenVisibilityStates();
+        checkAndUpdateParentVisibilityStates();
     }
 
     public void showParentLevels() {
@@ -528,7 +530,7 @@ public abstract class Shape {
         boolean allParentsVisible = true;
 
         for (VisConnector connector : inConnectors) {
-            if (connector.isVisible()) {
+            if (connector.from.isVisible()) {
                 allParentsHidden = false;
             } else {
                 allParentsVisible = false;
