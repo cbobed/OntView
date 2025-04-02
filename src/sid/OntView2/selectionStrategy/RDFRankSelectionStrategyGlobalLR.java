@@ -34,9 +34,9 @@ public class RDFRankSelectionStrategyGlobalLR implements SelectionStrategy {
             if (selectedShapes.size() >= numberToShow) {
                 break;
             }
-            if(!candidate.isVisible())
+            if(!candidate.isVisible()) {
                 selectedShapes.add(candidate);
-
+            }
         }
 
         return selectedShapes;
@@ -74,7 +74,6 @@ public class RDFRankSelectionStrategyGlobalLR implements SelectionStrategy {
             if (candidate.isVisible()) {
                 selectedShapes.add(candidate);
             }
-
         }
 
         return selectedShapes;

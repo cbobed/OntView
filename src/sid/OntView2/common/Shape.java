@@ -409,7 +409,7 @@ public abstract class Shape {
             }
             case VisConstants.STEPSTRATEGY_RDF_LEVEL_RL -> {
                 RDFRankSelectionStrategyGlobalRL RDFStrategy = new RDFRankSelectionStrategyGlobalRL(limit,
-                    asVisClass().orderedDescendantsByLevel);
+                    asVisClass().orderedDescendantsByLevel, this);
                 return toHide ? RDFStrategy.getShapesToHide() : RDFStrategy.getShapesToVisualize();
             }
             default -> {
