@@ -384,13 +384,17 @@ public class Mine extends Application implements Embedable{
 	public void createImage() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG files", "*.png"));
-        File directory = fileChooser.showSaveDialog(primaryStage);
-        if (directory == null) return;
+        File fl = fileChooser.showSaveDialog(primaryStage);
+        if (fl == null) return;
 
+        boolean hasSuffix = fl.getName().toLowerCase().endsWith("png");
+        if (!hasSuffix)  fl = new File(fl.getAbsolutePath() + ".png");
+
+        File finalFl = fl;
         Task<Void> task = new Task<>() {
             @Override
             protected Void call(){
-                exportLargeCanvasAsPNGs(directory);
+                exportLargeCanvasAsPNGs(finalFl);
                 return null;
             }
         };
@@ -417,14 +421,17 @@ public class Mine extends Application implements Embedable{
     private void imageDialog(PaintFrame panel, int w, int h) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG", "*.png"));
-        File file = fileChooser.showSaveDialog(primaryStage);
-        if (file != null) {
+        File fl = fileChooser.showSaveDialog(primaryStage);
+        if (fl != null) {
+            boolean hasSuffix = fl.getName().toLowerCase().endsWith("png");
+            if (!hasSuffix)  fl = new File(fl.getAbsolutePath() + ".png");
+
             WritableImage snapshot = new WritableImage(w, h);
             SnapshotParameters parameters = new SnapshotParameters();
             parameters.setViewport(new Rectangle2D(0, 0, w, h));
 
             panel.snapshot(parameters, snapshot);
-            saveViewTask(snapshot, file);
+            saveViewTask(snapshot, fl);
         }
     }
     public void exportLargeCanvasAsPNGs(File directory) {
