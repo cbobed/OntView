@@ -35,6 +35,10 @@ public class VisShapeContext extends ContextMenu {
 	double posx,posy;
     int oldValue;
 
+    public Stage getSliderStage(){
+        return sliderStage;
+    }
+
 	public VisShapeContext(Shape s, PaintFrame parentFrame, MouseEvent e){
 		
 		super();

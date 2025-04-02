@@ -55,7 +55,7 @@ public class PaintFrame extends Canvas {
 	private String activeOntologySource;
 	OWLReasoner reasoner;
 	VisGraph visGraph, rVisGraph; // visGraph will handle both depending on which is currently selected
-	private VisShapeContext menuVisShapeContext = null;
+	public VisShapeContext menuVisShapeContext = null;
 	private VisGeneralContext menuVisGeneralContext = null;
     private Stage sliderStage = null;
 	public int screenWidth;
@@ -1082,7 +1082,7 @@ public class PaintFrame extends Canvas {
 		menuVisShapeContext.show(this, x, y);
 	}
 
-	private void closeContextMenu(ContextMenu menu) {
+	public void closeContextMenu(ContextMenu menu) {
 		menu.hide();
 	}
 

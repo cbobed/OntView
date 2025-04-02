@@ -849,12 +849,19 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		}
 	}
 
-	void loadReasonerButtonActionTask(ActionEvent event) {
-		// Only use Custom mode once the graph is loaded
+    private void resetParameters(){
         restoreSliderValue();
         resetConnectorsSwitch();
+        if(parent.artPanel.menuVisShapeContext != null) { // close slider
+            parent.artPanel.menuVisShapeContext.getSliderStage().close();
+        }
         parent.artPanel.cleanConnectors();
-		parent.artPanel.clearCanvas();
+        parent.artPanel.clearCanvas();
+    }
+
+	void loadReasonerButtonActionTask(ActionEvent event) {
+		// Only use Custom mode once the graph is loaded
+        resetParameters();
 		if (Objects.equals(getKceComboBox().getValue(), VisConstants.CUSTOMCOMBOOPTION3)){
 			getKceComboBox().setValue(VisConstants.NONECOMBOOPTION);
 		}
