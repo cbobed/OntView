@@ -523,6 +523,7 @@ public class PaintFrame extends Canvas {
 
     public void cleanConnectors() {
 		selectedShapes.clear();
+        selectedDisjoints.clear();
 	}
 
 	public void handleMouseEntered(MouseEvent e) {
