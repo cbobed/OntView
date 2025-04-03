@@ -4,17 +4,24 @@ import sid.OntView2.common.Shape;
 
 import java.util.*;
 
-public class RDFRankSelectionStrategyGlobalLR implements SelectionStrategy {
+public class RDFRankSelectionStrategyGlobalLevel implements SelectionStrategy {
     private final int limit;
-    private final Set<Shape> orderedShapesByRDFLevel, orderedDescendantsByLevelLeastImportant;
+    private final Set<Shape> orderedShapesByRDFLevel, orderedDescendantsByLevelLeastImportant,
+        orderedDescendantsByLevelBottomTop;
     private final Shape parentShape;
+    private final boolean isLR;
 
-    public RDFRankSelectionStrategyGlobalLR(int limit, Set<Shape> orderedShapesByRDFLevel,
-                                            Set<Shape> orderedDescendantsByLevelLeastImportant, Shape parentShape) {
+    public RDFRankSelectionStrategyGlobalLevel(int limit, Set<Shape> orderedShapesByRDFLevel,
+                                               Set<Shape> orderedDescendantsByLevelLeastImportant,
+                                               Set<Shape> orderedDescendantsByLevelBottomTop,
+                                               Shape parentShape, boolean isLR) {
         this.limit = limit;
         this.orderedShapesByRDFLevel = orderedShapesByRDFLevel;
         this.orderedDescendantsByLevelLeastImportant = orderedDescendantsByLevelLeastImportant;
+        this.orderedDescendantsByLevelBottomTop = orderedDescendantsByLevelBottomTop;
         this.parentShape = parentShape;
+        this.isLR = isLR;
+
     }
 
     /**
@@ -31,8 +38,9 @@ public class RDFRankSelectionStrategyGlobalLR implements SelectionStrategy {
         numberToShow -= alreadyShown;
 
         Set<Shape> selectedShapes = new LinkedHashSet<>();
+        Set<Shape> iterable = isLR ? orderedShapesByRDFLevel : orderedDescendantsByLevelBottomTop;
 
-        for (Shape candidate : orderedShapesByRDFLevel) {
+        for (Shape candidate : iterable) {
             if (selectedShapes.size() >= numberToShow) {
                 break;
             }
@@ -58,7 +66,16 @@ public class RDFRankSelectionStrategyGlobalLR implements SelectionStrategy {
         numberToHide -= alreadyHidden;
 
         Set<Shape> selectedShapes = new LinkedHashSet<>();
-        for (Shape candidate : orderedDescendantsByLevelLeastImportant) {
+        Set<Shape> iterable;
+        if (isLR){
+            iterable = orderedDescendantsByLevelLeastImportant;
+        } else {
+            List<Shape> reversedShapes = new ArrayList<>(orderedShapesByRDFLevel);
+            Collections.reverse(reversedShapes);
+            iterable = new LinkedHashSet<>(reversedShapes);
+        }
+
+        for (Shape candidate : iterable) {
             if (selectedShapes.size() >= numberToHide) {
                 break;
             }

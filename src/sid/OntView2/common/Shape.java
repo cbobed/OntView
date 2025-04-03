@@ -403,13 +403,15 @@ public abstract class Shape {
                 return toHide ? RDFStrategy.getShapesToHide() : RDFStrategy.getShapesToVisualize();
             }
             case VisConstants.STEPSTRATEGY_RDF_LEVEL_LR -> {
-                RDFRankSelectionStrategyGlobalLR RDFStrategy = new RDFRankSelectionStrategyGlobalLR(limit,
-                    asVisClass().orderedDescendantsByLevel, asVisClass().orderedDescendantsByLevelLeastImportant, this);
+                RDFRankSelectionStrategyGlobalLevel RDFStrategy = new RDFRankSelectionStrategyGlobalLevel(limit,
+                    asVisClass().orderedDescendantsByLevel, asVisClass().orderedDescendantsByLevelLeastImportant,
+                    asVisClass().orderedDescendantsByLevelBottomTop, this, true);
                 return toHide ? RDFStrategy.getShapesToHide() : RDFStrategy.getShapesToVisualize();
             }
             case VisConstants.STEPSTRATEGY_RDF_LEVEL_RL -> {
-                RDFRankSelectionStrategyGlobalRL RDFStrategy = new RDFRankSelectionStrategyGlobalRL(limit,
-                    asVisClass().orderedDescendantsByLevel, asVisClass().orderedDescendantsByLevelBottomTop, this);
+                RDFRankSelectionStrategyGlobalLevel RDFStrategy = new RDFRankSelectionStrategyGlobalLevel(limit,
+                    asVisClass().orderedDescendantsByLevel, asVisClass().orderedDescendantsByLevelLeastImportant,
+                    asVisClass().orderedDescendantsByLevelBottomTop, this, false);
                 return toHide ? RDFStrategy.getShapesToHide() : RDFStrategy.getShapesToVisualize();
             }
             default -> {
