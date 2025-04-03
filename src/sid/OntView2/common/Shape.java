@@ -191,6 +191,10 @@ public abstract class Shape {
         return hiddenDescendantsSet.size();
     }
 
+    public Set<Shape> get1(){
+        return hiddenDescendantsSet;
+    }
+
     public int getHiddenParentsSet() {
         return hiddenParentsSet.size();
     }

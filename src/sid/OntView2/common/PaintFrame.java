@@ -1208,6 +1208,9 @@ public class PaintFrame extends Canvas {
 			}
 		}
 		compactGraph();
+        if (menuVisShapeContext != null) {
+            menuVisShapeContext.updateSliderView();
+        }
 	}
 
 	public void compactGraph() {

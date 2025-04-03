@@ -34,6 +34,7 @@ public class VisShapeContext extends ContextMenu {
 	OWLClassExpression expression;
 	double posx,posy;
     int oldValue;
+    boolean ignoreSliderListener = false;
 
     public Stage getSliderStage(){
         return sliderStage;
@@ -173,38 +174,44 @@ public class VisShapeContext extends ContextMenu {
         return titleBar;
     }
 
-    private Slider getSlider(){
-        slider = new Slider(0,100, getPercentage());
-        slider.setShowTickLabels(true);
-        slider.setShowTickMarks(true);
-        slider.setMajorTickUnit(10);
-        slider.setMinorTickCount(5);
-        slider.setBlockIncrement(1);
-        slider.setSnapToTicks(true);
-        slider.getStyleClass().add("custom-slider");
+    private Slider getSlider() {
+        if (slider == null) {
+            slider = new Slider(0, 100, getPercentage());
+            slider.setShowTickLabels(true);
+            slider.setShowTickMarks(true);
+            slider.setMajorTickUnit(10);
+            slider.setMinorTickCount(5);
+            slider.setBlockIncrement(1);
+            slider.setSnapToTicks(true);
+            slider.getStyleClass().add("custom-slider");
 
-        oldValue = (int) slider.getValue();
+            oldValue = (int) slider.getValue();
 
-        slider.valueProperty().addListener((obs, oldVal, newVal) -> {
-            int intValue = newVal.intValue();
-            if (intValue != oldValue) {
-                changeSliderValue(oldValue, intValue);
-                oldValue = intValue;
-            }
-        });
+            slider.valueProperty().addListener((obs, oldVal, newVal) -> {
+                if (ignoreSliderListener) {
+                    ignoreSliderListener = false;
+                    return;
+                }
+                int intValue = newVal.intValue();
+                if (intValue != oldValue) {
+                    showShapesAccordingToSliderValue(oldValue, intValue);
+                    oldValue = intValue;
+                }
+            });
+        }
 
         return slider;
     }
 
     public void updateSliderView(){
-        System.out.println("update " + shape.getLabel());
+        ignoreSliderListener = true;
         if (sliderStage != null && sliderStage.isShowing()) {
-            slider.setValue(getPercentage());
+            getSlider().setValue(getPercentage());
         }
     }
 
     private int getPercentage(){
-        return (100 * (shape.asVisClass().descendants.size() - shape.asVisClass().getHiddenDescendantsSet())
+        return (100 * (shape.asVisClass().descendants.size() - shape.getHiddenDescendantsSet())
             / shape.asVisClass().descendants.size());
     }
 
@@ -239,7 +246,7 @@ public class VisShapeContext extends ContextMenu {
         sliderStage.show();
     }
 
-    private void changeSliderValue(int oldValue, int newValue) {
+    private void showShapesAccordingToSliderValue(int oldValue, int newValue) {
         if (newValue < oldValue) {
             shape.hideSubLevels(shape.getShapesFromStrategyGlobal(true, newValue));
         } else {
