@@ -4,15 +4,21 @@ import sid.OntView2.common.Shape;
 
 import java.util.*;
 
-public class RDFRankSelectionStrategyStepsRL implements SelectionStrategy {
+public class RDFRankSelectionStrategyStepsLevel implements SelectionStrategy {
     private final int limit;
-    private final Set<Shape> orderedShapesByRDFLevel, orderedDescendantsByLevelBottomTop;
+    private final Set<Shape> orderedShapesByRDFLevel, orderedDescendantsByLevelLeastImportant,
+        orderedDescendantsByLevelBottomTop;
+    private final boolean isLR;
 
-    public RDFRankSelectionStrategyStepsRL(int limit, Set<Shape> orderedShapesByRDFLevel,
-                                           Set<Shape> orderedDescendantsByLevelBottomTop) {
+    public RDFRankSelectionStrategyStepsLevel(int limit, Set<Shape> orderedShapesByRDFLevel,
+                                              Set<Shape> orderedDescendantsByLevelLeastImportant,
+                                              Set<Shape> orderedDescendantsByLevelBottomTop,
+                                              boolean isLR) {
         this.limit = limit;
         this.orderedShapesByRDFLevel = orderedShapesByRDFLevel;
+        this.orderedDescendantsByLevelLeastImportant = orderedDescendantsByLevelLeastImportant;
         this.orderedDescendantsByLevelBottomTop = orderedDescendantsByLevelBottomTop;
+        this.isLR = isLR;
     }
 
     /**
@@ -23,7 +29,9 @@ public class RDFRankSelectionStrategyStepsRL implements SelectionStrategy {
         int numberToShow = (int) Math.ceil((limit / 100.0) * orderedShapesByRDFLevel.size());
 
         Set<Shape> selectedShapes = new LinkedHashSet<>();
-        for (Shape candidate : orderedDescendantsByLevelBottomTop) {
+        Set<Shape> iterable = isLR ? orderedShapesByRDFLevel : orderedDescendantsByLevelBottomTop;
+
+        for (Shape candidate : iterable) {
             if (selectedShapes.size() >= numberToShow) {
                 break;
             }
@@ -42,10 +50,16 @@ public class RDFRankSelectionStrategyStepsRL implements SelectionStrategy {
         int numberToShow = (int) Math.ceil((limit / 100.0) * orderedShapesByRDFLevel.size());
 
         Set<Shape> selectedShapes = new LinkedHashSet<>();
-        List<Shape> reversedShapes = new ArrayList<>(orderedShapesByRDFLevel);
-        Collections.reverse(reversedShapes);
+        Set<Shape> iterable;
+        if (isLR){
+            iterable = orderedDescendantsByLevelLeastImportant;
+        } else {
+            List<Shape> reversedShapes = new ArrayList<>(orderedShapesByRDFLevel);
+            Collections.reverse(reversedShapes);
+            iterable = new LinkedHashSet<>(reversedShapes);
+        }
 
-        for (Shape candidate : reversedShapes) {
+        for (Shape candidate : iterable) {
             if (selectedShapes.size() >= numberToShow) {
                 break;
             }
