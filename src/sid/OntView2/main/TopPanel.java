@@ -657,8 +657,10 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
     }
 
     public void changeLimitValue(int newLimit) {
-        if (percentageSpinner != null)
+        if (percentageSpinner != null) {
             getVisibilitySpinner().getValueFactory().setValue(newLimit);
+            parent.artPanel.setPercentageShown(newLimit);
+        }
     }
 
     private Spinner<Integer> getVisibilitySpinner() {

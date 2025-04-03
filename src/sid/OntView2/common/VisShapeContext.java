@@ -197,14 +197,15 @@ public class VisShapeContext extends ContextMenu {
     }
 
     public void updateSliderView(){
+        System.out.println("update " + shape.getLabel());
         if (sliderStage != null && sliderStage.isShowing()) {
             slider.setValue(getPercentage());
         }
     }
 
     private int getPercentage(){
-        return (100 * (shape.asVisClass().descendants.size() - shape.asVisClass().getHiddenDescendantsSet()))
-            / shape.asVisClass().descendants.size();
+        return (100 * (shape.asVisClass().descendants.size() - shape.asVisClass().getHiddenDescendantsSet())
+            / shape.asVisClass().descendants.size());
     }
 
     private void showSliderAction() {

@@ -364,7 +364,7 @@ public abstract class Shape {
     }
 
     public void notEnoughLimit(){
-        int requiredValue = 100 / asVisClass().orderedDescendants.size();
+        int requiredValue = (int) Math.ceil(100.0 / asVisClass().orderedDescendants.size());
         graph.paintframe.nTopPanel.changeLimitValue(requiredValue);
         graph.paintframe.showAlertDialog("Warning",
             "The selected visibility percentage is insufficient to display or hide at least one node.",

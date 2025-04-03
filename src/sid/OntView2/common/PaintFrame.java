@@ -759,20 +759,7 @@ public class PaintFrame extends Canvas {
                 }
             }
         }
-
     }
-
-    public void printScrollAttributes() {
-        System.out.println("ScrollPane Attributes:--------------------------------------");
-        System.out.println("HValue: " + scroll.getHvalue() + " VValue: " + scroll.getVvalue());
-        System.out.println("HMin: " + scroll.getHmin() + " HMax: " + scroll.getHmax());
-        System.out.println("VMin: " + scroll.getVmin() + " VMax: " + scroll.getVmax());
-        System.out.println("Viewport Bounds: " + scroll.getViewportBounds());
-        System.out.println("Content Bounds: " + scroll.getContent().getBoundsInParent());
-        System.out.println("PrefWidth: " + scroll.getPrefWidth() + " PrefHeight: " + scroll.getPrefHeight());
-        System.out.println("Width: " + scroll.getWidth() + " Height: " + scroll.getHeight()  + "\n");
-    }
-
 
 	/**
 	 * translates point to current zoom factor

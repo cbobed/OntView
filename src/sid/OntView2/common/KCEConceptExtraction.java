@@ -18,6 +18,9 @@ public class KCEConceptExtraction extends KConceptExtractor {
 		Map<String, Shape> shapeMap = graph.getShapeMap();
 		Set<String> conceptSet = retrieveKeyConcepts(activeOntology, shapeMap, limitResultSize);
 
+        conceptSet.add(VisConstants.THING_ENTITY);
+        conceptSet.add(VisConstants.NOTHING_ENTITY);
+
 		for (Map.Entry<String, Shape> entry : shapeMap.entrySet()) {
 			Shape shape = entry.getValue();
 			if (isNonKeyConcept(entry.getKey(), conceptSet, shapeMap)) {
