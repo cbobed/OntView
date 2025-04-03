@@ -45,10 +45,6 @@ public class RDFRankSelectionStrategySteps implements SelectionStrategy {
         Collections.reverse(reversedShapes);
 
         for (Shape candidate : reversedShapes) {
-            /*if (candidate.getLabel().matches("Animal") || candidate.getLabel().matches("TasmanianDevil") ||
-                candidate.getLabel().matches("Student") || candidate.getLabel().contains("OneOf(BA,)")) {
-                selectedShapes.add(candidate);
-            }*/
             if (selectedShapes.size() >= numberToShow) {
                 break;
             }
