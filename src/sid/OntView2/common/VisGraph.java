@@ -1492,7 +1492,44 @@ public class VisGraph implements Runnable{
 
             shape.asVisClass().orderedDescendants = orderedDescendants;
             shape.asVisClass().orderedDescendantsByLevel = new LinkedHashSet<>(descendantsListLR);
+            shape.asVisClass().orderedDescendantsByLevelBottomTop = reorderListBottomTopImportance(shape.asVisClass().orderedDescendantsByLevel);
+            shape.asVisClass().orderedDescendantsByLevelLeastImportant = reorderListLessImportant(shape.asVisClass().orderedDescendantsByLevel);
         }
+    }
+
+    /**
+     * Reorders a collection of shapes by reversing their level order (from highest to lowest),
+     * while preserving the descending order of importance within each level.
+     */
+    private Set<Shape> reorderListBottomTopImportance(Collection<Shape> shapes) {
+        Map<Integer, List<Shape>> shapesByLevel = new TreeMap<>(Collections.reverseOrder());
+        for (Shape shape : shapes) {
+            shapesByLevel.computeIfAbsent(shape.depthlevel, k -> new ArrayList<>()).add(shape);
+        }
+
+        Set<Shape> reordered = new LinkedHashSet<>();
+        for (List<Shape> shapesGroup : shapesByLevel.values()) {
+            reordered.addAll(shapesGroup);
+        }
+        return reordered;
+    }
+
+    /**
+     * Reorders a collection of shapes by maintaining the original level order while reversing
+     * the importance order within each level (from least important to most important).
+     */
+    private Set<Shape> reorderListLessImportant(Collection<Shape> shapes) {
+        Map<Integer, List<Shape>> shapesByLevel = new HashMap<>();
+        for (Shape shape : shapes) {
+            shapesByLevel.computeIfAbsent(shape.depthlevel, k -> new ArrayList<>()).add(shape);
+        }
+
+        Set<Shape> reversedShapes = new LinkedHashSet<>();
+        for (List<Shape> shapesGroup : shapesByLevel.values()) {
+            Collections.reverse(shapesGroup);
+            reversedShapes.addAll(shapesGroup);
+        }
+        return reversedShapes;
     }
 
     /**

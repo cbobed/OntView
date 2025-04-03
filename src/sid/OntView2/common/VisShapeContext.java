@@ -246,9 +246,9 @@ public class VisShapeContext extends ContextMenu {
 
     private void changeSliderValue(int oldValue, int newValue) {
         if (newValue < oldValue) {
-            shape.hideSubLevels(shape.getShapesFromStrategy(true, newValue));
+            shape.hideSubLevels(shape.getShapesFromStrategyGlobal(true, newValue));
         } else {
-            shape.showSubLevels(shape.getShapesFromStrategy(false, newValue));
+            shape.showSubLevels(shape.getShapesFromStrategyGlobal(false, newValue));
         }
 
         parent.refreshDashedConnectors();

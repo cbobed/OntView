@@ -599,7 +599,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
             percentagePanel.setPadding(new Insets(5));
             percentagePanel.setSpacing(5);
 
-            StackPane titlePane = createTitlePane("Visibility");
+            StackPane titlePane = createTitlePane("Visibility Step");
             HBox row = createRow(createTitlePane("%"), getVisibilitySpinner(), changeSelectionStrategy());
 
             percentagePanel = createContainer(titlePane, row);

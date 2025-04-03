@@ -395,7 +395,7 @@ public abstract class Shape {
         }
     }
 
-    public Set<Shape> getShapesFromStrategy(boolean toHide, int limit){
+    public Set<Shape> getShapesFromStrategyGlobal(boolean toHide, int limit){
         switch (graph.paintframe.getStrategyOptionGlobal()) {
             case VisConstants.GLOBALSTRATEGY_RDFRANK -> {
                 RDFRankSelectionStrategyGlobal RDFStrategy = new RDFRankSelectionStrategyGlobal(limit,
@@ -404,12 +404,12 @@ public abstract class Shape {
             }
             case VisConstants.STEPSTRATEGY_RDF_LEVEL_LR -> {
                 RDFRankSelectionStrategyGlobalLR RDFStrategy = new RDFRankSelectionStrategyGlobalLR(limit,
-                    asVisClass().orderedDescendantsByLevel, this);
+                    asVisClass().orderedDescendantsByLevel, asVisClass().orderedDescendantsByLevelLeastImportant, this);
                 return toHide ? RDFStrategy.getShapesToHide() : RDFStrategy.getShapesToVisualize();
             }
             case VisConstants.STEPSTRATEGY_RDF_LEVEL_RL -> {
                 RDFRankSelectionStrategyGlobalRL RDFStrategy = new RDFRankSelectionStrategyGlobalRL(limit,
-                    asVisClass().orderedDescendantsByLevel, this);
+                    asVisClass().orderedDescendantsByLevel, asVisClass().orderedDescendantsByLevelBottomTop, this);
                 return toHide ? RDFStrategy.getShapesToHide() : RDFStrategy.getShapesToVisualize();
             }
             default -> {

@@ -6,12 +6,14 @@ import java.util.*;
 
 public class RDFRankSelectionStrategyGlobalLR implements SelectionStrategy {
     private final int limit;
-    private final Set<Shape> orderedShapesByRDFLevel;
+    private final Set<Shape> orderedShapesByRDFLevel, orderedDescendantsByLevelLeastImportant;
     private final Shape parentShape;
 
-    public RDFRankSelectionStrategyGlobalLR(int limit, Set<Shape> orderedShapesByRDFLevel, Shape parentShape) {
+    public RDFRankSelectionStrategyGlobalLR(int limit, Set<Shape> orderedShapesByRDFLevel,
+                                            Set<Shape> orderedDescendantsByLevelLeastImportant, Shape parentShape) {
         this.limit = limit;
         this.orderedShapesByRDFLevel = orderedShapesByRDFLevel;
+        this.orderedDescendantsByLevelLeastImportant = orderedDescendantsByLevelLeastImportant;
         this.parentShape = parentShape;
     }
 
@@ -55,19 +57,8 @@ public class RDFRankSelectionStrategyGlobalLR implements SelectionStrategy {
         }
         numberToHide -= alreadyHidden;
 
-        Map<Integer, List<Shape>> shapesByLevel = new HashMap<>();
-        for (Shape shape : orderedShapesByRDFLevel) {
-            shapesByLevel.computeIfAbsent(shape.depthlevel, k -> new ArrayList<>()).add(shape);
-        }
-
-        List<Shape> reversedShapes = new ArrayList<>();
-        for (List<Shape> shapes : shapesByLevel.values()) {
-            Collections.reverse(shapes);
-            reversedShapes.addAll(shapes);
-        }
-
         Set<Shape> selectedShapes = new LinkedHashSet<>();
-        for (Shape candidate : reversedShapes) {
+        for (Shape candidate : orderedDescendantsByLevelLeastImportant) {
             if (selectedShapes.size() >= numberToHide) {
                 break;
             }
