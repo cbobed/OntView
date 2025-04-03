@@ -16,4 +16,13 @@ public interface SelectionStrategy {
      * according to the specific strategy.
      */
     Set<Shape> getShapesToHide();
+
+    default int ensureLimitSufficient(int limit, Shape parentShape, int numShapes) {
+        int minimumRequired = (int) Math.ceil(100.0 / numShapes);
+        if (limit < minimumRequired) {
+            parentShape.notEnoughLimit();
+            return minimumRequired;
+        }
+        return limit;
+    }
 }

@@ -5,12 +5,14 @@ import sid.OntView2.common.Shape;
 import java.util.*;
 
 public class RDFRankSelectionStrategySteps implements SelectionStrategy {
-    private final int limit;
+    private int limit;
     private final Set<Shape> orderedShapesByRDF;
+    private final Shape parentShape;
 
-    public RDFRankSelectionStrategySteps(int limit, Set<Shape> orderedShapesByRDF) {
+    public RDFRankSelectionStrategySteps(int limit, Set<Shape> orderedShapesByRDF, Shape parentShape) {
         this.limit = limit;
         this.orderedShapesByRDF = orderedShapesByRDF;
+        this.parentShape = parentShape;
     }
 
     /**
@@ -18,7 +20,8 @@ public class RDFRankSelectionStrategySteps implements SelectionStrategy {
      */
     @Override
     public Set<Shape> getShapesToVisualize() {
-        int numberToShow = (int) Math.ceil((limit / 100.0) * orderedShapesByRDF.size());
+        limit = ensureLimitSufficient(limit, parentShape, orderedShapesByRDF.size());
+        int numberToShow = (int) Math.floor((limit / 100.0) * orderedShapesByRDF.size());
 
         Set<Shape> selectedShapes = new LinkedHashSet<>();
 
@@ -38,7 +41,8 @@ public class RDFRankSelectionStrategySteps implements SelectionStrategy {
      */
     @Override
     public Set<Shape> getShapesToHide() {
-        int numberToShow = (int) Math.ceil((limit / 100.0) * orderedShapesByRDF.size());
+        limit = ensureLimitSufficient(limit, parentShape, orderedShapesByRDF.size());
+        int numberToShow = (int) Math.floor((limit / 100.0) * orderedShapesByRDF.size());
 
         Set<Shape> selectedShapes = new LinkedHashSet<>();
         List<Shape> reversedShapes = new ArrayList<>(orderedShapesByRDF);

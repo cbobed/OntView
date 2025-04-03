@@ -12,6 +12,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class Shape {
+    private ControlPanelInterface limitListener;
 
     public static final int CLOSED = 0;
     public static final int OPEN = 1;
@@ -170,7 +171,6 @@ public abstract class Shape {
      * Then looks for those remaining visible nodes and adds a reference (dashed line)
      */
     public void closeRight() {
-        showWarning();
         hideSubLevels(getShapesFromStrategySteps(true, graph.paintframe.getPercentageShown()));
     }
 
@@ -363,32 +363,34 @@ public abstract class Shape {
         return true;
     }
 
-    private void showWarning() {
-        if (graph.paintframe.getPercentageShown() == 0) {
-            graph.paintframe.showAlertDialog("Warning",
-                "Please note that the visibility percentage for showing \nor hiding nodes is currently set to 0.",
-                "Consider selecting a different percentage to adjust the visibility appropriately.",
-                Alert.AlertType.INFORMATION);
-        }
+    public void notEnoughLimit(){
+        int requiredValue = 100 / asVisClass().orderedDescendants.size();
+        graph.paintframe.nTopPanel.changeLimitValue(requiredValue);
+        graph.paintframe.showAlertDialog("Warning",
+            "The selected visibility percentage is insufficient to display or hide at least one node.",
+            "The minimum required value is " + requiredValue + "%. The percentage has been adjusted accordingly.",
+            Alert.AlertType.INFORMATION);
+
+
     }
 
     public Set<Shape> getShapesFromStrategySteps(boolean toHide, int limit){
         switch (graph.paintframe.getStrategyOptionStep()) {
             case VisConstants.STEPSTRATEGY_RDFRANK -> {
                 RDFRankSelectionStrategySteps RDFStrategy = new RDFRankSelectionStrategySteps(limit,
-                    asVisClass().orderedDescendants);
+                    asVisClass().orderedDescendants, this);
                 return toHide ? RDFStrategy.getShapesToHide() : RDFStrategy.getShapesToVisualize();
             }
             case VisConstants.STEPSTRATEGY_RDF_LEVEL_LR -> {
                 RDFRankSelectionStrategyStepsLevel RDFStrategy = new RDFRankSelectionStrategyStepsLevel(limit,
                     asVisClass().orderedDescendantsByLevel, asVisClass().orderedDescendantsByLevelLeastImportant,
-                    asVisClass().orderedDescendantsByLevelBottomTop, true);
+                    asVisClass().orderedDescendantsByLevelBottomTop, this, true);
                 return toHide ? RDFStrategy.getShapesToHide() : RDFStrategy.getShapesToVisualize();
             }
             case VisConstants.STEPSTRATEGY_RDF_LEVEL_RL -> {
                 RDFRankSelectionStrategyStepsLevel RDFStrategy = new RDFRankSelectionStrategyStepsLevel(limit,
                     asVisClass().orderedDescendantsByLevel, asVisClass().orderedDescendantsByLevelLeastImportant,
-                    asVisClass().orderedDescendantsByLevelBottomTop, false);
+                    asVisClass().orderedDescendantsByLevelBottomTop, this, false);
                 return toHide ? RDFStrategy.getShapesToHide() : RDFStrategy.getShapesToVisualize();
             }
             default -> {
@@ -425,7 +427,6 @@ public abstract class Shape {
     /**************************************************************/
 
     public void openRight() {
-        showWarning();
         showSubLevels(getShapesFromStrategySteps(false, graph.paintframe.getPercentageShown()));
     }
 

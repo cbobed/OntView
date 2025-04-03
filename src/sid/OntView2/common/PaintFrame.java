@@ -33,6 +33,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 import reducer.StructuralReducer;
+import sid.OntView2.main.TopPanel;
 
 public class PaintFrame extends Canvas {
 	private static final long serialVersionUID = 1L;
@@ -51,6 +52,7 @@ public class PaintFrame extends Canvas {
 	private String kceOption = VisConstants.NONECOMBOOPTION;
 	Dimension2D prevSize;
 	PaintFrame paintFrame = this;
+    public TopPanel nTopPanel;
 	OWLOntology activeOntology;
 	private String activeOntologySource;
 	OWLReasoner reasoner;

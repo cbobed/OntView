@@ -5,19 +5,21 @@ import sid.OntView2.common.Shape;
 import java.util.*;
 
 public class RDFRankSelectionStrategyStepsLevel implements SelectionStrategy {
-    private final int limit;
+    private int limit;
     private final Set<Shape> orderedShapesByRDFLevel, orderedDescendantsByLevelLeastImportant,
         orderedDescendantsByLevelBottomTop;
+    private final Shape parentShape;
     private final boolean isLR;
 
     public RDFRankSelectionStrategyStepsLevel(int limit, Set<Shape> orderedShapesByRDFLevel,
                                               Set<Shape> orderedDescendantsByLevelLeastImportant,
                                               Set<Shape> orderedDescendantsByLevelBottomTop,
-                                              boolean isLR) {
+                                              Shape parentShape, boolean isLR) {
         this.limit = limit;
         this.orderedShapesByRDFLevel = orderedShapesByRDFLevel;
         this.orderedDescendantsByLevelLeastImportant = orderedDescendantsByLevelLeastImportant;
         this.orderedDescendantsByLevelBottomTop = orderedDescendantsByLevelBottomTop;
+        this.parentShape = parentShape;
         this.isLR = isLR;
     }
 
@@ -26,7 +28,8 @@ public class RDFRankSelectionStrategyStepsLevel implements SelectionStrategy {
      */
     @Override
     public Set<Shape> getShapesToVisualize() {
-        int numberToShow = (int) Math.ceil((limit / 100.0) * orderedShapesByRDFLevel.size());
+        limit = ensureLimitSufficient(limit, parentShape, orderedShapesByRDFLevel.size());
+        int numberToShow = (int) Math.floor((limit / 100.0) * orderedShapesByRDFLevel.size());
 
         Set<Shape> selectedShapes = new LinkedHashSet<>();
         Set<Shape> iterable = isLR ? orderedShapesByRDFLevel : orderedDescendantsByLevelBottomTop;
@@ -47,7 +50,8 @@ public class RDFRankSelectionStrategyStepsLevel implements SelectionStrategy {
      */
     @Override
     public Set<Shape> getShapesToHide() {
-        int numberToShow = (int) Math.ceil((limit / 100.0) * orderedShapesByRDFLevel.size());
+        limit = ensureLimitSufficient(limit, parentShape, orderedShapesByRDFLevel.size());
+        int numberToShow = (int) Math.floor((limit / 100.0) * orderedShapesByRDFLevel.size());
 
         Set<Shape> selectedShapes = new LinkedHashSet<>();
         Set<Shape> iterable;

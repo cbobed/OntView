@@ -113,6 +113,7 @@ public class Mine extends Application implements Embedable{
         viewer.scroll.setFitToWidth(false);
         viewer.scroll.setFitToHeight(false);
 		viewer.artPanel.scroll = viewer.scroll;
+        viewer.artPanel.nTopPanel = viewer.nTopPanel;
 
 		viewer.artPanel.scroll.hvalueProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal.doubleValue() < 0.0) newVal = 0;

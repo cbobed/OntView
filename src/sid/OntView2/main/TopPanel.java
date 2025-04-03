@@ -656,6 +656,11 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
         return new CustomMenuItem(label, false);
     }
 
+    public void changeLimitValue(int newLimit) {
+        if (percentageSpinner != null)
+            getVisibilitySpinner().getValueFactory().setValue(newLimit);
+    }
+
     private Spinner<Integer> getVisibilitySpinner() {
         if (percentageSpinner == null) {
             SpinnerValueFactory<Integer> values =

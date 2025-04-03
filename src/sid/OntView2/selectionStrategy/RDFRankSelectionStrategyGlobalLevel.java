@@ -29,7 +29,7 @@ public class RDFRankSelectionStrategyGlobalLevel implements SelectionStrategy {
      */
     @Override
     public Set<Shape> getShapesToVisualize() {
-        int numberToShow = (int) Math.ceil((limit / 100.0) * orderedShapesByRDFLevel.size());
+        int numberToShow = (int) Math.floor((limit / 100.0) * orderedShapesByRDFLevel.size());
         int alreadyShown = orderedShapesByRDFLevel.size() - parentShape.getHiddenDescendantsSet();
 
         if (alreadyShown >= numberToShow){
