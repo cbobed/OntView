@@ -1022,9 +1022,6 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	}
 
 	public void loadSearchCombo() {
-		/*
-		 * Fills up the search combo with all the non-anonymous entities
-		 */
 		ArrayList<String> temp;
 		getComboBox0().getItems().clear();
 		temp = new ArrayList<>();
