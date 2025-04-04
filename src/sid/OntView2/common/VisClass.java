@@ -469,11 +469,15 @@ public class VisClass extends Shape {
         if (g == null){
             return;
         }
+        Color oldColor = (Color) g.getFill();
+        Color oldStroke = (Color) g.getStroke();
         g.setFill(lightYellow);
         g.fillRoundRect(getLeftCorner() - 15, getTopCorner()-15, getWidth() + 30, getHeight() + 30, 10, 10);
 
         g.setStroke(Color.GOLD);
         g.strokeRoundRect(getLeftCorner() - 15, getTopCorner()-15, getWidth() + 30, getHeight() + 30, 10, 10);
+        g.setFill(oldColor);
+        g.setStroke(oldStroke);
     }
 
     public void setMaxSizeHiddenNodesIndicator(){
