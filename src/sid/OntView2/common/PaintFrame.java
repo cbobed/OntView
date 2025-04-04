@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.CountDownLatch;
 
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -26,6 +27,7 @@ import javafx.scene.web.WebView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.util.Duration;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
@@ -120,6 +122,7 @@ public class PaintFrame extends Canvas {
 	public boolean getShowConnectors() { return showConnectors; }
     public Stage getSliderStage() { return sliderStage; }
     public void setSliderStage(Stage stage) { sliderStage = stage; }
+    public Shape selectedShape = null;
 
 	public PaintFrame(double width, double height) {
 		super();
@@ -323,6 +326,10 @@ public class PaintFrame extends Canvas {
 					g.setStroke(Color.LIGHTGRAY);
 				}
 				g.setStroke(Color.BLACK);
+
+                if (selectedShape != null) {
+                    selectedShape.paintFocus(g);
+                }
 
 				// draw connectors
 				if (showConnectors) {
@@ -1018,6 +1025,15 @@ public class PaintFrame extends Canvas {
 
 	public void focusOnShape(String shapeKey, Shape pshape) {
 		Shape shape = pshape != null ? pshape : visGraph.getShape(shapeKey);
+
+        selectedShape = shape;
+        Platform.runLater(redrawRunnable);
+        PauseTransition pause = new PauseTransition(Duration.seconds(1));
+        pause.setOnFinished(event -> {
+            selectedShape = null;
+            Platform.runLater(redrawRunnable);
+        });
+        pause.play();
 
 		if (shape != null) {
             double viewportWidth = scroll.getViewportBounds().getWidth() / factor;

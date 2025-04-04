@@ -216,7 +216,11 @@ public class VisConstraint extends Shape {
 		}	
 	}
 
-	@Override
+    @Override
+    public void paintFocus(GraphicsContext g) {
+    }
+
+    @Override
 	public Point2D getConnectionPoint(Point2D p,boolean left) {
 	//return Closest conection point	
 		if (left){

@@ -151,6 +151,7 @@ public abstract class Shape {
     public abstract int getLevelRelativePos();
 
     public abstract void drawShape(GraphicsContext g);
+    public abstract void paintFocus(GraphicsContext g);
 
     public abstract Point2D getConnectionPoint(Point2D point, boolean b);
 

@@ -162,7 +162,9 @@ public class VisShapeContext extends ContextMenu {
             closeButton.getStyleClass().add("round-button");
             closeButton.setOnAction(event -> {
                 sliderStage.close();
+                shape.graph.paintframe.selectedShape = null;
                 parent.setSliderStage(null);
+                Platform.runLater(shape.graph.paintframe.redrawRunnable);
             });
 
             Region spacer = new Region();
@@ -257,6 +259,7 @@ public class VisShapeContext extends ContextMenu {
 
     private void showSliderAction() {
         if (parent.getSliderStage() != null && parent.getSliderStage().isShowing()) {
+            shape.graph.paintframe.selectedShape = null;
             parent.getSliderStage().close();
         }
 
@@ -271,7 +274,11 @@ public class VisShapeContext extends ContextMenu {
         vbox.setPadding(new Insets(20));
         vbox.setAlignment(Pos.CENTER);
         vbox.getStyleClass().add("custom-vbox-slider");
+
         handleDragged(vbox, sliderStage); // to be able to move the stage
+        shape.graph.paintframe.selectedShape = shape; // mark as selected
+        Platform.runLater(shape.graph.paintframe.redrawRunnable);
+
         vbox.setOnMouseClicked(e -> {
             if (manualValueSlider.isFocused()) {
                 vbox.requestFocus();

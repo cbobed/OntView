@@ -84,8 +84,10 @@ public class VisClass extends Shape {
     Color lightBlue = Color.rgb(212, 238, 247);
     Color lightGreen = Color.rgb(212, 247, 212);
     Color barGreen = Color.rgb(120, 190, 145);
-	
-	public String getClassExpressionFragment (){
+    Color lightYellow = Color.rgb(255, 255, 184);
+
+
+    public String getClassExpressionFragment (){
 		return classExpressionFragment == null ? getLinkedClassExpression().asOWLClass().getIRI().getFragment() :
 												 classExpressionFragment;
 	}
@@ -236,7 +238,7 @@ public class VisClass extends Shape {
 		int x, y;
 		int roundCornerValue = 10;
 
-		x = posx +1;
+		x = posx + 1;
 		y = posy;
 
         Font oldFont=g.getFont();
@@ -462,6 +464,17 @@ public class VisClass extends Shape {
 		}
 		g.setFont(oldFont);
 	}
+
+    public void paintFocus(GraphicsContext g) {
+        if (g == null){
+            return;
+        }
+        g.setFill(lightYellow);
+        g.fillRoundRect(getLeftCorner() - 15, getTopCorner()-15, getWidth() + 30, getHeight() + 30, 10, 10);
+
+        g.setStroke(Color.GOLD);
+        g.strokeRoundRect(getLeftCorner() - 15, getTopCorner()-15, getWidth() + 30, getHeight() + 30, 10, 10);
+    }
 
     public void setMaxSizeHiddenNodesIndicator(){
         GraphicsContext g = graph.paintframe.getGraphicsContext2D();

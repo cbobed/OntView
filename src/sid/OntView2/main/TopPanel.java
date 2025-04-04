@@ -895,6 +895,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
         }
         parent.artPanel.cleanConnectors();
         parent.artPanel.clearCanvas();
+        parent.artPanel.selectedShape = null;
     }
 
 	void loadReasonerButtonActionTask(ActionEvent event) {
@@ -988,8 +989,10 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private void comboBox0ItemItemStateChanged(String selectedItem) {
 		if (parent.artPanel.getVisGraph() == null) return;
 		String key = parent.artPanel.getVisGraph().getQualifiedLabelMap().get(selectedItem);
-		if (key != null)
-			parent.artPanel.focusOnShape(key, null);
+		if (key != null) {
+            parent.artPanel.focusOnShape(key, null);
+
+        }
 	}
 
 	private void handleAutoComplete(String input, ObservableList<String> dataList) {
@@ -1001,7 +1004,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			comboBox.hide();
 		} else {
 			for (String item : dataList) {
-				if (item.toLowerCase().startsWith(input.toLowerCase())) {
+				if (item.toLowerCase().contains(input.toLowerCase())) {
 					filteredList.add(item);
 				}
 			}
