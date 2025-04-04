@@ -14,10 +14,11 @@ public class VisConstants {
     public static final String STEPSTRATEGY_RDFRANK = "RDFRank";
     public static final String STEPSTRATEGY_RDF_LEVEL_LR = "RDFRank + Level: left to right";
     public static final String STEPSTRATEGY_RDF_LEVEL_RL = "RDFRank + Level: right to left";
-
     public static final String GLOBALSTRATEGY_RDFRANK = "RDFRank";
     public static final String GLOBALSTRATEGY_RDF_LEVEL_LR = "RDFRank + Level: left to right";
     public static final String GLOBALSTRATEGY_RDF_LEVEL_RL = "RDFRank + Level: right to left";
+
+    public static final String COMPACT_GRAPH = "Compact graph";
 
 	public static final int CONNECTOROFFSET = 7;
 

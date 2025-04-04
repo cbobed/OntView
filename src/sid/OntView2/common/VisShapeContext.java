@@ -310,21 +310,21 @@ public class VisShapeContext extends ContextMenu {
             changeSelectionStrategy.setStyle("-fx-font-size: 20px; -fx-padding: -2 5 0 5;");
 
             ContextMenu contextMenu = new ContextMenu();
-            MenuItem item1 = new MenuItem(VisConstants.STEPSTRATEGY_RDFRANK);
-            MenuItem item2 = new MenuItem(VisConstants.STEPSTRATEGY_RDF_LEVEL_LR);
-            MenuItem item3 = new MenuItem(VisConstants.STEPSTRATEGY_RDF_LEVEL_RL);
+            MenuItem item1 = new MenuItem(VisConstants.GLOBALSTRATEGY_RDFRANK);
+            MenuItem item2 = new MenuItem(VisConstants.GLOBALSTRATEGY_RDF_LEVEL_LR);
+            MenuItem item3 = new MenuItem(VisConstants.GLOBALSTRATEGY_RDF_LEVEL_RL);
             contextMenu.getStyleClass().add("context-menu-custom");
 
             item1.setOnAction(e -> {
-                parent.setStrategyOptionGlobal(VisConstants.STEPSTRATEGY_RDFRANK);
+                parent.setStrategyOptionGlobal(VisConstants.GLOBALSTRATEGY_RDFRANK);
                 contextMenu.hide();
             });
             item2.setOnAction(e -> {
-                parent.setStrategyOptionGlobal(VisConstants.STEPSTRATEGY_RDF_LEVEL_LR);
+                parent.setStrategyOptionGlobal(VisConstants.GLOBALSTRATEGY_RDF_LEVEL_LR);
                 contextMenu.hide();
             });
             item3.setOnAction(e -> {
-                parent.setStrategyOptionGlobal(VisConstants.STEPSTRATEGY_RDF_LEVEL_RL);
+                parent.setStrategyOptionGlobal(VisConstants.GLOBALSTRATEGY_RDF_LEVEL_RL);
                 contextMenu.hide();
             });
 

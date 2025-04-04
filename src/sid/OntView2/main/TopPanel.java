@@ -40,7 +40,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	//private static final long serialVersionUID = 1L;
 	private Button loadOntologyButton, loadReasonerButton, saveViewButton, restoreViewButton,
         saveImageButton, saveImagePartialButton, cleanConnectorsButton, fileSystemButton, helpButton,
-        helpButtonCE, submitButtonCE, expressionButton, changeSelectionStrategy;
+        helpButtonCE, submitButtonCE, expressionButton, changeSelectionStrategy, moreOptions;
 	private ComboBox<Object> loadOntologyCombo;
 	private ComboBox<String> loadReasonerCombo, comboBox, kceComboBox;
 	private VBox mainPane, panelLoad, panelCheckBox, viewPanel, panel0, connectorPanel, helpPanel,
@@ -178,6 +178,37 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			Platform.runLater(parent.artPanel.getRedrawRunnable());
 		}
 	}
+
+    private Button moreOptions() {
+        if (moreOptions == null) {
+            moreOptions = new Button("\u22EE");
+            moreOptions.setStyle("-fx-font-size: 20px; -fx-padding: -2 5 0 5;");
+
+            ContextMenu contextMenu = new ContextMenu();
+            MenuItem item1 = createMenuItemWithTooltip(VisConstants.COMPACT_GRAPH,
+                "Compacts the graph to reduce visual clutter and enhance clarity");
+            contextMenu.getStyleClass().add("context-menu-custom");
+
+            item1.setOnAction(e -> {
+                parent.artPanel.compactGraph();
+                contextMenu.hide();
+            });
+
+            contextMenu.getItems().addAll(item1);
+
+            moreOptions.setOnAction(e -> {
+                if (contextMenu.isShowing()) {
+                    contextMenu.hide();
+                } else {
+                    contextMenu.show(moreOptions, moreOptions.localToScreen(0, moreOptions.getHeight()).getX(),
+                        moreOptions.localToScreen(0, moreOptions.getHeight()).getY());
+                }
+            });
+
+            tooltipInfo(moreOptions, "Additional options for ontology processing");
+        }
+        return moreOptions;
+    }
 
 	private Slider getZoomSlider() {
 		if (zoomSlider == null) {
@@ -520,7 +551,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			panelCheckBox = new VBox();
 
 			StackPane titlePane = createTitlePane("Options");
-			HBox row = createRow(getPropertiesCheckBox(), getRenderLabel(), getQualifiedNames());
+			HBox row = createRow(getPropertiesCheckBox(), getRenderLabel(), getQualifiedNames(), moreOptions());
 			row.setSpacing(10);
 			row.setAlignment(Pos.CENTER);
 
