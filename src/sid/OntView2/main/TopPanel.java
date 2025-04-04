@@ -339,6 +339,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			AutoCompletion.enable(comboBox);
 			comboBox.setEditable(true);
 			comboBox.getStyleClass().add("custom-combo-box");
+            comboBox.setMaxWidth(100);
 
 			ObservableList<String> items = FXCollections.observableArrayList();
 			comboBox.setItems(items);
@@ -1044,29 +1045,18 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		Task<Void> task = new Task<>() {
 			@Override
 			protected Void call() {
-				// Temporary fix for the bug that causes the shapes to go out of the canvas
-				/*if (parent.artPanel.getHeight() >= PaintFrame.MAX_SIZE) {
-					isGraphTooLarge.set(true);
-					getPropertiesCheckBox().setDisable(true);
-					getPropertiesCheckBox().setSelected(false);
-
-					parent.artPanel.showAlertDialog("Information Dialog", "Graph is too large to show properties.",
-							"We recommend displaying the node properties one at a time.", Alert.AlertType.INFORMATION);
-				} else {*/
-					for (Entry<String, Shape> entry : classesInGraph) {
-						if ((entry.getValue() instanceof VisClass) && (entry.getValue().asVisClass().getPropertyBox() != null)) {
-							entry.getValue().asVisClass().getPropertyBox().setVisible(getPropertiesCheckBox().isSelected());
-							if (!getPropertiesCheckBox().isSelected()) {
-								if(entry.getValue().asVisClass().getPropertyBox() != null)
-									parent.artPanel.compactNodes(entry.getValue().asVisClass());
-							}
-						}
-					}
-					Platform.runLater(parent.artPanel.getCanvasAdjusterRunnable());
-					parent.artPanel.setStateChanged(true);
-					Platform.runLater(parent.artPanel.getRelaxerRunnable());
-
-				//}
+                for (Entry<String, Shape> entry : classesInGraph) {
+                    if ((entry.getValue() instanceof VisClass) && (entry.getValue().asVisClass().getPropertyBox() != null)) {
+                        entry.getValue().asVisClass().getPropertyBox().setVisible(getPropertiesCheckBox().isSelected());
+                        if (!getPropertiesCheckBox().isSelected()) {
+                            if(entry.getValue().asVisClass().getPropertyBox() != null)
+                                parent.artPanel.compactNodes(entry.getValue().asVisClass());
+                        }
+                    }
+                }
+                Platform.runLater(parent.artPanel.getCanvasAdjusterRunnable());
+                parent.artPanel.setStateChanged(true);
+                Platform.runLater(parent.artPanel.getRelaxerRunnable());
 				return null;
 			}
 		};
