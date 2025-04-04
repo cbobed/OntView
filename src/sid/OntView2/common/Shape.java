@@ -674,11 +674,9 @@ public abstract class Shape {
      * Updates the parents hidden descendants count. Node hided by double-clicked
      */
     public void updateParents() {
-        Set<Shape> visitedParents = new HashSet<>();
-        for (VisConnector s: this.inConnectors){
-            Shape parent =  s.from;
-            updateAncestorsForHiddenDescendants(parent, visitedParents, parent.hiddenDescendantsSet);
-        }
+        Set<Shape> descendantsToProcess = new HashSet<>();
+        descendantsToProcess.add(this);
+        this.addHiddenDescendantsToAncestors(descendantsToProcess, new HashSet<>());
     }
 
     /**
