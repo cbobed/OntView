@@ -1,12 +1,8 @@
 package sid.OntView2.common;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import openllet.aterm.pure.owl.FunBottomObjectProperty;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
@@ -15,7 +11,6 @@ import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.search.EntitySearcher;
-import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 import org.xml.sax.SAXException;
 
 import sid.OntView2.expressionNaming.NonGatheredClassExpressionsException;
@@ -29,7 +24,6 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import static sid.OntView2.utils.ExpressionManager.qualifyLabel;
@@ -298,6 +292,15 @@ public class VisGraph implements Runnable{
 		
 		// If we haven't returned so far, we must check which children must be connected 
 		HashSet<Shape> potentialChildren = new HashSet<>();
+		for (Node<OWLClass> subclassNode: reasoner.getSubClasses(e, true)) {
+			for (OWLClass subclass: subclassNode) {
+				Shape aux = getShapeFromOWLClassExpression(subclass); 
+				if(aux != null) {
+					potentialChildren.add(aux); 
+				}
+			}
+		}
+		
 		for (Shape currentParent: directParents) {
 			for (Shape currentChild: currentParent.asVisClass().getChildren()) {
 				if (subsumes(e, currentChild.getLinkedClassExpression(), activeOntology, reasoner, dataFactory)) {
@@ -325,7 +328,9 @@ public class VisGraph implements Runnable{
 	   int depthLevel = 0; 
 	   while (!nextLevel.isEmpty()) {
 		   System.out.println("Creating level "+depthLevel+"..."+nextLevel.size()); 
-		   nextLevel.stream().forEach(x->System.out.println("including ... ("+x.getChildren().size()+") "+x.getLinkedClassExpression())); 
+		   nextLevel.stream().forEach(x-> {System.out.println("including ... ("+x.getChildren().size()+") "+x.getLinkedClassExpression()); 
+		   				x.getChildren().forEach (y -> System.out.println("\t"+y.getLabel())); 
+		   }); 
 		   VisLevel vlevel;
 	       int levelPosx = VisClass.FIRST_X_SEPARATION;
 	       vlevel = VisLevel.getLevelFromID(levelSet, depthLevel);
@@ -609,8 +614,8 @@ public class VisGraph implements Runnable{
 				addVisClass(e.asOWLClass().getIRI().toString(), e, activeOntology, reasoner); 
 			 }
 			for (OWLClassExpression exp : EntitySearcher.getEquivalentClasses(e, activeOntology).toList()){
-		    	 if (!(exp instanceof OWLClass) && (shapeMap.get(exp.toString())==null)){
-		    		addVisClass(exp.asOWLClass().getIRI().toString(), exp, activeOntology, reasoner);  
+		    	 if (!(exp instanceof OWLClass) && (shapeMap.get(Shape.getKey(exp))==null)){
+		    		addVisClass(Shape.getKey(exp), exp, activeOntology, reasoner);  
 		    	 }
 		     }
 		});	 
