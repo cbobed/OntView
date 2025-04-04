@@ -123,6 +123,7 @@ public class PaintFrame extends Canvas {
     public Stage getSliderStage() { return sliderStage; }
     public void setSliderStage(Stage stage) { sliderStage = stage; }
     public Shape selectedShape = null;
+    public Shape focusOnShape = null;
 
 	public PaintFrame(double width, double height) {
 		super();
@@ -327,9 +328,8 @@ public class PaintFrame extends Canvas {
 				}
 				g.setStroke(Color.BLACK);
 
-                if (selectedShape != null) {
-                    selectedShape.paintFocus(g);
-                }
+                if (selectedShape != null) selectedShape.paintFocus(g);
+                if (focusOnShape != null) focusOnShape.paintFocus(g);
 
 				// draw connectors
 				if (showConnectors) {
@@ -1024,16 +1024,17 @@ public class PaintFrame extends Canvas {
 	}
 
 	public void focusOnShape(String shapeKey, Shape pshape) {
-		Shape shape = pshape != null ? pshape : visGraph.getShape(shapeKey);
-
-        selectedShape = shape;
-        Platform.runLater(redrawRunnable);
-        PauseTransition pause = new PauseTransition(Duration.seconds(1));
-        pause.setOnFinished(event -> {
-            selectedShape = null;
+        if (shapeKey != null) {
+            focusOnShape = visGraph.getShape(shapeKey);
             Platform.runLater(redrawRunnable);
-        });
-        pause.play();
+            PauseTransition pause = new PauseTransition(Duration.seconds(1));
+            pause.setOnFinished(event -> {
+                focusOnShape = null;
+                Platform.runLater(redrawRunnable);
+            });
+            pause.play();
+        }
+		Shape shape = pshape != null ? pshape : visGraph.getShape(shapeKey);
 
 		if (shape != null) {
             double viewportWidth = scroll.getViewportBounds().getWidth() / factor;
