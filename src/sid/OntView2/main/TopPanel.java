@@ -890,7 +890,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
     private void resetParameters(){
         restoreSliderValue();
         resetConnectorsSwitch();
-        if(parent.artPanel.menuVisShapeContext != null) { // close slider
+        if(parent.artPanel.menuVisShapeContext != null && parent.artPanel.menuVisShapeContext.getSliderStage() != null) { // close slider
             parent.artPanel.menuVisShapeContext.getSliderStage().close();
         }
         parent.artPanel.cleanConnectors();
