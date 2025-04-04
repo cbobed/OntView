@@ -290,3 +290,12 @@
     -fx-background-radius: 5px;
     -fx-font-size: 13px;
 }
+
+.text-field-custom {
+    -fx-text-fill: blue;
+    -fx-border-color: #8186d0;
+    -fx-border-width: 1px;
+    -fx-background-radius: 3px;
+    -fx-border-radius: 3px;
+    -fx-font-size: 12px;
+}

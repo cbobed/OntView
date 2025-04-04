@@ -27,6 +27,7 @@ public class VisShapeContext extends ContextMenu {
 	MenuItem hideItem, hideProperties, showInstances, showSliderPercentage;
     HBox titleBar;
     Slider slider;
+    TextField manualValueSlider;
     private Button changeSelectionStrategy;
     private Stage sliderStage = null;
 	Shape shape;
@@ -195,12 +196,51 @@ public class VisShapeContext extends ContextMenu {
                 int intValue = newVal.intValue();
                 if (intValue != oldValue) {
                     showShapesAccordingToSliderValue(oldValue, intValue);
+                    setManualValueSlider().setText(String.valueOf(intValue));
                     oldValue = intValue;
                 }
             });
         }
 
         return slider;
+    }
+
+    private TextField setManualValueSlider(){
+        if (manualValueSlider == null) {
+            manualValueSlider = new TextField(String.valueOf((int) getSlider().getValue()));
+            manualValueSlider.setPrefWidth(40);
+            manualValueSlider.setMaxWidth(40);
+            manualValueSlider.alignmentProperty().set(Pos.CENTER);
+            manualValueSlider.getStyleClass().add("text-field-custom");
+
+            manualValueSlider.textProperty().addListener((obs, oldValue, newValue) -> {
+                if (!newValue.matches("\\d*")) {
+                    manualValueSlider.setText(newValue.replaceAll("[^\\d]", ""));
+                } else if (!newValue.isEmpty()) {
+                    try {
+                        int value = Integer.parseInt(newValue);
+                        if (value < 0 || value > 100) {
+                            manualValueSlider.setText(oldValue);
+                        }
+                    } catch (NumberFormatException e) {
+                        manualValueSlider.setText(oldValue);
+                    }
+                }
+            });
+
+            manualValueSlider.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {
+                if (!isNowFocused && !manualValueSlider.getText().isEmpty()) {
+                    getSlider().setValue(Integer.parseInt(manualValueSlider.getText()));
+                }
+            });
+
+            manualValueSlider.setOnAction(e -> {
+                if (!manualValueSlider.getText().isEmpty()) {
+                    getSlider().setValue(Integer.parseInt(manualValueSlider.getText()));
+                }
+            });
+        }
+        return manualValueSlider;
     }
 
     public void updateSliderView(){
@@ -221,17 +261,22 @@ public class VisShapeContext extends ContextMenu {
         }
 
         sliderStage = new Stage();
-        sliderStage.setMinHeight(110);
-        sliderStage.setMaxHeight(110);
+        sliderStage.setMinHeight(140);
+        sliderStage.setMaxHeight(140);
         sliderStage.setMinWidth(470);
         sliderStage.initStyle(StageStyle.UNDECORATED);
         sliderStage.setAlwaysOnTop(true);
 
-        VBox vbox = new VBox(sliderHeader(), getSlider());
+        VBox vbox = new VBox(sliderHeader(), getSlider(), setManualValueSlider());
         vbox.setPadding(new Insets(20));
         vbox.setAlignment(Pos.CENTER);
         vbox.getStyleClass().add("custom-vbox-slider");
         handleDragged(vbox, sliderStage); // to be able to move the stage
+        vbox.setOnMouseClicked(e -> {
+            if (manualValueSlider.isFocused()) {
+                vbox.requestFocus();
+            }
+        });
 
         ClassLoader c = Thread.currentThread().getContextClassLoader();
         Scene scene = new Scene(vbox, 450, 70);
