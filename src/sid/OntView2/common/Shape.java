@@ -336,16 +336,6 @@ public abstract class Shape {
         graph.addDashedConnectors();
     }
 
-    private int getVisibleInReferences() {
-        int count = 0;
-        for (VisConnector c : inConnectors) {
-            if (c.visible) {
-                count++;
-            }
-        }
-        return count;
-    }
-
     private int getVisibleOutReferences() {
         int count = 0;
         for (VisConnector c : outConnectors) {
@@ -745,22 +735,6 @@ public abstract class Shape {
         for (VisConnector outConnector : s.outConnectors) {
             addHiddenDescendants(outConnector.to, countedChildren);
         }
-    }
-
-    /**
-     * Updates the hidden descendants count for the first visible parent of nodes in hiddenDescendantsSet.
-     */
-    public void updateVisibleDescendantsForParents() {
-        Set<Shape> descendantsToProcess = new HashSet<>(visibleDescendantsSet);
-        Set<Shape> visitedNodes = new HashSet<>();
-
-        updateAncestorsForVisibleChildren(this, visitedNodes, descendantsToProcess);
-
-        for (Shape child : descendantsToProcess) {
-            updateSameLevelParentsDescendants(child, visitedNodes, visibleDescendantsSet);
-        }
-
-        visibleDescendantsSet.clear();
     }
 
     /**
