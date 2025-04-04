@@ -27,9 +27,6 @@ import static sid.OntView2.utils.ExpressionManager.qualifyLabel;
 import static sid.OntView2.utils.ExpressionManager.replaceString;
 
 public class VisGraph implements Runnable{
-
-	private int progress = 0;
-
     HashSet<VisLevel>       levelSet;
     ArrayList<VisConnector> connectorList;
 	ArrayList<VisConnector> dashedConnectorList;
@@ -53,9 +50,6 @@ public class VisGraph implements Runnable{
 	
     public HashMap<String, String> getQualifiedLabelMap(){return qualifiedLabelMap;}
 	public List<VisConnector> getDashedConnectorList(){ return dashedConnectorList;}
-	public List<VisConnector> getConnectorList(){ return connectorList;}
-	public int getProgress(){return progress;}
-    private void setProgress(int p){progress = p;}
     public Map<String,Shape> getShapeMap() {return shapeMap;}
     public PaintFrame getPaintFrame(){return paintframe;}
     public HashSet<VisLevel> getLevelSet(){return levelSet;}
@@ -63,7 +57,6 @@ public class VisGraph implements Runnable{
 	public void setOWLClassExpressionSet(HashSet<OWLClassExpression> pset) { set = pset;}
 	public void setCheck(boolean pcheck) {check = pcheck;	}
 	public OWLOntology getActiveOntology(){return activeOntology;}
-	public HashSet<OWLClassExpression> getOWLClassExpressionSet(){return set;}
 	public boolean isExpanded(){return check;}
 	public void setReasoner(OWLReasoner preasoner) {reasoner = preasoner;}
 	public OWLReasoner getReasoner(){return reasoner;}

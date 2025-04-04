@@ -1030,8 +1030,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		temp = new ArrayList<>();
 
 		for (Entry<String, String> s : parent.artPanel.getVisGraph().getQualifiedLabelMap().entrySet()) {
-			if (!s.getValue().contains(VisConstants.SIDCLASS))
-				temp.add(s.getKey());
+            temp.add(s.getKey());
 		}
 
 		Collections.sort(temp);
