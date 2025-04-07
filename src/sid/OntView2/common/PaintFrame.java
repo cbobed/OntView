@@ -1309,10 +1309,6 @@ public class PaintFrame extends Canvas {
 		Platform.runLater(relaxerRunnable);
 	}
 
-	public void applyStructuralReduction() {
-		StructuralReducer.applyStructuralReduction(getOntology());
-	}
-
 	public void setParentFrame(Embedable pEmb) {
 		parentFrame = pEmb;
 	}
