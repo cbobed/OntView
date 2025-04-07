@@ -358,7 +358,7 @@ public abstract class Shape {
     }
 
     public void notEnoughLimit(){
-        int requiredValue = (int) Math.ceil(100.0 / asVisClass().orderedDescendants.size());
+        int requiredValue = (int)  Math.min(Math.ceil(100.0 / asVisClass().orderedDescendants.size()),100);
         graph.paintframe.nTopPanel.changeLimitValue(requiredValue);
         graph.paintframe.showAlertDialog("Warning",
             "The selected visibility percentage is insufficient to display or hide at least one node.",
@@ -773,4 +773,19 @@ public abstract class Shape {
         }
     }
 
+    /**
+     * Determines whether the node can use displayed or hidden functionalities on its right side.
+     */
+    public boolean canShowFunctionalityRight() {
+        return !asVisClass().children.isEmpty() && (outConnectors != null) && (!outConnectors.isEmpty()) &&
+            (!outConnectors.get(0).to.asVisClass().isBottom) && (!asVisClass().isBottom);
+    }
+
+    /**
+     * Determines whether the node can use displayed or hidden functionalities on its left side.
+     */
+    public boolean canShowFunctionalityLeft() {
+        return !asVisClass().parents.isEmpty() && (inConnectors != null) && (!inConnectors.isEmpty()) &&
+            (!inConnectors.get(0).from.getLabel().matches("Thing")) && (!asVisClass().isBottom);
+    }
 }

@@ -49,7 +49,7 @@ public class VisClass extends Shape {
 	String  explicitLabel = "";
 	boolean isAnonymous;
     boolean isDefined   = false;
-    boolean isBottom    = false;
+    public boolean isBottom    = false;
     int     currentHeight, currentWidth = 0;
 
     int     propertyBoxWidth = 0;
@@ -332,92 +332,95 @@ public class VisClass extends Shape {
 	    		}
 	    	}
 
-			if(!outConnectors.isEmpty()){
+			if(!outConnectors.isEmpty() && !outConnectors.get(0).to.asVisClass().isBottom) {
 				drawHiddenNodesIndicator(g, getHiddenDescendantsSet(), getLeftCorner(), posy);
 			}
 
-		    if (!children.isEmpty() && (outConnectors!=null) &&(!outConnectors.isEmpty())) {
-				switch (this.getState()) {
-					case PARTIALLY_CLOSED:
-						g.setFill(mini);
-						g.fillRect(x + (double) getWidth() / 2, y - 10, 10, 10);
-						g.setStroke(Color.BLACK);
-						g.strokeRect(x + (double) getWidth() / 2, y - 10, 10, 10);
-						g.strokeLine(x + (double) getWidth() / 2 + 2, y - 5, x + (double) getWidth() / 2 + 8, y - 5);
-						g.strokeLine(x + (double) getWidth() / 2 + 5, y - 8, x + (double) getWidth() / 2 + 5, y - 3);
+            if (!isBottom) {
+                if (!children.isEmpty() && (outConnectors != null) && (!outConnectors.isEmpty()) &&
+                    (!outConnectors.get(0).to.asVisClass().isBottom)) {
+                    switch (this.getState()) {
+                        case PARTIALLY_CLOSED:
+                            g.setFill(mini);
+                            g.fillRect(x + (double) getWidth() / 2, y - 10, 10, 10);
+                            g.setStroke(Color.BLACK);
+                            g.strokeRect(x + (double) getWidth() / 2, y - 10, 10, 10);
+                            g.strokeLine(x + (double) getWidth() / 2 + 2, y - 5, x + (double) getWidth() / 2 + 8, y - 5);
+                            g.strokeLine(x + (double) getWidth() / 2 + 5, y - 8, x + (double) getWidth() / 2 + 5, y - 3);
 
-						// open
-						g.setFill(mini);
-						g.fillRect(x + (double) getWidth() / 2, y, 10, 10);
-						g.setStroke(Color.BLACK);
-						g.strokeRect(x + (double) getWidth() / 2, y, 10, 10);
-						g.strokeLine(x + (double) getWidth() / 2 + 2, y + 5, x + (double) getWidth() / 2 + 8, y + 5);
-						break;
+                            // open
+                            g.setFill(mini);
+                            g.fillRect(x + (double) getWidth() / 2, y, 10, 10);
+                            g.setStroke(Color.BLACK);
+                            g.strokeRect(x + (double) getWidth() / 2, y, 10, 10);
+                            g.strokeLine(x + (double) getWidth() / 2 + 2, y + 5, x + (double) getWidth() / 2 + 8, y + 5);
+                            break;
 
-					case CLOSED:
-						g.setFill(mini);
-						// right
-						g.fillRect(x + (double) getWidth() / 2, y - 10, 10, 10);
-						g.setStroke(Color.BLACK);
-						g.strokeRect(x + (double) getWidth() / 2, y - 10, 10, 10);
-						g.strokeLine(x + (double) getWidth() / 2 + 2, y - 5, x + (double) getWidth() / 2 + 8, y - 5);
-						g.strokeLine(x + (double) getWidth() / 2 + 5, y - 8, x + (double) getWidth() / 2 + 5, y - 3);
-						break;
+                        case CLOSED:
+                            g.setFill(mini);
+                            // right
+                            g.fillRect(x + (double) getWidth() / 2, y - 10, 10, 10);
+                            g.setStroke(Color.BLACK);
+                            g.strokeRect(x + (double) getWidth() / 2, y - 10, 10, 10);
+                            g.strokeLine(x + (double) getWidth() / 2 + 2, y - 5, x + (double) getWidth() / 2 + 8, y - 5);
+                            g.strokeLine(x + (double) getWidth() / 2 + 5, y - 8, x + (double) getWidth() / 2 + 5, y - 3);
+                            break;
 
-					case OPEN:
-						// right
-						g.setFill(mini);
-						g.fillRect(x + (double) getWidth() / 2, y, 10, 10);
-						g.setStroke(Color.BLACK);
-						g.strokeRect(x + (double) getWidth() / 2, y, 10, 10);
-						g.strokeLine(x + (double) getWidth() / 2 + 2, y + 5, x + (double) getWidth() / 2 + 8, y + 5);
-						break;
-					default:
-						break;
-				}
-			}
-			if (!parents.isEmpty() && (inConnectors!=null) &&(!inConnectors.isEmpty()) &&
-					(!inConnectors.get(0).from.getLabel().matches("Thing"))){
-				switch (this.getLeftState()) {
-					case LEFT_PARTIALLY_CLOSED:
-						g.setFill(mini);
-						g.fillRect(x - (double) getWidth()/2 - 10, y - 10, 10, 10);
-						g.setStroke(Color.BLACK);
-						g.strokeRect(x - (double) getWidth()/2 - 10, y - 10, 10, 10);
-						g.strokeLine(x - (double) getWidth()/2 - 8, y - 5, x - (double) getWidth()/2 - 2, y - 5);
-						g.strokeLine(x - (double) getWidth()/2 - 5, y - 8, x - (double) getWidth()/2 - 5, y - 3);
+                        case OPEN:
+                            // right
+                            g.setFill(mini);
+                            g.fillRect(x + (double) getWidth() / 2, y, 10, 10);
+                            g.setStroke(Color.BLACK);
+                            g.strokeRect(x + (double) getWidth() / 2, y, 10, 10);
+                            g.strokeLine(x + (double) getWidth() / 2 + 2, y + 5, x + (double) getWidth() / 2 + 8, y + 5);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                if (!parents.isEmpty() && (inConnectors != null) && (!inConnectors.isEmpty()) &&
+                    (!inConnectors.get(0).from.getLabel().matches("Thing"))) {
+                    switch (this.getLeftState()) {
+                        case LEFT_PARTIALLY_CLOSED:
+                            g.setFill(mini);
+                            g.fillRect(x - (double) getWidth() / 2 - 10, y - 10, 10, 10);
+                            g.setStroke(Color.BLACK);
+                            g.strokeRect(x - (double) getWidth() / 2 - 10, y - 10, 10, 10);
+                            g.strokeLine(x - (double) getWidth() / 2 - 8, y - 5, x - (double) getWidth() / 2 - 2, y - 5);
+                            g.strokeLine(x - (double) getWidth() / 2 - 5, y - 8, x - (double) getWidth() / 2 - 5, y - 3);
 
-						// open
-						g.setFill(mini);
-						g.fillRect(x - (double) getWidth()/2 - 10, y, 10, 10);
-						g.setStroke(Color.BLACK);
-						g.strokeRect(x - (double) getWidth()/2 - 10, y, 10, 10);
-						g.strokeLine(x - (double) getWidth()/2 - 8, y + 5, x - (double) getWidth()/2 - 2, y + 5);
-						break;
+                            // open
+                            g.setFill(mini);
+                            g.fillRect(x - (double) getWidth() / 2 - 10, y, 10, 10);
+                            g.setStroke(Color.BLACK);
+                            g.strokeRect(x - (double) getWidth() / 2 - 10, y, 10, 10);
+                            g.strokeLine(x - (double) getWidth() / 2 - 8, y + 5, x - (double) getWidth() / 2 - 2, y + 5);
+                            break;
 
-				   case LEFTCLOSED:
-					   // left
-					   g.setFill(mini);
-					   g.fillRect(x - (double) getWidth()/2 - 10, y - 10, 10, 10);
-					   g.setStroke(Color.BLACK);
-					   g.strokeRect(x - (double) getWidth()/2 - 10, y - 10, 10, 10);
-					   g.strokeLine(x - (double) getWidth()/2 - 8, y - 5, x - (double) getWidth()/2 - 2, y - 5);
-					   g.strokeLine(x - (double) getWidth()/2 - 5, y - 8, x - (double) getWidth()/2 - 5, y - 3);
-					   break;
+                        case LEFTCLOSED:
+                            // left
+                            g.setFill(mini);
+                            g.fillRect(x - (double) getWidth() / 2 - 10, y - 10, 10, 10);
+                            g.setStroke(Color.BLACK);
+                            g.strokeRect(x - (double) getWidth() / 2 - 10, y - 10, 10, 10);
+                            g.strokeLine(x - (double) getWidth() / 2 - 8, y - 5, x - (double) getWidth() / 2 - 2, y - 5);
+                            g.strokeLine(x - (double) getWidth() / 2 - 5, y - 8, x - (double) getWidth() / 2 - 5, y - 3);
+                            break;
 
-				   case LEFTOPEN:
-					   // left
-					   g.setFill(mini);
-					   g.fillRect(x - (double) getWidth()/2 - 10, y, 10, 10);
-					   g.setStroke(Color.BLACK);
-					   g.strokeRect(x - (double) getWidth()/2 - 10, y, 10, 10);
-					   g.strokeLine(x - (double) getWidth()/2 - 8, y + 5, x - (double) getWidth()/2 - 2, y + 5);
-					   break;
-		    		   
-		    	   default :
-		    		   break;
-		       }
-			}
+                        case LEFTOPEN:
+                            // left
+                            g.setFill(mini);
+                            g.fillRect(x - (double) getWidth() / 2 - 10, y, 10, 10);
+                            g.setStroke(Color.BLACK);
+                            g.strokeRect(x - (double) getWidth() / 2 - 10, y, 10, 10);
+                            g.strokeLine(x - (double) getWidth() / 2 - 8, y + 5, x - (double) getWidth() / 2 - 2, y + 5);
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+            }
 		}
 		g.setFont(oldFont);
 	}

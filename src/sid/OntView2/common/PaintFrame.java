@@ -35,11 +35,8 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 import sid.OntView2.main.TopPanel;
-import sid.OntView2.kcExtractors.KCEConceptExtraction;
 import sid.OntView2.kcExtractors.KConceptExtractor;
 import sid.OntView2.kcExtractors.KConceptExtractorFactory;
-import sid.OntView2.kcExtractors.PageRankConceptExtraction;
-import sid.OntView2.kcExtractors.RDFRankConceptExtraction;
 
 public class PaintFrame extends Canvas {
 	private static final long serialVersionUID = 1L;
@@ -875,52 +872,60 @@ public class PaintFrame extends Canvas {
 					// Right: Click on the open symbol
 					if (pressedRightOpen(shape, x, y, e)) {
 						if (shape.getState() == Shape.CLOSED || shape.getState() == Shape.PARTIALLY_CLOSED) {
-							// if [+] clicked, open the node
-							shape.openRight();
-							refreshDashedConnectors();
-							VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
-							setStateChanged(true);
-							Platform.runLater(relaxerRunnable);
-                            if (menuVisShapeContext != null) {
-                                menuVisShapeContext.updateSliderView();
+                            if (shape.canShowFunctionalityRight()) {
+                                // if [+] clicked, open the node
+                                shape.openRight();
+                                refreshDashedConnectors();
+                                VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
+                                setStateChanged(true);
+                                Platform.runLater(relaxerRunnable);
+                                if (menuVisShapeContext != null) {
+                                    menuVisShapeContext.updateSliderView();
+                                }
                             }
 						}
 					}
 					// Right: Click on the close symbol
 					else if (pressedRightClose(shape, x, y, e)) {
 						if (shape.getState() == Shape.OPEN || shape.getState() == Shape.PARTIALLY_CLOSED) {
-							// if [-] clicked, close the node
-							shape.closeRight();
-							refreshDashedConnectors();
-							VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
-							setStateChanged(true);
-							Platform.runLater(relaxerRunnable);
-                            if (menuVisShapeContext != null) {
-                                menuVisShapeContext.updateSliderView();
+                            if (shape.canShowFunctionalityRight()) {
+                                // if [-] clicked, close the node
+                                shape.closeRight();
+                                refreshDashedConnectors();
+                                VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
+                                setStateChanged(true);
+                                Platform.runLater(relaxerRunnable);
+                                if (menuVisShapeContext != null) {
+                                    menuVisShapeContext.updateSliderView();
+                                }
                             }
 						}
 					}
 					// Left: Click on the open symbol
 					else if (pressedLeftOpen(shape, x, y, e)) {
-						if (shape.getLeftState() == Shape.LEFTCLOSED || shape.getLeftState() == Shape.LEFT_PARTIALLY_CLOSED) {
-							// if [+] clicked, open the node
-							shape.openLeft();
-							refreshDashedConnectors();
-							VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
-							setStateChanged(true);
-							Platform.runLater(relaxerRunnable);
+                        if (shape.canShowFunctionalityLeft()) {
+                            if (shape.getLeftState() == Shape.LEFTCLOSED || shape.getLeftState() == Shape.LEFT_PARTIALLY_CLOSED) {
+                                // if [+] clicked, open the node
+                                shape.openLeft();
+                                refreshDashedConnectors();
+                                VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
+                                setStateChanged(true);
+                                Platform.runLater(relaxerRunnable);
+                            }
 						}
 					}
 					// Left: Click on the close symbol
 					else if (pressedLeftClose(shape, x, y, e)) {
-						if (shape.getLeftState() == Shape.LEFTOPEN || shape.getLeftState() == Shape.LEFT_PARTIALLY_CLOSED) {
-							// if [-] clicked, close the node
-							shape.closeLeft();
-							refreshDashedConnectors();
-							VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
-							setStateChanged(true);
-							Platform.runLater(relaxerRunnable);
-						}
+                        if (shape.canShowFunctionalityLeft()) {
+                            if (shape.getLeftState() == Shape.LEFTOPEN || shape.getLeftState() == Shape.LEFT_PARTIALLY_CLOSED) {
+                                // if [-] clicked, close the node
+                                shape.closeLeft();
+                                refreshDashedConnectors();
+                                VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
+                                setStateChanged(true);
+                                Platform.runLater(relaxerRunnable);
+                            }
+                        }
 
 
 					} else { // pressed elsewhere on the shape

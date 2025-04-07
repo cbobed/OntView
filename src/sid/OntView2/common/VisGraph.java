@@ -1033,6 +1033,8 @@ public class VisGraph implements Runnable{
 		Set<Shape> allDescendants = new HashSet<>();
 		for (VisConnector outConnector : currentNode.outConnectors) {
 			Shape childNode = outConnector.to;
+            if (childNode.asVisClass().isBottom) continue;
+
 			allDescendants.add(childNode);
 			traverseAndStoreDescendants(childNode, visitedNodes);
 			allDescendants.addAll(childNode.asVisClass().descendants);

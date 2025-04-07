@@ -19,6 +19,9 @@ public interface SelectionStrategy {
 
     default int ensureLimitSufficient(int limit, Shape parentShape, int numShapes) {
         int minimumRequired = (int) Math.ceil(100.0 / numShapes);
+        System.out.println("Minimum required: " + minimumRequired);
+        minimumRequired = Math.min(minimumRequired, 100);
+        System.out.println("Minimum required after clamping: " + minimumRequired);
         if (limit < minimumRequired) {
             parentShape.notEnoughLimit();
             return minimumRequired;
