@@ -86,7 +86,7 @@ public class Mine extends Application implements Embedable{
 		primaryStage.setTitle("Viewer");
 		primaryStage.setMinWidth(1400);
 		primaryStage.setOnCloseRequest(event -> System.exit(0));
-		ClassLoader c = Thread.currentThread().getContextClassLoader();
+		ClassLoader c = Thread.currentThread().getContextClassLoader(); 
 		primaryStage.getIcons().add(new Image(Objects.requireNonNull(c.getResource("icon.png")).toExternalForm()));
 
 		Rectangle2D screenBounds = Screen.getPrimary().getBounds();
@@ -269,7 +269,10 @@ public class Mine extends Application implements Embedable{
 				reasoner = getReasonerFactory(reasonerString).createReasoner(activeOntology, config);
 
 				// between creating and precomputing
-				applyRenaming();
+				if (VisConfig.APPLY_RENAMING_DEBUG_PURPOSES) {
+					applyRenaming();
+				}
+				
 				reasoner.precomputeInferences();
 				artPanel.setReasoner(reasoner);
 				return true;

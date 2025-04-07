@@ -34,8 +34,12 @@ import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
-import reducer.StructuralReducer;
 import sid.OntView2.main.TopPanel;
+import sid.OntView2.kcExtractors.KCEConceptExtraction;
+import sid.OntView2.kcExtractors.KConceptExtractor;
+import sid.OntView2.kcExtractors.KConceptExtractorFactory;
+import sid.OntView2.kcExtractors.PageRankConceptExtraction;
+import sid.OntView2.kcExtractors.RDFRankConceptExtraction;
 
 public class PaintFrame extends Canvas {
 	private static final long serialVersionUID = 1L;
@@ -336,8 +340,8 @@ public class PaintFrame extends Canvas {
 
 				// draw levels
 				g.setStroke(Color.LIGHTGRAY);
-				for (VisLevel lvl : visGraph.levelSet) {
-					g.strokeLine(lvl.getXpos(), 0, lvl.getXpos(), canvasHeight);
+                for (VisLevel lvl : visGraph.levelSet.values()) {
+                    g.strokeLine(lvl.getXpos(), 0, lvl.getXpos(), canvasHeight);
 					// Uncomment this to get a vertical line in every level
 					g.setStroke(Color.LIGHTGRAY);
 				}
@@ -421,9 +425,6 @@ public class PaintFrame extends Canvas {
 
 		paintFrame.setCursor(Cursor.WAIT);
 
-		VisGraphObserver graphObserver = new VisGraphObserver(this.getVisGraph());
-		visGraph.addGeneralObserver((observable, oldValue, newValue) -> graphObserver.update());
-
 		stable = true;
 		stateChanged = true;
 		factor = 1.0;
@@ -491,7 +492,8 @@ public class PaintFrame extends Canvas {
 				System.out.println("relax");
 				stateChanged = false;
 
-				for (VisLevel level: visGraph.levelSet) {
+				// Faster version
+				for (VisLevel level: visGraph.levelSet.values()) {
 					for (Shape s_i: level.getShapeSet()) {
                         if (s_i.getTopCorner() < BORDER_PANEL) {
                             s_i.setPosY(BORDER_PANEL + (s_i.getHeight() / 2));
@@ -753,7 +755,7 @@ public class PaintFrame extends Canvas {
         double minY = Double.MAX_VALUE;
         double maxX = Double.MIN_VALUE;
 
-        for (VisLevel level : visGraph.getLevelSet()) {
+        for (VisLevel level : visGraph.getLevelSet().values()) {
             for (Shape shape : level.levelShapes) {
                 double shapeMaxY = shape.getBottomCorner();
                 double shapeMinY = shape.getTopCorner();
@@ -775,7 +777,7 @@ public class PaintFrame extends Canvas {
 
         if (minY < 0) {
             // Adjust the shape position
-            for (VisLevel level : visGraph.getLevelSet()) {
+            for (VisLevel level : visGraph.getLevelSet().values()) {
                 for (Shape shape : level.orderedList()) {
                     shape.setPosY((int) ((shape.getPosY() * factor - minY + BORDER_PANEL) / factor));
                 }
@@ -935,7 +937,6 @@ public class PaintFrame extends Canvas {
 						break;
 					}
 				}
-				getVisGraph().updateObservers(VisConstants.GENERALOBSERVER);
 				return true;
 			}
 		} else {
@@ -947,7 +948,6 @@ public class PaintFrame extends Canvas {
 			}
 		}
 
-		getVisGraph().updateObservers(VisConstants.GENERALOBSERVER);
 		return false;
 	}
 
@@ -1196,54 +1196,44 @@ public class PaintFrame extends Canvas {
 		if (getVisGraph() == null) {
 			return;
 		}
-		cleanSelectedConcepts();
-		KCEConceptExtraction extractorKCE = new KCEConceptExtraction();
-		RDFRankConceptExtraction extractorRDFRank = new RDFRankConceptExtraction();
-		PageRankConceptExtraction extractorPageRank = new PageRankConceptExtraction();
-		CustomConceptExtraction extractorCustom = new CustomConceptExtraction(getSelectedConcepts());
-
-		switch (getKceOption()) {
-			case VisConstants.NONECOMBOOPTION -> { // "None"
-				getVisGraph().clearDashedConnectorList();
-				getVisGraph().showAll();
-			}
-			case VisConstants.KCECOMBOOPTION1 -> { // "KCE10"
-				getVisGraph().showAll();
-				extractorKCE.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 10);
-			}
-			case VisConstants.KCECOMBOOPTION2 -> { // "KCE20"
-				getVisGraph().showAll();
-				extractorKCE.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20);
-			}
-			case VisConstants.PAGERANKCOMBOOPTION1 -> { // "PageRank10"
-				getVisGraph().showAll();
-				extractorPageRank.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 10);
-			}
-			case VisConstants.PAGERANKCOMBOOPTION2 -> { // "PageRank20"
-				getVisGraph().showAll();
-				extractorPageRank.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20);
-			}
-			case VisConstants.RDFRANKCOMBOOPTION1 -> { // "RDFRank10"
-				getVisGraph().showAll();
-				extractorRDFRank.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 10);
-			}
-			case VisConstants.RDFRANKCOMBOOPTION2 -> { // "RDFRank20"
-				getVisGraph().showAll();
-				extractorRDFRank.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20);
-			}
-			case VisConstants.CUSTOMCOMBOOPTION3 -> { // "Custom"
-				getVisGraph().showAll();
-				showConceptSelectionPopup(getVisGraph().shapeMap);
-				if (getSelectedConcepts().isEmpty()) return;
-				extractorCustom.hideNonKeyConcepts(activeOntology, this.getVisGraph(), getSelectedConcepts().size());
-
-			}
+		
+		if (Objects.equals(getKceOption(), VisConstants.NONECOMBOOPTION)) {
+			getVisGraph().clearDashedConnectorList();
+			getVisGraph().showAll();
 		}
-		compactGraph();
-        if (menuVisShapeContext != null) {
-            menuVisShapeContext.updateSliderView();
+		else {
+
+            KConceptExtractor extractor = KConceptExtractorFactory.getInstance(getKceOption(), getSelectedConcepts());
+
+            switch (getKceOption()) {
+                case VisConstants.KCECOMBOOPTION1,
+                    VisConstants.PAGERANKCOMBOOPTION1,
+                    VisConstants.RDFRANKCOMBOOPTION1 -> { // "KCE10"
+                    getVisGraph().showAll();
+                    extractor.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 10);
+                }
+                case VisConstants.KCECOMBOOPTION2,
+                    VisConstants.PAGERANKCOMBOOPTION2,
+                    VisConstants.RDFRANKCOMBOOPTION2 -> { // "KCE20"
+                    getVisGraph().showAll();
+                    extractor.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20);
+                }
+                case VisConstants.CUSTOMCOMBOOPTION3 -> { // "Custom"
+                    getVisGraph().showAll();
+                    showConceptSelectionPopup(getVisGraph().shapeMap);
+                    if (getSelectedConcepts().isEmpty()) return;
+                    extractor.hideNonKeyConcepts(activeOntology, this.getVisGraph(), getSelectedConcepts().size());
+
+                }
+            }
+            compactGraph();
+            if (menuVisShapeContext != null) {
+                menuVisShapeContext.updateSliderView();
+            }
+
         }
 	}
+	
 
 	public void compactGraph() {
 		int currentY = BORDER_PANEL;
@@ -1254,7 +1244,7 @@ public class PaintFrame extends Canvas {
 		Map<Integer, ArrayList<Shape>> visibleShapesPerLevel = new HashMap<>(); 
 		Map<Integer, Integer> ySpanPerLevel = new HashMap<>(); 
 		maxY = Integer.MIN_VALUE; 
-		for (VisLevel level : visGraph.getLevelSet()) {
+		for (VisLevel level : visGraph.getLevelSet().values()) {
 			currentY = BORDER_PANEL;
 			ArrayList<Shape> orderedShapeList = level.orderedList();
 			visibleShapesPerLevel.put(level.id, new ArrayList<>());
@@ -1272,7 +1262,7 @@ public class PaintFrame extends Canvas {
 
 		span = maxY - minY; // this is the maximum level height we have witnessed
 		// TODO: This must be refined to take into account the size of the intermediate boxes as well (getHeight)
-		for (VisLevel level : visGraph.getLevelSet()) {
+		for (VisLevel level : visGraph.getLevelSet().values()) {
 			currentY = BORDER_PANEL + (span - ySpanPerLevel.get(level.id))/ 2; 
 			for (Shape shape : visibleShapesPerLevel.get(level.id)) {
 				shape.setPosY(currentY);

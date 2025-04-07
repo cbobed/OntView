@@ -1026,7 +1026,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		temp = new ArrayList<>();
 
 		for (Entry<String, String> s : parent.artPanel.getVisGraph().getQualifiedLabelMap().entrySet()) {
-            temp.add(s.getKey());
+			temp.add(s.getKey());
 		}
 
 		Collections.sort(temp);

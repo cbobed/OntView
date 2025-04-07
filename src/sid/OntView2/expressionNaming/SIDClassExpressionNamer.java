@@ -40,61 +40,25 @@ public class SIDClassExpressionNamer {
 		this.classesFiltered = new ArrayList<Explanation>();
 		this.axiomsToAdd = new HashSet<OWLEquivalentClassesAxiom> ();
 	}
-
+	
 	public void applyNaming (boolean refreshReasoner) {
 
 		// First: obtain all the classExpressions that
 		// are anonymous (TOP LEVEL)
 		// Adapted from the code of Alessandro
 
-		OWLClassExpressionHarvester axiomVisitor = new OWLClassExpressionHarvester();
-		Hashtable<Integer, OWLClassExpression> syntacticalSieve = new Hashtable<Integer, OWLClassExpression>();
-
-		// we apply the reduction in this module to all the
-		// import closure
-		for (OWLAxiom axiom: ontology.getTBoxAxioms(Imports.INCLUDED)) {
-			axiom.accept(axiomVisitor);
+		
+		try {
+			retrieveClassExpressions(); 
+			applySyntactiSieve(); 
 		}
-		classesToAdd = axiomVisitor.getHarvestedClasses();
-		System.out.println("--> "+classesToAdd.size() + " class expressions harvested");
-		// CBL: due to the large amount of tests in huge ontologies
-		// we first perform a syntactic sieve
-		Integer auxInt;
-		for (OWLClassExpression auxClass: classesToAdd) {
-			auxInt = auxClass.toString().hashCode();
-			if (!syntacticalSieve.containsKey(auxInt))
-				syntacticalSieve.put(auxInt, auxClass);
+		catch (NonGatheredClassExpressionsException e) {
+			System.err.println("Not possible -- we have just called retrieveClassExpressions()"); 
 		}
-
-		System.out.println("--> "+syntacticalSieve.size()+" class expressions after syntactic sieve");
-
-		// we now filter the classes to add with the help of the
-		// reasoner before asserting them with the new names
 
 		OWLOntologyManager manager = ontology.getOWLOntologyManager();
 		OWLDataFactory dataFactory = manager.getOWLDataFactory();
 		OWLEquivalentClassesAxiom equivalentAxiom = null;
-
-		classesFiltered.clear();
-
-//		for (int i=0; i<classesToAdd.size(); i++) {
-//			// System.out.println("comparing "+renderer.render(classesToAdd.get(i)));
-//			for (int j=classesToAdd.size()-1; j>i; j--) {
-//				// we go backwards because we remove elements on the fly
-//				// System.out.println("  to "+renderer.render(classesToAdd.get(j)));
-//				equivalentAxiom = dataFactory.getOWLEquivalentClassesAxiom(classesToAdd.get(i), classesToAdd.get(j));
-//				if (reasoner.isEntailed(equivalentAxiom)){
-//					// System.out.println("    which is removed due to equivalence");
-//					classesFiltered.add(new Explanation (classesToAdd.get(i), classesToAdd.get(j)));
-//					classesToAdd.remove(j);
-//				}
-//			}
-//		}
-
-// 		System.out.println("--> "+classesToAdd.size()+" class expressions after semantic sieve");
-
-		classesToAdd.clear();
-		classesToAdd.addAll(syntacticalSieve.values()) ;
 
 		// we have the minimum set of class expressions that have to be named
 		// it should be enough to assert the new class as part of the equivalence
@@ -113,7 +77,6 @@ public class SIDClassExpressionNamer {
 
 		for (OWLClassExpression ce: classesToAdd) {
 			auxiliarClass = dataFactory.getOWLClass(IRI.create(baseIRI+className+classID));
-			// System.out.println(auxiliarClass.toString()); 
 			classID++;
 			equivalentAxiom = dataFactory.getOWLEquivalentClassesAxiom(auxiliarClass, ce);
 			axiomsToAdd.add(equivalentAxiom);
@@ -127,9 +90,49 @@ public class SIDClassExpressionNamer {
 		}
 
 	}
+	
+	public void gatherAllExpressionsFiltering() throws NonGatheredClassExpressionsException {
+		retrieveClassExpressions();
+		applySyntactiSieve();
+	}
+	
+	private void retrieveClassExpressions () {
+		OWLClassExpressionHarvester axiomVisitor = new OWLClassExpressionHarvester();
+		// we apply the reduction in this module to all the
+		// import closure
+		for (OWLAxiom axiom: ontology.getTBoxAxioms(Imports.INCLUDED)) {
+			axiom.accept(axiomVisitor);
+		}
+		classesToAdd = axiomVisitor.getHarvestedClasses();		
+	}
+	
+	private void applySyntactiSieve() throws NonGatheredClassExpressionsException {
+		
+		if (this.classesToAdd == null) throw new NonGatheredClassExpressionsException(); 
+		System.out.println("--> "+classesToAdd.size() + " class expressions harvested");
+		// CBL: due to the large amount of tests in huge ontologies
+		// we first perform a syntactic sieve
+
+		Hashtable<Integer, OWLClassExpression> syntacticalSieve = new Hashtable<Integer, OWLClassExpression>();
+		Integer auxInt;
+		for (OWLClassExpression auxClass: classesToAdd) {
+			auxInt = auxClass.toString().hashCode();
+			if (!syntacticalSieve.containsKey(auxInt))
+				syntacticalSieve.put(auxInt, auxClass);
+		}
+		System.out.println("--> "+syntacticalSieve.size()+" class expressions after syntactic sieve");
+
+		classesToAdd.clear();
+		classesToAdd.addAll(syntacticalSieve.values()) ;
+		
+	}
 
 	public ArrayList<OWLClassExpression> getClassesToAdd() {
 		return classesToAdd;
+	}
+	
+	public void nullifyClassesToAdd() {
+		classesToAdd = null; 
 	}
 
 	public ArrayList<Explanation> getClassesFiltered() {

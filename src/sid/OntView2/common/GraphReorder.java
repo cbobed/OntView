@@ -22,14 +22,17 @@ public class GraphReorder {
 	public void visualReorder(){
 		Graph graph = new Graph();
 		cloneGraph(graph, vgraph);
-
+		
 		float minY = 0;
 		float maxY = 0;
 		vgraphHeight = vgraph.getHeight();
 		//Step 2
+		System.out.println("-->Sugiyama"); 
 		Sugiyama s = new Sugiyama(graph);
 		s.getLayoutedGraph();
+		System.out.println("-->Sugiyama - run"); 
 		s.run();
+		System.out.println("<--Sugiyama"); 
 		@SuppressWarnings("rawtypes")
 		LayoutedGraph layoutedGraph = s.getLayoutedGraph();
 		SugiyamaNodeView nodeView;
@@ -59,7 +62,6 @@ public class GraphReorder {
 				}
 			}
 		}
-
 		repositionParents();
 	}
 
@@ -75,6 +77,7 @@ public class GraphReorder {
 	}
 
 	public static void cloneGraph(Graph graph, VisGraph vgraph){
+		System.out.println("-->clone graph"); 
 		for (Entry<String, Shape> entry : vgraph.shapeMap.entrySet()){
 			Shape shape = entry.getValue();
 			if (!(shape.outConnectors.isEmpty()) ||(!(shape.inConnectors.isEmpty()))){
@@ -93,6 +96,7 @@ public class GraphReorder {
 				}
 			}
 		}
+		System.out.println("<--clone graph"); 
 	}
 
 	private void repositionParents() {

@@ -9,17 +9,30 @@ import java.util.Set;
 
 public class OWLClassExpressionHarvester implements OWLAxiomVisitor {
 
-	public ArrayList<OWLClassExpression> getHarvestedClasses() {
-		return harvestedClasses;
-	}
-
-	ArrayList<OWLClassExpression> harvestedClasses = null; 
+	ArrayList<OWLClassExpression> harvestedClasses = null;
+	ArrayList<OWLClassExpression> domainClasses = null; 
+	ArrayList<OWLClassExpression> rangeClasses = null; 
 	
 	public OWLClassExpressionHarvester () {
 		this.harvestedClasses = new ArrayList<OWLClassExpression>(); 
+		this.domainClasses = new ArrayList<>(); 
+		this.rangeClasses = new ArrayList<>(); 
 	}
 	
-	@Override
+	public ArrayList<OWLClassExpression> getHarvestedClasses() {
+		return harvestedClasses;
+	}
+	
+	public ArrayList<OWLClassExpression> getDomainClasses() {
+		return domainClasses;
+	}
+
+	public ArrayList<OWLClassExpression> getRangeClasses() {
+		return rangeClasses;
+	}
+	
+	//// VISITOR PATTERN AXIOMS 
+	
 	public void visit(OWLAnnotationAssertionAxiom axiom) {
 		return;
 	}
@@ -134,7 +147,7 @@ public class OWLClassExpressionHarvester implements OWLAxiomVisitor {
 		// here, we only consider C1 == .. == Cn, with all being 
 		// anonymous classExpressions
 		
-		Set<OWLClassExpression> operands = axiom.getClassExpressions();
+		Set<OWLClassExpression> operands = axiom.getClassExpressions(); 
 		
 		Iterator<OWLClassExpression> it = operands.iterator(); 
 		boolean anyNamed = false;
@@ -163,6 +176,7 @@ public class OWLClassExpressionHarvester implements OWLAxiomVisitor {
 		OWLClassExpression domain = axiom.getDomain();
 		if (domain.isAnonymous()) {
 			harvestedClasses.add(domain); 
+			domainClasses.add(domain); 
 		}
 	}
 
@@ -172,7 +186,8 @@ public class OWLClassExpressionHarvester implements OWLAxiomVisitor {
 		OWLClassExpression domain = axiom.getDomain();
 		
 		if (domain.isAnonymous()) {
-			harvestedClasses.add(domain); 
+			harvestedClasses.add(domain);
+			domainClasses.add(domain); 
 		}
 	}
 
@@ -208,7 +223,8 @@ public class OWLClassExpressionHarvester implements OWLAxiomVisitor {
 		OWLClassExpression range = axiom.getRange();
 		
 		if (range.isAnonymous()) {
-			harvestedClasses.add(range); 
+			harvestedClasses.add(range);
+			rangeClasses.add(range); 
 		}
 	}
 

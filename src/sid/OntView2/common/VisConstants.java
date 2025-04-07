@@ -28,10 +28,11 @@ public class VisConstants {
     final static int HEIGHT_MARGIN       = 30;
 	final static int PROGRESSBAROBSERVER = 1;
 	final static int GENERALOBSERVER     = 2;
-    final static String THING_ENTITY = "http://www.w3.org/2002/07/owl#Thing";
-	final static String NOTHING_ENTITY = "http://www.w3.org/2002/07/owl#Nothing";
 	public final static String SIDCLASS = "SIDClass_";
     public final static int NEEDED_HEIGHT = 245; // TODO
+    public final static String THING_ENTITY = "http://www.w3.org/2002/07/owl#Thing";
+	public final static String NOTHING_ENTITY = "http://www.w3.org/2002/07/owl#Nothing";
+
 
 
 	final int KEYCONCEPTNO = 10;

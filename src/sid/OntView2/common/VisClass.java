@@ -15,6 +15,7 @@ import sid.OntView2.expressionNaming.SIDClassExpressionNamer;
 import sid.OntView2.utils.ExpressionManager;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class VisClass extends Shape {
 	
@@ -40,11 +41,10 @@ public class VisClass extends Shape {
     Set<Shape> orderedDescendantsByLevelLeastImportant = new HashSet<>();
     Set<Shape> orderedDescendantsByLevelBottomTop = new HashSet<>();
     ArrayList<VisConnectorDisjoint> disjointList;
-	ArrayList<VisConnectorEquiv> equivList;
-	ArrayList<String>  properties; // those that have this class as its domain  
+	ArrayList<String>  properties; // those that have this class as its domain
 	VisPropertyBox propertyBox;
-	// <CBL 24/9/13>: Theoretically, one term can have more than one definition
-	ArrayList<OWLClassExpression> definitions;
+	
+	HashSet<OWLClassExpression> equivalentClasses;
 	
 	String  explicitLabel = "";
 	boolean isAnonymous;
@@ -118,8 +118,7 @@ public class VisClass extends Shape {
         parents     = new ArrayList<>();
         properties  = new ArrayList<>();
         
-        //<CBL 24/9/13> Added the initialization in the constructor
-        definitions = new ArrayList<>();
+        equivalentClasses = new HashSet<>();
         visibleDefinitionLabels = new ArrayList<>();
       
 	}
@@ -140,17 +139,10 @@ public class VisClass extends Shape {
 		return disjointList;
 	}
 	
-	public ArrayList<VisConnectorEquiv> getEquivConnectors(){
-		if (equivList==null) {
-			equivList = new ArrayList<>();
-		}	
-		return equivList;
-	}
-	
 	private Set<OWLDisjointClassesAxiom> getDisJointClassesAxioms(){
 		  OWLOntology ontology = graph.paintframe.getOntology();
 		  if (this.getLinkedClassExpression() instanceof OWLClass)
-		      return ontology.getDisjointClassesAxioms((OWLClass) this.getLinkedClassExpression());
+			  return ontology.disjointClassesAxioms((OWLClass) this.getLinkedClassExpression()).collect(Collectors.toSet()); 
 		  return null;
 	}
 	
@@ -183,37 +175,6 @@ public class VisClass extends Shape {
         if (!already){
 			getDisjointConnectors().add(new VisConnectorDisjoint(this, dst));
 		}
-	}
-	
-	public void addEquivalentConnectors(){
-		  OWLReasoner reasoner = graph.paintframe.getReasoner();
-		  
-		  // <CBL 25/9/13> 
-		  // at first sight, if a concept is equivalent to Thing, it should be expressed 
-		  // removed the getEntitiesMinusTop()
-		  for(OWLClass  c : reasoner.getEquivalentClasses(this.getLinkedClassExpression())){
-			  if (c!= this.getLinkedClassExpression()){
-				  VisClass v = graph.getVisualExtension(c);
-				  if (((v.isDefined)&&(this.isAnonymous)) || 
-				  			((this.isDefined)&&(v.isAnonymous))){
-					  continue;
-				  }	 
-				  HashSet<Shape> d = null;
-			   if (!VisConnectorEquiv.accesible(this, v,d)){
-					  addEquivConnector(v);
-					  v.addEquivConnector(this);
-				  }  
-			  }
-
-			  
-		  }
-	}
-	
-	public void addEquivConnector(Shape dst){
-		if ((dst==this) ||  (VisConnectorEquiv.getConnector(getEquivConnectors(), this, dst)!=null))
-			return;
-		getEquivConnectors().add(new VisConnectorEquiv(this,dst));
-	
 	}
 	
 	private Font defFont;
@@ -457,10 +418,6 @@ public class VisClass extends Shape {
 		    		   break;
 		       }
 			}
-		    /*
-		    for (VisConnectorEquiv equ: getEquivConnectors()){
-			    equ.draw(g);
-		    }*/
 		}
 		g.setFont(oldFont);
 	}
@@ -651,39 +608,39 @@ public class VisClass extends Shape {
 	// <CBL 24/9/13> 
 	// instead of setDefinition, we now add a new one
 	// and update the labels
-	public void addDefinition(OWLClassExpression def){
+	public void addEquivalentExpression(OWLClassExpression def){
 		
-		definitions.add(def);
-		
-		if (definitionLabels == null) {
-			definitionLabels = new ArrayList<>();
-			qualifiedDefinitionLabels = new ArrayList<> ();
-			// <CBL> for the time being, we are not considering the rendering 
-			// of labels in the anonymous expressions, just qualified/nonQualified names of the 
-			// concepts 
-			// TO_DO: add two new methods to obtain the reducedClassExpression 
-			// using the labels and the qualified labels for each of the terms. 
-			explicitDefinitionLabels = definitionLabels; 
-			explicitQualifiedDefinitionLabels = qualifiedDefinitionLabels; 
-		}	
-		// CBL: we add the different labels
-		String label = ExpressionManager.getReducedClassExpression(def);
-		definitionLabels.add(label);
-		String auxQLabel = ExpressionManager.getReducedQualifiedClassExpression(def); 
-       if (auxQLabel != null && !"null".equalsIgnoreCase(auxQLabel))
-    	   qualifiedDefinitionLabels.add(auxQLabel); 
-       else 
-    	   qualifiedDefinitionLabels.add(label); 
-       
-	   visibleDefinitionLabels = definitionLabels;
+		if (!equivalentClasses.contains(def)) {
+			equivalentClasses.add(def);
+			
+			if (definitionLabels == null) {
+				definitionLabels = new ArrayList<>();
+				qualifiedDefinitionLabels = new ArrayList<> ();
+				// <CBL> for the time being, we are not considering the rendering 
+				// of labels in the anonymous expressions, just qualified/nonQualified names of the 
+				// concepts 
+				// TO_DO: add two new methods to obtain the reducedClassExpression 
+				// using the labels and the qualified labels for each of the terms. 
+				explicitDefinitionLabels = definitionLabels; 
+				explicitQualifiedDefinitionLabels = qualifiedDefinitionLabels; 
+			}	
+			// CBL: we add the different labels
+			String label = ExpressionManager.getReducedClassExpression(def);
+			definitionLabels.add(label);
+			String auxQLabel = ExpressionManager.getReducedQualifiedClassExpression(def); 
+	       if (auxQLabel != null && !"null".equalsIgnoreCase(auxQLabel))
+	    	   qualifiedDefinitionLabels.add(auxQLabel); 
+	       else 
+	    	   qualifiedDefinitionLabels.add(label); 
+	       
+		   visibleDefinitionLabels = definitionLabels;
+		}
 	   
 	}
-	public ArrayList<OWLClassExpression> getDefinitions(){
-		return definitions;
+	public HashSet<OWLClassExpression> getEquivalentClasses(){
+		return equivalentClasses;
 	}
-
-
-
+	
 	public String getToolTipInfo() {
 	/*
 	 * Renders html for class info
@@ -708,15 +665,15 @@ public class VisClass extends Shape {
 				other.append("<b>Disjoint</b><ul>");
 				
 				VisClass auxVisClass = null;
-				ArrayList<OWLClassExpression> auxArray = null;
+				Set<OWLClassExpression> auxSet = null;
 				for (OWLClass cl: getDisjointClasses()) {
 					auxVisClass = graph.getVisualExtension(cl); 
 					if (auxVisClass != null) {
 						
 						if (auxVisClass.label.startsWith(sid.OntView2.expressionNaming.SIDClassExpressionNamer.className)) {
-							auxArray = auxVisClass.getDefinitions();
-							if (auxArray != null){ 
-								for (OWLClassExpression ce: auxArray) {
+							auxSet = auxVisClass.getEquivalentClasses();
+							if (auxSet != null){ 
+								for (OWLClassExpression ce: auxSet) {
 									other.append("<li>").append(qualifiedRendering ?
                                             ExpressionManager.getReducedQualifiedClassExpression(ce) :
                                             ExpressionManager.getReducedClassExpression(ce)).append("</li>");
