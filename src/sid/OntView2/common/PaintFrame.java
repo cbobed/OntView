@@ -194,17 +194,32 @@ public class PaintFrame extends Canvas {
 	/**
 	 * sets scaling/zoom factor
 	 */
-	public void setFactor(double newFactor) {
+	public void setFactor1(double newFactor) {
         double oldZoom = this.factor;
         this.factor = newFactor;
         offsetX = offsetX * oldZoom / newFactor;
         offsetY = offsetY * oldZoom / newFactor;
 
         Platform.runLater(redrawRunnable);
-
     }
 
-	public void setOriginalSize(Dimension2D in) { oSize = in; }
+    public void setFactor(double newZoom) {
+        double oldZoom = this.factor;
+        double viewportWidth = scroll.getViewportBounds().getWidth();
+        double viewportHeight = scroll.getViewportBounds().getHeight();
+
+        double centerX = offsetX + viewportWidth / (2 * oldZoom);
+        double centerY = offsetY + viewportHeight / (2 * oldZoom);
+
+        this.factor = newZoom;
+        offsetX = centerX - viewportWidth / (2 * newZoom);
+        offsetY = centerY - viewportHeight / (2 * newZoom);
+
+        Platform.runLater(redrawRunnable);
+    }
+
+
+    public void setOriginalSize(Dimension2D in) { oSize = in; }
 	
 	/*** 
 	 * Runnable required to push the drawing to the javaFx application thread using Platform.runLater()
