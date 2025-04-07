@@ -1,5 +1,6 @@
 package sid.OntView2.common;
 
+import javafx.application.Platform;
 import javafx.geometry.Point2D;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;

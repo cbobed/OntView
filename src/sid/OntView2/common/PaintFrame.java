@@ -1202,7 +1202,6 @@ public class PaintFrame extends Canvas {
 			getVisGraph().showAll();
 		}
 		else {
-
             KConceptExtractor extractor = KConceptExtractorFactory.getInstance(getKceOption(), getSelectedConcepts());
 
             switch (getKceOption()) {
@@ -1226,11 +1225,10 @@ public class PaintFrame extends Canvas {
 
                 }
             }
-            compactGraph();
-            if (menuVisShapeContext != null) {
-                menuVisShapeContext.updateSliderView();
-            }
-
+        }
+        compactGraph();
+        if (menuVisShapeContext != null) {
+            menuVisShapeContext.updateSliderView();
         }
 	}
 	

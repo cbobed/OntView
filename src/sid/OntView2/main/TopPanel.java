@@ -187,6 +187,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
             ContextMenu contextMenu = new ContextMenu();
             MenuItem item1 = createMenuItemWithTooltip(VisConstants.COMPACT_GRAPH,
                 "Compacts the graph to reduce visual clutter and enhance clarity");
+            MenuItem item2 = createMenuItemWithTooltip("Reset zoom value",
+                "Reset the zoom value to 1.0");
             contextMenu.getStyleClass().add("context-menu-custom");
 
             item1.setOnAction(e -> {
@@ -194,7 +196,13 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
                 contextMenu.hide();
             });
 
-            contextMenu.getItems().addAll(item1);
+            item2.setOnAction(e -> {
+                zoomSlider.setValue(1.0);
+                zoomSliderChangeStateChanged(1.0);
+                contextMenu.hide();
+            });
+
+            contextMenu.getItems().addAll(item1, item2);
 
             moreOptions.setOnAction(e -> {
                 if (contextMenu.isShowing()) {
