@@ -533,7 +533,6 @@ public class PaintFrame extends Canvas {
 	Shape pressedShape = null;
 	List<Shape> selectedShapes = new ArrayList<>();
 	List<Shape> selectedDisjoints = new ArrayList<>();
-	Cursor cursorState = Cursor.DEFAULT;
 	public boolean hideRange = false;
 	private Embedable parentFrame;
 	private final Tooltip tooltip = new Tooltip();
@@ -667,9 +666,7 @@ public class PaintFrame extends Canvas {
 		}
 		if ((shape != null) || (prop != null)) {
 			setCursor(Cursor.HAND);
-			cursorState = Cursor.HAND;
 		} else {
-			cursorState = Cursor.DEFAULT;
 			setCursor(Cursor.DEFAULT);
 		}
 	}

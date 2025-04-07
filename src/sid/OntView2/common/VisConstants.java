@@ -24,8 +24,9 @@ public class VisConstants {
 
 	public static final int CONTAINER_SIZE = 65;
 	
-	final static int WIDTH_MARGIN        = 30;
-    final static int HEIGHT_MARGIN       = 30;
+	final static int WIDTH_MARGIN = 30;
+    final static int HEIGHT_MARGIN = 30;
+    final static int BUTTON_SIZE = 10;
 	final static int PROGRESSBAROBSERVER = 1;
 	final static int GENERALOBSERVER     = 2;
 	public final static String SIDCLASS = "SIDClass_";

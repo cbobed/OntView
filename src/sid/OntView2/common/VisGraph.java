@@ -702,17 +702,19 @@ public class VisGraph implements Runnable{
 			int w = e.getValue().getWidth();
 			int h = e.getValue().getHeight();
 
-			if (isInShape(x,y,w,h,p) && e.getValue().visible) {
+			if (isInShape(e.getValue(),x,y,w,h,p) && e.getValue().visible) {
 				return e.getValue();
 			}
 		}
 		return null;
 	}
 
-	private boolean isInShape(int x, int y, int w, int h, Point2D p) {
-		int buttonMargin = 10; // Take into account the buttons size
+	private boolean isInShape(Shape shape, int x, int y, int w, int h, Point2D p) {
+        // Take into account the buttons size
+        int buttonMarginLeft = shape.canShowFunctionalityLeft() ? VisConstants.BUTTON_SIZE : 0;
+        int buttonMarginRight = shape.canShowFunctionalityRight() ? VisConstants.BUTTON_SIZE : 0;
 
-		return (p.getX() >= x - buttonMargin) && (p.getX() <= x + w + buttonMargin) &&
+		return (p.getX() >= x - buttonMarginLeft) && (p.getX() <= x + w + buttonMarginRight) &&
 				(p.getY() >= y ) && (p.getY() <= y +  h);
 	}
 
