@@ -764,13 +764,12 @@ public class PaintFrame extends Canvas {
             }
         }
 
-
-
         if (minY < 0) {
             // Adjust the shape position
             for (VisLevel level : visGraph.getLevelSet().values()) {
                 for (Shape shape : level.orderedList()) {
                     shape.setPosY((int) ((shape.getPosY() * factor - minY + BORDER_PANEL) / factor));
+                    maxY = Math.max(maxY, shape.getBottomCorner());
                 }
             }
         }
@@ -780,7 +779,7 @@ public class PaintFrame extends Canvas {
 
             for (VisLevel level : visGraph.getLevelSet().values()) {
                 for (Shape shape : level.orderedList()) {
-                    shape.setPosY((int) ((shape.getPosY() * factor - offset) / factor));
+                    shape.setPosY((int) ((shape.getPosY() - offset) / factor));
                 }
             }
 
