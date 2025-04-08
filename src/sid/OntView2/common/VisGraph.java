@@ -40,6 +40,7 @@ public class VisGraph implements Runnable{
 	ArrayList<VisConnector> dashedConnectorList;
 	
     final public Map<String, Shape>    shapeMap;
+    final public Map<String, String>   labelMap;
 	HashMap<String, VisObjectProperty>     propertyMap;
 	HashMap<String, VisDataProperty> dPropertyMap;
 	HashMap<String, OWLSubPropertyChainOfAxiom> chainPropertiesMap;
@@ -83,6 +84,7 @@ public class VisGraph implements Runnable{
 	 */
     public  VisGraph(PaintFrame pframe) {
 		shapeMap     = new ConcurrentHashMap<>();
+        labelMap     = new ConcurrentHashMap<>();
 		propertyMap  = new HashMap<>();
 		dPropertyMap = new HashMap<>();
 		connectorList 		= new ArrayList<>();
@@ -97,6 +99,7 @@ public class VisGraph implements Runnable{
 	 */
 	public void clearShapeMap() {
 		shapeMap.clear();
+        labelMap.clear();
 		propertyMap.clear();
 		dPropertyMap.clear();
 		connectorList.clear();
@@ -184,13 +187,14 @@ public class VisGraph implements Runnable{
 
         VisLevel.adjustWidthAndPos(levelSet);
 
-        // here, we should add the
+        // here, we should add the disjointness
         System.out.println("Disjointness ... ");
         for (Entry<String, Shape> entry : shapeMap.entrySet()){
             Shape shape = entry.getValue();
             if (shape instanceof VisClass) {
                 shape.asVisClass().addAssertedDisjointConnectors();
             }
+            labelMap.put(entry.getValue().getLabel(), entry.getKey()); // convert <String, Shape> to <String, String>
         }
 
         placeProperties(activeOntology,reasoner,set);
@@ -431,6 +435,7 @@ public class VisGraph implements Runnable{
 		propertyMap.clear();
 		dPropertyMap.clear();
 		shapeMap.clear();
+        labelMap.clear();
 		connectorList.clear();
 		dashedConnectorList.clear();
 		levelSet.clear();

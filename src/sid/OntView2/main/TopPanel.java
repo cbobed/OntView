@@ -33,6 +33,7 @@ import java.io.*;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 //VS4E -- DO NOT REMOVE THIS LINE!
 public class TopPanel extends Canvas implements ControlPanelInterface {
@@ -1001,10 +1002,9 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 	private void comboBox0ItemItemStateChanged(String selectedItem) {
 		if (parent.artPanel.getVisGraph() == null) return;
-		String key = parent.artPanel.getVisGraph().getQualifiedLabelMap().get(selectedItem);
+        String key = parent.artPanel.getVisGraph().labelMap.get(selectedItem);;
 		if (key != null) {
             parent.artPanel.focusOnShape(key, null);
-
         }
 	}
 
@@ -1033,17 +1033,17 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		parent.saveViewButtonAction(event);
 	}
 
-	public void loadSearchCombo() {
-		ArrayList<String> temp;
+    public void loadSearchCombo() {
 		getComboBox0().getItems().clear();
-		temp = new ArrayList<>();
+        Set<String> labelSet = new HashSet<>();
 
-		for (Entry<String, String> s : parent.artPanel.getVisGraph().getQualifiedLabelMap().entrySet()) {
-			temp.add(s.getKey());
+		for (Entry<String, Shape> s : parent.artPanel.getVisGraph().shapeMap.entrySet()) {
+            labelSet.add(s.getValue().getLabel());
 		}
 
-		Collections.sort(temp);
-		getComboBox0().getItems().addAll(temp);
+        List<String> sortedLabels = new ArrayList<>(labelSet);
+        Collections.sort(sortedLabels);
+        comboBox.getItems().addAll(sortedLabels);
 	}
 
 	private void propertiesActionActionPerformed(ActionEvent event) {
