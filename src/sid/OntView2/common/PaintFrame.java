@@ -764,13 +764,7 @@ public class PaintFrame extends Canvas {
             }
         }
 
-        double viewportHeight = scroll.getViewportBounds().getHeight() / factor;
-        double viewportWidth = scroll.getViewportBounds().getWidth() / factor;
-        canvasHeight = (int) (maxY + VisConstants.NEEDED_HEIGHT / factor);
-        canvasWidth = (int) maxX + VisConstants.WIDTH_MARGIN;
 
-        scroll.setVmax(Math.max(0, maxY - viewportHeight));
-        scroll.setHmax(Math.max(0, maxX - viewportWidth));
 
         if (minY < 0) {
             // Adjust the shape position
@@ -780,9 +774,29 @@ public class PaintFrame extends Canvas {
                 }
             }
         }
+
+        if (minY > BORDER_PANEL) {
+            double offset = minY - BORDER_PANEL;
+
+            for (VisLevel level : visGraph.getLevelSet().values()) {
+                for (Shape shape : level.orderedList()) {
+                    shape.setPosY((int) ((shape.getPosY() * factor - offset) / factor));
+                }
+            }
+
+            maxY -= offset;
+        }
+
+        double viewportHeight = scroll.getViewportBounds().getHeight() / factor;
+        double viewportWidth = scroll.getViewportBounds().getWidth() / factor;
+        canvasHeight = (int) (maxY + VisConstants.NEEDED_HEIGHT / factor);
+        canvasWidth = (int) maxX + VisConstants.WIDTH_MARGIN;
+
+        scroll.setVmax(Math.max(0, maxY - viewportHeight));
+        scroll.setHmax(Math.max(0, maxX - viewportWidth));
     }
 
-	/**
+    /**
 	 * translates point to current zoom factor
 	 */
 	private Point2D translatePoint(Point2D p) {
