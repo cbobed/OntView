@@ -1156,7 +1156,7 @@ public class VisGraph implements Runnable{
 			System.out.println("-->storeDescendants"); 
 			storeDescendants();
 			storeAncestors();
-            getShapeOrderedByRDFRank();
+            getShapeOrderedByRDFRank(); 
 		} catch (XPathExpressionException | ParserConfigurationException | SAXException | IOException e) {
 			e.printStackTrace();
 		} finally {
