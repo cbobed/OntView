@@ -910,7 +910,7 @@ public class VisClass extends Shape {
 
 	private int calculateTextHeight(String text) {
 		String[] lines = text.split("\n");
-		int totalHeight = 0;
+		int totalHeight = 0, lineSpacing = 5, padding = 5;
 
 		for (String line : lines) {
 			Text textNode = new Text(line);
@@ -918,7 +918,7 @@ public class VisClass extends Shape {
 			totalHeight += (int) textNode.getLayoutBounds().getHeight();
 		}
 
-		return totalHeight + (lines.length - 1) * 5 + 5 * 2;
+		return totalHeight + (lines.length - 1) * lineSpacing + padding * 2;
 	}
 	
 	public ArrayList<String> getVisibleDefinitionLabels() {
