@@ -156,8 +156,14 @@ public class VisShapeContext extends ContextMenu {
      */
     private HBox sliderHeader() {
         if (titleBar == null) {
-            Label titleLabel = new Label(" Slider Percentage: " + shape.getLabel());
+            String firstLine = shape.getLabel().split("\n").length > 1 ?
+                shape.getLabel().split("\n")[0] + "..." : shape.getLabel();
+            Label titleLabel = new Label(" Slider Percentage: " + firstLine);
             titleLabel.getStyleClass().add("title-label");
+            titleLabel.setWrapText(false);
+            titleLabel.setEllipsisString("...");
+            titleLabel.setTextOverrun(OverrunStyle.ELLIPSIS);
+
             Button closeButton = new Button("X");
             closeButton.getStyleClass().add("round-button");
             closeButton.setOnAction(event -> {
