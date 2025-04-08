@@ -1,5 +1,6 @@
-https://protege.stanford.edu/ontologies/koala.owl
 https://protege.stanford.edu/ontologies/pizza/pizza.owl
+file:/home/carlota/Desktop/OntView/onts/SUMO.owl
+https://protege.stanford.edu/ontologies/koala.owl
 file:/home/carlota/Desktop/OntView/onts/dbpedia_3.8.owl
 file:/home/carlota/Desktop/OntView/onts/proyectos.owl
 file:/home/carlota/Desktop/OntView/onts/animals.owl
@@ -12,4 +13,3 @@ file:/home/carlota/Downloads/library_ontology.owl
 file:/home/carlota/Downloads/ontology_subniveles.owl
 file:/home/carlota/Desktop/OntView/onts/animalsChanged.owl
 file:/home/carlota/ontologies/family/family.owl
-file:/home/carlota/Downloads/family.owl

@@ -166,7 +166,7 @@ public class VisGraph implements Runnable{
         //It's important to set config constants before creating
         //will have to move this elsewhere
         clearAll();
-        set.stream().forEach(x->System.err.println("Build 1st set: "+x));
+        set.stream().forEach(x->System.out.println("Build 1st set: "+x));
         OWLClass topClass = activeOntology.getOWLOntologyManager().getOWLDataFactory().getOWLThing();
         // we start from a fresh graph, so it is safe to create OWLThing directly
         addVisClass(Shape.getKey(topClass), topClass, activeOntology, reasoner);

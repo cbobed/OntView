@@ -246,7 +246,7 @@ public class VisClass extends Shape {
 				g.strokeRoundRect(x - (double) getWidth()/2, y - (double) currentHeight/2,  getWidth()-1, currentHeight-1, roundCornerValue, roundCornerValue);
 			    g.setFill(Color.BLACK);
 				// Square for properties
-				if (propertyBox != null) {
+				if (propertyBox != null && !properties.isEmpty()) {
 					propertyDraw(g, x, y, roundCornerValue);
 				}
 				if (!getDisjointConnectors().isEmpty()) {
@@ -289,7 +289,7 @@ public class VisClass extends Shape {
 		    			}
 		    		}
 
-					if (propertyBox != null) {
+					if (propertyBox != null && !properties.isEmpty()) {
 						propertyDraw(g, x + 5, y - 5, roundCornerValue);
 					}
 					if (!getDisjointConnectors().isEmpty()) {
@@ -311,7 +311,7 @@ public class VisClass extends Shape {
 				    //rectangle
 				    g.strokeRoundRect(x - (double) getWidth()/2, y - (double) currentHeight /2,  getWidth()-1, currentHeight-1, roundCornerValue, roundCornerValue);
 				    g.setFill(Color.BLACK);
-				    if (propertyBox!=null){
+				    if (propertyBox!=null && !properties.isEmpty()){
 						propertyDraw(g, x, y, roundCornerValue);
 						propertySpace += 5;
 				    }
@@ -838,7 +838,7 @@ public class VisClass extends Shape {
 			if (!getDisjointConnectors().isEmpty()) {
 				max += 10;
 			}
-			if (propertyBox != null) {
+			if (propertyBox != null && !properties.isEmpty()) {
 				max += 20;
 			}
 		} catch (Exception e) {
@@ -882,24 +882,23 @@ public class VisClass extends Shape {
 	    	// <CBL 24/9/13> <
 	    	// first step to the new representation of defined concepts
 	    	if (!isDefined) { 
-	    		result += fontHeight+5;
+	    		result += fontHeight + 5;
 	    	}
 	    	else {
-	    		
 	    		// we have to check whether it is a special defined concept
 	    		if (!label.startsWith(SIDClassExpressionNamer.className)) {
 		    		// CBL: for the grey box
-		    		result += fontHeight+15;
+		    		result += fontHeight + 10;
 		    		// CBL: for the underlying white box containing the definitions
 		    		for (String auxLabel: getVisibleDefinitionLabels()) {
 						result += calculateTextHeight(auxLabel);
 					}
 		    		if (!getVisibleDefinitionLabels().isEmpty())
-		    			result += (getVisibleDefinitionLabels().size()-1)*5; 
+		    			result += (getVisibleDefinitionLabels().size()-1) * 5;
 	    		}
 	    		else {
 	    			for (String auxLabel: getVisibleDefinitionLabels()) {
-						result += calculateTextHeight(auxLabel) + 5;
+						result += calculateTextHeight(auxLabel);
 					}
 		    		
 	    		}
@@ -919,7 +918,7 @@ public class VisClass extends Shape {
 			totalHeight += (int) textNode.getLayoutBounds().getHeight();
 		}
 
-		return totalHeight + (lines.length - 1) * 5 + 5;
+		return totalHeight + (lines.length - 1) * 5 + 5 * 2;
 	}
 	
 	public ArrayList<String> getVisibleDefinitionLabels() {
