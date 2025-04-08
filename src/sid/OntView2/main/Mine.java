@@ -125,13 +125,31 @@ public class Mine extends Application implements Embedable{
         });
 
         viewer.artPanel.scroll.addEventFilter(ScrollEvent.SCROLL, event -> {
-            if (event.getDeltaY() != 0) {
-                double delta = event.getDeltaY() > 0 ? SCROLL_INCREMENT : -SCROLL_INCREMENT;
-                viewer.artPanel.scroll.setVvalue(viewer.artPanel.scroll.getVvalue() - delta / SPEED);
-            }
-            if (event.getDeltaX() != 0) {
-                double delta = event.getDeltaX() > 0 ? SCROLL_INCREMENT : -SCROLL_INCREMENT;
-                viewer.artPanel.scroll.setHvalue(viewer.artPanel.scroll.getHvalue() - delta / SPEED);
+            if (event.isControlDown()) {
+                double newZoom = viewer.getNewZoom(event);
+                double oldZoom = viewer.artPanel.getFactor();
+
+                double mouseX = event.getX();
+                double mouseY = event.getY();
+
+                double worldX = viewer.artPanel.offsetX + mouseX / oldZoom;
+                double worldY = viewer.artPanel.offsetY + mouseY / oldZoom;
+
+                viewer.artPanel.setFactorValue(newZoom);
+                viewer.artPanel.setOffsetX(worldX - mouseX / newZoom);
+                viewer.artPanel.setOffsetY(worldY - mouseY / newZoom);
+
+                viewer.artPanel.nTopPanel.ignoreSliderListener = true;
+                viewer.artPanel.nTopPanel.getZoomSlider().setValue(newZoom);
+            } else {
+                if (event.getDeltaY() != 0) {
+                    double delta = event.getDeltaY() > 0 ? SCROLL_INCREMENT : -SCROLL_INCREMENT;
+                    viewer.artPanel.scroll.setVvalue(viewer.artPanel.scroll.getVvalue() - delta / SPEED);
+                }
+                if (event.getDeltaX() != 0) {
+                    double delta = event.getDeltaX() > 0 ? SCROLL_INCREMENT : -SCROLL_INCREMENT;
+                    viewer.artPanel.scroll.setHvalue(viewer.artPanel.scroll.getHvalue() - delta / SPEED);
+                }
             }
             event.consume();
         });
@@ -149,6 +167,15 @@ public class Mine extends Application implements Embedable{
 		viewer.primaryStage.show();
 
 	}
+
+    private double getNewZoom(ScrollEvent event) {
+        double sensitivity = 0.001;
+        double zoomFactor = Math.exp(event.getDeltaY() * sensitivity);
+        double currentZoom = artPanel.getFactor();
+        double newZoom = currentZoom * zoomFactor;
+        newZoom = Math.max(nTopPanel.getZoomSlider().getMin(), Math.min(newZoom, nTopPanel.getZoomSlider().getMax()));
+        return newZoom;
+    }
 
 	/* Rest of methods */
 	protected void createButtonAction() {

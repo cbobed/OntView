@@ -192,6 +192,9 @@ public class PaintFrame extends Canvas {
 	double prevFactor = 1.0;
 	Dimension2D oSize;
 
+    public double getFactor() { return factor; }
+    public void setFactorValue(double newFactor) { factor = newFactor; }
+
 	/**
 	 * sets scaling/zoom factor
 	 */

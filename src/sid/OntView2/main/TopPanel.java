@@ -218,7 +218,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
         return moreOptions;
     }
 
-	private Slider getZoomSlider() {
+    public boolean ignoreSliderListener = false;
+	Slider getZoomSlider() {
 		if (zoomSlider == null) {
 			zoomSlider = new Slider(0.5, 2.0, 1.0);
 			zoomSlider.setOrientation(Orientation.VERTICAL);
@@ -230,9 +231,13 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			zoomSlider.setMinHeight(VisConstants.CONTAINER_SIZE);
 			zoomSlider.setMaxHeight(VisConstants.CONTAINER_SIZE);
 
-            zoomSlider.valueProperty().addListener((obs, oldVal, newVal) ->
-                zoomSliderChangeStateChanged(newVal.doubleValue())
-            );
+            zoomSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
+                if (ignoreSliderListener) {
+                    ignoreSliderListener = false;
+                    return;
+                }
+                zoomSliderChangeStateChanged(newVal.doubleValue());
+            });
 		}
 		return zoomSlider;
 	}
