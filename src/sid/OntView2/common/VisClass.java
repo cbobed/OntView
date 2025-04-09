@@ -25,13 +25,9 @@ public class VisClass extends Shape {
 	public static Color color;
 	
 	String   label;
-//	String   mapKey;
-	private String   classExpressionFragment;
-	OWLClassExpression linkedClassExpression; 
+	OWLClassExpression linkedClassExpression;
 	HashSet<OWLObjectProperty> inherited;
 	HashSet<OWLDataProperty>  dInherited;
-	HashSet<OWLObjectProperty> aplicable;
-	HashSet<OWLDataProperty> dAplicable;
 	ArrayList<Shape>   children;
 	ArrayList<Shape>   parents;
 	Set<Shape> descendants = new HashSet<>();
@@ -43,21 +39,16 @@ public class VisClass extends Shape {
     ArrayList<VisConnectorDisjoint> disjointList;
 	ArrayList<String>  properties; // those that have this class as its domain
 	VisPropertyBox propertyBox;
-	
 	HashSet<OWLClassExpression> equivalentClasses;
-	
 	String  explicitLabel = "";
 	boolean isAnonymous;
     boolean isDefined   = false;
     public boolean isBottom    = false;
-    int     currentHeight, currentWidth = 0;
-
-    int     propertyBoxWidth = 0;
+    int     currentHeight;
 
     // 17-01-2013
     // CBL: Added the qualified label fields to store the 
-    // labels with the translated namespace 
-    
+    // labels with the translated namespace
     String qualifiedLabel = "";  
     String explicitQualifiedLabel = ""; 
     
@@ -72,7 +63,7 @@ public class VisClass extends Shape {
 	ArrayList<String> explicitQualifiedDefinitionLabels;
 	// </CBL>
     
-    String visibleLabel ="";
+    String visibleLabel;
 
 	boolean qualifiedRendering = false; 
 	boolean labelRendering = false;
@@ -86,32 +77,26 @@ public class VisClass extends Shape {
     Color barGreen = Color.rgb(120, 190, 145);
     Color lightYellow = Color.rgb(255, 255, 184);
 
-
-    public String getClassExpressionFragment (){
-		return classExpressionFragment == null ? getLinkedClassExpression().asOWLClass().getIRI().getFragment() :
-												 classExpressionFragment;
-	}
-    
 	public boolean isAnonymous(){return isAnonymous;}
 	public ArrayList<Shape> getChildren() {return children;}
 
 	public Set<Shape> getDescendants() { return descendants; }
 	public Set<Shape> getAncestors() { return ancestors; }
  	
-	public VisClass(int par_depthlevel,OWLClassExpression o, String plabel, VisGraph pgraph) {
+	public VisClass(int par_depthlevel,OWLClassExpression o, String pLabel, VisGraph pGraph) {
 		
 		super();
 		depthlevel = par_depthlevel;
         setPosX(0); 
         //first position is irrelevant after rearranging 
 		setPosY((int)(Math.random()*600));
-		graph     = pgraph;
+		graph     = pGraph;
 		setHeight(0); 
 		setWidth (0);
 		currentHeight= getHeight();
 		linkedClassExpression = o;
-		this.label= plabel;
-		this.visibleLabel = plabel; 
+		this.label= pLabel;
+		this.visibleLabel = pLabel;
 		connectionPointsL = new Point2D(posx,posy+5);
 		connectionPointsR = new Point2D(posx+getWidth(),posy+5);
 		children    = new ArrayList<>();
@@ -258,7 +243,7 @@ public class VisClass extends Shape {
 					g.fillText(visibleLabel, x - (double) (getWidth())/2 + 10 + propertySpace, (y -(double) (currentHeight - 4) / 2) + ascent);
 			    }
 			    else {
-					drawFormattedString(g, visibleLabel, x - (getWidth() - 10)/2,  (int) ((y - (currentHeight - 4) / 2) + ascent), (int) fontHeight);
+					drawFormattedString(g, visibleLabel, x - (getWidth() - 10)/2,  (int) ((y - (currentHeight - 4) / 2) + ascent));
 			    }
 	    	}
 	    	else {
@@ -284,7 +269,7 @@ public class VisClass extends Shape {
 		    		double auxY = y - ((double) currentHeight /2) + (fontHeight +5) + 2;
 		    		if (visibleDefinitionLabels != null) {
 		    			for (String auxDefString: visibleDefinitionLabels) {
-							drawFormattedString(g, auxDefString, x - (getWidth() - 12) / 2, (int) (auxY + ascent)+5, (int) fontHeight);
+							drawFormattedString(g, auxDefString, x - (getWidth() - 12) / 2, (int) (auxY + ascent)+5);
 							auxY += (countLines(auxDefString)*fontHeight) + 5;
 		    			}
 		    		}
@@ -298,7 +283,7 @@ public class VisClass extends Shape {
 					g.setFill(Color.BLACK);
 				}
 	    		else {
-	    			// CBL: it is an auxiliar definition 
+	    			// CBL: it is an auxiliary definition
 	    			// CBL if it is not defined, we use the previous representation
 
 					g.setFill(Color.WHITE);
@@ -325,7 +310,7 @@ public class VisClass extends Shape {
 		    		if (visibleDefinitionLabels != null) {
 		    			for (String auxDefString: visibleDefinitionLabels) {
 							g.setFill(Color.BLACK);
-							drawFormattedString(g, auxDefString, x - (getWidth() - 10) / 2 + propertySpace, (int) (auxY + ascent)-1, (int) fontHeight);
+							drawFormattedString(g, auxDefString, x - (getWidth() - 10) / 2 + propertySpace, (int) (auxY + ascent)-1);
 							auxY += (countLines(auxDefString)*fontHeight) + 5;
 		    			}
 		    		}
@@ -514,35 +499,30 @@ public class VisClass extends Shape {
 	}
 
 	public void swapLabel(Boolean labelRendering, Boolean qualifiedRendering){
-		
-		String oldVisibleLabel = visibleLabel; 
-		
 		this.qualifiedRendering = qualifiedRendering; 
 		this.labelRendering = labelRendering; 
 		
-		if (!explicitLabel.equals("")) {
+		if (!explicitLabel.isEmpty()) {
 			
 			if (labelRendering) {
 				if (qualifiedRendering) {
-					if (!explicitQualifiedLabel.equals("")) {
+					if (!explicitQualifiedLabel.isEmpty()) {
 						visibleLabel = explicitQualifiedLabel;
 					}
 				}
 				else {
-					if (!explicitLabel.equals("")) {
-						visibleLabel = explicitLabel; 
-					}
-				}
+                    visibleLabel = explicitLabel;
+                }
 			}
 			else {
 				// we do not want to use labels
 				if (qualifiedRendering) {
-					if (!qualifiedLabel.equals("")) {
+					if (!qualifiedLabel.isEmpty()) {
 						visibleLabel = qualifiedLabel; 
 					}
 				}
 				else  {
-					if (!label.equals("")){
+					if (!label.isEmpty()){
 						visibleLabel = label; 
 					}
 				}
@@ -559,40 +539,20 @@ public class VisClass extends Shape {
 		setWidth(calculateWidth());
 	}
 
-     public void addParent(Shape parent) {
-    	if (!parents.contains(parent)) {
-    	    parents.add(parent);
+    public void addParent(Shape parent) {
+        if (!parents.contains(parent)) {
+            parents.add(parent);
     	}
-     }
+    }
 	
-	 public void addSon(Shape son){
+	public void addSon(Shape son){
 		if (!children.contains(son)){
-		    children.add(son);
+	        children.add(son);
 	    }
-	 }
-	 
-	 public void removeAllChildren(){
-		 for (Shape child : children) {
-			 child.asVisClass().removeParent(this);
-		 }
-		 children.clear();
-	 }
-	 
-	 public void removeParent(Shape parent) {
-		if (parents.contains(parent)){ 
-			parents.remove(parent);
-			VisConnector.removeConnector(graph.connectorList, parent, this);
-		}	
-	 }
-		
-	 public void removeSon(Shape son){
-		if (children.contains(son)){ 
-			children.remove(son);
-		}	
-	 }
+	}
 		
 	public Point2D getConnectionPoint(Point2D p,boolean left) {
-	//return Closest conection point	
+	    //return Closest connection point
 		if (left){
 			connectionPointsL = new Point2D(getPosX() - (double) getWidth()/2, getPosY());
 			return connectionPointsL;
@@ -631,7 +591,7 @@ public class VisClass extends Shape {
 			String label = ExpressionManager.getReducedClassExpression(def);
 			definitionLabels.add(label);
 			String auxQLabel = ExpressionManager.getReducedQualifiedClassExpression(def); 
-	       if (auxQLabel != null && !"null".equalsIgnoreCase(auxQLabel))
+	       if (!"null".equalsIgnoreCase(auxQLabel))
 	    	   qualifiedDefinitionLabels.add(auxQLabel); 
 	       else 
 	    	   qualifiedDefinitionLabels.add(label); 
@@ -667,8 +627,8 @@ public class VisClass extends Shape {
 			if ((getDisjointClasses() !=null)&& (!getDisjointClasses().isEmpty())) {
 				other.append("<b>Disjoint</b><ul>");
 				
-				VisClass auxVisClass = null;
-				Set<OWLClassExpression> auxSet = null;
+				VisClass auxVisClass;
+				Set<OWLClassExpression> auxSet;
 				for (OWLClass cl: getDisjointClasses()) {
 					auxVisClass = graph.getVisualExtension(cl); 
 					if (auxVisClass != null) {
@@ -700,7 +660,7 @@ public class VisClass extends Shape {
 	
 	public void getInheritedObjectProperties(){
 		if (inherited==null){
-			inherited = new HashSet<OWLObjectProperty>();
+			inherited = new HashSet<>();
 			OWLReasoner reasoner       = graph.paintframe.getReasoner();
 			OWLOntology activeOntology = graph.paintframe.getOntology();
 			//all properties
@@ -724,10 +684,10 @@ public class VisClass extends Shape {
 									Set<Node<OWLClass>> domainNodes,Set<OWLObjectProperty> objPropertySet) {
 		// TODO Auto-generated method stub
 		for (Node<OWLClass> node : domainNodes){
-			for (OWLClass clase : node.getEntities()) {
+			for (OWLClass oClass : node.getEntities()) {
 				for (OWLObjectProperty prop : objPropertySet){
 					NodeSet<OWLClass> p= reasoner.getObjectPropertyDomains(prop, true);
-						if (p.containsEntity(clase))
+						if (p.containsEntity(oClass))
 							inherited2.add(prop);
 				}
 			}
@@ -738,10 +698,10 @@ public class VisClass extends Shape {
 			Set<Node<OWLClass>> domainNodes,Set<OWLDataProperty> objPropertySet) {
 		// TODO Auto-generated method stub
 		for (Node<OWLClass> node : domainNodes){
-			for (OWLClass clase : node.getEntities()) {
+			for (OWLClass oClass : node.getEntities()) {
 				for (OWLDataProperty prop : objPropertySet){
 					NodeSet<OWLClass> p= reasoner.getDataPropertyDomains(prop, true);
-					if (p.containsEntity(clase))
+					if (p.containsEntity(oClass))
 						dInherited.add(prop);
 				}
 			}
@@ -751,7 +711,7 @@ public class VisClass extends Shape {
 	
 	public void getInheritedDataProperties(){
 		if (dInherited==null){
-			dInherited = new HashSet<OWLDataProperty>();
+			dInherited = new HashSet<>();
 			OWLReasoner reasoner       = graph.paintframe.getReasoner();
 			OWLOntology activeOntology = graph.paintframe.getOntology();
 			//all properties
@@ -789,20 +749,16 @@ public class VisClass extends Shape {
 		Text textNode = new Text();
 		textNode.setFont(newFont);
 
-	    StringTokenizer sTokenizer = null; 
+	    StringTokenizer sTokenizer;
     	String token; 
-    	int candidate = 0;
+    	int candidate;
 		try {
 			if (!isAnonymous) {
 				if (!label.startsWith(SIDClassExpressionNamer.className)) {
 					textNode.setText(visibleLabel);
 					max = (int) textNode.getLayoutBounds().getWidth() + 25 ;
 				}
-				else {
-					// there is no label as it is supposed to be anonymous
-					max = 0;
-				}
-				//<CBL> for the defined, max might not be the desired value
+                //<CBL> for the defined, max might not be the desired value
 				if (isDefined) {
 
 					// we have to do the same as for the anonymous ones
@@ -823,8 +779,7 @@ public class VisClass extends Shape {
 			}
 			else {
 				sTokenizer = new StringTokenizer(visibleLabel, "\n");
-				max = 0;
-				while (sTokenizer.hasMoreElements()) {
+                while (sTokenizer.hasMoreElements()) {
 					token = sTokenizer.nextToken();
 					textNode.setText(removeFormatInformation(token));
 					candidate = (int) textNode.getLayoutBounds().getWidth() + 25;
@@ -959,10 +914,7 @@ public class VisClass extends Shape {
 	}
 	
 	public String removeFormatInformation(String str) {
-		String aux; 
-		aux = str.replace("\n", ""); 
-		aux = str.replace("\t", ""); 
-		return aux; 
+		return str.replace("\n", "").replace("\t", "");
 	}
 	
 	public int countLines(String str) {
@@ -990,9 +942,9 @@ public class VisClass extends Shape {
 		return numTabs*tabSize; 
 	}
 
-	public void drawFormattedString (GraphicsContext g, String toDraw, int x, int y, int ascent) {
+	public void drawFormattedString (GraphicsContext g, String toDraw, int x, int y) {
 		StringTokenizer sTokenizer = new StringTokenizer(toDraw,"\n"); 
-		int currentX = x; 
+		int currentX;
 		int currentY = y;
 		String token; 
 		while (sTokenizer.hasMoreTokens()) {
