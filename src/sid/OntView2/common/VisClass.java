@@ -231,7 +231,7 @@ public class VisClass extends Shape {
 				g.strokeRoundRect(x - (double) getWidth()/2, y - (double) currentHeight/2,  getWidth()-1, currentHeight-1, roundCornerValue, roundCornerValue);
 			    g.setFill(Color.BLACK);
 				// Square for properties
-				if (propertyBox != null && !properties.isEmpty()) {
+				if (propertyBox != null) {
 					propertyDraw(g, x, y, roundCornerValue);
 				}
 				if (!getDisjointConnectors().isEmpty()) {
@@ -274,7 +274,7 @@ public class VisClass extends Shape {
 		    			}
 		    		}
 
-					if (propertyBox != null && !properties.isEmpty()) {
+					if (propertyBox != null) {
 						propertyDraw(g, x + 5, y - 5, roundCornerValue);
 					}
 					if (!getDisjointConnectors().isEmpty()) {
@@ -296,7 +296,7 @@ public class VisClass extends Shape {
 				    //rectangle
 				    g.strokeRoundRect(x - (double) getWidth()/2, y - (double) currentHeight /2,  getWidth()-1, currentHeight-1, roundCornerValue, roundCornerValue);
 				    g.setFill(Color.BLACK);
-				    if (propertyBox!=null && !properties.isEmpty()){
+				    if (propertyBox!=null){
 						propertyDraw(g, x, y, roundCornerValue);
 						propertySpace += 5;
 				    }
@@ -793,7 +793,7 @@ public class VisClass extends Shape {
 			if (!getDisjointConnectors().isEmpty()) {
 				max += 10;
 			}
-			if (propertyBox != null && !properties.isEmpty()) {
+			if (propertyBox != null) {
 				max += 20;
 			}
 		} catch (Exception e) {
@@ -942,7 +942,7 @@ public class VisClass extends Shape {
 		return numTabs*tabSize; 
 	}
 
-	public void drawFormattedString (GraphicsContext g, String toDraw, int x, int y) {
+	public void drawFormattedString(GraphicsContext g, String toDraw, int x, int y) {
 		StringTokenizer sTokenizer = new StringTokenizer(toDraw,"\n"); 
 		int currentX;
 		int currentY = y;

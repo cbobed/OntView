@@ -342,8 +342,7 @@ public class VisGraph implements Runnable{
 	   int depthLevel = 0; 
 	   while (!nextLevel.isEmpty()) {
 		   System.out.println("Creating level "+depthLevel+"..."+nextLevel.size()); 
-		   nextLevel.stream().forEach(x-> {System.out.println("including ... ("+x.getChildren().size()+") "+x.getLinkedClassExpression()); 
-		   				x.getChildren().forEach (y -> System.out.println("\t"+y.getLabel())); 
+		   nextLevel.stream().forEach(x-> {System.out.println("including ... ("+x.getChildren().size()+") "+x.getLinkedClassExpression());
 		   }); 
 		   VisLevel vlevel;
 	       int levelPosx = VisClass.FIRST_X_SEPARATION;
@@ -1149,24 +1148,39 @@ public class VisGraph implements Runnable{
         }
     }
 
+    private static volatile boolean voluntaryCancel = false;
+    public static void voluntaryCancel(boolean cancelValue) { voluntaryCancel = cancelValue; }
+    public static boolean isVoluntaryCancel() { return voluntaryCancel; }
 
-	@Override
+
+    @Override
 	public void run() {
 		try {
-			
-			HashSet<OWLClassExpression> topSet = new HashSet<>();   
-			topSet.add(getActiveOntology().getOWLOntologyManager().getOWLDataFactory().getOWLThing());  
-			System.out.println("-->buildReasonedGraph"); 
+            System.out.println("..>Starting the graph building process");
+            if (Thread.currentThread().isInterrupted()) { return; }
+            HashSet<OWLClassExpression> topSet = new HashSet<>();
+            topSet.add(getActiveOntology().getOWLOntologyManager().getOWLDataFactory().getOWLThing());
+
+            if (Thread.currentThread().isInterrupted()) { return; }
+            System.out.println("-->buildReasonedGraph");
 			this.buildReasonedGraph(getActiveOntology(), getReasoner(), topSet, isExpanded());
-			System.out.println("-->storeDescendants"); 
+
+            if (Thread.currentThread().isInterrupted()) { return; }
+            System.out.println("-->storeDescendants");
 			storeDescendants();
 			storeAncestors();
             getShapeOrderedByRDFRank(); 
 		} catch (XPathExpressionException | ParserConfigurationException | SAXException | IOException e) {
-			e.printStackTrace();
+            if (!Thread.currentThread().isInterrupted()) {
+                e.printStackTrace();
+            }
 		} finally {
 			// Release the latch to unblock the main thread
-			System.out.println("-->releasing the latch "); 
+			System.out.println("-->releasing the latch ");
+            if (Thread.currentThread().isInterrupted()) {
+                Platform.runLater(() -> paintframe.loadingStage.close());
+                paintframe.clearCanvas();
+            }
 			latch.countDown();
 		}
 	}

@@ -219,11 +219,17 @@ public class Mine extends Application implements Embedable{
 			@Override
 			protected Void call() {
 				loadActiveOntology(source);
+                if (isCancelled()) {
+                    nTopPanel.getLoadReasonerButton().setDisable(true);
+                    nTopPanel.getReasonerCombo().setDisable(true);
+                    nTopPanel.getKceComboBox().setDisable(true);
+                }
 				return null;
 			}
 		};
 
 		Stage loadingStage = artPanel.showLoadingStage(task);
+        task.setOnCancelled(e -> loadingStage.close());
 		task.setOnSucceeded(e -> loadingStage.close());
 		task.setOnFailed(e -> {
 			task.getException().printStackTrace();

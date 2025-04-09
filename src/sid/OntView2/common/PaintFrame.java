@@ -40,6 +40,7 @@ import sid.OntView2.kcExtractors.KConceptExtractorFactory;
 
 public class PaintFrame extends Canvas {
 	private static final long serialVersionUID = 1L;
+    public Stage loadingStage = null;
 	public ScrollPane scroll;
 	static final int BORDER_PANEL = 50;
 	static final int MIN_SPACE = 20;
@@ -418,10 +419,7 @@ public class PaintFrame extends Canvas {
 		visGraph.setOWLClassExpressionSet(set);
 		visGraph.setCheck(check);
 		visGraph.setReasoner(reasoner);
-
-		Task<Void> task = getVoidTask();
-
-		new Thread(task).start();
+        visGraph.run();
 
 		paintFrame.setCursor(Cursor.WAIT);
 
@@ -433,28 +431,14 @@ public class PaintFrame extends Canvas {
 		try {
 			latch.await(); // Block until latch.countDown() is called in VisGraph
 		} catch (InterruptedException e) {
-			e.printStackTrace();
-			throw new RuntimeException(e);
+            if (!VisGraph.isVoluntaryCancel()) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            } else {
+                VisGraph.voluntaryCancel(false);
+            }
 		}
 
-	}
-
-	private Task<Void> getVoidTask() {
-		Task<Void> task = new Task<>() {
-			@Override
-			protected Void call() {
-				visGraph.run();
-				return null;
-			}
-		};
-
-		task.setOnSucceeded(e -> paintFrame.setCursor(Cursor.DEFAULT));
-
-		task.setOnFailed(e -> {
-			paintFrame.setCursor(Cursor.DEFAULT);
-			task.getException().printStackTrace();
-		});
-		return task;
 	}
 
 	/**
@@ -512,6 +496,7 @@ public class PaintFrame extends Canvas {
 								}
 							}
 						}
+                        if (visGraph == null) return;
 						visGraph.adjustPanelSize((float) factor);
 						recentChange = true;
 					}
@@ -984,11 +969,18 @@ public class PaintFrame extends Canvas {
 						if(visibility) compactNodes(shape);
 						showRelatedProperties(shape.asVisClass(), visGraph, !visibility);
 
+                        if (isCancelled()){
+                            shape.asVisClass().propertyBox.setVisible(visibility);
+                            if(visibility) compactNodes(shape);
+                            showRelatedProperties(shape.asVisClass(), visGraph, visibility);
+                            Platform.runLater(() -> loadingStage.close());
+                            Platform.runLater(redrawRunnable);
+                        }
 						return null;
 					}
 				};
 
-				Stage loadingStage = showLoadingStage(task);
+                loadingStage = showLoadingStage(task);
 
 				task.setOnSucceeded(e -> {
 					loadingStage.close();
@@ -1325,6 +1317,7 @@ public class PaintFrame extends Canvas {
 
 	public void clearCanvas(){
 		visGraph = null;
+        Tooltip.uninstall(this, tooltip);
         scroll.setHvalue(0);
         scroll.setVvalue(0);
 		GraphicsContext gc = this.getGraphicsContext2D();
@@ -1460,9 +1453,8 @@ public class PaintFrame extends Canvas {
 		return saveButton;
 	}
 
-
 	public Stage showLoadingStage(Task<?> task) {
-		Stage loadingStage = new Stage();
+		loadingStage = new Stage();
 		loadingStage.initModality(Modality.APPLICATION_MODAL);
 		loadingStage.initStyle(StageStyle.UNDECORATED);
 
@@ -1476,10 +1468,11 @@ public class PaintFrame extends Canvas {
 		Button cancelButton = new Button("Cancel");
 		cancelButton.getStyleClass().add("cancelButton");
 		cancelButton.setOnAction(event -> {
-			task.cancel();
-			loadingStage.close();
-			System.err.println("Task cancelled");
-		});
+            task.cancel();
+            loadingLabel.setText("Cancelling task...");
+            cancelButton.setDisable(true);
+            System.err.println("Task cancelled");
+        });
 
 		VBox loadingBox = new VBox(15.0, progressIndicator, loadingLabel, cancelButton);
 		loadingBox.setAlignment(javafx.geometry.Pos.CENTER);

@@ -33,7 +33,6 @@ import java.io.*;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
 
 //VS4E -- DO NOT REMOVE THIS LINE!
 public class TopPanel extends Canvas implements ControlPanelInterface {
@@ -352,13 +351,13 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			AutoCompletion.enable(comboBox);
 			comboBox.setEditable(true);
 			comboBox.getStyleClass().add("custom-combo-box");
-            comboBox.setMaxWidth(100);
+            comboBox.setMaxWidth(180);
+            comboBox.setPrefWidth(180);
 
 			ObservableList<String> items = FXCollections.observableArrayList();
 			comboBox.setItems(items);
 			HBox.setHgrow(comboBox, Priority.ALWAYS);
-			comboBox.setMaxWidth(Double.MAX_VALUE);
-			comboBox.valueProperty().addListener((options, oldValue, newValue) -> comboBox0ItemItemStateChanged(newValue));
+            comboBox.valueProperty().addListener((options, oldValue, newValue) -> comboBox0ItemItemStateChanged(newValue));
 
 			TextField editor = comboBox.getEditor();
 			editor.addEventHandler(KeyEvent.KEY_RELEASED, event -> handleAutoComplete(editor.getText(), items));
@@ -927,14 +926,15 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			}
 		};
 
-		Stage loadingStage = parent.artPanel.showLoadingStage(task);
+		parent.artPanel.loadingStage = parent.artPanel.showLoadingStage(task);
 
-		task.setOnSucceeded(e -> loadingStage.close());
+        task.setOnCancelled(e -> VisGraph.voluntaryCancel(true));
+		task.setOnSucceeded(e -> parent.artPanel.loadingStage.close());
 		task.setOnFailed(e -> {
 			task.getException().printStackTrace();
 			parent.artPanel.showAlertDialog("Error", "Reasoner could not be loaded.",  "Try another reasoner.",
 					Alert.AlertType.ERROR);
-			loadingStage.close();
+            parent.artPanel.loadingStage.close();
 		});
 
 		new Thread(task).start();
@@ -1071,10 +1071,11 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 		Stage loadingStage = parent.artPanel.showLoadingStage(task);
 
+        task.setOnCancelled(e -> loadingStage.close());
 		task.setOnSucceeded(e -> {
 			loadingStage.close();
 			parent.artPanel.setStateChanged(true);
-			Platform.runLater(() -> parent.artPanel.getRelaxerRunnable());
+			Platform.runLater(parent.artPanel.getRelaxerRunnable());
 		});
 
 		task.setOnFailed(e -> {
