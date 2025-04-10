@@ -7,25 +7,23 @@ import pedviz.graph.Graph;
 import pedviz.graph.LayoutedGraph;
 import pedviz.graph.Node;
 
-import java.util.HashMap;
 import java.util.Map.Entry;
-
 
 public class GraphReorder {
 
-	VisGraph vgraph;
-	int vgraphHeight;
+	VisGraph vGraph;
+	int vGraphHeight;
 	public GraphReorder(VisGraph v){
-		vgraph = v;
+		vGraph = v;
 	}
 
 	public void visualReorder(){
 		Graph graph = new Graph();
-		cloneGraph(graph, vgraph);
+		cloneGraph(graph, vGraph);
 		
 		float minY = 0;
 		float maxY = 0;
-		vgraphHeight = vgraph.getHeight();
+		vGraphHeight = vGraph.getHeight();
 		//Step 2
 		System.out.println("-->Sugiyama"); 
 		Sugiyama s = new Sugiyama(graph);
@@ -37,7 +35,7 @@ public class GraphReorder {
 		LayoutedGraph layoutedGraph = s.getLayoutedGraph();
 		SugiyamaNodeView nodeView;
 		Object key;
-		vgraph.paintframe.stable = true;
+		vGraph.paintframe.stable = true;
 
 		for(Object entry: layoutedGraph.getAllNodes().entrySet()){
 			@SuppressWarnings("unchecked")
@@ -53,39 +51,39 @@ public class GraphReorder {
 			Entry<String,SugiyamaNodeView> entryCast = (Entry<String,SugiyamaNodeView>) entry;
 			nodeView = entryCast.getValue();
 			key = entryCast.getKey();
-			if (key instanceof String){
+			if (key != null){
 				String key2 = key.toString();
-				Shape shape = vgraph.shapeMap.get(key2);
+				Shape shape = vGraph.shapeMap.get(key2);
 				if (shape !=null && shape.isVisible()){
 					shape.setPosY(translateRelativePos(nodeView.getPosX(), minY, maxY));
 
 				}
 			}
 		}
-		repositionParents();
 	}
 
 	/**
-	 * gets the relative equivalent point in visgraph
+	 * gets the relative equivalent point in visGraph
 	 */
 	public int translateRelativePos(float in, float low,float high){
 
 		float total = high-low;
 		float perOne = (in-low)/total;
+        float spacingFactor = 2f;
 
-		return (int) (vgraphHeight * perOne);
+		return (int) (vGraphHeight * perOne * spacingFactor);
 	}
 
-	public static void cloneGraph(Graph graph, VisGraph vgraph){
+	public static void cloneGraph(Graph graph, VisGraph vGraph){
 		System.out.println("-->clone graph"); 
-		for (Entry<String, Shape> entry : vgraph.shapeMap.entrySet()){
+		for (Entry<String, Shape> entry : vGraph.shapeMap.entrySet()){
 			Shape shape = entry.getValue();
 			if (!(shape.outConnectors.isEmpty()) ||(!(shape.inConnectors.isEmpty()))){
 				Node n = new Node(entry.getKey());
 				graph.addNode(n);
 			}
 		}
-		for (Entry<String, Shape> entry : vgraph.shapeMap.entrySet()){
+		for (Entry<String, Shape> entry : vGraph.shapeMap.entrySet()){
 			Shape shape = entry.getValue();
 			for (VisConnector c : shape.outConnectors){
 				if (!c.isRedundant()){
@@ -97,53 +95,5 @@ public class GraphReorder {
 			}
 		}
 		System.out.println("<--clone graph"); 
-	}
-
-	private void repositionParents() {
-		for (Entry<String, Shape> entry : vgraph.shapeMap.entrySet()) {
-			Shape shape = entry.getValue();
-			if (shape.isVisible() && shape instanceof VisClass) {
-				VisClass visClass = (VisClass) shape;
-				if (!visClass.children.isEmpty()) {
-					int sumY = 0;
-					int count = 0;
-					for (Shape child : visClass.children) {
-						if (child.isVisible()) {
-							sumY += child.getPosY();
-							count++;
-						}
-					}
-					if (count > 0) {
-						int averageY = sumY / count;
-						visClass.setPosY(averageY);
-					}
-				}
-			}
-		}
-	}
-
-	public static void cloneGraphWithVisibility(Graph graph, VisGraph vgraph){
-		for (Entry<String, Shape> entry : vgraph.shapeMap.entrySet()){
-			if (entry.getValue().isVisible() &&
-					(!(entry.getValue().outConnectors.isEmpty()) || !(entry.getValue().inConnectors.isEmpty()))){
-				Node n = new Node(entry.getKey());
-				graph.addNode(n);
-			}
-		}
-		for (Entry<String, Shape> entry : vgraph.shapeMap.entrySet()){
-			Shape shape = entry.getValue();
-			if (shape.isVisible()) {
-				for (VisConnector c : shape.outConnectors){
-					if (!c.isRedundant()){
-						Node or  = graph.getNode(entry.getKey());
-						Node dst = graph.getNode(Shape.getKey(c.to.getLinkedClassExpression()));
-						if (dst != null) {
-							dst.setIdDad(or.getId());
-							graph.addEdge(new Edge(or, dst));
-						}
-					}
-				}
-			}
-		}
 	}
 }
