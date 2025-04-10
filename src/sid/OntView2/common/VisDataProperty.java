@@ -48,9 +48,11 @@ public class VisDataProperty extends VisProperty {
 
 	public int getPosX(){return getDomain().getPosX()-(getDomain().getWidth()/2)+2;}
 	public int getPosY(){return getDomain().getPosY()+(getDomain().getHeight())+getLabelHeight()*voffset;}
-	
-	
-	public VisDataProperty( VisPropertyBox ppbox, OWLDataPropertyExpression  dexp,int pvoffset,String prange,OWLOntology ontology) {
+    public int getPosY1(){return pbox.vclass.getPosY()+(pbox.vclass.getHeight())+getLabelHeight()*voffset;}
+
+
+
+    public VisDataProperty( VisPropertyBox ppbox, OWLDataPropertyExpression  dexp,int pvoffset,String prange,OWLOntology ontology) {
 		pbox = ppbox;
 		label = ExpressionManager.getReducedDataPropertyExpression(dexp);
 		qualifiedLabel = ExpressionManager.getReducedQualifiedDataPropertyExpression(dexp); 

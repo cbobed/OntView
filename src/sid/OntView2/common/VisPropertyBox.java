@@ -81,7 +81,6 @@ public class VisPropertyBox {
 		int ascent = (int)f.getLayoutBounds().getHeight();
 		height = (ascent + 3) * (propertyList.size()+dPropertyList.size());
 		objectPropHeight =  (ascent + 3) * (propertyList.size());
-		
 	}
 	
 	public void draw(GraphicsContext g){
@@ -89,6 +88,7 @@ public class VisPropertyBox {
 			return;
 		}
 		Color prevColor = (Color) g.getFill();
+        Font prevFont = g.getFont();
 		Font font = Font.font("DejaVu Sans", FontWeight.NORMAL, 9);
 		g.setFont(font);
 		g.setFill(Color.BLACK);
@@ -102,6 +102,7 @@ public class VisPropertyBox {
 	    	p.draw(g);
 		}
 		g.setFill(prevColor);
+        g.setFont(prevFont);
     }
 	
 	public void sortProperties(){

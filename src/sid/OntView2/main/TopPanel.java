@@ -917,8 +917,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		if (Objects.equals(getKceComboBox().getValue(), VisConstants.CUSTOMCOMBOOPTION3)){
 			getKceComboBox().setValue(VisConstants.NONECOMBOOPTION);
 		}
-
-		Task<Void> task = new Task<>() {
+        Task<Void> task = new Task<>() {
 			@Override
 			protected Void call() {
 				loadReasonerButtonActionActionPerformed(event);
@@ -954,7 +953,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 					return;
 				}
 				createButtonActionActionPerformed(event);
-				ArrayList<String> recent = new ArrayList<>();
+                ArrayList<String> recent = new ArrayList<>();
 				String selected = (String) getOntologyCombo().getValue();
 				recent.add(selected);
 

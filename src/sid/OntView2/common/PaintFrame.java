@@ -374,7 +374,7 @@ public class PaintFrame extends Canvas {
 					shape.drawShape(g);
 				}
 				drawPropertyBoxes(g);
-			} else {
+           } else {
 				System.err.println("visGraph is null in draw method.");
 			}
 		}
@@ -387,11 +387,15 @@ public class PaintFrame extends Canvas {
 	}
 
 	private void drawPropertyBoxes(GraphicsContext g2d) {
+        Set<Shape> propertyBoxes = new HashSet<>();
 		if (!this.isDisabled() && this.isVisible() && g2d != null) {
 			for (Entry<String, Shape> entry : visGraph.shapeMap.entrySet()) {
 				if (entry.getValue() instanceof VisClass) {
 					VisClass v = entry.getValue().asVisClass();
 					if ((v.getPropertyBox() != null) && (v.getPropertyBox().visible)) {
+                        if (propertyBoxes.contains(v)) continue;
+                        propertyBoxes.add(v);
+
 						Font c = g2d.getFont();
 						g2d.setStroke(Color.BLACK);
 						v.getPropertyBox().draw(g2d);
@@ -402,7 +406,7 @@ public class PaintFrame extends Canvas {
 		}
 	}
 
-	public void createReasonedGraph(HashSet<OWLClassExpression> set, boolean check) {
+    public void createReasonedGraph(HashSet<OWLClassExpression> set, boolean check) {
 		CountDownLatch latch = new CountDownLatch(1);
 
 		if (visGraph != null) {
@@ -684,7 +688,7 @@ public class PaintFrame extends Canvas {
 			}
 			showContextMenu((int) e.getScreenX(), (int) e.getScreenY());
 		}
-		Platform.runLater(redrawRunnable);
+		//Platform.runLater(redrawRunnable);
 	}
 
 	private void configurationTooltip(String tip) {
