@@ -221,7 +221,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
     public boolean ignoreSliderListener = false;
 	Slider getZoomSlider() {
 		if (zoomSlider == null) {
-			zoomSlider = new Slider(0.5, 2.0, 1.0);
+			zoomSlider = new Slider(0.25, 3.0, 1.0);
 			zoomSlider.setOrientation(Orientation.VERTICAL);
             zoomSlider.setShowTickLabels(true);
             zoomSlider.setMinWidth(30);
@@ -357,7 +357,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			ObservableList<String> items = FXCollections.observableArrayList();
 			comboBox.setItems(items);
 			HBox.setHgrow(comboBox, Priority.ALWAYS);
-            comboBox.valueProperty().addListener((options, oldValue, newValue) -> comboBox0ItemItemStateChanged(newValue));
+            comboBox.setOnAction(event -> comboBox0ItemItemStateChanged(comboBox.getEditor().getText()));
+            //comboBox.valueProperty().addListener((options, oldValue, newValue) -> comboBox0ItemItemStateChanged(newValue));
 
 			TextField editor = comboBox.getEditor();
 			editor.addEventHandler(KeyEvent.KEY_RELEASED, event -> handleAutoComplete(editor.getText(), items));
@@ -1014,18 +1015,21 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			comboBox.getSelectionModel().clearSelection();
 			comboBox.setItems(dataList);
 			comboBox.hide();
-		} else {
-			for (String item : dataList) {
-				if (item.toLowerCase().contains(input.toLowerCase())) {
-					filteredList.add(item);
-				}
-			}
-			comboBox.setItems(filteredList);
-
-			if (!filteredList.isEmpty()) {
-				comboBox.show();
-			}
+            return;
 		}
+
+        for (String item : dataList) {
+            if (item.toLowerCase().contains(input.toLowerCase())) {
+                filteredList.add(item);
+            }
+        }
+        if (!filteredList.isEmpty()) {
+            comboBox.setItems(filteredList);
+            comboBox.show();
+        } else {
+            comboBox.hide();
+        }
+
 	}
 
 	private void saveViewButtonActionActionPerformed(ActionEvent event) {

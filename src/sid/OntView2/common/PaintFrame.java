@@ -677,6 +677,9 @@ public class PaintFrame extends Canvas {
 		int x = (int) p.getX();
 		int y = (int) p.getY();
 		Shape shape = visGraph.findShape(p);
+        if(shape != null){
+            System.out.println("Clicked on shape: " + shape.getLabel() + " " + shape.asVisClass().qualifiedLabel);
+        }
 		if (clickedOnClosePropertyBox(x, y, shape) || clickedOnCloseDisjointBox(x, y)) {
 			return;
 		}
