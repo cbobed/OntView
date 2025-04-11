@@ -910,6 +910,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
         }
         parent.artPanel.cleanConnectors();
         parent.artPanel.clearCanvas();
+        parent.artPanel.languagesLabels.clear();
         parent.artPanel.selectedShape = null;
     }
 
@@ -1180,48 +1181,75 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
     /** Label language */
     private void selectLanguageActionPerformed(ActionEvent event) {
+        getRenderLabel().setSelected(false);
+
+        if (parent.artPanel.getVisGraph() == null) {
+            return;
+        }
+
         Stage stage = new Stage();
-        stage.setMinWidth(800);
-        stage.setMinHeight(500);
-        stage.setMaxHeight(700);
         stage.setTitle("Select language");
         stage.initModality(Modality.APPLICATION_MODAL);
 
-        Scene scene = new Scene(labelCheckBox(), 800, 500);
+        Scene scene = new Scene(createLanguageModalContent(stage), 800, 500);
         ClassLoader c = Thread.currentThread().getContextClassLoader();
         scene.getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
         stage.setScene(scene);
+
+        stage.setOnCloseRequest(e -> {
+            getRenderLabel().setSelected(false);
+        });
+
         stage.show();
     }
 
-    private VBox labelCheckBox() {
-        if (parent.artPanel != null) {
-            if (labelListVBox == null) {
-                labelListVBox = new VBox(5);
-                StackPane parentTitle = createTitlePane("Label");
+    private VBox createLanguageModalContent(Stage stage) {
+        VBox container = new VBox(10);
+        container.setPadding(new Insets(10));
+        StackPane title = createTitlePane("Select Language");
 
-                labelListBox = new ListView<>();
-                ObservableList<CheckBox> checkBoxList = toCheckBoxList(parent.artPanel.languagesLabels);
-                labelListBox.setItems(checkBoxList);
+        List<CheckBox> languageCheckboxes = getCheckBoxes();
 
-                labelListVBox.getChildren().addAll(parentTitle, labelListBox);
-                labelListVBox.setMaxWidth(Double.MAX_VALUE);
+        ListView<CheckBox> listView = new ListView<>();
+        ObservableList<CheckBox> items = FXCollections.observableArrayList(languageCheckboxes);
+        listView.setItems(items);
+        listView.setMaxHeight(200);
+
+        Button submitButton = new Button("Submit");
+        submitButton.setOnAction(e -> {
+            getRenderLabel().setSelected(true);
+            renderLabelActionActionPerformed(e);
+            stage.close();
+        });
+
+        container.getChildren().addAll(title, listView, submitButton);
+
+        return container;
+    }
+
+    private List<CheckBox> getCheckBoxes() {
+        List<CheckBox> languageCheckboxes = new ArrayList<>();
+        for (String lang : parent.artPanel.languagesLabels) {
+            CheckBox cb = new CheckBox(lang);
+            if (lang.equalsIgnoreCase("en")) {
+                cb.setSelected(true);
             }
+            cb.setOnAction(e -> {
+                if (cb.isSelected()) {
+                    for (CheckBox other : languageCheckboxes) {
+                        if (other != cb) {
+                            other.setSelected(false);
+                        }
+                    }
+                } else {
+                }
+            });
+            languageCheckboxes.add(cb);
         }
-        return labelListVBox;
+        return languageCheckboxes;
     }
 
-    private ObservableList<CheckBox> toCheckBoxList(Set<String> nodeList) {
-        ObservableList<CheckBox> checkBoxList = FXCollections.observableArrayList();
-        for (String node : nodeList) {
-            CheckBox checkBox = new CheckBox(node);
-            checkBoxList.add(checkBox);
-        }
-        return checkBoxList;
-    }
-
-
-	/** class expression (query) */
+    /** class expression (query) */
 	private void selectNodesClassExpressionActionPerformed(ActionEvent event) {
 		Stage stage = new Stage();
 		stage.setMinWidth(800);

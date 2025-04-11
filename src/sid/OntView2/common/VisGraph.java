@@ -58,26 +58,19 @@ public class VisGraph implements Runnable{
 	
     public HashMap<String, String> getQualifiedLabelMap(){return qualifiedLabelMap;}
 	public List<VisConnector> getDashedConnectorList(){ return dashedConnectorList;}
-
-	public List<VisConnector> getConnectorList(){ return connectorList;}
-	public int getProgress(){return progress;}
-    public int getZoomLevel(){return zoomLevel;}
-    public void setZoomLevel(int z){zoomLevel=z;}
+    public int getProgress(){return progress;}
     public Map<String,Shape> getShapeMap() {return shapeMap;}
-    public PaintFrame getPaintFrame(){return paintframe;}
     public Map<Integer, VisLevel> getLevelSet(){return levelSet;}
 	public void setActiveOntology(OWLOntology pactiveOntology) {activeOntology = pactiveOntology;}
 	public void setOWLClassExpressionSet(HashSet<OWLClassExpression> pset) { set = pset;}
-	public void setCheck(boolean pcheck) {check = pcheck;	}
+	public void setCheck(boolean pcheck) {check = pcheck;}
 	public OWLOntology getActiveOntology(){return activeOntology;}
 	public boolean isExpanded(){return check;}
 	public void setReasoner(OWLReasoner preasoner) {reasoner = preasoner;}
 	public OWLReasoner getReasoner(){return reasoner;}
 	public boolean isCreated(){return created;}
-
 	private CountDownLatch latch;
 	public void setLatch(CountDownLatch latch) { this.latch = latch; }
-
 	
 	/**
 	 * Progress bar criteria. From 0-70 % it will depend on the number of shapes added to the map
@@ -218,6 +211,14 @@ public class VisGraph implements Runnable{
         paintframe.getParentFrame().loadSearchCombo();
         paintframe.setStateChanged(true);
         System.out.println("<--buildReasonedGraph");
+
+        for (Map.Entry<String, Shape> entry : shapeMap.entrySet()) {
+            System.out.println(" ----- getKey: " + entry.getKey());
+            System.out.println(" ----- getValue: " + entry.getValue());
+            System.out.println(" ----- getLabel: " + entry.getValue().getLabel() +"\n");
+        }
+
+
     }
 
 	private void insertClassExpressions (OWLOntology activeOntology, 

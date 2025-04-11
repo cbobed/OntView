@@ -503,7 +503,6 @@ public class VisClass extends Shape {
 		this.labelRendering = labelRendering; 
 		
 		if (!explicitLabel.isEmpty()) {
-			
 			if (labelRendering) {
 				if (qualifiedRendering) {
 					if (!explicitQualifiedLabel.isEmpty()) {

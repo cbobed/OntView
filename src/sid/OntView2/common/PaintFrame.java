@@ -53,6 +53,7 @@ public class PaintFrame extends Canvas {
 	boolean repulsion = true;
 	public boolean renderLabel = false;
     public Set<String> languagesLabels = new HashSet<>();
+    public String selectedLanguage = null;
 	// CBL: added the qualified names rendering
 	public boolean qualifiedNames = false;
 	private String kceOption = VisConstants.NONECOMBOOPTION;
