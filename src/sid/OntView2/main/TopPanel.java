@@ -44,7 +44,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private ComboBox<Object> loadOntologyCombo;
 	private ComboBox<String> loadReasonerCombo, comboBox, kceComboBox;
 	private VBox mainPane, panelLoad, panelCheckBox, viewPanel, panel0, connectorPanel, helpPanel,
-        classExpressionPanel, percentagePanel, parentListBox, childListBox;
+        classExpressionPanel, percentagePanel, parentListBox, childListBox, labelListVBox;
 	private Label label0;
 	private ToggleButton toggleSwitch;
 	private CheckBox Properties, reduceCheckBox;
@@ -52,7 +52,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
     private Spinner<Integer> percentageSpinner;
 	private Popup helpPopup;
 	private TextField parentField, childField, parentSearchField, childSearchField;
-	private ListView<CheckBox> parentCheckBoxList , childCheckBoxList;
+	private ListView<CheckBox> parentCheckBoxList , childCheckBoxList, labelListBox;
 	private VisClass selectedParent = null, selectedChild = null;
     private final Mine parent;
 
@@ -166,7 +166,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		if (renderLabel == null) {
 			renderLabel = new CheckBox("label");
 			renderLabel.setCursor(Cursor.HAND);
-			renderLabel.setOnAction(this::renderLabelActionActionPerformed);
+            renderLabel.setOnAction(this::selectLanguageActionPerformed);
+			//renderLabel.setOnAction(this::renderLabelActionActionPerformed);
 		}
 		return renderLabel;
 	}
@@ -1176,6 +1177,48 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			Platform.runLater(parent.artPanel.getCanvasAdjusterRunnable());
 		}
 	}
+
+    /** Label language */
+    private void selectLanguageActionPerformed(ActionEvent event) {
+        Stage stage = new Stage();
+        stage.setMinWidth(800);
+        stage.setMinHeight(500);
+        stage.setMaxHeight(700);
+        stage.setTitle("Select language");
+        stage.initModality(Modality.APPLICATION_MODAL);
+
+        Scene scene = new Scene(labelCheckBox(), 800, 500);
+        ClassLoader c = Thread.currentThread().getContextClassLoader();
+        scene.getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    private VBox labelCheckBox() {
+        if (parent.artPanel != null) {
+            if (labelListVBox == null) {
+                labelListVBox = new VBox(5);
+                StackPane parentTitle = createTitlePane("Label");
+
+                labelListBox = new ListView<>();
+                ObservableList<CheckBox> checkBoxList = toCheckBoxList(parent.artPanel.languagesLabels);
+                labelListBox.setItems(checkBoxList);
+
+                labelListVBox.getChildren().addAll(parentTitle, labelListBox);
+                labelListVBox.setMaxWidth(Double.MAX_VALUE);
+            }
+        }
+        return labelListVBox;
+    }
+
+    private ObservableList<CheckBox> toCheckBoxList(Set<String> nodeList) {
+        ObservableList<CheckBox> checkBoxList = FXCollections.observableArrayList();
+        for (String node : nodeList) {
+            CheckBox checkBox = new CheckBox(node);
+            checkBoxList.add(checkBox);
+        }
+        return checkBoxList;
+    }
 
 
 	/** class expression (query) */

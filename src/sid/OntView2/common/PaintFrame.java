@@ -38,6 +38,8 @@ import sid.OntView2.main.TopPanel;
 import sid.OntView2.kcExtractors.KConceptExtractor;
 import sid.OntView2.kcExtractors.KConceptExtractorFactory;
 
+import javax.print.DocFlavor;
+
 public class PaintFrame extends Canvas {
 	private static final long serialVersionUID = 1L;
     public Stage loadingStage = null;
@@ -50,7 +52,7 @@ public class PaintFrame extends Canvas {
 	boolean stable = false;
 	boolean repulsion = true;
 	public boolean renderLabel = false;
-
+    public Set<String> languagesLabels = new HashSet<>();
 	// CBL: added the qualified names rendering
 	public boolean qualifiedNames = false;
 	private String kceOption = VisConstants.NONECOMBOOPTION;
@@ -678,10 +680,11 @@ public class PaintFrame extends Canvas {
 		int y = (int) p.getY();
 		Shape shape = visGraph.findShape(p);
         if(shape != null){
-            System.out.println("Clicked on shape: " + shape.getLabel() + " " + shape.asVisClass().explicitQualifiedLabel.size());
-            for (String v : shape.asVisClass().explicitQualifiedLabel) {
-                System.out.println("Clicked on shape: " + v);
+            System.out.println("Clicked on shape: " + shape.getLabel());
+            for (String s: languagesLabels){
+                System.out.println("Language: " + s);
             }
+
         }
 		if (clickedOnClosePropertyBox(x, y, shape) || clickedOnCloseDisjointBox(x, y)) {
 			return;

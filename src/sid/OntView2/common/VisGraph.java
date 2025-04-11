@@ -739,13 +739,13 @@ public class VisGraph implements Runnable{
 				   vis.explicitLabel.replaceAll("\"", "");
 				   vis.explicitLabel = replaceString(vis.explicitLabel);
 				   auxQLabel = qualifyLabel(ce.asOWLClass(), vis.explicitLabel);
-
 				   if (!"null".equalsIgnoreCase(auxQLabel)) {
 					   vis.explicitQualifiedLabel.add(auxQLabel);
 				   }
 				   else {
 					   vis.explicitQualifiedLabel.add(vis.explicitLabel);
 				   }
+                   paintframe.languagesLabels.add(vis.explicitLabel.split("@")[1]);
 			   }
 		   }
        }
