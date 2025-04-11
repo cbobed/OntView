@@ -50,7 +50,7 @@ public class VisClass extends Shape {
     // CBL: Added the qualified label fields to store the 
     // labels with the translated namespace
     String qualifiedLabel = "";  
-    String explicitQualifiedLabel = ""; 
+    Set<String> explicitQualifiedLabel = new HashSet<>();
     
     // <CBL 24/9/13> 
     // we have to do the same with the definitions 
@@ -507,7 +507,7 @@ public class VisClass extends Shape {
 			if (labelRendering) {
 				if (qualifiedRendering) {
 					if (!explicitQualifiedLabel.isEmpty()) {
-						visibleLabel = explicitQualifiedLabel;
+						visibleLabel = explicitQualifiedLabel.iterator().next();
 					}
 				}
 				else {

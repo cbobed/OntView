@@ -739,11 +739,12 @@ public class VisGraph implements Runnable{
 				   vis.explicitLabel.replaceAll("\"", "");
 				   vis.explicitLabel = replaceString(vis.explicitLabel);
 				   auxQLabel = qualifyLabel(ce.asOWLClass(), vis.explicitLabel);
-				   if (auxQLabel != null && !"null".equalsIgnoreCase(auxQLabel)) {
-					   vis.explicitQualifiedLabel = auxQLabel;
+
+				   if (!"null".equalsIgnoreCase(auxQLabel)) {
+					   vis.explicitQualifiedLabel.add(auxQLabel);
 				   }
 				   else {
-					   vis.explicitQualifiedLabel = vis.explicitLabel;
+					   vis.explicitQualifiedLabel.add(vis.explicitLabel);
 				   }
 			   }
 		   }
@@ -751,7 +752,7 @@ public class VisGraph implements Runnable{
 	   vis.label = ExpressionManager.getReducedClassExpression(ce);
 	   vis.visibleLabel = vis.label; 
 	   auxQLabel = ExpressionManager.getReducedQualifiedClassExpression(ce); 
-       if (auxQLabel != null && !"null".equalsIgnoreCase(auxQLabel))
+       if (!"null".equalsIgnoreCase(auxQLabel))
     	   vis.qualifiedLabel = auxQLabel; 
        else 
     	   vis.qualifiedLabel = vis.label;
