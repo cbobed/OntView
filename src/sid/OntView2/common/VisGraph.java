@@ -894,8 +894,10 @@ public class VisGraph implements Runnable{
 		 OWLOntology ontology = paintframe.getOntology();
 		 HashSet<Shape> parents = new HashSet<Shape>();
 		 for (Entry<String,Shape> entry : shapeMap.entrySet()){
+			 System.out.println("Processing "+entry.getValue().asVisClass().getLabel()); 
 			 Shape shape = entry.getValue();
 			 for (VisConnector in : shape.inConnectors){
+				 System.out.println("\t"+in.from.asVisClass().getLabel()+"-->"+in.to.asVisClass().getLabel()); 
 				 parents.add(in.from);
 			 }
 			 remove(parents,shape,reasoner,ontology);
@@ -931,7 +933,8 @@ public class VisGraph implements Runnable{
 		 for (Shape pi : parents){
 			 for (Shape pj : parents){
 				 if (pi!=pj){
-					 if (existSubsumptionPath(pi,pj, OWLThingShape) && existSubsumptionPath(pj,pi, OWLThingShape)) {
+					 if (existSubsumptionPath(pi,pj, OWLThingShape)) {
+						 System.out.println(pi.getLabel()+" ==> "+pj.getLabel()); 
 						 if (pi.getVisLevel().getID() != pj.getVisLevel().getID()){
 	
 							 Shape candidate = (pi.getVisLevel().getID() < pj.getVisLevel().getID() ? pi:pj);
@@ -944,15 +947,7 @@ public class VisGraph implements Runnable{
 							 }	 
 						 }
 					 }
-					 else if (existSubsumptionPath(pi,pj, OWLThingShape)) {
-						 VisConnector c = VisConnector.getConnector(connectorList, pi, son);
-						 if ( (son instanceof VisConstraint)||(pi instanceof VisConstraint)){
-							 c.setRedundant();
-						 }
-						 else {
-							 VisConnector.removeConnector(connectorList, pi, son);
-						 }	 
-					 }
+					 
 				 }
 			 }
 		 }
