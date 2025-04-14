@@ -211,14 +211,6 @@ public class VisGraph implements Runnable{
         paintframe.getParentFrame().loadSearchCombo();
         paintframe.setStateChanged(true);
         System.out.println("<--buildReasonedGraph");
-
-        for (Map.Entry<String, Shape> entry : shapeMap.entrySet()) {
-            System.out.println(" ----- getKey: " + entry.getKey());
-            System.out.println(" ----- getValue: " + entry.getValue());
-            System.out.println(" ----- getLabel: " + entry.getValue().getLabel() +"\n");
-        }
-
-
     }
 
 	private void insertClassExpressions (OWLOntology activeOntology, 
@@ -387,34 +379,29 @@ public class VisGraph implements Runnable{
 		}
 	}
 
-	public void changeRenderMethod(Boolean labelRendering, Boolean qualifiedRendering ){
-		
+	public void changeRenderMethod(Boolean labelRendering, Boolean qualifiedRendering, String language){
+
 		for (Entry<String,Shape> entry : shapeMap.entrySet()){
 			Shape shape = entry.getValue();
 			if (shape instanceof VisClass) {
-				shape.asVisClass().swapLabel(labelRendering, qualifiedRendering);
+				shape.asVisClass().swapLabel(labelRendering, qualifiedRendering, language);
 			}
 		}
-		
+
 		// CBL
 		// we also change the visible label for both object and datatype properties
 		for (Entry<String, VisObjectProperty> oProp: propertyMap.entrySet()) {
-			VisObjectProperty p = oProp.getValue(); 
-			p.swapLabel(qualifiedRendering); 
+			VisObjectProperty p = oProp.getValue();
+			p.swapLabel(qualifiedRendering);
 		}
 		for (Entry<String, VisDataProperty> dProp: dPropertyMap.entrySet()) {
-			VisDataProperty v = dProp.getValue(); 
-			v.swapLabel(qualifiedRendering); 
+			VisDataProperty v = dProp.getValue();
+			v.swapLabel(qualifiedRendering);
 		}
-		
+
     	VisLevel.adjustWidthAndPos(levelSet);
     	VisLevel.adjustWidthAndPos(levelSet);
     	arrangePos();
-	}
-	
-	// Convenience method to allow backwards code compatibility 
-	public void changeRenderMethod(Boolean labelRendering){
-		changeRenderMethod(labelRendering,false); 
 	}
 	
 	/**
@@ -736,17 +723,16 @@ public class VisGraph implements Runnable{
 		if (ce instanceof OWLClass){
 		   for (OWLAnnotation  an : EntitySearcher.getAnnotations(ce.asOWLClass(), activeOntology).toList() ){
 			   if (an.getProperty().toString().equals("rdfs:label")){
-				   vis.explicitLabel = an.getValue().toString();
-				   vis.explicitLabel.replaceAll("\"", "");
-				   vis.explicitLabel = replaceString(vis.explicitLabel);
-				   auxQLabel = qualifyLabel(ce.asOWLClass(), vis.explicitLabel);
+                   String auxLabel = replaceString(an.getValue().toString().replaceAll("\"", ""));
+				   vis.explicitLabel.add(auxLabel);
+				   auxQLabel = qualifyLabel(ce.asOWLClass(), auxLabel);
 				   if (!"null".equalsIgnoreCase(auxQLabel)) {
 					   vis.explicitQualifiedLabel.add(auxQLabel);
 				   }
 				   else {
-					   vis.explicitQualifiedLabel.add(vis.explicitLabel);
+					   vis.explicitQualifiedLabel.add(auxLabel);
 				   }
-                   paintframe.languagesLabels.add(vis.explicitLabel.split("@")[1]);
+                   paintframe.languagesLabels.add(auxLabel.split("@")[1]);
 			   }
 		   }
        }
@@ -898,7 +884,6 @@ public class VisGraph implements Runnable{
 			 System.out.println("Processing "+entry.getValue().asVisClass().getLabel()); 
 			 Shape shape = entry.getValue();
 			 for (VisConnector in : shape.inConnectors){
-				 System.out.println("\t"+in.from.asVisClass().getLabel()+"-->"+in.to.asVisClass().getLabel()); 
 				 parents.add(in.from);
 			 }
 			 remove(parents,shape,reasoner,ontology);

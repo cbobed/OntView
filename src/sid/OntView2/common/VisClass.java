@@ -40,7 +40,8 @@ public class VisClass extends Shape {
 	ArrayList<String>  properties; // those that have this class as its domain
 	VisPropertyBox propertyBox;
 	HashSet<OWLClassExpression> equivalentClasses;
-	String  explicitLabel = "";
+	Set<String>  explicitLabel = new HashSet<>();
+
 	boolean isAnonymous;
     boolean isDefined   = false;
     public boolean isBottom    = false;
@@ -51,7 +52,7 @@ public class VisClass extends Shape {
     // labels with the translated namespace
     String qualifiedLabel = "";  
     Set<String> explicitQualifiedLabel = new HashSet<>();
-    
+
     // <CBL 24/9/13> 
     // we have to do the same with the definitions 
     // associated to the class
@@ -498,7 +499,7 @@ public class VisClass extends Shape {
 
 	}
 
-	public void swapLabel(Boolean labelRendering, Boolean qualifiedRendering){
+	public void swapLabel(Boolean labelRendering, Boolean qualifiedRendering, String language) {
 		this.qualifiedRendering = qualifiedRendering; 
 		this.labelRendering = labelRendering; 
 		
@@ -506,11 +507,17 @@ public class VisClass extends Shape {
 			if (labelRendering) {
 				if (qualifiedRendering) {
 					if (!explicitQualifiedLabel.isEmpty()) {
-						visibleLabel = explicitQualifiedLabel.iterator().next();
+                        Optional<String> candidate = explicitQualifiedLabel.stream()
+                            .filter(s -> s.contains("@" + language))
+                            .findFirst();
+                        candidate.ifPresent(s -> visibleLabel = s);
 					}
 				}
 				else {
-                    visibleLabel = explicitLabel;
+                    Optional<String> candidate = explicitLabel.stream()
+                        .filter(s -> s.contains("@" + language))
+                        .findFirst();
+                    candidate.ifPresent(s -> visibleLabel = s);
                 }
 			}
 			else {

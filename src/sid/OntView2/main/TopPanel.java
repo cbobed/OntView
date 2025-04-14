@@ -157,7 +157,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	public void qualifiedNamesActionActionPerformed(ActionEvent event) {
 		if (parent.artPanel != null) {
 			parent.artPanel.qualifiedNames = getQualifiedNames().isSelected();
-			parent.artPanel.getVisGraph().changeRenderMethod(parent.artPanel.renderLabel, parent.artPanel.qualifiedNames);
+			parent.artPanel.getVisGraph().changeRenderMethod(parent.artPanel.renderLabel, parent.artPanel.qualifiedNames,
+                    "");
 			Platform.runLater(parent.artPanel.getRedrawRunnable());
 		}
 	}
@@ -167,15 +168,14 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			renderLabel = new CheckBox("label");
 			renderLabel.setCursor(Cursor.HAND);
             renderLabel.setOnAction(this::selectLanguageActionPerformed);
-			//renderLabel.setOnAction(this::renderLabelActionActionPerformed);
 		}
 		return renderLabel;
 	}
 
-	public void renderLabelActionActionPerformed(ActionEvent event) {
+	public void renderLabelActionActionPerformed(ActionEvent event, String lang) {
 		if (parent.artPanel != null) {
 			parent.artPanel.renderLabel = getRenderLabel().isSelected();
-			parent.artPanel.getVisGraph().changeRenderMethod(parent.artPanel.renderLabel, parent.artPanel.qualifiedNames);
+			parent.artPanel.getVisGraph().changeRenderMethod(parent.artPanel.renderLabel, parent.artPanel.qualifiedNames, lang);
 			Platform.runLater(parent.artPanel.getRedrawRunnable());
 		}
 	}
@@ -894,7 +894,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		}
 
 		if (getRenderLabel().isSelected()) {
-			renderLabelActionActionPerformed(e);
+			renderLabelActionActionPerformed(e, "en");
 		}
 
 		if (getQualifiedNames().isSelected()) {
@@ -1181,26 +1181,29 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
     /** Label language */
     private void selectLanguageActionPerformed(ActionEvent event) {
-        getRenderLabel().setSelected(false);
+        if (!getRenderLabel().isSelected()) {
+            renderLabelActionActionPerformed(event,"");
+        } else {
 
-        if (parent.artPanel.getVisGraph() == null) {
-            return;
+            if (parent.artPanel.getVisGraph() == null) {
+                return;
+            }
+
+            Stage stage = new Stage();
+            stage.setTitle("Select language");
+            stage.initModality(Modality.APPLICATION_MODAL);
+
+            Scene scene = new Scene(createLanguageModalContent(stage), 800, 500);
+            ClassLoader c = Thread.currentThread().getContextClassLoader();
+            scene.getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
+            stage.setScene(scene);
+
+            stage.setOnCloseRequest(e -> {
+                getRenderLabel().setSelected(false);
+            });
+
+            stage.show();
         }
-
-        Stage stage = new Stage();
-        stage.setTitle("Select language");
-        stage.initModality(Modality.APPLICATION_MODAL);
-
-        Scene scene = new Scene(createLanguageModalContent(stage), 800, 500);
-        ClassLoader c = Thread.currentThread().getContextClassLoader();
-        scene.getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
-        stage.setScene(scene);
-
-        stage.setOnCloseRequest(e -> {
-            getRenderLabel().setSelected(false);
-        });
-
-        stage.show();
     }
 
     private VBox createLanguageModalContent(Stage stage) {
@@ -1218,7 +1221,13 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
         Button submitButton = new Button("Submit");
         submitButton.setOnAction(e -> {
             getRenderLabel().setSelected(true);
-            renderLabelActionActionPerformed(e);
+            String selectedLanguage = languageCheckboxes.stream()
+                .filter(CheckBox::isSelected)
+                .map(CheckBox::getText)
+                .findFirst()
+                .orElse("en");
+
+            renderLabelActionActionPerformed(e, selectedLanguage);
             stage.close();
         });
 
