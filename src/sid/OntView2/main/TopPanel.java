@@ -1213,8 +1213,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
         languagesGrid.setHgap(15);
         languagesGrid.setVgap(10);
         languagesGrid.setAlignment(Pos.CENTER);
-        ToggleGroup languageGroup = createLanguageToggleGroup(languagesGrid);
 
+        ToggleGroup languageGroup = createLanguageToggleGroup(languagesGrid);
         VBox togglesContainer = createContainerNoSize(languagesGrid);
 
         Button submitButton = new Button("Submit");
@@ -1235,10 +1235,16 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
     }
 
     private ToggleGroup createLanguageToggleGroup(GridPane grid) {
+        int columnsPerRow = 6;
+        for (int i = 0; i < columnsPerRow; i++) {
+            ColumnConstraints cc = new ColumnConstraints();
+            cc.setPercentWidth(100.0 / columnsPerRow);
+            grid.getColumnConstraints().add(cc);
+        }
+
         ToggleGroup languageGroup = new ToggleGroup();
         Set<String> labels = parent.artPanel.languagesLabels;
         int total = labels.size();
-        int columnsPerRow = 6;
         int fullRows = total / columnsPerRow;
         int remainder = total % columnsPerRow;
 
@@ -1246,9 +1252,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
         int indexInRow = 0;
         int colOffset = 0;
 
-        // Iterate through the set; order is implementation-dependent
         for (String lang : labels) {
-            // Compute offset at start of last row
             if (indexInRow == 0) {
                 if (row == fullRows && remainder > 0) {
                     colOffset = (columnsPerRow - remainder) / 2;
@@ -1264,7 +1268,6 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
             }
             rb.getStyleClass().add("language-radio");
 
-            // Add to grid with calculated offset and center alignment
             grid.add(rb, colOffset + indexInRow, row);
             GridPane.setHalignment(rb, HPos.CENTER);
 
@@ -1275,29 +1278,6 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
             }
         }
 
-        return languageGroup;
-    }
-
-    private ToggleGroup createLanguageToggleGroup2(GridPane languagesContainer) {
-        ToggleGroup languageGroup = new ToggleGroup();
-        int columnsPerRow = 6;
-        int row = 0;
-        int col = 0;
-
-        for (String lang : parent.artPanel.languagesLabels) {
-            RadioButton rb = new RadioButton(lang);
-            rb.setToggleGroup(languageGroup);
-            if (lang.equalsIgnoreCase("en")) {
-                rb.setSelected(true);
-            }
-            rb.getStyleClass().add("language-radio");
-            languagesContainer.add(rb, col, row);
-            col++;
-            if (col == columnsPerRow) {
-                col = 0;
-                row++;
-            }
-        }
         return languageGroup;
     }
 
