@@ -1214,10 +1214,20 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
         languagesGrid.setVgap(10);
         languagesGrid.setAlignment(Pos.CENTER);
 
-        ToggleGroup languageGroup = createLanguageToggleGroup(languagesGrid);
-        VBox togglesContainer = createContainerNoSize(languagesGrid);
-
+        VBox togglesContainer;
+        ToggleGroup languageGroup;
         Button submitButton = new Button("Submit");
+
+        if (parent.artPanel.languagesLabels == null || parent.artPanel.languagesLabels.isEmpty()) {
+            Label noLabels = new Label("No language labels available in this ontology.");
+            togglesContainer = createContainerNoSize(noLabels);
+            languageGroup = new ToggleGroup();
+            submitButton.setDisable(true);
+        } else {
+            languageGroup = createLanguageToggleGroup(languagesGrid);
+            togglesContainer = createContainerNoSize(languagesGrid);
+        }
+
         submitButton.setOnAction(e -> {
             RadioButton selected = (RadioButton) languageGroup.getSelectedToggle();
             String selectedLanguage = selected.getText();
@@ -1243,39 +1253,23 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
         }
 
         ToggleGroup languageGroup = new ToggleGroup();
-        Set<String> labels = parent.artPanel.languagesLabels;
+        List<String> labels = new ArrayList<>(parent.artPanel.languagesLabels);
         int total = labels.size();
         int fullRows = total / columnsPerRow;
         int remainder = total % columnsPerRow;
 
-        int row = 0;
-        int indexInRow = 0;
-        int colOffset = 0;
+        for (int i = 0; i < total; i++) {
+            int row = i / columnsPerRow;
+            int colInRow = i % columnsPerRow;
+            int offset = (row == fullRows && remainder > 0) ? (columnsPerRow - remainder) / 2 : 0;
 
-        for (String lang : labels) {
-            if (indexInRow == 0) {
-                if (row == fullRows && remainder > 0) {
-                    colOffset = (columnsPerRow - remainder) / 2;
-                } else {
-                    colOffset = 0;
-                }
-            }
-
-            RadioButton rb = new RadioButton(lang);
+            RadioButton rb = new RadioButton(labels.get(i));
             rb.setToggleGroup(languageGroup);
-            if (lang.equalsIgnoreCase("en")) {
-                rb.setSelected(true);
-            }
+            if (labels.get(i).equalsIgnoreCase("en")) rb.setSelected(true);
             rb.getStyleClass().add("language-radio");
 
-            grid.add(rb, colOffset + indexInRow, row);
+            grid.add(rb, offset + colInRow, row);
             GridPane.setHalignment(rb, HPos.CENTER);
-
-            indexInRow++;
-            if (indexInRow == columnsPerRow) {
-                indexInRow = 0;
-                row++;
-            }
         }
 
         return languageGroup;
