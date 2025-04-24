@@ -6,10 +6,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
-import javafx.geometry.Dimension2D;
-import javafx.geometry.Insets;
-import javafx.geometry.Orientation;
-import javafx.geometry.Pos;
+import javafx.geometry.*;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -1193,15 +1190,17 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
             stage.setTitle("Select language");
             stage.initModality(Modality.APPLICATION_MODAL);
 
-            Scene scene = new Scene(createLanguageModalContent(stage), 800, 500);
+            VBox root = createLanguageModalContent(stage);
+            root.setPrefWidth(400);
+
+            Scene scene = new Scene(root);
             ClassLoader c = Thread.currentThread().getContextClassLoader();
             scene.getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
             stage.setScene(scene);
+            stage.setResizable(false);
+            stage.setAlwaysOnTop(true);
 
-            stage.setOnCloseRequest(e -> {
-                getRenderLabel().setSelected(false);
-            });
-
+            stage.setOnCloseRequest(e -> getRenderLabel().setSelected(false));
             stage.show();
         }
     }
@@ -1209,53 +1208,97 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
     private VBox createLanguageModalContent(Stage stage) {
         VBox container = new VBox(10);
         container.setPadding(new Insets(10));
-        StackPane title = createTitlePane("Select Language");
 
-        List<CheckBox> languageCheckboxes = getCheckBoxes();
+        GridPane languagesGrid = new GridPane();
+        languagesGrid.setHgap(15);
+        languagesGrid.setVgap(10);
+        languagesGrid.setAlignment(Pos.CENTER);
+        ToggleGroup languageGroup = createLanguageToggleGroup(languagesGrid);
 
-        ListView<CheckBox> listView = new ListView<>();
-        ObservableList<CheckBox> items = FXCollections.observableArrayList(languageCheckboxes);
-        listView.setItems(items);
-        listView.setMaxHeight(200);
+        VBox togglesContainer = createContainerNoSize(languagesGrid);
 
         Button submitButton = new Button("Submit");
         submitButton.setOnAction(e -> {
+            RadioButton selected = (RadioButton) languageGroup.getSelectedToggle();
+            String selectedLanguage = selected.getText();
             getRenderLabel().setSelected(true);
-            String selectedLanguage = languageCheckboxes.stream()
-                .filter(CheckBox::isSelected)
-                .map(CheckBox::getText)
-                .findFirst()
-                .orElse("en");
-
             renderLabelActionActionPerformed(e, selectedLanguage);
             stage.close();
         });
 
-        container.getChildren().addAll(title, listView, submitButton);
+        HBox buttonContainer = new HBox();
+        buttonContainer.setAlignment(Pos.CENTER_RIGHT);
+        buttonContainer.getChildren().add(submitButton);
 
+        container.getChildren().addAll(togglesContainer, buttonContainer);
         return container;
     }
 
-    private List<CheckBox> getCheckBoxes() {
-        List<CheckBox> languageCheckboxes = new ArrayList<>();
-        for (String lang : parent.artPanel.languagesLabels) {
-            CheckBox cb = new CheckBox(lang);
-            if (lang.equalsIgnoreCase("en")) {
-                cb.setSelected(true);
-            }
-            cb.setOnAction(e -> {
-                if (cb.isSelected()) {
-                    for (CheckBox other : languageCheckboxes) {
-                        if (other != cb) {
-                            other.setSelected(false);
-                        }
-                    }
+    private ToggleGroup createLanguageToggleGroup(GridPane grid) {
+        ToggleGroup languageGroup = new ToggleGroup();
+        Set<String> labels = parent.artPanel.languagesLabels;
+        int total = labels.size();
+        int columnsPerRow = 6;
+        int fullRows = total / columnsPerRow;
+        int remainder = total % columnsPerRow;
+
+        int row = 0;
+        int indexInRow = 0;
+        int colOffset = 0;
+
+        // Iterate through the set; order is implementation-dependent
+        for (String lang : labels) {
+            // Compute offset at start of last row
+            if (indexInRow == 0) {
+                if (row == fullRows && remainder > 0) {
+                    colOffset = (columnsPerRow - remainder) / 2;
                 } else {
+                    colOffset = 0;
                 }
-            });
-            languageCheckboxes.add(cb);
+            }
+
+            RadioButton rb = new RadioButton(lang);
+            rb.setToggleGroup(languageGroup);
+            if (lang.equalsIgnoreCase("en")) {
+                rb.setSelected(true);
+            }
+            rb.getStyleClass().add("language-radio");
+
+            // Add to grid with calculated offset and center alignment
+            grid.add(rb, colOffset + indexInRow, row);
+            GridPane.setHalignment(rb, HPos.CENTER);
+
+            indexInRow++;
+            if (indexInRow == columnsPerRow) {
+                indexInRow = 0;
+                row++;
+            }
         }
-        return languageCheckboxes;
+
+        return languageGroup;
+    }
+
+    private ToggleGroup createLanguageToggleGroup2(GridPane languagesContainer) {
+        ToggleGroup languageGroup = new ToggleGroup();
+        int columnsPerRow = 6;
+        int row = 0;
+        int col = 0;
+
+        for (String lang : parent.artPanel.languagesLabels) {
+            RadioButton rb = new RadioButton(lang);
+            rb.setToggleGroup(languageGroup);
+            if (lang.equalsIgnoreCase("en")) {
+                rb.setSelected(true);
+            }
+            rb.getStyleClass().add("language-radio");
+            languagesContainer.add(rb, col, row);
+            col++;
+            if (col == columnsPerRow) {
+                col = 0;
+                row++;
+            }
+        }
+        return languageGroup;
     }
 
     /** class expression (query) */
