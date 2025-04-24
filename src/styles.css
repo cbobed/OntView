@@ -299,3 +299,17 @@
     -fx-border-radius: 3px;
     -fx-font-size: 12px;
 }
+
+.language-radio .radio {
+    -fx-background-color: transparent;
+    -fx-border-color: #5679a2;
+    -fx-border-radius: 50%;
+}
+
+.language-radio:selected .radio {
+    -fx-mark-color: blue;
+}
+
+.language-radio .radio:hover {
+    -fx-background-color: linear-gradient(to bottom, #d3e3f1, #b0c4de);
+}
