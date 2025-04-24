@@ -116,6 +116,7 @@
     -fx-font-weight: normal;
 }
 
+
 .tooltipDesign {
     -fx-background-color: lightblue;
     -fx-text-fill: black;
@@ -220,6 +221,10 @@
     -fx-border-radius: 1px;
     -fx-cursor: hand;
     -fx-padding: 5px 8px;
+}
+
+.combo-box .arrow-button .arrow, .check-box:selected .box .mark {
+    -fx-background-color: blue;
 }
 
 .spinner .text-field {
