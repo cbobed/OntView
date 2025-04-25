@@ -302,7 +302,7 @@ public class VisObjectProperty extends VisProperty {
 		VisClass intersection = new VisClass(1, result, ExpressionManager.getReducedClassExpression(result), v);
 
 		l.addShape(intersection);
-		v.shapeMap.put(result.toString(), intersection);
+		v.shapeMap.put(Shape.getKey(result), intersection);
 		intersection.isAnonymous = true;
 		intersection.setHeight(intersection.calculateHeight());
 		intersection.setWidth(intersection.calculateWidth());
@@ -351,7 +351,7 @@ public class VisObjectProperty extends VisProperty {
 		VisClass intersection = new VisClass(1, result, ExpressionManager.getReducedClassExpression(result), v);
 
 		l.addShape(intersection);
-		v.shapeMap.put(result.toString(), intersection);
+		v.shapeMap.put(Shape.getKey(result), intersection);
 		intersection.isAnonymous = true;
 		intersection.setHeight(intersection.calculateHeight());
 		intersection.setWidth(intersection.calculateWidth());
