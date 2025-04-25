@@ -206,11 +206,10 @@ public class VisClass extends Shape {
 	    	else {
 				currentHeight = calculateHeight();
 			}
-			setWidth(calculateWidth());
 		}
+        setWidth(calculateWidth());
 
-	    if (visible){
-
+        if (visible){
 			int propertySpace = (propertyBox != null) ? 20 : 0;
 
 	    	if (!isDefined) {
@@ -745,14 +744,10 @@ public class VisClass extends Shape {
 	public int calculateWidth() {
 		GraphicsContext g = graph.paintframe.getGraphicsContext2D();
 	    int max = 0;
-	    Font prevFont = g.getFont();
-		Font newFont = Font.font("DejaVu Sans", FontWeight.BOLD, 10);
-
-		g.setFont(newFont);
 
 		// Way to measure text width
 		Text textNode = new Text();
-		textNode.setFont(newFont);
+		textNode.setFont(g.getFont());
 
 	    StringTokenizer sTokenizer;
     	String token; 
@@ -761,7 +756,7 @@ public class VisClass extends Shape {
 			if (!isAnonymous) {
 				if (!label.startsWith(SIDClassExpressionNamer.className)) {
 					textNode.setText(visibleLabel);
-					max = (int) textNode.getLayoutBounds().getWidth() + 25 ;
+					max = (int) textNode.getLayoutBounds().getWidth() + 25;
 				}
                 //<CBL> for the defined, max might not be the desired value
 				if (isDefined) {
@@ -803,11 +798,9 @@ public class VisClass extends Shape {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-			g.setFont(prevFont);
 		}
 
-		return max;
+        return max;
 		
 	}
 	public void createPropertyBox() {
