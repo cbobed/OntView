@@ -180,11 +180,10 @@ public class VisClass extends Shape {
 		if (g == null){
 			return;
 		}
-		int x, y;
 		int roundCornerValue = 10;
 
-		x = posx + 1;
-		y = posy;
+		int x = posx;
+		int y = posy;
 
         Font oldFont=g.getFont();
 	    if (this.isKorean) {
@@ -740,8 +739,82 @@ public class VisClass extends Shape {
 		// TODO Auto-generated method stub
 		return RELATIVE_POS;
 	}
+
+    public int calculateWidth() {
+        GraphicsContext g = graph.paintframe.getGraphicsContext2D();
+        int max = 0;
+        Font prevFont = g.getFont(), newFont;
+
+        if (this.isKorean) {
+            newFont = getKoreanFont();
+        }
+        else {
+            newFont = getBoldFont();
+        }
+        g.setFont(newFont);
+
+        // Way to measure text width
+        Text textNode = new Text();
+        textNode.setFont(newFont);
+
+        StringTokenizer sTokenizer;
+        String token;
+        int candidate;
+        try {
+            if (!isAnonymous) {
+                if (!label.startsWith(SIDClassExpressionNamer.className)) {
+                    textNode.setText(visibleLabel);
+                    max = (int) textNode.getLayoutBounds().getWidth() + 25 ;
+                }
+                //<CBL> for the defined, max might not be the desired value
+                if (isDefined) {
+
+                    // we have to do the same as for the anonymous ones
+                    // for each of the definitions
+                    for (String auxLabel: getVisibleDefinitionLabels()) {
+                        sTokenizer = new StringTokenizer(auxLabel, "\n");
+                        while (sTokenizer.hasMoreElements()) {
+                            token = sTokenizer.nextToken();
+                            textNode.setText(removeFormatInformation(token));
+                            candidate = (int) textNode.getLayoutBounds().getWidth() + 25;
+                            candidate += tabsSize(token);
+                            if (candidate > max) {
+                                max = candidate;
+                            }
+                        }
+                    }
+                }
+            }
+            else {
+                sTokenizer = new StringTokenizer(visibleLabel, "\n");
+                while (sTokenizer.hasMoreElements()) {
+                    token = sTokenizer.nextToken();
+                    textNode.setText(removeFormatInformation(token));
+                    candidate = (int) textNode.getLayoutBounds().getWidth() + 25;
+                    candidate += tabsSize(token);
+
+                    if (candidate > max) {
+                        max = candidate;
+                    }
+                }
+            }
+            if (!getDisjointConnectors().isEmpty()) {
+                max += 10;
+            }
+            if (propertyBox != null) {
+                max += 20;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            g.setFont(prevFont);
+        }
+
+        return max;
+
+    }
 	
-	public int calculateWidth() {
+	public int calculateWidth2() {
 		GraphicsContext g = graph.paintframe.getGraphicsContext2D();
 	    int max = 0;
 

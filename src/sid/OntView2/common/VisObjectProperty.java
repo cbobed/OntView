@@ -126,8 +126,10 @@ public class VisObjectProperty extends VisProperty {
 		parents  = new ArrayList<>();
 		label    = ExpressionManager.getReducedObjectPropertyExpression (po);
 		visibleLabel = label;
+
+        System.out.println("----- VisObjectProperty: " + ExpressionManager.getReducedQualifiedObjectPropertyExpression(po));
 		
-		qualifiedLabel = ExpressionManager.getReducedQualifiedObjectPropertyExpression (po); 
+		qualifiedLabel = ExpressionManager.getReducedQualifiedObjectPropertyExpression(po);
 		if (qualifiedLabel == null || "null".equalsIgnoreCase(qualifiedLabel)) {
 			qualifiedLabel = label; 
 		}
