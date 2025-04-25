@@ -813,69 +813,7 @@ public class VisClass extends Shape {
         return max;
 
     }
-	
-	public int calculateWidth2() {
-		GraphicsContext g = graph.paintframe.getGraphicsContext2D();
-	    int max = 0;
 
-		// Way to measure text width
-		Text textNode = new Text();
-		textNode.setFont(g.getFont());
-
-	    StringTokenizer sTokenizer;
-    	String token; 
-    	int candidate;
-		try {
-			if (!isAnonymous) {
-				if (!label.startsWith(SIDClassExpressionNamer.className)) {
-					textNode.setText(visibleLabel);
-					max = (int) textNode.getLayoutBounds().getWidth() + 25;
-				}
-                //<CBL> for the defined, max might not be the desired value
-				if (isDefined) {
-
-					// we have to do the same as for the anonymous ones
-					// for each of the definitions
-					for (String auxLabel: getVisibleDefinitionLabels()) {
-						sTokenizer = new StringTokenizer(auxLabel, "\n");
-						while (sTokenizer.hasMoreElements()) {
-							token = sTokenizer.nextToken();
-							textNode.setText(removeFormatInformation(token));
-							candidate = (int) textNode.getLayoutBounds().getWidth() + 25;
-							candidate += tabsSize(token);
-							if (candidate > max) {
-								max = candidate;
-							}
-						}
-					}
-				}
-			}
-			else {
-				sTokenizer = new StringTokenizer(visibleLabel, "\n");
-                while (sTokenizer.hasMoreElements()) {
-					token = sTokenizer.nextToken();
-					textNode.setText(removeFormatInformation(token));
-					candidate = (int) textNode.getLayoutBounds().getWidth() + 25;
-					candidate += tabsSize(token);
-
-					if (candidate > max) {
-						max = candidate;
-					}
-				}
-			}
-			if (!getDisjointConnectors().isEmpty()) {
-				max += 10;
-			}
-			if (propertyBox != null) {
-				max += 20;
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-        return max;
-		
-	}
 	public void createPropertyBox() {
 		propertyBox = new VisPropertyBox(this);
 	}

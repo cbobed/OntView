@@ -217,7 +217,7 @@ public class VisObjectProperty extends VisProperty {
 				g.fillText(visibleLabel, getPosX(), getPosY());
 			}	
 			else {
-				g.fillText(visibleLabel, getPosX(), getPosY());
+				g.fillText("----" + visibleLabel, getPosX(), getPosY());
 			}
 			Point2D circlePos = new Point2D(getPosX()-17, getPosY()-11);
 			if (isTransitive|| isFunctional || isSymmetric || hasInverse || isReflexive || propertyChainAxiom!=null){
@@ -377,7 +377,6 @@ public class VisObjectProperty extends VisProperty {
 		// global view refreshment, these methods have to be aware of the type of 
 		// rendering that is being used (labelled, qualified). 
 		this.qualifiedRendering = qualifiedRendering;
-		
 		if (qualifiedRendering) 
 			visibleLabel = qualifiedLabel; 
 		else 

@@ -153,13 +153,13 @@ public class VisGraph implements Runnable{
 	 *  builds the complete graph
 	 *  relies on wether it's expanded or not, and rearranging visual info
 	 */
-    public void buildReasonedGraph(OWLOntology activeOntology,OWLReasoner reasoner, Set<OWLClassExpression> rootCpts, boolean check) throws XPathExpressionException, ParserConfigurationException, SAXException, IOException {
+    public void buildReasonedGraph(OWLOntology activeOntology,OWLReasoner reasoner, Set<OWLClassExpression> rootCpts) throws XPathExpressionException, ParserConfigurationException, SAXException, IOException {
 
         System.out.println("-->buildReasonedGraph");
         //It's important to set config constants before creating
         //will have to move this elsewhere
         clearAll();
-        set.stream().forEach(x->System.out.println("Build 1st set: "+x));
+        set.forEach(x->System.out.println("Build 1st set: "+x));
         OWLClass topClass = activeOntology.getOWLOntologyManager().getOWLDataFactory().getOWLThing();
         // we start from a fresh graph, so it is safe to create OWLThing directly
         addVisClass(Shape.getKey(topClass), topClass, activeOntology, reasoner);
@@ -235,8 +235,6 @@ public class VisGraph implements Runnable{
 			if (getShapeFromOWLClassExpression(ce) == null) {
 				if ( (startingPoint.isOWLThing() || subsumes(startingPoint, ce, activeOntology, reasoner, dFactory)) && 
 						(endPoint.isOWLNothing() || subsumes(ce, endPoint, activeOntology, reasoner, dFactory )) ){
-					HashSet<OWLClassExpression> superset = new HashSet<>();
-					superset.add(activeOntology.getOWLOntologyManager().getOWLDataFactory().getOWLThing()); 
 					addGatheredClassExpression(ce, activeOntology.getOWLOntologyManager().getOWLDataFactory().getOWLThing(), reasoner, activeOntology, dFactory);
 					i++; 
 					if (i%5==0) 
@@ -283,8 +281,7 @@ public class VisGraph implements Runnable{
 			OWLOntology activeOntology,
 			OWLDataFactory dataFactory) {
 
-		HashSet<Shape> directParents = new HashSet<>();
-		directParents.addAll(exploreParent(e, entryPointParent, reasoner, activeOntology, dataFactory)); 
+        HashSet<Shape> directParents = new HashSet<>(exploreParent(e, entryPointParent, reasoner, activeOntology, dataFactory));
 		
 		// We check for the equivalences 
 		for (Shape directParent: directParents) {
@@ -319,10 +316,10 @@ public class VisGraph implements Runnable{
 		VisClass addedVis = addVisClass(e.toString(), e,activeOntology,reasoner);
 		
 		createParentConnections(addedVis, directParents.stream()
-														.map(x->x.getLinkedClassExpression())
+														.map(Shape::getLinkedClassExpression)
 														.collect(Collectors.toSet())); 
 		createChildConnections(addedVis, potentialChildren.stream()
-															.map(x->x.getLinkedClassExpression())
+															.map(Shape::getLinkedClassExpression)
 															.collect(Collectors.toSet()));
 		
 	}
@@ -335,7 +332,7 @@ public class VisGraph implements Runnable{
 	   int depthLevel = 0; 
 	   while (!nextLevel.isEmpty()) {
 		   System.out.println("Creating level "+depthLevel+"..."+nextLevel.size()); 
-		   nextLevel.stream().forEach(x-> {System.out.println("including ... ("+x.getChildren().size()+") "+x.getLinkedClassExpression());
+		   nextLevel.forEach(x-> {System.out.println("including ... ("+x.getChildren().size()+") "+x.getLinkedClassExpression());
 		   }); 
 		   VisLevel vlevel;
 	       int levelPosx = VisClass.FIRST_X_SEPARATION;
@@ -357,7 +354,7 @@ public class VisGraph implements Runnable{
 			   }
 		   }
 		   nextLevel.clear(); 
-		   auxNextLevel.stream().forEach( x -> {
+		   auxNextLevel.forEach(x -> {
 			   nextLevel.add(getShapeFromOWLClassExpression(x).asVisClass()); 
 		   }); 
 		   depthLevel++; 
@@ -1145,7 +1142,7 @@ public class VisGraph implements Runnable{
 
             if (Thread.currentThread().isInterrupted()) { return; }
             System.out.println("-->buildReasonedGraph");
-			this.buildReasonedGraph(getActiveOntology(), getReasoner(), topSet, isExpanded());
+			this.buildReasonedGraph(getActiveOntology(), getReasoner(), topSet);
 
             if (Thread.currentThread().isInterrupted()) { return; }
             System.out.println("-->storeDescendants");
