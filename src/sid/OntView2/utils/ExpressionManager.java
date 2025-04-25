@@ -552,7 +552,7 @@ public class ExpressionManager {
 			return obtainQualifiedEntityNameFromIRI(e.asOWLObjectProperty().getIRI()); 
 		}
 		else if (e instanceof OWLObjectInverseOf) {
-			OWLObjectPropertyExpression invProp = ((OWLObjectInverseOf) e).getInverseProperty(); 
+			OWLObjectPropertyExpression invProp = e.getInverseProperty();
 			return "inverseOf ("+getReducedQualifiedObjectPropertyExpression(invProp)+")"; 
 		}
 		else

@@ -43,7 +43,7 @@ public class VisClass extends Shape {
 	Set<String>  explicitLabel = new HashSet<>();
 
 	boolean isAnonymous;
-    boolean isDefined   = false;
+    boolean isDefined   = false, isKorean = false;
     public boolean isBottom    = false;
     int     currentHeight;
 
@@ -163,20 +163,18 @@ public class VisClass extends Shape {
 		}
 	}
 	
-	private Font defFont;
-	private Font boldFont;
-	private Font getDefinedClassFont(){
-		if (defFont==null)
-			defFont = Font.font("DejaVu Sans", FontWeight.BOLD, 10);
-		return defFont;
-	}
-	
+	private Font boldFont, koreanFont;
 	private Font getBoldFont(){
 		if (boldFont==null)
 			boldFont= Font.font("DejaVu Sans", FontWeight.BOLD, 10);
 		return boldFont;
 	}
 
+    private Font getKoreanFont(){
+        if (koreanFont==null)
+            koreanFont= Font.font("Noto Sans CJK KR", FontWeight.BOLD, 10);
+        return koreanFont;
+    }
 
 	public void drawShape(GraphicsContext g) {
 		if (g == null){
@@ -189,8 +187,8 @@ public class VisClass extends Shape {
 		y = posy;
 
         Font oldFont=g.getFont();
-	    if (this.isDefined) {
-	        g.setFont(getDefinedClassFont());
+	    if (this.isKorean) {
+	        g.setFont(getKoreanFont());
 	    }
 	    else {
 	    	g.setFont(getBoldFont());
@@ -263,10 +261,10 @@ public class VisClass extends Shape {
 
 		    		// this is the name of the concept
 					g.setFill(Color.BLACK);
-		    		g.setFont(getDefinedClassFont()); 
+		    		//g.setFont(getBoldFont());
 		    		g.fillText(visibleLabel, x - (double) (getWidth() - 16) /2 + 5 + propertySpace, (y - (double) (currentHeight - 4) /2) - 6 + ascent);
 
-		    		g.setFont(getBoldFont());
+		    		//g.setFont(getBoldFont());
 		    		double auxY = y - ((double) currentHeight /2) + (fontHeight +5) + 2;
 		    		if (visibleDefinitionLabels != null) {
 		    			for (String auxDefString: visibleDefinitionLabels) {
@@ -306,7 +304,7 @@ public class VisClass extends Shape {
 					}
 
 				    g.setStroke(Color.BLACK);
-				    g.setFont(getBoldFont()); 
+				    //g.setFont(getBoldFont());
 		    		double auxY = (y - (double) (currentHeight - 4) /2);
 		    		if (visibleDefinitionLabels != null) {
 		    			for (String auxDefString: visibleDefinitionLabels) {
@@ -501,7 +499,8 @@ public class VisClass extends Shape {
 
 	public void swapLabel(Boolean labelRendering, Boolean qualifiedRendering, String language) {
 		this.qualifiedRendering = qualifiedRendering; 
-		this.labelRendering = labelRendering; 
+		this.labelRendering = labelRendering;
+        this.isKorean = language.equals("ko");
 		
 		if (!explicitLabel.isEmpty()) {
 			if (labelRendering) {
