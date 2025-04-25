@@ -16,32 +16,27 @@ import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Objects;
 
 public class VisObjectProperty extends VisProperty {
 
-	VisPropertyBox pbox;
+	VisPropertyBox pBox;
 	int height,width;
-	int voffset;
+	int vOffset;
 	OWLObjectPropertyExpression oPropExp;
 	String label;
-	String qualifiedLabel = "";
-	String visibleLabel = "";
+	String qualifiedLabel;
+	String visibleLabel;
 	Shape range;
 	boolean visible = true;
 	VisConnectorPropertyRange rangeConnector;
 	ArrayList<VisConnectorHeritance> parentConnectors;
 	ArrayList<VisObjectProperty> parents;
-	HashSet<Point2D> pointSet;
 	VisConnectorPropProp onlyParentConnector;
 	ArrayList<Point2D> connectionPoints;
 	Font textFont;
 	Font circleFont;
 	
-	boolean qualifiedRendering = false; 
-	boolean labelRendering = false; 
-	
-	
+	boolean qualifiedRendering = false;
 	org.semanticweb.owlapi.reasoner.Node<OWLObjectPropertyExpression> inverseOf;
 
 	boolean isTransitive  =  false;
@@ -50,13 +45,13 @@ public class VisObjectProperty extends VisProperty {
 	boolean isFunctional  =  false;
 	boolean isAsymmetric  =  false;
 	boolean hasInverse    =  false;
-	boolean isIrreflexive =  false;
+	boolean isIrreflexive=  false;
 	boolean isInverseFunctional = false;
 	OWLSubPropertyChainOfAxiom propertyChainAxiom = null;
 
 	public int getPosX(){return getDomain().getPosX()-(getDomain().getWidth()/2);}
-	public int getPosY(){return  15+getDomain().getPosY()+(getDomain().getHeight()/2)+getLabelHeight()*voffset;}
-	public OWLReasoner getReasoner(){return pbox.vclass.graph.paintframe.getReasoner();}
+	public int getPosY(){return  15+getDomain().getPosY()+(getDomain().getHeight()/2)+getLabelHeight()* vOffset;}
+	public OWLReasoner getReasoner(){return pBox.vclass.graph.paintframe.getReasoner();}
 	
 	public boolean onProperty(Point2D p){
 		return ((p.getX() >= getPosX()-20)&&(p.getX() <= getPosX())&& (p.getY() >= getPosY()-10)&&(p.getY() <= getPosY()));
@@ -127,8 +122,8 @@ public class VisObjectProperty extends VisProperty {
 	
 	
 	public VisObjectProperty(VisPropertyBox ppbox, OWLObjectPropertyExpression po, int pvoffset, Shape prange, OWLOntology ontology) {
-		pbox = ppbox;
-		parents  = new ArrayList<VisObjectProperty>();
+		pBox = ppbox;
+		parents  = new ArrayList<>();
 		label    = ExpressionManager.getReducedObjectPropertyExpression (po);
 		visibleLabel = label;
 		
@@ -139,35 +134,35 @@ public class VisObjectProperty extends VisProperty {
 		
 		oPropExp = po;
 		range    = prange;
-		voffset  = pvoffset;
+		vOffset = pvoffset;
 
 		textFont    = Font.font("DejaVu Sans", FontWeight.NORMAL, FontPosture.REGULAR, 11);
 		circleFont  = Font.font("DejaVu Sans", FontWeight.BOLD, 10);
 
 		connectionPoints = new ArrayList<>();
 		if (getDomain() != range) {
-			rangeConnector = new VisConnectorPropertyRange(ppbox, pbox.vclass , range, this);
+			rangeConnector = new VisConnectorPropertyRange(ppbox, pBox.vclass , range, this);
 		}
 		if (EntitySearcher.isFunctional(oPropExp, ontology)) isFunctional = true;
 		if (EntitySearcher.isTransitive(oPropExp, ontology)) isTransitive = true;
 		if (EntitySearcher.isSymmetric(oPropExp, ontology)) isSymmetric  = true;
 		inverseOf  = getReasoner().getInverseObjectProperties(po);
-		hasInverse = ((inverseOf !=null)&&(inverseOf.getEntities().size())>0);
+		hasInverse = ((inverseOf !=null)&& !inverseOf.getEntities().isEmpty());
 		if (EntitySearcher.isReflexive(oPropExp, ontology)) isReflexive =true;
 		if (EntitySearcher.isAsymmetric(oPropExp, ontology)) isAsymmetric = true;
 		if (EntitySearcher.isIrreflexive(oPropExp, ontology)) isIrreflexive = true;
 		if (EntitySearcher.isInverseFunctional(oPropExp, ontology))	isInverseFunctional = true;
-		if (pbox.vclass.graph.chainPropertiesMap!=null)
-			propertyChainAxiom = pbox.vclass.graph.chainPropertiesMap.get(getKey (oPropExp));
+		if (pBox.vclass.graph.chainPropertiesMap!=null)
+			propertyChainAxiom = pBox.vclass.graph.chainPropertiesMap.get(getKey (oPropExp));
 	}
 	
-	public void add(VisObjectProperty pparent){
-		parents.add(pparent);
+	public void add(VisObjectProperty pParent){
+		parents.add(pParent);
 		if (parentConnectors == null){
 			parentConnectors = new ArrayList<>();
-			parentConnectors.add(new VisConnectorHeritance(this, pparent));
+			parentConnectors.add(new VisConnectorHeritance(this, pParent));
 		}
-		parentConnectors.add(new VisConnectorHeritance(this, pparent));
+		parentConnectors.add(new VisConnectorHeritance(this, pParent));
 
 	}
 	
@@ -205,14 +200,14 @@ public class VisObjectProperty extends VisProperty {
 	}
 	
 	public VisClass getDomain( ) {
-		return pbox.vclass;
+		return pBox.vclass;
 	}
 
 	public void draw(GraphicsContext g){
 		if (g == null){
 			return;
 		}
-		if ((pbox.visible)&&(visible)&&(pbox.vclass.visible)){
+		if ((pBox.visible)&&(visible)&&(pBox.vclass.visible)){
 			g.setFont(textFont);
 			g.setFill(Color.BLACK);
 
@@ -235,19 +230,6 @@ public class VisObjectProperty extends VisProperty {
 		}
 	}
 
-	public Point2D getConnectionPoint(int index) {
-		if (connectionPoints ==null)
-			getConnectionPoints();
-		return connectionPoints.get(index);
-	}
-	
-	public ArrayList<Point2D> getConnectionPoints(){
-		if (connectionPoints.size()==0) {
-			addPoints(connectionPoints);
-		}
-		return connectionPoints;
-	}
-
 	private void addPoints(ArrayList<Point2D> list ) {
 		list.add(new Point2D(getPosX(),getPosY()));
 		list.add(new Point2D(getPosX()+getLabelWidth()+2,getPosY()));
@@ -264,7 +246,7 @@ public class VisObjectProperty extends VisProperty {
 				rangeConnector.draw(g);
 			if (parents.size()>1){
 				g.setFont(circleFont);
-				if (pbox.vclass.visible){
+				if (pBox.vclass.visible){
 					g.strokeOval(getPosX()-17, getPosY()-14, 14,14);
 					g.fillText(OntViewConstants.AND, getPosX()-14, getPosY()-2);
 				}
@@ -284,7 +266,7 @@ public class VisObjectProperty extends VisProperty {
 
 
 	public static void addDomain(VisGraph v, NodeSet<OWLClass> propertyDomainNodeSet,
-                                 OWLObjectProperty property, OWLReasoner reasoner, OWLOntology ontology,
+                                 OWLObjectProperty property, OWLOntology ontology,
                                  Shape range){
 		// Since property domain returned more than one class, this will have
 		// to create  a new class as the intersection of all of them
@@ -325,21 +307,15 @@ public class VisObjectProperty extends VisProperty {
 	
 	/**
 	 * Esta en wip
-	 * @param v
-	 * @param propertyRangeNodeSet
-	 * @param property
-	 * @param reasoner
-	 * @param ontology
 	 */
 	
 	
-	public static Shape addRange(VisGraph v, NodeSet<OWLClass> propertyRangeNodeSet,
-                                 OWLObjectProperty property, OWLReasoner reasoner, OWLOntology ontology){
+	public static Shape addRange(VisGraph v, NodeSet<OWLClass> propertyRangeNodeSet){
 		// Since property range returned more than one class, this will have
 		// to create  a new class as the intersection of all of them
 		
 		OWLDataFactory dFactory = OWLManager.getOWLDataFactory();
-		HashSet<OWLClassExpression> terms = new HashSet<OWLClassExpression>();
+		HashSet<OWLClassExpression> terms = new HashSet<>();
 		
 		for ( org.semanticweb.owlapi.reasoner.Node<OWLClass> node : propertyRangeNodeSet.getNodes()){
 			for ( OWLClass entity :node.getEntities()){

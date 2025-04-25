@@ -482,7 +482,7 @@ public class VisGraph implements Runnable{
 			// CBL: 
 			// changed the way the range shape is added and handled
 			if (propertyRangeNodeSet.getNodes().size()>1) {
-				range = VisObjectProperty.addRange(this, propertyRangeNodeSet, property, reasoner, activeOntology); 
+				range = VisObjectProperty.addRange(this, propertyRangeNodeSet);
 			}
 			else {
 				// there is only one node in the range definition
@@ -493,7 +493,7 @@ public class VisGraph implements Runnable{
 			}
 			
 			if (propertyDomainNodeSet.getNodes().size()>1){
-				VisObjectProperty.addDomain(this,propertyDomainNodeSet,property,reasoner,activeOntology,range);
+				VisObjectProperty.addDomain(this,propertyDomainNodeSet,property, activeOntology,range);
 			}
 			else { //common case 
 				for (Node<OWLClass> o : propertyDomainNodeSet ){

@@ -118,7 +118,7 @@ public class VisPropertyBox {
 		}
 		int offset = 0;
 		for (VisObjectProperty orderedProperty : ordered){
-			orderedProperty.voffset=offset;
+			orderedProperty.vOffset =offset;
 			offset++;
 		}
 		ordered.clear();
