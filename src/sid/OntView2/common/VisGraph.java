@@ -55,12 +55,12 @@ public class VisGraph implements Runnable{
 	public List<VisConnector> getDashedConnectorList(){ return dashedConnectorList;}
     public Map<String,Shape> getShapeMap() {return shapeMap;}
     public Map<Integer, VisLevel> getLevelSet(){return levelSet;}
-	public void setActiveOntology(OWLOntology pactiveOntology) {activeOntology = pactiveOntology;}
-	public void setOWLClassExpressionSet(HashSet<OWLClassExpression> pset) { set = pset;}
-	public void setCheck(boolean pcheck) {check = pcheck;}
+	public void setActiveOntology(OWLOntology pActiveOntology) {activeOntology = pActiveOntology;}
+	public void setOWLClassExpressionSet(HashSet<OWLClassExpression> pSet) { set = pSet;}
+	public void setCheck(boolean pCheck) {check = pCheck;}
 	public OWLOntology getActiveOntology(){return activeOntology;}
 	public boolean isExpanded(){return check;}
-	public void setReasoner(OWLReasoner preasoner) {reasoner = preasoner;}
+	public void setReasoner(OWLReasoner pReasoner) {reasoner = pReasoner;}
 	public OWLReasoner getReasoner(){return reasoner;}
 	public boolean isCreated(){return created;}
 	private CountDownLatch latch;
@@ -69,7 +69,7 @@ public class VisGraph implements Runnable{
 	/**
 	 * Progress bar criteria. From 0-70 % it will depend on the number of shapes added to the map
 	 */
-    public  VisGraph(PaintFrame pframe) {
+    public  VisGraph(PaintFrame pFrame) {
 		shapeMap     = new ConcurrentHashMap<>();
         labelMap     = new ConcurrentHashMap<>();
 		propertyMap  = new HashMap<>();
@@ -77,7 +77,7 @@ public class VisGraph implements Runnable{
 		connectorList 		= new ArrayList<>();
 		dashedConnectorList = new ArrayList<>();
 		levelSet 			= new Hashtable<>();
-		paintframe = pframe;
+		paintframe = pFrame;
 		qualifiedLabelMap = new HashMap<>();
 	}
 
@@ -112,7 +112,6 @@ public class VisGraph implements Runnable{
 			return 0;
 		}
         return (lvl.getWidth()+lvl.getXpos()+VisConstants.WIDTH_MARGIN);
-		//return Math.max(((lvl.getWidth()+lvl.getXpos()+VisConstants.WIDTH_MARGIN) - paintframe.screenWidth), 0);
 
 	}
     public int getHeight() {
@@ -121,12 +120,11 @@ public class VisGraph implements Runnable{
             maxy = (Math.max(entry.getValue().getBottomCorner(), maxy));
 		}
         return (maxy + VisConstants.HEIGHT_MARGIN);
-		//return Math.max(((maxy + VisConstants.HEIGHT_MARGIN) - paintframe.screenHeight), 0);
     }
     
     public void adjustPanelSize(float factor){
 		if (paintframe == null) {
-			System.err.println("paintframe is null in adjustPanelSize method.");
+			System.err.println("PaintFrame is null in adjustPanelSize method.");
 			return;
 		}
         double viewPortHeight = paintframe.scroll.getViewportBounds().getHeight();
@@ -138,14 +136,14 @@ public class VisGraph implements Runnable{
 		paintframe.canvasHeight = y + paintframe.screenHeight;
 		paintframe.canvasWidth = x + paintframe.screenWidth;
 
-        // deja un espacio de 164px
+        // leaves a space of 164px
 		paintframe.scroll.setHmax(x);
 		paintframe.scroll.setVmax(y);
     }
 	
 	/**
 	 *  builds the complete graph
-	 *  relies on wether it's expanded or not, and rearranging visual info
+	 *  relies on weather it's expanded or not, and rearranging visual info
 	 */
     public void buildReasonedGraph(OWLOntology activeOntology,OWLReasoner reasoner, Set<OWLClassExpression> rootCpts) throws XPathExpressionException, ParserConfigurationException, SAXException, IOException {
 
@@ -197,7 +195,7 @@ public class VisGraph implements Runnable{
         reorder.visualReorder();
         adjustPanelSize((float) 1.0);
         clearDashedConnectorList();
-        updateXposition();
+        updatePosition();
         System.out.println("Applying KCE Option if required ...");
         paintframe.doKceOptionAction();
         //showAll();
@@ -216,7 +214,7 @@ public class VisGraph implements Runnable{
 			renamer.gatherAllExpressionsFiltering();
 		}
 		catch (NonGatheredClassExpressionsException e) {
-			System.err.println("Problem gathering anononymous classes"); 
+			System.err.println("Problem gathering anonymous classes");
 			renamer.nullifyClassesToAdd();
 		}
 		
@@ -328,21 +326,21 @@ public class VisGraph implements Runnable{
 		   System.out.println("Creating level "+depthLevel+"..."+nextLevel.size()); 
 		   nextLevel.forEach(x-> {System.out.println("including ... ("+x.getChildren().size()+") "+x.getLinkedClassExpression());
 		   }); 
-		   VisLevel vlevel;
+		   VisLevel vLevel;
 	       int levelPosx = VisClass.FIRST_X_SEPARATION;
-	       vlevel = VisLevel.getLevelFromID(levelSet, depthLevel);
-	       if (vlevel==null) {
-	    	   VisLevel auxlevel;
-	    	   auxlevel = VisLevel.getLevelFromID(levelSet,depthLevel-1);
-	    	   if (auxlevel != null) {
-	    		   levelPosx  = auxlevel.getXpos()+auxlevel.getWidth()+30;
+	       vLevel = VisLevel.getLevelFromID(levelSet, depthLevel);
+	       if (vLevel==null) {
+	    	   VisLevel auxLevel;
+	    	   auxLevel = VisLevel.getLevelFromID(levelSet,depthLevel-1);
+	    	   if (auxLevel != null) {
+	    		   levelPosx  = auxLevel.getXpos()+auxLevel.getWidth()+30;
 	    	   }
-	    	   vlevel = new VisLevel(this,depthLevel, levelPosx);
-	    	   levelSet.put(depthLevel, vlevel);
+	    	   vLevel = new VisLevel(this,depthLevel, levelPosx);
+	    	   levelSet.put(depthLevel, vLevel);
 	       }
 		   Set<OWLClassExpression> auxNextLevel = new HashSet<>(); 
 		   for (VisClass s: nextLevel) {
-			   vlevel.addShape(s);
+			   vLevel.addShape(s);
 			   for (Shape child: s.getChildren()) {
 				   auxNextLevel.add(child.getLinkedClassExpression()); 
 			   }
@@ -356,7 +354,7 @@ public class VisGraph implements Runnable{
 	}
 	
 	
-	private void updateXposition() {
+	private void updatePosition() {
 		for ( Entry<String, Shape> entry : shapeMap.entrySet()){
 			Shape shape = entry.getValue();
 
@@ -365,7 +363,6 @@ public class VisGraph implements Runnable{
                     shape.asVisClass().setMaxSizeHiddenNodesIndicator();
                 }
 				shape.asVisClass().setWidth(shape.asVisClass().calculateWidth());
-				//shape.asVisClass().setHeight(shape.asVisClass().calculateHeight());
 			}
 		}
 	}
@@ -432,7 +429,7 @@ public class VisGraph implements Runnable{
 						definition -> {
 							// we add all the equivalences 
 							// CBL: 27/8/2024 => We can add all the equivalences here, though it would be the assertions, not the actual 
-							// 	equivalent classes -- OWLAPI considers any class with an equivalence as defined.
+							// 	equivalent classes -- OWL-API considers any class with an equivalence as defined.
 							if (definition.isAnonymous()) {
 								// <CBL 25/9/13>
 								// We also add the definition to the aliases handling
@@ -461,7 +458,7 @@ public class VisGraph implements Runnable{
 	private void placeObjectProperties(OWLOntology activeOntology,OWLReasoner reasoner, HashSet<OWLClassExpression> set) {
 
 		VisClass c;
-		Shape range = null; // non anonymous for the moment
+		Shape range = null; // non-anonymous for the moment
 		Set<OWLObjectProperty> propertySet = activeOntology.getObjectPropertiesInSignature();
 		for (OWLObjectProperty property : propertySet){
 
@@ -486,8 +483,8 @@ public class VisGraph implements Runnable{
 			}
 			else { //common case 
 				for (Node<OWLClass> o : propertyDomainNodeSet ){
-					for (OWLClass oclass : o.getEntities()){	
-						c =	(VisClass) getShapeFromOWLClassExpression(oclass);
+					for (OWLClass oClass : o.getEntities()){
+						c =	(VisClass) getShapeFromOWLClassExpression(oClass);
 						c.properties.add(property.getIRI().toString());
 						if (c.getPropertyBox() == null) 
 							c.createPropertyBox();
@@ -532,8 +529,8 @@ public class VisGraph implements Runnable{
 			}
 			else {
 				for (Node<OWLClass> o : propertyDomainNodeSet ){
-					for (OWLClass oclass : o.getEntities()){
-					    c =	(VisClass) getShapeFromOWLClassExpression(oclass);
+					for (OWLClass oClass : o.getEntities()){
+					    c =	(VisClass) getShapeFromOWLClassExpression(oClass);
 						if (c.getPropertyBox() == null)
 							c.createPropertyBox();
 	//					CBL::Changing the keys
@@ -639,19 +636,19 @@ public class VisGraph implements Runnable{
 	/**
 	 * used by LinkToParents()	
 	 */
-	private void connect(VisClass vis,VisClass parent,ArrayList<VisConnector> pconnectorList) {
+	private void connect(VisClass vis,VisClass parent,ArrayList<VisConnector> pConnectorList) {
 		
 		VisConnector con; 
 		parent.addSon(vis);
         vis.addParent(parent);
         //skip if previously added
-        for (VisConnector c :pconnectorList) {
+        for (VisConnector c :pConnectorList) {
            if ((c.from == parent) && (c.to == vis)){
         	  return;}
         }
         con = new VisConnectorIsA(parent, vis);
         
-        pconnectorList.add(con);
+        pConnectorList.add(con);
         vis.inConnectors.add(con);
         parent.outConnectors.add(con);
 	}
@@ -693,8 +690,8 @@ public class VisGraph implements Runnable{
 
 
 	/**
-	 * Creates a new visclass instance and adds it to the set(hashmap) of visclasses
-	 * Creates or adjusts new Vislevels width
+	 * Creates a new VisClass instance and adds it to the set(hashmap) of VisClasses
+	 * Creates or adjusts new VisLevels width
 	 */
 	public VisClass addVisClass(String label, OWLClassExpression ce, OWLOntology activeOntology, OWLReasoner reasoner) {
 
@@ -768,7 +765,7 @@ public class VisGraph implements Runnable{
 	}
 	 
     /**
-     * This will be called when closing a node in Paintframe
+     * This will be called when closing a node in PaintFrame
      * it will redo the dashed connector list
      */
 	public void addDashedConnectors(){
@@ -782,7 +779,7 @@ public class VisGraph implements Runnable{
 	}
 	 
 	/**
-     * Searchs sublevels for nodes that are still visible/referenced
+     * Searches sublevels for nodes that are still visible/referenced
      * and adds a dashedLine connecting them
      */
 	private void dashLink(Shape source,Shape current, int pathLength) {
@@ -827,19 +824,19 @@ public class VisGraph implements Runnable{
 						}
 						else {
 
-							VisLevel newl = VisLevel.getLevelFromID(levelSet, parentShape.getVisLevel().getID()+1);
-							if (newl == null) {
+							VisLevel newLevel = VisLevel.getLevelFromID(levelSet, parentShape.getVisLevel().getID()+1);
+							if (newLevel == null) {
 								System.out.println("is bottom");
-					    		 newl = new VisLevel(this, parentLevel.getID()+1, 
+					    		 newLevel = new VisLevel(this, parentLevel.getID()+1,
 					    				                   parentLevel.getXpos()+parentLevel.getWidth()+30);
-						    	 levelSet.put(newl.getID(), newl);
+						    	 levelSet.put(newLevel.getID(), newLevel);
 								 currentShape.setVisLevel(VisLevel.getLevelFromID(levelSet, currentShapeLevel-1));
      	                    }
 							else if ( VisLevel.getLevelFromID(levelSet, parentShape.getVisLevel().getID()+1).isBottomLevel()){
 								VisLevel.insertLevel(levelSet, parentShape.getVisLevel().getID()+1, this);
 
 							}
-							currentShape.setVisLevel(newl);
+							currentShape.setVisLevel(newLevel);
 						}
 					}
 				}
