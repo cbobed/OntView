@@ -927,7 +927,10 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 		parent.artPanel.loadingStage = parent.artPanel.showLoadingStage(task);
 
-        task.setOnCancelled(e -> VisGraph.voluntaryCancel(true));
+        task.setOnCancelled(e -> {
+            if (!parent.cancelledOutOfVisGraph) VisGraph.voluntaryCancel(true);
+            parent.cancelledOutOfVisGraph = false;
+        });
 		task.setOnSucceeded(e -> parent.artPanel.loadingStage.close());
 		task.setOnFailed(e -> {
 			task.getException().printStackTrace();

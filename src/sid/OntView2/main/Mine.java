@@ -6,7 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.*;
 
 import javax.imageio.ImageIO;
 
@@ -34,11 +34,7 @@ import openllet.owlapi.OpenlletReasonerFactory;
 import org.semanticweb.HermiT.ReasonerFactory;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLClassExpression;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.ConsoleProgressMonitor;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerConfiguration;
@@ -63,7 +59,7 @@ public class Mine extends Application implements Embedable{
 	TopPanel     nTopPanel;
 	ScrollPane  scroll;
 	Mine         self= this;
-	boolean      check = true;
+	boolean      check = true, cancelledOutOfVisGraph = false;
     private static final double SCROLL_INCREMENT = 10000;
     private static final double SPEED = 100;
 
@@ -182,14 +178,27 @@ public class Mine extends Application implements Embedable{
 		if (reasoner!= null) {
 			artPanel.setCursor(Cursor.WAIT);
 			//cant cast to set<OWLClassExpression> from set<OWLClass>
-			HashSet<OWLClassExpression> set = new HashSet<>(reasoner.getTopClassNode().getEntitiesMinusBottom());
+            HashSet<OWLClassExpression> set;
+            Future<HashSet<OWLClassExpression>> loaderFuture;
+            ExecutorService exec = Executors.newSingleThreadExecutor();
+            loaderFuture = exec.submit(() -> new HashSet<>(reasoner
+                .getTopClassNode()
+                .getEntitiesMinusBottom()));
 
 			try {
+                set = loaderFuture.get();
 				//set reasoner and ontology before creating
 				artPanel.createReasonedGraph(set,check);
 				artPanel.setCursor(Cursor.DEFAULT);
 				artPanel.cleanConnectors();
 			}
+            catch (CancellationException | InterruptedException e) {
+                artPanel.clearCanvas();
+                cancelledOutOfVisGraph = true;
+                Platform.runLater(() -> artPanel.loadingStage.close());
+                artPanel.setCursor(Cursor.DEFAULT);
+                return;
+            }
 			catch (Exception e1) {
 				e1.printStackTrace();
 				artPanel.setCursor(Cursor.DEFAULT);
@@ -377,15 +386,15 @@ public class Mine extends Application implements Embedable{
 			}
 		};
 
-		Stage loadingStage = artPanel.showLoadingStage(task);
+		artPanel.loadingStage = artPanel.showLoadingStage(task);
 
 		task.setOnSucceeded(e -> {
-			loadingStage.close();
+            artPanel.loadingStage.close();
 			Platform.runLater(artPanel.getRedrawRunnable());
 		});
 		task.setOnFailed(e -> {
 			task.getException().printStackTrace();
-			loadingStage.close();
+            artPanel.loadingStage.close();
 			artPanel.clearCanvas();
 			Platform.runLater(artPanel.getRedrawRunnable());
             String message = """

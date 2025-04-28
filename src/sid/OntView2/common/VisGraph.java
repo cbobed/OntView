@@ -698,6 +698,7 @@ public class VisGraph implements Runnable{
 		   for (OWLAnnotation  an : EntitySearcher.getAnnotations(ce.asOWLClass(), activeOntology).toList() ){
 			   if (an.getProperty().toString().equals("rdfs:label")){
                    String auxLabel = replaceString(an.getValue().toString().replaceAll("\"", ""));
+                   System.out.println("Label: "+auxLabel);
 				   vis.explicitLabel.add(auxLabel);
 				   auxQLabel = qualifyLabel(ce.asOWLClass(), auxLabel);
 				   if (!"null".equalsIgnoreCase(auxQLabel)) {
@@ -706,7 +707,9 @@ public class VisGraph implements Runnable{
 				   else {
 					   vis.explicitQualifiedLabel.add(auxLabel);
 				   }
-                   paintframe.languagesLabels.add(auxLabel.split("@")[1]);
+                   if (auxLabel.contains("@")) {
+                       paintframe.languagesLabels.add(auxLabel.split("@")[1]);
+                   }
 			   }
 		   }
        }

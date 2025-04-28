@@ -628,20 +628,17 @@ public class ExpressionManager {
 		return manager.getQName(iri.toString());
 	}
 
-
 	public static String qualifyLabel(OWLClass c, String label) {
-
 		String result = label;
-
 		String aux = manager.getQName(c.getIRI().toString());
 
 		if (aux!= null) {
 			if (aux.contains(":")) {
 				String prefix = aux.substring(0, aux.indexOf(':'));
 				result = prefix+":"+label;
-			}
+            }
 		}
-		result = replaceString(result);
+        result = replaceString(result);
 		return result;
 	}
 
