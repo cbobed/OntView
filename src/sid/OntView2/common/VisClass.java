@@ -177,21 +177,13 @@ public class VisClass extends Shape {
     }
 
 	public void drawShape(GraphicsContext g) {
-		if (g == null){
-			return;
-		}
+		if (g == null) return;
+
 		int roundCornerValue = 10;
+		int x = posx + 1, y = posy;
 
-		int x = posx;
-		int y = posy;
-
-        Font oldFont=g.getFont();
-	    if (this.isKorean) {
-	        g.setFont(getKoreanFont());
-	    }
-	    else {
-	    	g.setFont(getBoldFont());
-	    }
+        Font oldFont = g.getFont();
+        g.setFont(this.isKorean ? getKoreanFont() : getBoldFont());
 
 		Text textNode = new Text();
 		textNode.setFont(g.getFont());
@@ -199,213 +191,178 @@ public class VisClass extends Shape {
 		double ascent = textNode.getBaselineOffset() + 5.5;
 	    
 	    if (currentHeight == 0) {
-	    	if (!isAnonymous && !isDefined) {
-	    		currentHeight = getHeight();
-	    	}
-	    	else {
-				currentHeight = calculateHeight();
-			}
+            currentHeight = (!isAnonymous && !isDefined) ? getHeight() : calculateHeight();
 		}
         setWidth(calculateWidth());
 
-        if (visible){
-			int propertySpace = (propertyBox != null) ? 20 : 0;
+        if (visible) {
+            int propSpace = (propertyBox != null) ? 20 : 0;
 
-	    	if (!isDefined) {
-	    		// CBL if it is not defined, we use the previous representation
-		    	if (!isAnonymous)
-		    		g.setFill(lightgray);
-		    	else
-		    		g.setFill(Color.WHITE);
-
-				g.fillRoundRect(x - (double) getWidth()/2, y - (double) currentHeight/2, getWidth(), currentHeight, roundCornerValue, roundCornerValue);
-			    g.setStroke(Color.BLACK);
-			    if (isBottom) {
-			    	g.setStroke(Color.RED);
-			    }	
-		 
-			    //rectangle
-				g.strokeRoundRect(x - (double) getWidth()/2, y - (double) currentHeight/2,  getWidth()-1, currentHeight-1, roundCornerValue, roundCornerValue);
-			    g.setFill(Color.BLACK);
-				// Square for properties
-				if (propertyBox != null) {
-					propertyDraw(g, x, y, roundCornerValue);
-				}
-				if (!getDisjointConnectors().isEmpty()) {
-					disjointDraw(g, x, y, roundCornerValue);
-				}
-			    g.setFill(Color.BLACK);
-	
-			    if (!isAnonymous) {
-					g.fillText(visibleLabel, x - (double) (getWidth())/2 + 10 + propertySpace, (y -(double) (currentHeight - 4) / 2) + ascent);
-			    }
-			    else {
-					drawFormattedString(g, visibleLabel, x - (getWidth() - 10)/2,  (int) ((y - (currentHeight - 4) / 2) + ascent));
-			    }
-	    	}
-	    	else {
-	    		if (!label.startsWith(SIDClassExpressionNamer.className)) {
-		    		// CBL: the new definitions representation
-		    		g.setFill(lightGreen);
-		    		g.fillRect(x - (double) getWidth()/2, y- (double) currentHeight /2, getWidth(), currentHeight);
-					g.setStroke(isBottom ? Color.RED : Color.BLACK);
-		    		g.strokeRect(x - (double) getWidth()/2, y - (double) currentHeight /2, getWidth()-1, currentHeight);
-
-		    		// now => the rectangle for the name of the concept
-		    		g.setFill(lightgray);
-		    		g.fillRect(x - (double) getWidth()/2+5, y- (double) currentHeight /2 - 5, getWidth()-10, fontHeight+15);
-					g.setStroke(isBottom ? Color.RED : Color.BLACK);
-		    		g.strokeRect(x - (double) getWidth()/2+5, y - (double) currentHeight /2 - 5,  getWidth()-10, fontHeight+14);
-
-		    		// this is the name of the concept
-					g.setFill(Color.BLACK);
-		    		//g.setFont(getBoldFont());
-		    		g.fillText(visibleLabel, x - (double) (getWidth() - 16) /2 + 5 + propertySpace, (y - (double) (currentHeight - 4) /2) - 6 + ascent);
-
-		    		//g.setFont(getBoldFont());
-		    		double auxY = y - ((double) currentHeight /2) + (fontHeight +5) + 2;
-		    		if (visibleDefinitionLabels != null) {
-		    			for (String auxDefString: visibleDefinitionLabels) {
-							drawFormattedString(g, auxDefString, x - (getWidth() - 12) / 2, (int) (auxY + ascent)+5);
-							auxY += (countLines(auxDefString)*fontHeight) + 5;
-		    			}
-		    		}
-
-					if (propertyBox != null) {
-						propertyDraw(g, x + 5, y - 5, roundCornerValue);
-					}
-					if (!getDisjointConnectors().isEmpty()) {
-						disjointDraw(g, x-5, y - 5, roundCornerValue);
-					}
-					g.setFill(Color.BLACK);
-				}
-	    		else {
-	    			// CBL: it is an auxiliary definition
-	    			// CBL if it is not defined, we use the previous representation
-
-					g.setFill(Color.WHITE);
-				    g.fillRoundRect(x - (double) getWidth()/2, y - (double) currentHeight /2, getWidth(), currentHeight, roundCornerValue, roundCornerValue);
-				    g.setStroke(Color.BLACK);
-				    if (isBottom) {
-				    	g.setStroke(Color.RED);
-				    }	
-			 
-				    //rectangle
-				    g.strokeRoundRect(x - (double) getWidth()/2, y - (double) currentHeight /2,  getWidth()-1, currentHeight-1, roundCornerValue, roundCornerValue);
-				    g.setFill(Color.BLACK);
-				    if (propertyBox!=null){
-						propertyDraw(g, x, y, roundCornerValue);
-						propertySpace += 5;
-				    }
-					if (!getDisjointConnectors().isEmpty()) {
-						disjointDraw(g, x, y, roundCornerValue);
-					}
-
-				    g.setStroke(Color.BLACK);
-				    //g.setFont(getBoldFont());
-		    		double auxY = (y - (double) (currentHeight - 4) /2);
-		    		if (visibleDefinitionLabels != null) {
-		    			for (String auxDefString: visibleDefinitionLabels) {
-							g.setFill(Color.BLACK);
-							drawFormattedString(g, auxDefString, x - (getWidth() - 10) / 2 + propertySpace, (int) (auxY + ascent)-1);
-							auxY += (countLines(auxDefString)*fontHeight) + 5;
-		    			}
-		    		}
-	    		}
-	    	}
-
-			if(!outConnectors.isEmpty() && !outConnectors.get(0).to.asVisClass().isBottom) {
-				drawHiddenNodesIndicator(g, getHiddenDescendantsSet(), getLeftCorner(), posy);
-			}
-
-            if (!isBottom) {
-                if (!children.isEmpty() && (outConnectors != null) && (!outConnectors.isEmpty()) &&
-                    (!outConnectors.get(0).to.asVisClass().isBottom)) {
-                    switch (this.getState()) {
-                        case PARTIALLY_CLOSED:
-                            g.setFill(mini);
-                            g.fillRect(x + (double) getWidth() / 2, y - 10, 10, 10);
-                            g.setStroke(Color.BLACK);
-                            g.strokeRect(x + (double) getWidth() / 2, y - 10, 10, 10);
-                            g.strokeLine(x + (double) getWidth() / 2 + 2, y - 5, x + (double) getWidth() / 2 + 8, y - 5);
-                            g.strokeLine(x + (double) getWidth() / 2 + 5, y - 8, x + (double) getWidth() / 2 + 5, y - 3);
-
-                            // open
-                            g.setFill(mini);
-                            g.fillRect(x + (double) getWidth() / 2, y, 10, 10);
-                            g.setStroke(Color.BLACK);
-                            g.strokeRect(x + (double) getWidth() / 2, y, 10, 10);
-                            g.strokeLine(x + (double) getWidth() / 2 + 2, y + 5, x + (double) getWidth() / 2 + 8, y + 5);
-                            break;
-
-                        case CLOSED:
-                            g.setFill(mini);
-                            // right
-                            g.fillRect(x + (double) getWidth() / 2, y - 10, 10, 10);
-                            g.setStroke(Color.BLACK);
-                            g.strokeRect(x + (double) getWidth() / 2, y - 10, 10, 10);
-                            g.strokeLine(x + (double) getWidth() / 2 + 2, y - 5, x + (double) getWidth() / 2 + 8, y - 5);
-                            g.strokeLine(x + (double) getWidth() / 2 + 5, y - 8, x + (double) getWidth() / 2 + 5, y - 3);
-                            break;
-
-                        case OPEN:
-                            // right
-                            g.setFill(mini);
-                            g.fillRect(x + (double) getWidth() / 2, y, 10, 10);
-                            g.setStroke(Color.BLACK);
-                            g.strokeRect(x + (double) getWidth() / 2, y, 10, 10);
-                            g.strokeLine(x + (double) getWidth() / 2 + 2, y + 5, x + (double) getWidth() / 2 + 8, y + 5);
-                            break;
-                        default:
-                            break;
-                    }
-                }
-                if (!parents.isEmpty() && (inConnectors != null) && (!inConnectors.isEmpty()) &&
-                    (!inConnectors.get(0).from.getLabel().matches("Thing"))) {
-                    switch (this.getLeftState()) {
-                        case LEFT_PARTIALLY_CLOSED:
-                            g.setFill(mini);
-                            g.fillRect(x - (double) getWidth() / 2 - 10, y - 10, 10, 10);
-                            g.setStroke(Color.BLACK);
-                            g.strokeRect(x - (double) getWidth() / 2 - 10, y - 10, 10, 10);
-                            g.strokeLine(x - (double) getWidth() / 2 - 8, y - 5, x - (double) getWidth() / 2 - 2, y - 5);
-                            g.strokeLine(x - (double) getWidth() / 2 - 5, y - 8, x - (double) getWidth() / 2 - 5, y - 3);
-
-                            // open
-                            g.setFill(mini);
-                            g.fillRect(x - (double) getWidth() / 2 - 10, y, 10, 10);
-                            g.setStroke(Color.BLACK);
-                            g.strokeRect(x - (double) getWidth() / 2 - 10, y, 10, 10);
-                            g.strokeLine(x - (double) getWidth() / 2 - 8, y + 5, x - (double) getWidth() / 2 - 2, y + 5);
-                            break;
-
-                        case LEFTCLOSED:
-                            // left
-                            g.setFill(mini);
-                            g.fillRect(x - (double) getWidth() / 2 - 10, y - 10, 10, 10);
-                            g.setStroke(Color.BLACK);
-                            g.strokeRect(x - (double) getWidth() / 2 - 10, y - 10, 10, 10);
-                            g.strokeLine(x - (double) getWidth() / 2 - 8, y - 5, x - (double) getWidth() / 2 - 2, y - 5);
-                            g.strokeLine(x - (double) getWidth() / 2 - 5, y - 8, x - (double) getWidth() / 2 - 5, y - 3);
-                            break;
-
-                        case LEFTOPEN:
-                            // left
-                            g.setFill(mini);
-                            g.fillRect(x - (double) getWidth() / 2 - 10, y, 10, 10);
-                            g.setStroke(Color.BLACK);
-                            g.strokeRect(x - (double) getWidth() / 2 - 10, y, 10, 10);
-                            g.strokeLine(x - (double) getWidth() / 2 - 8, y + 5, x - (double) getWidth() / 2 - 2, y + 5);
-                            break;
-
-                        default:
-                            break;
-                    }
-                }
+            if (!isDefined) {
+                drawPrimitiveAndAnonymous(g, x, y, ascent, roundCornerValue, propSpace);
+            } else if (!label.startsWith(SIDClassExpressionNamer.className)) {
+                drawDefined(g, x, y, fontHeight, ascent, roundCornerValue, propSpace);
+            } else {
+                drawAuxDefinition(g, x, y, fontHeight, ascent, roundCornerValue, propSpace);
             }
-		}
+
+            // Draw hidden descendants indicator
+            if (!outConnectors.isEmpty() && !outConnectors.get(0).to.asVisClass().isBottom) {
+                drawHiddenNodesIndicator(g, getHiddenDescendantsSet(), getLeftCorner(), posy);
+            }
+
+            // Draw expand/collapse toggles
+            drawToggles(g, x, y);
+        }
 		g.setFont(oldFont);
 	}
+
+    /**
+     * Draws the primitive and anonymous classes
+     */
+    private void drawPrimitiveAndAnonymous(GraphicsContext g, int x, int y, double ascent, int roundCorner, int propSpace) {
+        // CBL if it is not defined, we use the previous representation
+        g.setFill(isAnonymous ? Color.WHITE : lightgray);
+
+        g.fillRoundRect(x - getWidth()/2.0, y - currentHeight/2.0, getWidth(), currentHeight, roundCorner, roundCorner);
+        g.setStroke(isBottom ? Color.RED : Color.BLACK);
+
+        //rectangle
+        g.strokeRoundRect(x - getWidth()/2.0, y - currentHeight/2.0,  getWidth()-1, currentHeight-1, roundCorner, roundCorner);
+        g.setFill(Color.BLACK);
+        // Square for properties
+        if (propertyBox != null) propertyDraw(g, x, y, roundCorner);
+        if (!getDisjointConnectors().isEmpty()) disjointDraw(g, x, y, roundCorner);
+
+        g.setFill(Color.BLACK);
+        if (!isAnonymous) {
+            g.fillText(visibleLabel, x - (double) (getWidth())/2 + 10 + propSpace, (y -(double) (currentHeight - 4) / 2) + ascent);
+        }
+        else {
+            drawFormattedString(g, visibleLabel, x - (getWidth() - 10)/2,  (int) ((y - (currentHeight - 4) / 2) + ascent));
+        }
+    }
+
+    /**
+     * Draws defined classes
+     */
+    private void drawDefined(GraphicsContext g, int x, int y, double fontH, double ascent, int roundCorner, int propSpace) {
+        // CBL: the new definitions representation
+        g.setFill(lightGreen);
+        g.fillRect(x - getWidth()/2.0, y - currentHeight/2.0, getWidth(), currentHeight);
+        g.setStroke(isBottom ? Color.RED : Color.BLACK);
+        g.strokeRect(x - getWidth()/2.0, y - currentHeight /2.0, getWidth()-1, currentHeight);
+
+        // now => the rectangle for the name of the concept
+        g.setFill(lightgray);
+        g.fillRect(x - getWidth()/2.0 + 5, y - currentHeight/2.0 - 5, getWidth()-10, fontH+15);
+        g.setStroke(isBottom ? Color.RED : Color.BLACK);
+        g.strokeRect(x - getWidth()/2.0 + 5, y - currentHeight/2.0 - 5,  getWidth()-10, fontH+14);
+
+        // this is the name of the concept
+        g.setFill(Color.BLACK);
+        g.fillText(visibleLabel, x - (getWidth() - 16)/2.0 + 5 + propSpace, (y - (currentHeight - 4)/2.0) - 6 + ascent);
+
+        double auxY = y - (currentHeight/2.0) + (fontH + 5) + 2;
+        if (visibleDefinitionLabels != null) {
+            for (String auxDefString: visibleDefinitionLabels) {
+                drawFormattedString(g, auxDefString, x - (getWidth() - 12) / 2, (int) (auxY + ascent)+5);
+                auxY += (countLines(auxDefString)*fontH) + 5;
+            }
+        }
+
+        if (propertyBox != null) propertyDraw(g, x + 5, y - 5, roundCorner);
+        if (!getDisjointConnectors().isEmpty()) disjointDraw(g, x-5, y - 5, roundCorner);
+
+        g.setFill(Color.BLACK);
+    }
+
+    /**
+     * Draws the auxiliary definition
+     */
+    private void drawAuxDefinition(GraphicsContext g, int x, int y, double fontH, double ascent, int roundCorner, int propSpace) {
+        // CBL: it is an auxiliary definition
+        // CBL if it is not defined, we use the previous representation
+        g.setFill(Color.WHITE);
+        g.fillRoundRect(x - getWidth()/2.0, y - currentHeight/2.0, getWidth(), currentHeight, roundCorner, roundCorner);
+        g.setStroke(isBottom ? Color.RED : Color.BLACK);
+
+        //rectangle
+        g.strokeRoundRect(x - getWidth()/2.0, y - currentHeight /2.0,  getWidth()-1, currentHeight-1, roundCorner, roundCorner);
+        g.setFill(Color.BLACK);
+        if (propertyBox!=null){
+            propertyDraw(g, x, y, roundCorner);
+            propSpace += 5;
+        }
+        if (!getDisjointConnectors().isEmpty()) disjointDraw(g, x, y, roundCorner);
+
+        double auxY = (y - (double) (currentHeight - 4) /2);
+        if (visibleDefinitionLabels != null) {
+            for (String auxDefString: visibleDefinitionLabels) {
+                g.setFill(Color.BLACK);
+                drawFormattedString(g, auxDefString, x - (getWidth() - 10) / 2 + propSpace, (int) (auxY + ascent)-1);
+                auxY += (countLines(auxDefString)*fontH) + 5;
+            }
+        }
+    }
+
+    /**
+     * Draws the expand/collapse toggles
+     */
+    private void drawToggles(GraphicsContext g, int x, int y) {
+        if (isBottom) return;
+
+        // right side
+        if (!children.isEmpty() && (outConnectors != null) && (!outConnectors.isEmpty()) &&
+            (!outConnectors.get(0).to.asVisClass().isBottom)) {
+            drawSideToggles(g, x + getWidth() / 2.0, y, getState());
+        }
+
+        // left side
+        if (!parents.isEmpty() && (inConnectors != null) && (!inConnectors.isEmpty()) &&
+            (!inConnectors.get(0).from.getLabel().matches("Thing"))) {
+            drawSideToggles(g, x - getWidth()/2.0 - 10, y, getLeftState());
+        }
+    }
+
+    private void drawSideToggles(GraphicsContext g, double posX, double posY, int state) {
+        double toggleSize = 10;
+        g.setFill(mini);
+        g.setStroke(Color.BLACK);
+
+        switch (state) {
+            case PARTIALLY_CLOSED:
+            case LEFT_PARTIALLY_CLOSED:
+                // top toggle
+                g.fillRect(posX, posY - toggleSize, toggleSize, toggleSize);
+                g.strokeRect(posX, posY - toggleSize, toggleSize, toggleSize);
+                g.strokeLine(posX + 2, posY - toggleSize/2, posX + 8, posY - toggleSize/2);
+                g.strokeLine(posX + toggleSize/2, posY - toggleSize + 2, posX + toggleSize/2, posY - 3);
+                // bottom toggle
+                g.fillRect(posX, posY, toggleSize, toggleSize);
+                g.strokeRect(posX, posY, toggleSize, toggleSize);
+                g.strokeLine(posX + 2, posY + toggleSize/2, posX + 8, posY + toggleSize/2);
+                break;
+
+            case CLOSED:
+            case LEFTCLOSED:
+                // single toggle
+                g.fillRect(posX, posY - toggleSize, toggleSize, toggleSize);
+                g.strokeRect(posX, posY - toggleSize, toggleSize, toggleSize);
+                g.strokeLine(posX + 2, posY - toggleSize/2, posX + 8, posY - toggleSize/2);
+                g.strokeLine(posX + toggleSize/2, posY - toggleSize + 2, posX + toggleSize/2, posY - 3);
+                break;
+
+            case OPEN:
+            case LEFTOPEN:
+                g.fillRect(posX, posY, toggleSize, toggleSize);
+                g.strokeRect(posX, posY, toggleSize, toggleSize);
+                g.strokeLine(posX + 2, posY + toggleSize/2, posX + 8, posY + toggleSize/2);
+                break;
+            default:
+                break;
+        }
+    }
 
     public void paintFocus(GraphicsContext g) {
         if (g == null){
