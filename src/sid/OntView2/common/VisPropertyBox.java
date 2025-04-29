@@ -15,12 +15,10 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import java.util.*;
 
 public class VisPropertyBox {
-	int maxWidth=0;
 	int height = 0;
 	int posy;
 	boolean visible = false;
-	
-	VisClass vclass;
+	VisClass vClass;
 	HashSet<VisClass> visClassSet;
 	HashMap<OWLObjectProperty, Shape> objectPropertyMap;
 	HashMap<OWLDataProperty, String> dataPropertyMap;
@@ -33,8 +31,6 @@ public class VisPropertyBox {
 	OWLReasoner reasoner;
 	HashMap<String, VisObjectProperty> graphVisProperties =null;
 	
-	
-	ArrayList<String> rep;
 	public void setVisible(boolean b){visible=b;}
 	public int getHeight(){
 		if (visible) {
@@ -44,21 +40,17 @@ public class VisPropertyBox {
 			return 0; 
 		}
 	}
-	public int getPropertyHeight(){
-		return height;
-	}
-	public void setHeight(int x){height =x;}
+	public void setHeight(int newHeight){ height = newHeight; }
 	
 	private HashMap<String, VisObjectProperty> getVisPropertiesInGraph(){
 		if (graphVisProperties ==null)
-			graphVisProperties = vclass.graph.propertyMap;
+			graphVisProperties = vClass.graph.propertyMap;
 		return graphVisProperties;
 	}
 	
-	
 	private OWLReasoner getReasoner(){
 		if (reasoner==null)
-			reasoner = vclass.graph.paintframe.getReasoner();
+			reasoner = vClass.graph.paintframe.getReasoner();
 		return reasoner;
 	}
 	public VisPropertyBox(VisClass c){
@@ -69,13 +61,13 @@ public class VisPropertyBox {
 		orderedObjectProperties = new ArrayList<>();
 		visClassSet   = new HashSet<>();
 		dPropertyList = new ArrayList<>();
-		vclass = c;
-		posy = vclass.currentHeight;
+		vClass = c;
+		posy = vClass.currentHeight;
 		propRangeConnectorList = new ArrayList<>();
 	}
 
 	public void calculateHeight(){
-		GraphicsContext context = vclass.graph.paintframe.getGraphicsContext2D();
+		GraphicsContext context = vClass.graph.paintframe.getGraphicsContext2D();
 		Text f = new Text();
 		f.setFont(context.getFont());
 		int ascent = (int)f.getLayoutBounds().getHeight();
@@ -107,12 +99,12 @@ public class VisPropertyBox {
 	
 	public void sortProperties(){
 		HashSet<OWLObjectProperty> rootProperties = rootProperties();
-		ArrayList<VisObjectProperty> ordered = new ArrayList<VisObjectProperty>();
+		ArrayList<VisObjectProperty> ordered = new ArrayList<>();
 		for (OWLObjectProperty parent : rootProperties){
-			VisObjectProperty vparent = getVisPropertiesInGraph().get(VisObjectProperty.getKey(parent));
-			ordered.add(vparent);
+			VisObjectProperty vParent = getVisPropertiesInGraph().get(VisObjectProperty.getKey(parent));
+			ordered.add(vParent);
 			for(VisObjectProperty prop : propertyList){
-				if ((prop!= vparent) && (!ordered.contains(prop)) && (isSubProperty(prop.oPropExp, vparent.oPropExp)))
+				if ((prop!= vParent) && (!ordered.contains(prop)) && (isSubProperty(prop.oPropExp, vParent.oPropExp)))
 					ordered.add(prop);
 			}
 		}
@@ -122,17 +114,11 @@ public class VisPropertyBox {
 			offset++;
 		}
 		ordered.clear();
-		offset = 0;
-	}
+    }
 	
 	public boolean isSubProperty(OWLObjectPropertyExpression e1,OWLObjectPropertyExpression e2){
 		OWLDataFactory dFactory = OWLManager.getOWLDataFactory();
-	    if (getReasoner().isEntailed(dFactory.getOWLSubObjectPropertyOfAxiom(e1, e2))){
-	    	return true;	    	
-	    }
-	    else {
-	    	return false;
-	    }	
+        return getReasoner().isEntailed(dFactory.getOWLSubObjectPropertyOfAxiom(e1, e2));
 	}
 
 	public VisObjectProperty add(OWLObjectProperty objProp, Shape range, OWLOntology ontology){
@@ -140,7 +126,7 @@ public class VisPropertyBox {
 		if (!VisObjectProperty.contains(propertyList, objProp)){
 			v = new VisObjectProperty(this,objProp,propertyList.size(),range,ontology);
 			propertyList.add(v);		
-			vclass.graph.propertyMap.put(VisObjectProperty.getKey(objProp),v);
+			vClass.graph.propertyMap.put(VisObjectProperty.getKey(objProp),v);
 		}
 		calculateHeight();
 		return v; 
@@ -153,33 +139,28 @@ public class VisPropertyBox {
 		    v = new VisDataProperty(this,dProp,offset,dRange,ontology);
 			dPropertyList.add(v);		
 //			CBL::Changing the keys
-//			vclass.graph.dPropertyMap.put(ExpressionManager.reduceDataPropertyName(dProp),v);
-			vclass.graph.dPropertyMap.put(VisDataProperty.getKey(dProp),v);
+			vClass.graph.dPropertyMap.put(VisDataProperty.getKey(dProp),v);
 		}
 		calculateHeight();
 		return v;
 	}
 
 	public void buildConnections(){
-		for (VisObjectProperty vprop : propertyList) {
-			NodeSet<OWLObjectPropertyExpression> propNodeSet = getReasoner().getSuperObjectProperties(vprop.oPropExp, true);
+		for (VisObjectProperty vProp : propertyList) {
+			NodeSet<OWLObjectPropertyExpression> propNodeSet = getReasoner().getSuperObjectProperties(vProp.oPropExp, true);
 			for ( Node<OWLObjectPropertyExpression> node : propNodeSet){
 				Set<OWLObjectPropertyExpression> entities = node.getEntities();
 				if (entities.size() ==1) {
 					for (OWLObjectPropertyExpression exp :entities){
 //						CBL::Changing keys
-//						String key = ExpressionManager.reduceObjectPropertyName(exp);
 						String key = VisObjectProperty.getKey(exp);
-						VisObjectProperty p = vclass.graph.propertyMap.get(key);
+						VisObjectProperty p = vClass.graph.propertyMap.get(key);
 						if (p!=null){
-							vprop.add(p);
+							vProp.add(p);
 						}
 					}
 				}
-				else { //entities size > 1 implies multiple heritance
-					;
-				}
-			}
+            }
 		}
 	}
 	
@@ -189,7 +170,7 @@ public class VisPropertyBox {
 	 * Gets object properties in a VisPropertyBox that are not subsumed by others in
 	 * the same box
 	 */
-		HashSet<OWLObjectProperty> rootSet = new HashSet<OWLObjectProperty>();
+		HashSet<OWLObjectProperty> rootSet = new HashSet<>();
 		for (VisObjectProperty prop : propertyList){
 			if (!prop.subsumed(propertyList)){	
 		    	rootSet.add((OWLObjectProperty) prop.oPropExp);
@@ -198,30 +179,7 @@ public class VisPropertyBox {
 		return rootSet;
 	}
 
-	public VisObjectProperty getVisProperty(OWLObjectProperty oprop){
-//		CBL::Changing the keys
-//		return vclass.graph.propertyMap.get(ExpressionManager.reduceObjectPropertyName(oprop));
-		return vclass.graph.propertyMap.get(VisObjectProperty.getKey(oprop));
-	}
-
-	
-	public int getObjectPropHeight(){
-		calculateHeight();
-		return objectPropHeight;
-	}
-	public int getMaxWidth(){
-		if (maxWidth ==0){
-			for (VisObjectProperty op : propertyList){
-				maxWidth = (op.getLabelWidth() > maxWidth ? op.getLabelWidth() : maxWidth); 
-			}
-			for (VisDataProperty dp : dPropertyList){
-				maxWidth = (dp.getLabelWidth() > maxWidth ? dp.getLabelWidth() : maxWidth);
-			}
-		}
-		return maxWidth;
-	}
-	
-	public static void sortProperties(VisGraph visGraph) {
+    public static void sortProperties(VisGraph visGraph) {
 		for ( java.util.Map.Entry<String, Shape> entry : visGraph.getShapeMap().entrySet()){
 			Shape shape = entry.getValue();
 			if ((shape instanceof VisClass) && (shape.asVisClass().getPropertyBox()!=null)){
@@ -229,6 +187,7 @@ public class VisPropertyBox {
 			}
 		}		
 	}
+
 	public static void buildConnections(VisGraph visGraph) {
 		for (java.util.Map.Entry<String, Shape> entry: visGraph.getShapeMap().entrySet() ){
 			if ((entry.getValue() instanceof VisClass) && (entry.getValue().asVisClass().getPropertyBox()!=null))

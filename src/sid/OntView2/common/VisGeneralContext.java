@@ -1,19 +1,13 @@
 package sid.OntView2.common;
 
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
-
 
 import java.util.Map.Entry;
 import java.util.Set;
 
-
 public class VisGeneralContext extends ContextMenu {
-
-
 	MenuItem item1;
 	MenuItem item2;
 	MenuItem item3;
@@ -36,9 +30,9 @@ public class VisGeneralContext extends ContextMenu {
 	}
 	PaintFrame parent;
 
-	public VisGeneralContext (PaintFrame pparent){
+	public VisGeneralContext (PaintFrame pParent){
 		super();
-		parent = pparent;
+		parent = pParent;
 		getItems().add(getMenuItem1());
 		getMenuItem1().setOnAction(e -> propertiesItemClicked());
 

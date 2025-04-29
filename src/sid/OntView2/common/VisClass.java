@@ -919,7 +919,7 @@ public class VisClass extends Shape {
 			g.fillText(removeFormatInformation(token), currentX, currentY);
 			Font font = Font.font("DejaVu Sans", FontWeight.NORMAL, 9);
 
-			currentY += VisProperty.stringHeight(font, g)+6;
+			currentY += VisProperty.stringHeight(font)+6;
 		}
 	}
 

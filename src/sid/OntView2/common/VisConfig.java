@@ -10,20 +10,13 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.*;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.HashMap;
+import java.util.Objects;
 
 public class VisConfig {
-
-	static String BASE ="plugins/sid/OntView/Protege/";
-
 	private static VisConfig instance = null;
-	DocumentBuilderFactory domFactory;
 	Document doc;
 	XPath xpath;
 
-//	enum ClassExpressionsOption {ALL, ONLY_CLASSES, ONLY_DOMAIN, ONLY_RANGE, DOMAIN_RANGE}; 
-//	public static ClassExpressionsOption visualizeClassExpressions = ClassExpressionsOption.ALL;
-	
 	public static boolean APPLY_RENAMING_DEBUG_PURPOSES=false; 
 	
 	private VisConfig() throws ParserConfigurationException, SAXException, IOException{
@@ -36,7 +29,7 @@ public class VisConfig {
 	      else 
 	    	  c = getClass().getClassLoader();
 	      try {
-			doc = builder.parse(c.getResource("visconfig.xml").toURI().toString());
+			doc = builder.parse(Objects.requireNonNull(c.getResource("visconfig.xml")).toURI().toString());
 		  } catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -64,13 +57,13 @@ public class VisConfig {
 	
 	public void connectorColor() throws XPathExpressionException{
 		XPathExpression expr = xpath.compile("//connector/color/text()");
-        Object result = expr.evaluate(doc, XPathConstants.STRING);
+        expr.evaluate(doc, XPathConstants.STRING);
         VisConnector.color =  Color.BLUE;
 	}
 	
 	public void dashedConnectorColor() throws XPathExpressionException{
 		XPathExpression expr = xpath.compile("//dashedConnector/color/text()");
-        Object result = expr.evaluate(doc, XPathConstants.STRING);
+        expr.evaluate(doc, XPathConstants.STRING);
         VisConnectorDashed.color = Color.GREEN;
 	}
 	

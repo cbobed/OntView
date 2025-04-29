@@ -7,9 +7,7 @@ import javafx.geometry.Point2D;
 
 
 public abstract class VisProperty {
-
-	boolean visible; 
-	
+	boolean visible;
 	public abstract int getPosX();
 	public abstract int getPosY();	
 	public abstract boolean onProperty(Point2D p);
@@ -19,19 +17,17 @@ public abstract class VisProperty {
     public abstract void draw(GraphicsContext g);
 	public void setVisible(boolean f){visible = f;}
 
-
-	public static int stringWidth(String s, Font f, GraphicsContext g){
+	public static int stringWidth(String s, Font f){
 		Text text = new Text(s);
 		text.setFont(f);
 		return (int) Math.ceil(text.getLayoutBounds().getWidth());
 	}
 	
-	public static int stringHeight(Font f, GraphicsContext g){
+	public static int stringHeight(Font f){
 		Text text = new Text();
 		text.setFont(f);
 		return (int) Math.ceil(text.getLayoutBounds().getHeight());
 	}
-
 }
 	
 

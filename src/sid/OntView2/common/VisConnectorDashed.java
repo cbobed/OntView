@@ -10,7 +10,6 @@ public class VisConnectorDashed extends VisConnectorIsA {
 
 	double[] dash = { 4.0f };
 	public static Color color = Color.BLACK;
-	static double frac = 0.01;
 
 	public VisConnectorDashed(Shape par_from, Shape par_to) {
 		super(par_from, par_to);

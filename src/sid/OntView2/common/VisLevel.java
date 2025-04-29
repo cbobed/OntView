@@ -89,19 +89,19 @@ public class VisLevel {
             }
         }
         // remove empty levels
-        HashSet<VisLevel> emptyLevels = new HashSet<VisLevel>();
+        HashSet<VisLevel> emptyLevels = new HashSet<>();
         for (VisLevel lvl : set.values()) {
             if (lvl.levelShapes.isEmpty()){
                 emptyLevels.add(lvl);
             }
         }
-        for (VisLevel emptylvl : emptyLevels) {
+        for (VisLevel emptyLvl : emptyLevels) {
             for (VisLevel lvl : set.values()){
-                if (lvl.getID()> emptylvl.getID()) {
+                if (lvl.getID()> emptyLvl.getID()) {
                     lvl.setID(lvl.getID()-1);
                 }
             }
-            set.remove(emptylvl);
+            set.remove(emptyLvl);
         }
     }
 	
@@ -114,7 +114,7 @@ public class VisLevel {
 	
 	private void fold(Map<Integer, VisLevel>set){
 		int j = id+1;
-		boolean possible = true;
+		boolean possible;
 		Set<Shape> movableSet = new HashSet<>();
 		while ( (Objects.requireNonNull(getLevelFromID(set, j)).isConstraintLevel())  ||  (j!=lastLevel(set))) {
 			VisLevel lvl = getLevelFromID(set, j);
@@ -183,22 +183,22 @@ public class VisLevel {
 	 */
     public static void insertLevel(Map<Integer, VisLevel> set, int id, VisGraph graph){
         //creates a new Level
-        VisLevel newlvl = null;
+        VisLevel newLvl;
         if (id > 0){
             VisLevel prevLevel = VisLevel.getLevelFromID(set, id-1);
             if (prevLevel!= null) {
-                newlvl = new VisLevel(graph, id, prevLevel.posx+prevLevel.width);
+                newLvl = new VisLevel(graph, id, prevLevel.posx+prevLevel.width);
             }
             else {
                 //shouldn't enter here though
-                newlvl = new VisLevel(graph, id, VisClass.FIRST_X_SEPARATION);
+                newLvl = new VisLevel(graph, id, VisClass.FIRST_X_SEPARATION);
             }
             for (VisLevel lvl: set.values()){
                 if (lvl.getID() >= id){
                     lvl.setID(lvl.getID()+1);
                 }
             }
-            set.put(id, newlvl);
+            set.put(id, newLvl);
         }
     }
 	

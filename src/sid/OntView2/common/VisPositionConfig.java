@@ -14,9 +14,6 @@ import java.util.Map.Entry;
 
 
 public class VisPositionConfig {
-   
-//	private static VisPositionConfig instance = null;
-	DocumentBuilderFactory domFactory;
 	Document doc;
 	XPath xpath;
 	static VisPositionConfig config = new VisPositionConfig();
@@ -38,7 +35,7 @@ public class VisPositionConfig {
 	public static void saveState(String path, VisGraph graph){
 		if (graph!= null){
 			try {
-				new VisPositionConfig().saveStatePriv(path, graph);
+				new VisPositionConfig().saveStatePrivate(path, graph);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -80,7 +77,6 @@ public class VisPositionConfig {
 	public void recoverVisInfo(VisGraph graph) throws XPathExpressionException{
 		for (Entry<String, Shape> entry : graph.shapeMap.entrySet()) {
 			Shape shape = entry.getValue();
-//				String key = escapeXML(entry.getKey());
 			String key = entry.getKey();
 
 			recoverShapePos(shape, key);
@@ -92,7 +88,6 @@ public class VisPositionConfig {
 			if (shape.isVisible()) shape.updateHiddenDescendants();
 		}
 		for (VisConnector connector : graph.connectorList) {
-//			recoverConnectorVisibility(connector);
 			connector.visible = (connector.from.visible && connector.to.visible);
 		}
 		graph.clearDashedConnectorList();
@@ -141,7 +136,6 @@ public class VisPositionConfig {
 	}
 	
 	public void recoverShapeVisibility(Shape shape, String key) throws XPathExpressionException{
-		
 		String search;
 		if ((shape instanceof VisConstraint)|| (shape instanceof VisClass)&&(shape.asVisClass().isAnonymous)) {
 			search = "Anon[@id='"+key+"']";
@@ -175,24 +169,19 @@ public class VisPositionConfig {
 
 	public boolean mapBool( String boolString){
 		if (boolString.equals("true")) return true;
-		if (boolString.equals("false")) return false;
-		return true;
-	}
-	
-	
-	
-	private void saveStatePriv(String resourcePath, VisGraph graph) throws IOException{
+        return !boolString.equals("false");
+    }
+
+	private void saveStatePrivate(String resourcePath, VisGraph graph) throws IOException{
          if (resourcePath != null){ 
         	 new File(resourcePath).createNewFile();
-        	 boolean anon =false;
-        	 BufferedWriter out = new BufferedWriter(new FileWriter(new File(resourcePath)));
+        	 boolean anon;
+        	 BufferedWriter out = new BufferedWriter(new FileWriter(resourcePath));
 			 out.write("<?xml version=\"1.0\" ?>\n");
 			 out.write("<root>\n");
 
 			 out.write("\t<ontologyName>" + graph.paintframe.getActiveOntologySource() + "</ontologyName>\n");
 			 out.write("\t<reasoner>" + graph.paintframe.getReasoner().getReasonerName() + "</reasoner>\n");
-
-			 //out.write("\t<reasoner>" + graph.getReasoner().getClass().getName() + "</reasoner>\n");
 
 			 for (Entry<String, Shape> entry : graph.shapeMap.entrySet()){
 				 Shape shape = entry.getValue();
@@ -225,7 +214,6 @@ public class VisPositionConfig {
 			 out.close();
 		 }
 	 }
-	 
 
 	private String escapeXML(String inString){
 		 String escapedString = inString.replaceAll("&,","&amp;");

@@ -28,25 +28,24 @@ import sid.OntView2.utils.ExpressionManager;
 public class VisConstraint extends Shape {
 	public static final int RELATIVE_POS =0;
 	String label;
-	String qualifiedLabel = ""; 
     String property = "";
     String filler= "";
 	OWLClassExpression linkedClassExpression; 
 	
-	public VisConstraint(VisLevel level, OWLClassExpression o, String plabel, VisGraph pgraph) {
+	public VisConstraint(VisLevel level, OWLClassExpression o, String pLabel, VisGraph pGraph) {
 	/*
 	 * constructor for the VisConstraint class	
 	 */
 		super();
 		
 		setVisLevel(level);
-		graph = pgraph;
+		graph = pGraph;
 		setPosX(0); 
 		setPosY((int) (10 + 500*Math.random()));
 		setHeight(20); 
 		setWidth(20);
 		linkedClassExpression=o;
-		this.label= plabel;
+		this.label= pLabel;
 		
 		System.err.println("Constraint Label: "+this.label);
 		
@@ -115,31 +114,31 @@ public class VisConstraint extends Shape {
         	  break;
           
           case DATA_SOME_VALUES_FROM:
-      	      OWLDataSomeValuesFrom dsome=(OWLDataSomeValuesFrom) o;
-        	  property= ExpressionManager.getReducedDataPropertyExpression(dsome.getProperty());
-        	  filler = ExpressionManager.getReducedDataRange(dsome.getFiller());
+      	      OWLDataSomeValuesFrom dSome=(OWLDataSomeValuesFrom) o;
+        	  property= ExpressionManager.getReducedDataPropertyExpression(dSome.getProperty());
+        	  filler = ExpressionManager.getReducedDataRange(dSome.getFiller());
 
         	  break;
           
           case DATA_HAS_VALUE:
-        	  OWLDataHasValue dhasv=(OWLDataHasValue) o;
-        	  property= ExpressionManager.getReducedDataPropertyExpression(dhasv.getProperty());
-        	  filler = "'"+dhasv.getValue().getLiteral()+"'";
+        	  OWLDataHasValue dHasV=(OWLDataHasValue) o;
+        	  property= ExpressionManager.getReducedDataPropertyExpression(dHasV.getProperty());
+        	  filler = "'"+dHasV.getValue().getLiteral()+"'";
         	  break;
           
           case DATA_EXACT_CARDINALITY:
-      	      OWLDataExactCardinality dexact=(OWLDataExactCardinality) o;
-        	  property= ExpressionManager.getReducedDataPropertyExpression(dexact.getProperty());
+      	      OWLDataExactCardinality dExact=(OWLDataExactCardinality) o;
+        	  property= ExpressionManager.getReducedDataPropertyExpression(dExact.getProperty());
         	  break;
           
           case DATA_MAX_CARDINALITY:
-      	      OWLDataMaxCardinality dmax=(OWLDataMaxCardinality) o;
-      	      property= ExpressionManager.getReducedDataPropertyExpression(dmax.getProperty());
+      	      OWLDataMaxCardinality dMax=(OWLDataMaxCardinality) o;
+      	      property= ExpressionManager.getReducedDataPropertyExpression(dMax.getProperty());
       	      break;
           
           case DATA_MIN_CARDINALITY:
-      	      OWLDataMinCardinality dmin=(OWLDataMinCardinality) o;
-        	  property= dmin.getProperty().asOWLDataProperty().getIRI().getFragment();
+      	      OWLDataMinCardinality dMin=(OWLDataMinCardinality) o;
+        	  property= dMin.getProperty().asOWLDataProperty().getIRI().getFragment();
         	  break;
           default :
 	    }
@@ -160,9 +159,9 @@ public class VisConstraint extends Shape {
 		// TODO Auto-generated method stub
 		
 		ClassExpressionType type = linkedClassExpression.getClassExpressionType();
-		if (!property.equals("")){
+		if (!property.isEmpty()){
 			draw = label+"("+property;
-			if (!filler.equals("")){
+			if (!filler.isEmpty()){
 				draw += ","+filler+")";
 			}
 			else {
@@ -210,7 +209,7 @@ public class VisConstraint extends Shape {
 				default:
 					g.fillText(draw,getPosX() - (double) getWidth() /2, getPosY());
 			}
-			g.strokeOval(x-getWidth()/2, y, getWidth(), getHeight());
+			g.strokeOval(x-getWidth()/2.0, y, getWidth(), getHeight());
 			g.setStroke(prevColor);
 			g.setFont(prevFont);
 		}	
@@ -222,7 +221,7 @@ public class VisConstraint extends Shape {
 
     @Override
 	public Point2D getConnectionPoint(Point2D p,boolean left) {
-	//return Closest conection point	
+	//return Closest connection point
 		if (left){
 			connectionPointsL = new Point2D(getPosX() - (double) getWidth() /2, getPosY() + (double) getHeight() /2);
 			return connectionPointsL;

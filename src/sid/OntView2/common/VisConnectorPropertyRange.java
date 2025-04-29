@@ -23,7 +23,7 @@ public class VisConnectorPropertyRange extends VisConnectorIsA {
 
 	@Override
 	public void draw(GraphicsContext g){
-        boolean globalHide  = parentBox.vclass.graph.paintframe.hideRange;
+        boolean globalHide  = parentBox.vClass.graph.paintframe.hideRange;
 		if ((visible)&&(parentBox.visible)&&(!globalHide)){
 			if ((from != null) && (to!= null)){
 				if ((from.visible) && (to.visible)){
@@ -72,10 +72,10 @@ public class VisConnectorPropertyRange extends VisConnectorIsA {
 	
 	protected void drawNurbs(GraphicsContext g2d, Point2D pfrom, Point2D pto){
 
-		calculateNurbPoints(pfrom.getX(), pfrom.getY(), toPoint.getX(), toPoint.getY());
+		calculateNURBPoints(pfrom.getX(), pfrom.getY(), toPoint.getX(), toPoint.getY());
 		g2d.beginPath();
 		g2d.moveTo(pfrom.getX(), pfrom.getY());
-		g2d.bezierCurveTo(controlx1, pfrom.getY(), controlx2, pfrom.getY(), pto.getX(), pto.getY());
+		g2d.bezierCurveTo(controlX1, pfrom.getY(), controlX2, pfrom.getY(), pto.getX(), pto.getY());
 		g2d.stroke();
 	}
 	

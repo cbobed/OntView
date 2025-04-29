@@ -117,16 +117,16 @@ public class VisConnectorIsA extends VisConnector {
 	 */
 		double heightDiff = Math.abs(toPointY -fromPointY);
 	    if (toPoint.getY() -fromPoint.getY() > 0){
-	    	controlx1 = fromPointX + 0.2*(toPointX-fromPointX);
-	    	controly1 = fromPointY + 0.8*(heightDiff);
-	    	controlx2 = fromPointX + 0.8*(toPointX-fromPointX);
-	    	controly2 = fromPointY + 0.9*(heightDiff);
+	    	controlX1 = fromPointX + 0.2*(toPointX-fromPointX);
+	    	controlY1 = fromPointY + 0.8*(heightDiff);
+	    	controlX2 = fromPointX + 0.8*(toPointX-fromPointX);
+	    	controlY2 = fromPointY + 0.9*(heightDiff);
         }
 	    else {
-	    	controlx1 = fromPoint.getX() + 0.2*(toPointX-fromPointX);
-	    	controly1 = fromPoint.getY() + (-0.8)*(heightDiff);
-	    	controlx2 = fromPoint.getX() + 0.8*(toPointX-fromPointX);
-	    	controly2 = fromPoint.getY() + (-0.9)*(heightDiff);
+	    	controlX1 = fromPoint.getX() + 0.2*(toPointX-fromPointX);
+	    	controlY1 = fromPoint.getY() + (-0.8)*(heightDiff);
+	    	controlX2 = fromPoint.getX() + 0.8*(toPointX-fromPointX);
+	    	controlY2 = fromPoint.getY() + (-0.9)*(heightDiff);
 	    }
 	}
 	
@@ -140,7 +140,7 @@ public class VisConnectorIsA extends VisConnector {
 		path.getElements().add(new MoveTo(fromPointX, fromPointY));
 		path.getElements().add(new LineTo(fromPointX + PATH_OFFSET, fromPointY));
 		path.getElements().add(new CubicCurveTo(
-				controlx1, controly1, controlx2, controly2, toPointX - PATH_OFFSET, toPointY
+            controlX1, controlY1, controlX2, controlY2, toPointX - PATH_OFFSET, toPointY
 		));
 		path.getElements().add(new LineTo(toPointX, toPointY));
 		

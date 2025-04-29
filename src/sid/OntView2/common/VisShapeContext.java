@@ -100,7 +100,6 @@ public class VisShapeContext extends ContextMenu {
         return showSliderPercentage;
     }
 
-
 	private MenuItem getMenuHideProperties(){
 		if (hideProperties==null) {
 			hideProperties = new MenuItem();
@@ -116,14 +115,13 @@ public class VisShapeContext extends ContextMenu {
 	}
 	
 	private void showInstancesAction(){
-		ArrayList<String> instanceArray = new ArrayList<String>();
+		ArrayList<String> instanceArray = new ArrayList<>();
 		if ((shape instanceof VisClass)){
 			NodeSet<OWLNamedIndividual> instanceSet = ((VisClass) shape).getInstances();
 			for (org.semanticweb.owlapi.reasoner.Node<OWLNamedIndividual>  instanceNode : instanceSet.getNodes() ){
 				for (OWLNamedIndividual instance : instanceNode.getEntities()){
 					instanceArray.add(instance.getIRI().getFragment());
 				}
-				
 			}
 			Stage stage = new Stage();
 			stage.setTitle("Instances of " + shape.asVisClass().label);
@@ -147,7 +145,6 @@ public class VisShapeContext extends ContextMenu {
 			stage.setX(posx);
 			stage.setY(posy);
 			stage.show();
-		
 		}
 	}
 
@@ -319,7 +316,7 @@ public class VisShapeContext extends ContextMenu {
 
     private Button changeSelectionStrategy() {
         if (changeSelectionStrategy == null) {
-            changeSelectionStrategy = new Button("\u22EE");
+            changeSelectionStrategy = new Button(OntViewConstants.QUESTION_MARK);
             changeSelectionStrategy.setStyle("-fx-font-size: 20px; -fx-padding: -2 5 0 5;");
 
             ContextMenu contextMenu = new ContextMenu();

@@ -3,7 +3,6 @@ package sid.OntView2.common;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.shape.StrokeLineCap;
 
 public class VisConnectorHeritance extends VisConnectorPropProp {
@@ -17,7 +16,6 @@ public class VisConnectorHeritance extends VisConnectorPropProp {
 		if (g == null){
 			return;
 		}
-		System.out.println("entro funcion");
         if ((visible)&&(from.asVisClass().getPropertyBox().visible)){
 			if ((from != null) && (to!= null)){
 				if ((from.visible) && (to.visible)){

@@ -14,10 +14,10 @@ public abstract class VisConnector {
     public static Color color = Color.BLACK;
     boolean visible = true;
     boolean redundant = false;
-	protected double controlx1;
-	protected double controly1;
-	protected double controlx2;
-	protected double controly2;
+	protected double controlX1;
+	protected double controlY1;
+	protected double controlX2;
+	protected double controlY2;
     static float  width  = 1.0f;
 	static float minWidth = 1.0f;
     
@@ -76,54 +76,49 @@ public abstract class VisConnector {
    
 	/**
 	 * Calculate Bezier Points for non-directed connectors
-	 * @param fromPointX
-	 * @param fromPointY
-	 * @param toPointX
-	 * @param toPointY
 	 */
 	protected void calculateBezierPoints(double fromPointX, double fromPointY, double toPointX,double toPointY){
 
-		final int MINDIF = 50;
-		double xdiff = toPointX - fromPointX;
-		double ydiff = toPointY - toPointY;
+        double xDiff = toPointX - fromPointX;
+		double yDiff = 0.0;
 
 		double c1 = 1.0;
 		double c2 = 1.0;
 		double offset = 0.0;
 
 		// Destination point is upper and right 
-	    if (((toPointY - fromPointY < 0) && (xdiff > 0)) ||
-				((toPointY - fromPointY < 0) && (xdiff <= 0)) ||
-				((toPointY - fromPointY >= 0) && (xdiff > 0)) ||
-				((toPointY - fromPointY >= 0) && (xdiff <= 0))){
+	    if (((toPointY - fromPointY < 0) && (xDiff > 0)) ||
+				((toPointY - fromPointY < 0) && (xDiff <= 0)) ||
+				((toPointY - fromPointY >= 0) && (xDiff > 0)) ||
+				((toPointY - fromPointY >= 0) && (xDiff <= 0))){
 
-	    	controlx1 = fromPointX + 0.1 * c1 * (xdiff) + offset;
-	    	controly1 = fromPointY + (ydiff);
-	    	controlx2 = fromPointX + 0.9 * c2 * (xdiff) + offset;
-	    	controly2 = fromPointY + (ydiff);	
+	    	controlX1 = fromPointX + 0.1 * c1 * (xDiff) + offset;
+	    	controlY1 = fromPointY + (yDiff);
+	    	controlX2 = fromPointX + 0.9 * c2 * (xDiff) + offset;
+	    	controlY2 = fromPointY + (yDiff);
 	
         }
 	}
 	
-	protected void calculateNurbPoints(double fromPointX, double fromPointY, double toPointX,double toPointY){
+	protected void calculateNURBPoints(double fromPointX, double fromPointY, double toPointX, double toPointY){
 
-		double xdiff = toPointX-fromPointX;
-	    if  (xdiff > 0) { // Right to left
-			controlx1 = fromPointX + 0.1 * (xdiff);
-			controly1 = fromPointY;
-			controlx2 = fromPointX + 0.4 * (xdiff);
-			controly2 = toPointY;
-		} else if (xdiff == 0) { // Up to down
-			double pseudoXdiff = 50;
-			controlx1 = fromPointX - pseudoXdiff;
-			controly1 = fromPointY + 0.5 * pseudoXdiff;
-			controlx2 = toPointX - pseudoXdiff;
-			controly2 = toPointY - 0.5 * pseudoXdiff;
+		double xDiff = toPointX-fromPointX;
+	    if  (xDiff > 0) { // Right to left
+			controlX1 = fromPointX + 0.1 * (xDiff);
+			controlY1 = fromPointY;
+			controlX2 = fromPointX + 0.4 * (xDiff);
+			controlY2 = toPointY;
+		} else if (xDiff == 0) { // Up to down
+			double pseudoXDiff = 50;
+			controlX1 = fromPointX - pseudoXDiff;
+			controlY1 = fromPointY + 0.5 * pseudoXDiff;
+			controlX2 = toPointX - pseudoXDiff;
+			controlY2 = toPointY - 0.5 * pseudoXDiff;
 		} else { // Left to right
-	    	controlx1 = toPointX + 0.4 * (-1.0) * (xdiff);
-	    	controly1 = fromPointY;
-	    	controlx2 = toPointX + 0.1 * (-1.0) * (xdiff);
-	    	controly2 = toPointY;
+	    	controlX1 = toPointX + 0.4 * (-1.0) * (xDiff);
+	    	controlY1 = fromPointY;
+	    	controlX2 = toPointX + 0.1 * (-1.0) * (xDiff);
+	    	controlY2 = toPointY;
         }
 
 
@@ -138,14 +133,14 @@ public abstract class VisConnector {
 		path.getElements().add(new MoveTo(fromPointX, fromPointY));
 		path.getElements().add(new LineTo(fromPointX, fromPointY));
 		path.getElements().add(new CubicCurveTo(
-				controlx1, controly1,
-				controlx2, controly2,
+            controlX1, controlY1,
+            controlX2, controlY2,
 				toPointX, toPointY
 		));
 		path.getElements().add(new LineTo(toPointX, toPointY));
 	}
 
-	protected void drawCurve(GraphicsContext g2d, int method) {};
+	protected void drawCurve(GraphicsContext g2d, int method) {}
 
 
 	protected void drawPath(GraphicsContext gc, Path path) {

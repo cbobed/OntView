@@ -7,7 +7,6 @@ public class VisConstants {
 	public static final String KCECOMBOOPTION2 = "KCE 20";
 	public static final String PAGERANKCOMBOOPTION1 = "PageRank 10";
 	public static final String PAGERANKCOMBOOPTION2 = "PageRank 20";
-
 	public static final String RDFRANKCOMBOOPTION1 = "RDFRank 10";
 	public static final String RDFRANKCOMBOOPTION2 = "RDFRank 20";
 	public static final String CUSTOMCOMBOOPTION3 = "Custom";
@@ -19,26 +18,15 @@ public class VisConstants {
     public static final String GLOBALSTRATEGY_RDF_LEVEL_RL = "RDFRank + Level: right to left";
 
     public static final String COMPACT_GRAPH = "Compact graph";
-
-	public static final int CONNECTOROFFSET = 7;
-
 	public static final int CONTAINER_SIZE = 65;
 	
 	final static int WIDTH_MARGIN = 30;
     final static int HEIGHT_MARGIN = 30;
     final static int BUTTON_SIZE = 10;
-	final static int PROGRESSBAROBSERVER = 1;
-	final static int GENERALOBSERVER     = 2;
 	public final static String SIDCLASS = "SIDClass_";
     public final static int NEEDED_HEIGHT = 245; // TODO
     public final static String THING_ENTITY = "http://www.w3.org/2002/07/owl#Thing";
 	public final static String NOTHING_ENTITY = "http://www.w3.org/2002/07/owl#Nothing";
-
-
-
-	final int KEYCONCEPTNO = 10;
-	
-	
 	
 	/**
 	 * Curve drawing method

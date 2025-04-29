@@ -8,7 +8,6 @@ import javafx.scene.paint.Color;
 
 
 public class VisConnectorPropProp extends VisConnector {
-
 	VisObjectProperty fromProp;
 	VisObjectProperty toProp;
     int d = 0;
@@ -50,15 +49,10 @@ public class VisConnectorPropProp extends VisConnector {
 	
 	
 	private boolean drawable (){
-		if ((from.visible) &&(to.visible) &&
-				(visible)&&(fromProp.visible)&&(toProp.visible)&&
-						(from.asVisClass().getPropertyBox().visible)&&
-						(to.asVisClass().getPropertyBox().visible)&&(from != null) && (to!= null)){
-			return true;
-			}
-		else {
-			return false;
-		}
+        return (from.visible) && (to.visible) &&
+            (visible) && (fromProp.visible) && (toProp.visible) &&
+            (from.asVisClass().getPropertyBox().visible) &&
+            (to.asVisClass().getPropertyBox().visible) && (from != null) && (to != null);
 	}
 	
 	@Override

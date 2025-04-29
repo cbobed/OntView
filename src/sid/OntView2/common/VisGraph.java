@@ -521,7 +521,7 @@ public class VisGraph implements Runnable{
 			NodeSet<OWLClass> propertyDomainNodeSet = reasoner.getDataPropertyDomains(dataProperty, true);
 
 			if (propertyDomainNodeSet.getNodes().size()>1){
-				VisDataProperty.addDomain(this, propertyDomainNodeSet, dataProperty, reasoner, activeOntology, dRange);
+				VisDataProperty.addDomain(this, propertyDomainNodeSet, dataProperty, activeOntology, dRange);
 			}
 			else {
 				for (Node<OWLClass> o : propertyDomainNodeSet ){
