@@ -96,6 +96,7 @@ public class Mine extends Application implements Embedable{
 
 		viewer.entityNameSet = new HashSet<>();
 		viewer.artPanel = new PaintFrame(screenWidth, screenHeight);
+        viewer.artPanel.setCache(false); // buffer overflow
 		viewer.artPanel.setParentFrame(viewer);
 		viewer.artPanel.screenWidth = (int) screenWidth;
 		viewer.artPanel.screenHeight = (int) screenHeight;
