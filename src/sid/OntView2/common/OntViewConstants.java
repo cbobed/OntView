@@ -10,5 +10,7 @@ public abstract class OntViewConstants {
 	public static final String OR = "\u222A";
 	public static final String HASVALUE = "hasVal";
 	public static final String COMPLEMENT = "¬";
+    public static final String LEFT_ARROW = "\u2190";
+    public static final String RIGHT_ARROW = "\u2192";
 
 	}

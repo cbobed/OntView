@@ -281,12 +281,9 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			panel0.setPadding(new Insets(5));
 			panel0.setSpacing(5);
 
-
 			StackPane titlePane = createTitlePane("Search");
-			HBox row = createRow(getLabel0(), getComboBox0());
-
+			HBox row = createRow(getLabel0(), getComboSearchBox());
 			panel0 = createContainer(titlePane, row);
-
 		}
 		return panel0;
 	}
@@ -343,10 +340,9 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		return cleanConnectorsButton;
 	}
 
-	private ComboBox<String> getComboBox0() {
+	private ComboBox<String> getComboSearchBox() {
 		if (comboBox == null) {
 			comboBox = new ComboBox<>();
-			AutoCompletion.enable(comboBox);
 			comboBox.setEditable(true);
 			comboBox.getStyleClass().add("custom-combo-box");
             comboBox.setMaxWidth(180);
@@ -356,7 +352,6 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			comboBox.setItems(items);
 			HBox.setHgrow(comboBox, Priority.ALWAYS);
             comboBox.setOnAction(event -> comboBox0ItemItemStateChanged(comboBox.getEditor().getText()));
-            //comboBox.valueProperty().addListener((options, oldValue, newValue) -> comboBox0ItemItemStateChanged(newValue));
 
 			TextField editor = comboBox.getEditor();
 			editor.addEventHandler(KeyEvent.KEY_RELEASED, event -> handleAutoComplete(editor.getText(), items));
@@ -369,7 +364,6 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	public ComboBox<String> getKceComboBox() {
 		if (kceComboBox == null) {
 			kceComboBox = new ComboBox<>();
-			AutoCompletion.enable(kceComboBox);
 			kceComboBox.setEditable(true);
 			kceComboBox.setPromptText("Select KCE");
 			kceComboBox.getStyleClass().add("custom-combo-box");
@@ -1039,7 +1033,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	}
 
     public void loadSearchCombo() {
-		getComboBox0().getItems().clear();
+		getComboSearchBox().getItems().clear();
         Set<String> labelSet = new HashSet<>();
 
 		for (Entry<String, Shape> s : parent.artPanel.getVisGraph().shapeMap.entrySet()) {

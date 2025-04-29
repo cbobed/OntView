@@ -38,8 +38,6 @@ import sid.OntView2.main.TopPanel;
 import sid.OntView2.kcExtractors.KConceptExtractor;
 import sid.OntView2.kcExtractors.KConceptExtractorFactory;
 
-import javax.print.DocFlavor;
-
 public class PaintFrame extends Canvas {
 	private static final long serialVersionUID = 1L;
     public Stage loadingStage = null;
@@ -201,16 +199,7 @@ public class PaintFrame extends Canvas {
 	/**
 	 * sets scaling/zoom factor
 	 */
-	public void setFactor1(double newFactor) {
-        double oldZoom = this.factor;
-        this.factor = newFactor;
-        offsetX = offsetX * oldZoom / newFactor;
-        offsetY = offsetY * oldZoom / newFactor;
-
-        Platform.runLater(redrawRunnable);
-    }
-
-    public void setFactor(double newZoom) {
+	public void setFactor(double newZoom) {
         double oldZoom = this.factor;
         double viewportWidth = scroll.getViewportBounds().getWidth();
         double viewportHeight = scroll.getViewportBounds().getHeight();
@@ -1341,10 +1330,6 @@ public class PaintFrame extends Canvas {
 		return selectedConcepts;
 	}
 
-	public void cleanSelectedConcepts() {
-		selectedConcepts.clear();
-	}
-
 	public void showConceptSelectionPopup(Map<String, Shape> shapeMap) {
 		Stage popupStage = new Stage();
 		popupStage.initModality(Modality.APPLICATION_MODAL);
@@ -1429,7 +1414,7 @@ public class PaintFrame extends Canvas {
 	}
 
 	private Button createAddButton(ListView<Shape> allConceptsView, ObservableList<Shape> selectedConceptsList) {
-		Button addButton = new Button("\u2192");
+		Button addButton = new Button(OntViewConstants.RIGHT_ARROW);
 		addButton.setOnAction(e -> {
 			Shape selected = allConceptsView.getSelectionModel().getSelectedItem();
 			if (selected != null && !selectedConceptsList.contains(selected)) {
@@ -1440,7 +1425,7 @@ public class PaintFrame extends Canvas {
 	}
 
 	private Button createRemoveButton(ListView<Shape> selectedConceptsView, ObservableList<Shape> selectedConceptsList) {
-		Button removeButton = new Button("\u2190");
+		Button removeButton = new Button(OntViewConstants.LEFT_ARROW);
 		removeButton.setOnAction(e -> {
 			Shape selected = selectedConceptsView.getSelectionModel().getSelectedItem();
 			if (selected != null) {
