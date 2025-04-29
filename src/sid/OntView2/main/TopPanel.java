@@ -145,7 +145,6 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		if (qualifiedNames == null) {
 			qualifiedNames = new CheckBox("qualified names");
 			qualifiedNames.setCursor(Cursor.HAND);
-			// TODO Auto-generated method stub
 			qualifiedNames.setOnAction(this::qualifiedNamesActionActionPerformed);
 		}
 		return qualifiedNames;

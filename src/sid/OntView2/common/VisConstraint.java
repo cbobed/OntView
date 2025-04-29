@@ -46,9 +46,7 @@ public class VisConstraint extends Shape {
 		setWidth(20);
 		linkedClassExpression=o;
 		this.label= pLabel;
-		
-		System.err.println("Constraint Label: "+this.label);
-		
+
 		connectionPointsL = new Point2D(posx- (double) getWidth() /2,posy+ (double) getHeight() /2);
 		connectionPointsR = new Point2D(posx- (double) getWidth() /2,posy+ (double) getHeight() /2);
 		setVisLevel(level);
