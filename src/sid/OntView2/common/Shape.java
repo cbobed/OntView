@@ -12,8 +12,6 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class Shape {
-    private ControlPanelInterface limitListener;
-
     public static final int CLOSED = 0;
     public static final int OPEN = 1;
     public static final int PARTIALLY_CLOSED = 2;
@@ -148,8 +146,6 @@ public abstract class Shape {
 
     public abstract String getToolTipInfo();
 
-    public abstract int getLevelRelativePos();
-
     public abstract void drawShape(GraphicsContext g);
     public abstract void paintFocus(GraphicsContext g);
 
@@ -184,35 +180,12 @@ public abstract class Shape {
         hiddenDescendantsSet.clear();
     }
 
-    public void resetHiddenParentsCount() {
-        hiddenParentsSet.clear();
-    }
-
     public int getHiddenDescendantsSet() {
         return hiddenDescendantsSet.size();
     }
 
     public Set<Shape> get1(){
         return hiddenDescendantsSet;
-    }
-
-    public int getHiddenParentsSet() {
-        return hiddenParentsSet.size();
-    }
-
-    /**
-     * Check if children has other visible parents
-     */
-    boolean childHasOtherParents() {
-        int visibleParentCount = 0;
-
-        for (VisConnector inConnector : this.inConnectors) {
-            if (inConnector.isVisible()) {
-                visibleParentCount++;
-            }
-        }
-
-        return visibleParentCount > 1;
     }
 
     /**
@@ -446,7 +419,7 @@ public abstract class Shape {
         }
     }
 
-    public void showLeft(Shape parent, Set<Shape> visibleDescendantsSet) {
+    public void showLeft(Set<Shape> visibleDescendantsSet) {
         if (!this.isVisible()) visibleDescendantsSet.add(this);
         this.visible = true;
 
@@ -457,7 +430,7 @@ public abstract class Shape {
             case LEFTOPEN, LEFT_PARTIALLY_CLOSED:
                 for (VisConnector connector : inConnectors) {
                     connector.show();
-                    connector.from.showLeft(this, visibleDescendantsSet);
+                    connector.from.showLeft(visibleDescendantsSet);
                     connector.from.checkAndUpdateChildrenVisibilityStates();
                     connector.from.checkAndUpdateParentVisibilityStates();
                 }
@@ -479,7 +452,7 @@ public abstract class Shape {
 
     public void showParentLevels() {
         for (VisConnector c : inConnectors) {
-            c.from.showLeft(this, visibleDescendantsSet);
+            c.from.showLeft(visibleDescendantsSet);
             c.show();
             c.from.checkAndUpdateChildrenVisibilityStates();
             c.from.checkAndUpdateParentVisibilityStates();
@@ -510,12 +483,7 @@ public abstract class Shape {
         }
     }
 
-    public static final Comparator<Shape> POSY_ORDER =
-        new Comparator<Shape>() {
-            public int compare(Shape s1, Shape s2) {
-                return s1.getTopCorner() - s2.getTopCorner();
-            }
-        };
+    public static final Comparator<Shape> POSY_ORDER = Comparator.comparingInt(Shape::getTopCorner);
 
     /**
      * Updates the state of the shape based on the visibility of its parents.

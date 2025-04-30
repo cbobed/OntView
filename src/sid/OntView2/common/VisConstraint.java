@@ -241,14 +241,6 @@ public class VisConstraint extends Shape {
 		return retVal;
 	}
 	
-
-	
-	@Override
-	public int getLevelRelativePos() {
-		return RELATIVE_POS;
-	}
-
-	
 	public OWLClassExpression getLinkedClassExpression (){
 		return linkedClassExpression;
 	}

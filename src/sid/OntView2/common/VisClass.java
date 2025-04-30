@@ -690,12 +690,6 @@ public class VisClass extends Shape {
 			}
 		}
 	}
-	
-	@Override
-	public int getLevelRelativePos() {
-		// TODO Auto-generated method stub
-		return RELATIVE_POS;
-	}
 
     public int calculateWidth() {
         GraphicsContext g = graph.paintframe.getGraphicsContext2D();
