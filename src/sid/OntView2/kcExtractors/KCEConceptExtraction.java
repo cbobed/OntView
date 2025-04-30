@@ -29,7 +29,11 @@ public class KCEConceptExtraction extends KConceptExtractor {
 			Shape shape = entry.getValue();
 			if (isNonKeyConcept(entry.getKey(), conceptSet, shapeMap)) {
 				shape.hide();
-			} 
+			} else {
+                if (!(shape.getLabel().matches("Nothing"))) {
+                    nonHiddenShape.add(shape);
+                }
+            }
 		}
 		for (Shape s: nonHiddenShape){
 			if (s.getState()!=Shape.OPEN) {
@@ -42,7 +46,6 @@ public class KCEConceptExtraction extends KConceptExtractor {
 	/**
 	 * Replaced by overloaded version
 	 * Retrieves a set of Key Concepts to be shown by using KCE Api
-	 * @param activeOntology
 	 */
 	@Override
 	public Set<String> retrieveKeyConcepts(OWLOntology activeOntology, Map<String, Shape> shapeMap, int limitResultSize) {

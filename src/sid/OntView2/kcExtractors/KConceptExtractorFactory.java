@@ -16,8 +16,6 @@ public class KConceptExtractorFactory {
 			case VisConstants.RDFRANKCOMBOOPTION1, VisConstants.RDFRANKCOMBOOPTION2 
 										-> {result = new RDFRankConceptExtraction(); }
             case VisConstants.CUSTOMCOMBOOPTION3 -> {result = new CustomConceptExtraction(selectedConcepts); }
-			case VisConstants.NONECOMBOOPTION 
-										-> {result = null; }
 		}
 		return result; 
 	}

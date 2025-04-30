@@ -79,8 +79,8 @@ public class PageRankConceptExtraction extends KConceptExtractor {
         Map<String, Double> scoreMap = pageRankScorer.getScores();
         ArrayList<Entry<String, Double>> scoreList = new ArrayList<>();
 
-        scoreMap.entrySet().stream().forEach(entry -> scoreList.add(entry));
-        Collections.sort(scoreList, Collections.reverseOrder(new PageRankScoreComparator()));
+        scoreMap.entrySet().forEach(scoreList::add);
+        scoreList.sort(Collections.reverseOrder(new PageRankScoreComparator()));
 
         int added = 0;
         for (int i=0; added<limitResultSize && i<scoreList.size(); i++) {

@@ -14,19 +14,12 @@ public abstract class KConceptExtractor {
 
 	/**
      * Hides non-key concepts in the graph
-     * @return Set<String>
      */
-    
     public abstract void hideNonKeyConcepts(OWLOntology activeOntology, VisGraph graph, int limitResultSize); 
 	
     /**
      * Retrieves the key concepts according to the implemented criteria
-     * @param activeOntology
-     * @param shapeMap
-     * @param limitResultSize
-     * @return Set<String>
      */
-	
     public abstract Set<String> retrieveKeyConcepts(OWLOntology activeOntology, Map<String, Shape> shapeMap,
                                            int limitResultSize);
 

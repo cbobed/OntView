@@ -1,12 +1,9 @@
 package sid.OntView2.kcExtractors;
 
-import it.essepuntato.semanticweb.kce.engine.Engine;
-import it.essepuntato.taxonomy.HTaxonomy;
 import org.semanticweb.owlapi.model.OWLOntology;
 import sid.OntView2.common.Shape;
 import sid.OntView2.common.VisConstants;
 import sid.OntView2.common.VisGraph;
-import sid.OntView2.utils.OWLAPITaxonomyMakerExtended;
 
 import java.util.HashMap;
 import java.util.HashSet;
