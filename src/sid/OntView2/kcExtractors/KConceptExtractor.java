@@ -4,6 +4,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 
 import sid.OntView2.common.Shape;
 import sid.OntView2.common.VisClass;
+import sid.OntView2.common.VisConstants;
 import sid.OntView2.common.VisGraph;
 
 import java.util.HashSet;
@@ -12,10 +13,35 @@ import java.util.Set;
 
 public abstract class KConceptExtractor {
 
-	/**
+    private final Set<Shape> nonHiddenShape = new HashSet<>();
+
+    /**
      * Hides non-key concepts in the graph
      */
-    public abstract void hideNonKeyConcepts(OWLOntology activeOntology, VisGraph graph, int limitResultSize); 
+    public void hideNonKeyConcepts(OWLOntology activeOntology, VisGraph graph, int limitResultSize){
+        Map<String, Shape> shapeMap = graph.getShapeMap();
+        Set<String> conceptSet = retrieveKeyConcepts(activeOntology, shapeMap, limitResultSize);
+
+        conceptSet.add(VisConstants.THING_ENTITY);
+        conceptSet.add(VisConstants.NOTHING_ENTITY);
+
+        for (Map.Entry<String, Shape> entry : shapeMap.entrySet()) {
+            Shape shape = entry.getValue();
+            if (isNonKeyConcept(entry.getKey(), conceptSet, shapeMap)) {
+                shape.hide();
+            } else {
+                if (!(shape.getLabel().matches("Nothing"))) {
+                    nonHiddenShape.add(shape);
+                }
+            }
+        }
+        for (Shape s: nonHiddenShape){
+            if (s.getState()!=Shape.OPEN) {
+                s.updateHiddenDescendants();
+            }
+        }
+        graph.addDashedConnectors();
+    }
 	
     /**
      * Retrieves the key concepts according to the implemented criteria
@@ -35,7 +61,7 @@ public abstract class KConceptExtractor {
             isNonKeyConcept = false;
         } else {
             if (s instanceof VisClass) {
-                if ((s.asVisClass().isAnonymous()) && (isKeyConceptDefinition(s, keyConcepts, shapeMap))) {
+                if ((s.asVisClass().isAnonymous()) && (isKeyConceptDefinition(s, keyConcepts))) {
                     isNonKeyConcept = false;
                 }
             }
@@ -48,7 +74,7 @@ public abstract class KConceptExtractor {
      * in keyConcepts
      * @return boolean
      */
-    protected boolean isKeyConceptDefinition(Shape s, Set<String> keyConcepts, Map<String, Shape> shapeMap) {
+    protected boolean isKeyConceptDefinition(Shape s, Set<String> keyConcepts) {
     	
     	Set<String> auxDefinitions = new HashSet<>();  
     	s.asVisClass().getEquivalentClasses().forEach(x -> {auxDefinitions.add(Shape.getKey(x));}); 
