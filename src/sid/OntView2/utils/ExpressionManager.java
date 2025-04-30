@@ -65,197 +65,183 @@ public class ExpressionManager {
 	}
 
 	public static String getReducedClassExpressionSub(OWLClassExpression o, int level){
-		String reduced ="";
+		StringBuilder reduced = new StringBuilder();
 		int i;
 		ClassExpressionType type = o.getClassExpressionType();
 		switch (type){
 			case OWL_CLASS :
-				reduced += obtainEntityNameFromIRI(o.asOWLClass().getIRI());
+				reduced.append(obtainEntityNameFromIRI(o.asOWLClass().getIRI()));
 				break;
 			case OBJECT_ONE_OF:
-				reduced = "OneOf(";
+				reduced = new StringBuilder("OneOf(");
 				OWLObjectOneOf oneOf = (OWLObjectOneOf) o;
 				i = 1;
 				for (OWLIndividual op :oneOf.getIndividuals()) {
-					reduced += obtainEntityNameFromIRI(op.asOWLNamedIndividual().getIRI());
+					reduced.append(obtainEntityNameFromIRI(op.asOWLNamedIndividual().getIRI()));
 					if (i<oneOf.getIndividuals().size()) {
-						reduced+=",\n";
-						for (int j=0; j<level; j++) {
-							reduced+="\t";
-						}
+						reduced.append(",\n");
+                        reduced.append("\t".repeat(Math.max(0, level)));
 					}
 					i++;
 				}
-				reduced+=")";
+				reduced.append(")");
 				break;
 			case OBJECT_SOME_VALUES_FROM:
 				OWLObjectSomeValuesFrom some = (OWLObjectSomeValuesFrom) o;
-				reduced = OntViewConstants.SOME+".(";
+				reduced = new StringBuilder(OntViewConstants.SOME + ".(");
 				if (some.getProperty()!= null)
-					reduced+= getReducedObjectPropertyExpression(some.getProperty());
+					reduced.append(getReducedObjectPropertyExpression(some.getProperty()));
 				if (some.getFiller()!= null) {
-					reduced +=",\n";
-					for (int j=0; j<level; j++) reduced+="\t";
-					reduced+= getReducedClassExpressionSub((OWLClassExpression) some.getFiller(), level+1);
+					reduced.append(",\n");
+                    reduced.append("\t".repeat(Math.max(0, level)));
+					reduced.append(getReducedClassExpressionSub(some.getFiller(), level + 1));
 				}
-				reduced +=")";
+				reduced.append(")");
 				break;
 			case OBJECT_ALL_VALUES_FROM:
 				OWLObjectAllValuesFrom all = (OWLObjectAllValuesFrom) o;
-				reduced = OntViewConstants.FOR_ALL+".(";
+				reduced = new StringBuilder(OntViewConstants.FOR_ALL + ".(");
 				if (all.getProperty()!=null)
-					reduced+= getReducedObjectPropertyExpression(all.getProperty());
+					reduced.append(getReducedObjectPropertyExpression(all.getProperty()));
 
 				if (all.getFiller()!= null) {
-					reduced +=",\n";
-					for (int j=0; j<level; j++) reduced+="\t";
-					reduced+= getReducedClassExpressionSub(all.getFiller(), level+1);
+					reduced.append(",\n");
+                    reduced.append("\t".repeat(Math.max(0, level)));
+					reduced.append(getReducedClassExpressionSub(all.getFiller(), level + 1));
 				}
-				reduced+=")";
+				reduced.append(")");
 				break;
 			case OBJECT_COMPLEMENT_OF:
 				OWLObjectComplementOf comp = (OWLObjectComplementOf) o;
-				reduced = OntViewConstants.COMPLEMENT+"(";
-				reduced += getReducedClassExpressionSub(comp.getOperand(), level+1);
-				reduced+=")";
+				reduced = new StringBuilder(OntViewConstants.COMPLEMENT + "(");
+				reduced.append(getReducedClassExpressionSub(comp.getOperand(), level + 1));
+				reduced.append(")");
 				break;
 			case OBJECT_EXACT_CARDINALITY:
 				OWLObjectExactCardinality exact = (OWLObjectExactCardinality) o;
-				reduced = "="+exact.getCardinality()+ "(";
+				reduced = new StringBuilder("=" + exact.getCardinality() + "(");
 				if (exact.getProperty()!=null)
-					reduced+= getReducedObjectPropertyExpression(exact.getProperty());
+					reduced.append(getReducedObjectPropertyExpression(exact.getProperty()));
 				if (exact.getFiller()!= null) {
-					reduced += ",\n";
-					for (int j=0; j<level; j++) reduced+="\t";
-					reduced+= getReducedClassExpressionSub(exact.getFiller(), level+1);
+					reduced.append(",\n");
+                    reduced.append("\t".repeat(Math.max(0, level)));
+					reduced.append(getReducedClassExpressionSub(exact.getFiller(), level + 1));
 				}
-				reduced+=")";
+				reduced.append(")");
 				break;
 			case OBJECT_HAS_SELF:
 				OWLObjectHasSelf self = (OWLObjectHasSelf) o;
-				reduced = "hasSelf("+getReducedObjectPropertyExpression(self.getProperty());
-				reduced+= ")";
+				reduced = new StringBuilder("hasSelf(" + getReducedObjectPropertyExpression(self.getProperty()));
+				reduced.append(")");
 				break;
 			case OBJECT_HAS_VALUE:
 				OWLObjectHasValue h = (OWLObjectHasValue) o;
-				reduced = OntViewConstants.HASVALUE + "(";
-				reduced += getReducedObjectPropertyExpression(h.getProperty());
-				reduced += ":"+obtainEntityNameFromIRI(h.getValue().asOWLNamedIndividual().getIRI()) +")";
+				reduced = new StringBuilder(OntViewConstants.HASVALUE + "(");
+				reduced.append(getReducedObjectPropertyExpression(h.getProperty()));
+				reduced.append(":").append(obtainEntityNameFromIRI(h.getValue().asOWLNamedIndividual().getIRI())).append(")");
 				break;
 			case OBJECT_INTERSECTION_OF:
 				OWLObjectIntersectionOf inter = (OWLObjectIntersectionOf) o;
-				reduced = OntViewConstants.AND + ".(";
+				reduced = new StringBuilder(OntViewConstants.AND + ".(");
 				i = 1;
 				for (OWLClassExpression op : inter.getOperands()){
-					reduced += getReducedClassExpressionSub(op, level+1);
+					reduced.append(getReducedClassExpressionSub(op, level + 1));
 					if (i<inter.getOperands().size()) {
-						reduced+=",\n";
-						for (int j=0; j<level; j++) {
-							reduced+="\t";
-						}
+						reduced.append(",\n");
+                        reduced.append("\t".repeat(Math.max(0, level)));
 					}
 					i++;
 				}
-				reduced+=")";
+				reduced.append(")");
 				break;
 			case OBJECT_MAX_CARDINALITY:
 				OWLObjectMaxCardinality max = (OWLObjectMaxCardinality) o;
-				reduced = OntViewConstants.LOWER_EQUAL+max.getCardinality()+ "(";
+				reduced = new StringBuilder(OntViewConstants.LOWER_EQUAL + max.getCardinality() + "(");
 				if (max.getProperty()!=null) {
-					reduced+= getReducedObjectPropertyExpression(max.getProperty()) ;
+					reduced.append(getReducedObjectPropertyExpression(max.getProperty()));
 				}
 				if (max.getFiller()!= null) {
-					reduced += ",\n";
-					for (int j=0; j<level; j++) reduced+="\t";
-					reduced+= getReducedClassExpressionSub(max.getFiller(), level+1);
+					reduced.append(",\n");
+                    reduced.append("\t".repeat(Math.max(0, level)));
+					reduced.append(getReducedClassExpressionSub(max.getFiller(), level + 1));
 				}
-				reduced+=")";
+				reduced.append(")");
 				break;
 			case OBJECT_MIN_CARDINALITY:
 				OWLObjectMinCardinality min = (OWLObjectMinCardinality) o;
-				reduced = OntViewConstants.GREATER_EQUAL+min.getCardinality()+ "(";
+				reduced = new StringBuilder(OntViewConstants.GREATER_EQUAL + min.getCardinality() + "(");
 				if (min.getProperty()!=null) {
-					reduced+= getReducedObjectPropertyExpression(min.getProperty());
+					reduced.append(getReducedObjectPropertyExpression(min.getProperty()));
 				}
 				if (min.getFiller()!= null) {
-					reduced+=",\n";
-					for (int j=0; j<level; j++) reduced+="\t";
-					reduced+= getReducedClassExpressionSub(min.getFiller(), level+1);
+					reduced.append(",\n");
+                    reduced.append("\t".repeat(Math.max(0, level)));
+					reduced.append(getReducedClassExpressionSub(min.getFiller(), level + 1));
 				}
-				reduced+=")";
+				reduced.append(")");
 				break;
 			case OBJECT_UNION_OF:
 				OWLObjectUnionOf u = (OWLObjectUnionOf) o;
 				i=1;
-				reduced = OntViewConstants.OR + ".(";
+				reduced = new StringBuilder(OntViewConstants.OR + ".(");
 				for (OWLClassExpression op : u.getOperands()){
-					reduced += getReducedClassExpressionSub(op, level+1);
+					reduced.append(getReducedClassExpressionSub(op, level + 1));
 					if (i<u.getOperands().size())  {
-						reduced+=",\n";
-						for (int j=0; j<level; j++) {
-							reduced+="\t";
-						}
+						reduced.append(",\n");
+                        reduced.append("\t".repeat(Math.max(0, level)));
 					}
 					i++;
 				}
-				reduced+=")";
+				reduced.append(")");
 				break;
 
 			case DATA_HAS_VALUE :
-				OWLDataHasValue dhas= (OWLDataHasValue) o;
-				reduced = OntViewConstants.HASVALUE + ".(";
-				reduced += getReducedDataPropertyExpression(dhas.getProperty())+":";
-				reduced += dhas.getValue()+")";
-				reduced+=")";
+				OWLDataHasValue dHas= (OWLDataHasValue) o;
+				reduced = new StringBuilder(OntViewConstants.HASVALUE + ".(");
+				reduced.append(getReducedDataPropertyExpression(dHas.getProperty())).append(":");
+				reduced.append(dHas.getValue()).append(")");
+				reduced.append(")");
 				break;
 			case DATA_ALL_VALUES_FROM:
-				OWLDataAllValuesFrom dall= (OWLDataAllValuesFrom) o;
-				reduced = OntViewConstants.FOR_ALL + ".(";
-				reduced += getReducedDataPropertyExpression(dall.getProperty())+",";
-				reduced += getReducedDataRange(dall.getFiller());
-				reduced+=")";
+				OWLDataAllValuesFrom dAll= (OWLDataAllValuesFrom) o;
+				reduced = new StringBuilder(OntViewConstants.FOR_ALL + ".(");
+				reduced.append(getReducedDataPropertyExpression(dAll.getProperty())).append(",");
+				reduced.append(getReducedDataRange(dAll.getFiller()));
+				reduced.append(")");
 				break;
 			case DATA_EXACT_CARDINALITY:
-				OWLDataExactCardinality dexact = (OWLDataExactCardinality) o;
-				reduced = "="+ dexact.getCardinality() + "(";
-				reduced += getReducedDataPropertyExpression(dexact.getProperty())+","; ;
-				reduced += getReducedDataRange(dexact.getFiller());
-				reduced+=")";
+				OWLDataExactCardinality dExact = (OWLDataExactCardinality) o;
+				reduced = new StringBuilder("=" + dExact.getCardinality() + "(");
+				reduced.append(getReducedDataPropertyExpression(dExact.getProperty())).append(",");
+				reduced.append(getReducedDataRange(dExact.getFiller()));
+				reduced.append(")");
 				break;
 			case DATA_MAX_CARDINALITY:
-				OWLDataMaxCardinality dmax = (OWLDataMaxCardinality) o;
-				reduced = OntViewConstants.LOWER_EQUAL + dmax.getCardinality() + "(";
-				reduced += getReducedDataPropertyExpression(dmax.getProperty())+",";
-				reduced += getReducedDataRange(dmax.getFiller());
-				reduced+=")";
+				OWLDataMaxCardinality dMax = (OWLDataMaxCardinality) o;
+				reduced = new StringBuilder(OntViewConstants.LOWER_EQUAL + dMax.getCardinality() + "(");
+				reduced.append(getReducedDataPropertyExpression(dMax.getProperty())).append(",");
+				reduced.append(getReducedDataRange(dMax.getFiller()));
+				reduced.append(")");
 				break;
 			case DATA_MIN_CARDINALITY:
-
-				OWLDataMinCardinality dmin = (OWLDataMinCardinality) o;
-				reduced = OntViewConstants.GREATER_EQUAL+ dmin.getCardinality() + "(";
-				reduced += getReducedDataPropertyExpression(dmin.getProperty())+",";
-				reduced += getReducedDataRange(dmin.getFiller());
-				reduced+=")";
+				OWLDataMinCardinality dMin = (OWLDataMinCardinality) o;
+				reduced = new StringBuilder(OntViewConstants.GREATER_EQUAL + dMin.getCardinality() + "(");
+				reduced.append(getReducedDataPropertyExpression(dMin.getProperty())).append(",");
+				reduced.append(getReducedDataRange(dMin.getFiller()));
+				reduced.append(")");
 				break;
-
 			case DATA_SOME_VALUES_FROM:
-
-				OWLDataSomeValuesFrom dsome = (OWLDataSomeValuesFrom) o;
-				reduced = OntViewConstants.SOME + "(";
-				reduced += getReducedDataPropertyExpression(dsome.getProperty())+",";
-				reduced += getReducedDataRange(dsome.getFiller());
-				reduced+=")";
+				OWLDataSomeValuesFrom dSome = (OWLDataSomeValuesFrom) o;
+				reduced = new StringBuilder(OntViewConstants.SOME + "(");
+				reduced.append(getReducedDataPropertyExpression(dSome.getProperty())).append(",");
+				reduced.append(getReducedDataRange(dSome.getFiller()));
+				reduced.append(")");
 				break;
-
 			default :
-				reduced += o.toString();
+				reduced.append(o);
 		}
-
-		//		replaceString(reduce);
-		return reduced;
+        return reduced.toString();
 	}
-
-
 
 	public static String getReducedQualifiedClassExpression(OWLClassExpression o){
 		String s = getReducedQualifiedClassExpressionSub(o, 1);
@@ -263,277 +249,251 @@ public class ExpressionManager {
 	}
 
 	public static String getReducedQualifiedClassExpressionSub(OWLClassExpression o, int level){
-		String reduced ="";
+		StringBuilder reduced = new StringBuilder();
 		int i;
 		ClassExpressionType type = o.getClassExpressionType();
 		switch (type){
 			case OWL_CLASS :
-				reduced += obtainQualifiedEntityNameFromIRI(o.asOWLClass().getIRI());
+				reduced.append(obtainQualifiedEntityNameFromIRI(o.asOWLClass().getIRI()));
 				break;
 			case OBJECT_ONE_OF:
-				reduced = "OneOf(";
+				reduced = new StringBuilder("OneOf(");
 				OWLObjectOneOf oneOf = (OWLObjectOneOf) o;
 				i = 1;
 				for (OWLIndividual op :oneOf.getIndividuals()) {
-					reduced += obtainQualifiedEntityNameFromIRI(op.asOWLNamedIndividual().getIRI());
+					reduced.append(obtainQualifiedEntityNameFromIRI(op.asOWLNamedIndividual().getIRI()));
 					if (i<oneOf.getIndividuals().size()) {
-						reduced+=",\n";
-						for (int j=0; j<level; j++) {
-							reduced+="\t";
-						}
+						reduced.append(",\n");
+                        reduced.append("\t".repeat(Math.max(0, level)));
 					}
 					i++;
 				}
-				reduced+=")";
+				reduced.append(")");
 				break;
 			case OBJECT_SOME_VALUES_FROM:
 				OWLObjectSomeValuesFrom some = (OWLObjectSomeValuesFrom) o;
-				reduced = OntViewConstants.SOME+".(";
+				reduced = new StringBuilder(OntViewConstants.SOME + ".(");
 				if (some.getProperty()!= null) {
-					reduced+= getReducedQualifiedObjectPropertyExpression(some.getProperty());
+					reduced.append(getReducedQualifiedObjectPropertyExpression(some.getProperty()));
 				}
 				if (some.getFiller()!= null) {
-					reduced+=",\n";
-					for (int j=0; j<level; j++) {
-						reduced+="\t";
-					}
-					reduced+= ExpressionManager.getReducedQualifiedClassExpressionSub((OWLClassExpression) some.getFiller(), level+1);
+					reduced.append(",\n");
+                    reduced.append("\t".repeat(Math.max(0, level)));
+					reduced.append(ExpressionManager.getReducedQualifiedClassExpressionSub(some.getFiller(), level + 1));
 				}
-				reduced +=")";
+				reduced.append(")");
 				break;
 			case OBJECT_ALL_VALUES_FROM:
 				OWLObjectAllValuesFrom all = (OWLObjectAllValuesFrom) o;
-				reduced = OntViewConstants.FOR_ALL+".(";
+				reduced = new StringBuilder(OntViewConstants.FOR_ALL + ".(");
 				if (all.getProperty()!=null) {
-					reduced+= getReducedQualifiedObjectPropertyExpression(all.getProperty());
+					reduced.append(getReducedQualifiedObjectPropertyExpression(all.getProperty()));
 				}
 				if (all.getFiller()!= null) {
-					reduced+=",\n";
-					for (int j=0; j<level; j++) {
-						reduced+="\t";
-					}
-					reduced+= ExpressionManager.getReducedQualifiedClassExpressionSub(all.getFiller(), level+1);
+					reduced.append(",\n");
+                    reduced.append("\t".repeat(Math.max(0, level)));
+					reduced.append(ExpressionManager.getReducedQualifiedClassExpressionSub(all.getFiller(), level + 1));
 				}
-				reduced+=")";
+				reduced.append(")");
 				break;
 			case OBJECT_COMPLEMENT_OF:
 				OWLObjectComplementOf comp = (OWLObjectComplementOf) o;
-				reduced = OntViewConstants.COMPLEMENT+"(";
-				reduced += ExpressionManager.getReducedQualifiedClassExpressionSub(comp.getOperand(), level+1);
-				reduced+=")";
+				reduced = new StringBuilder(OntViewConstants.COMPLEMENT + "(");
+				reduced.append(ExpressionManager.getReducedQualifiedClassExpressionSub(comp.getOperand(), level + 1));
+				reduced.append(")");
 				break;
 			case OBJECT_EXACT_CARDINALITY:
 				OWLObjectExactCardinality exact = (OWLObjectExactCardinality) o;
-				reduced = "="+exact.getCardinality()+ "(";
+				reduced = new StringBuilder("=" + exact.getCardinality() + "(");
 				if (exact.getProperty()!=null)
-					reduced+= getReducedQualifiedObjectPropertyExpression(exact.getProperty());
+					reduced.append(getReducedQualifiedObjectPropertyExpression(exact.getProperty()));
 				if (exact.getFiller()!= null) {
-					reduced+=",\n";
-					for (int j=0; j<level; j++) {
-						reduced+="\t";
-					}
-					reduced+= ExpressionManager.getReducedQualifiedClassExpressionSub(exact.getFiller(), level+1);
+					reduced.append(",\n");
+                    reduced.append("\t".repeat(Math.max(0, level)));
+					reduced.append(ExpressionManager.getReducedQualifiedClassExpressionSub(exact.getFiller(), level + 1));
 				}
-				reduced+=")";
+				reduced.append(")");
 				break;
 			case OBJECT_HAS_SELF:
 				OWLObjectHasSelf self = (OWLObjectHasSelf) o;
-				reduced = "hasSelf("+getReducedQualifiedObjectPropertyExpression(self.getProperty());
-				reduced+= ")";
+				reduced = new StringBuilder("hasSelf(" + getReducedQualifiedObjectPropertyExpression(self.getProperty()));
+				reduced.append(")");
 				break;
 			case OBJECT_HAS_VALUE:
 				OWLObjectHasValue h = (OWLObjectHasValue) o;
-				reduced = OntViewConstants.HASVALUE + "(";
-				reduced += getReducedQualifiedObjectPropertyExpression(h.getProperty());
-				reduced += ":"+obtainQualifiedEntityNameFromIRI(h.getValue().asOWLNamedIndividual().getIRI()) +")";
+				reduced = new StringBuilder(OntViewConstants.HASVALUE + "(");
+				reduced.append(getReducedQualifiedObjectPropertyExpression(h.getProperty()));
+				reduced.append(":").append(obtainQualifiedEntityNameFromIRI(h.getValue().asOWLNamedIndividual().getIRI())).append(")");
 				break;
 			case OBJECT_INTERSECTION_OF:
 				OWLObjectIntersectionOf inter = (OWLObjectIntersectionOf) o;
-				reduced = OntViewConstants.AND + ".(";
+				reduced = new StringBuilder(OntViewConstants.AND + ".(");
 				i = 1;
 				for (OWLClassExpression op : inter.getOperands()){
-					reduced += ExpressionManager.getReducedQualifiedClassExpressionSub(op, level+1);
+					reduced.append(ExpressionManager.getReducedQualifiedClassExpressionSub(op, level + 1));
 					if (i<inter.getOperands().size()) {
-						reduced+=",\n";
-						for (int j=0; j<level; j++) {
-							reduced+="\t";
-						}
+						reduced.append(",\n");
+                        reduced.append("\t".repeat(Math.max(0, level)));
 					}
 					i++;
 				}
-				reduced+=")";
+				reduced.append(")");
 				break;
 			case OBJECT_MAX_CARDINALITY:
 				OWLObjectMaxCardinality max = (OWLObjectMaxCardinality) o;
-				reduced = OntViewConstants.LOWER_EQUAL+max.getCardinality()+ "(";
+				reduced = new StringBuilder(OntViewConstants.LOWER_EQUAL + max.getCardinality() + "(");
 				if (max.getProperty()!=null) {
-					reduced+= getReducedQualifiedObjectPropertyExpression(max.getProperty());
+					reduced.append(getReducedQualifiedObjectPropertyExpression(max.getProperty()));
 				}
 				if (max.getFiller()!= null) {
-					reduced+=",\n";
-					for (int j=0; j<level; j++) {
-						reduced+="\t";
-					}
-					reduced+= ExpressionManager.getReducedQualifiedClassExpressionSub(max.getFiller(), level+1);
+					reduced.append(",\n");
+                    reduced.append("\t".repeat(Math.max(0, level)));
+					reduced.append(ExpressionManager.getReducedQualifiedClassExpressionSub(max.getFiller(), level + 1));
 				}
-				reduced+=")";
+				reduced.append(")");
 				break;
 			case OBJECT_MIN_CARDINALITY:
 				OWLObjectMinCardinality min = (OWLObjectMinCardinality) o;
-				reduced = OntViewConstants.GREATER_EQUAL+min.getCardinality()+ "(";
+				reduced = new StringBuilder(OntViewConstants.GREATER_EQUAL + min.getCardinality() + "(");
 				if (min.getProperty()!=null){
-					reduced+= getReducedQualifiedObjectPropertyExpression(min.getProperty());
+					reduced.append(getReducedQualifiedObjectPropertyExpression(min.getProperty()));
 				}
 				if (min.getFiller()!= null) {
-					reduced+=",\n";
-					for (int j=0; j<level; j++) {
-						reduced+="\t";
-					}
-					reduced+= ExpressionManager.getReducedQualifiedClassExpressionSub(min.getFiller(),level+1);
+					reduced.append(",\n");
+                    reduced.append("\t".repeat(Math.max(0, level)));
+					reduced.append(ExpressionManager.getReducedQualifiedClassExpressionSub(min.getFiller(), level + 1));
 				}
-				reduced+=")";
+				reduced.append(")");
 				break;
 			case OBJECT_UNION_OF:
 				OWLObjectUnionOf u = (OWLObjectUnionOf) o;
 				i=1;
-				reduced = OntViewConstants.OR + ".(";
+				reduced = new StringBuilder(OntViewConstants.OR + ".(");
 				for (OWLClassExpression op : u.getOperands()){
-					reduced += ExpressionManager.getReducedQualifiedClassExpressionSub(op,level+1);
+					reduced.append(ExpressionManager.getReducedQualifiedClassExpressionSub(op, level + 1));
 					if (i<u.getOperands().size()){
-						reduced+=",\n";;
-						for (int j=0; j<level; j++) {
-							reduced+="\t";
-						}
+						reduced.append(",\n");
+                        reduced.append("\t".repeat(Math.max(0, level)));
 					}
 					i++;
 				}
-				reduced+=")";
+				reduced.append(")");
 				break;
 
 			case DATA_HAS_VALUE :
-				OWLDataHasValue dhas= (OWLDataHasValue) o;
-				reduced = OntViewConstants.HASVALUE + ".(";
-				reduced += getReducedQualifiedDataPropertyExpression(dhas.getProperty())+":";
-				reduced += dhas.getValue()+")";
-				reduced+=")";
+				OWLDataHasValue dHas= (OWLDataHasValue) o;
+				reduced = new StringBuilder(OntViewConstants.HASVALUE + ".(");
+				reduced.append(getReducedQualifiedDataPropertyExpression(dHas.getProperty())).append(":");
+				reduced.append(dHas.getValue()).append(")");
+				reduced.append(")");
 				break;
 			case DATA_ALL_VALUES_FROM:
-				OWLDataAllValuesFrom dall= (OWLDataAllValuesFrom) o;
-				reduced = OntViewConstants.FOR_ALL + ".(";
-				reduced += getReducedQualifiedDataPropertyExpression(dall.getProperty());
-				reduced += getReducedDataRange(dall.getFiller());
+				OWLDataAllValuesFrom dAll= (OWLDataAllValuesFrom) o;
+				reduced = new StringBuilder(OntViewConstants.FOR_ALL + ".(");
+				reduced.append(getReducedQualifiedDataPropertyExpression(dAll.getProperty()));
+				reduced.append(getReducedDataRange(dAll.getFiller()));
 
-				reduced+=")";
+				reduced.append(")");
 				break;
 			case DATA_EXACT_CARDINALITY:
-				OWLDataExactCardinality dexact = (OWLDataExactCardinality) o;
-				reduced = "="+ dexact.getCardinality() + "(";
-				reduced += getReducedQualifiedDataPropertyExpression(dexact.getProperty());
-				reduced += getReducedDataRange(dexact.getFiller());
+				OWLDataExactCardinality dExact = (OWLDataExactCardinality) o;
+				reduced = new StringBuilder("=" + dExact.getCardinality() + "(");
+				reduced.append(getReducedQualifiedDataPropertyExpression(dExact.getProperty()));
+				reduced.append(getReducedDataRange(dExact.getFiller()));
 				break;
 			case DATA_MAX_CARDINALITY:
-				OWLDataMaxCardinality dmax = (OWLDataMaxCardinality) o;
-				reduced = OntViewConstants.LOWER_EQUAL + dmax.getCardinality() + "(";
-				reduced += getReducedQualifiedDataPropertyExpression(dmax.getProperty());
-				reduced += getReducedDataRange(dmax.getFiller());
+				OWLDataMaxCardinality dMax = (OWLDataMaxCardinality) o;
+				reduced = new StringBuilder(OntViewConstants.LOWER_EQUAL + dMax.getCardinality() + "(");
+				reduced.append(getReducedQualifiedDataPropertyExpression(dMax.getProperty()));
+				reduced.append(getReducedDataRange(dMax.getFiller()));
 				break;
 			case DATA_MIN_CARDINALITY:
-
-				OWLDataMinCardinality dmin = (OWLDataMinCardinality) o;
-				reduced = OntViewConstants.GREATER_EQUAL+ dmin.getCardinality() + "(";
-				reduced += getReducedQualifiedDataPropertyExpression(dmin.getProperty());
-				reduced += getReducedDataRange(dmin.getFiller());
+				OWLDataMinCardinality dMin = (OWLDataMinCardinality) o;
+				reduced = new StringBuilder(OntViewConstants.GREATER_EQUAL + dMin.getCardinality() + "(");
+				reduced.append(getReducedQualifiedDataPropertyExpression(dMin.getProperty()));
+				reduced.append(getReducedDataRange(dMin.getFiller()));
 				break;
-
 			case DATA_SOME_VALUES_FROM:
-
-				OWLDataSomeValuesFrom dsome = (OWLDataSomeValuesFrom) o;
-				reduced = OntViewConstants.SOME + "(";
-				reduced += getReducedQualifiedDataPropertyExpression(dsome.getProperty());
-				reduced += getReducedDataRange(dsome.getFiller());
+				OWLDataSomeValuesFrom dSome = (OWLDataSomeValuesFrom) o;
+				reduced = new StringBuilder(OntViewConstants.SOME + "(");
+				reduced.append(getReducedQualifiedDataPropertyExpression(dSome.getProperty()));
+				reduced.append(getReducedDataRange(dSome.getFiller()));
 				break;
-
-
-
 			default :
-				reduced += o.toString();
+				reduced.append(o);
 		}
-
-		//		replaceString(reduce);
-		return reduced;
+        return reduced.toString();
 	}
 
 
 	public static String getReducedDataRange(OWLDataRange o){
-		int i =1;
-		String reduced="";
+		int i;
+		StringBuilder reduced= new StringBuilder();
 		switch (o.getDataRangeType()){
 			case DATA_COMPLEMENT_OF:
 				OWLDataComplementOf dComp = (OWLDataComplementOf) o;
-				reduced+=OntViewConstants.COMPLEMENT+".("+ getReducedDataRange(dComp.getDataRange())+")";
+				reduced.append(OntViewConstants.COMPLEMENT + ".(").append(getReducedDataRange(dComp.getDataRange())).append(")");
 				break;
 			case DATA_INTERSECTION_OF:
 				OWLDataIntersectionOf dInter = (OWLDataIntersectionOf) o;
-				reduced+=(OntViewConstants.AND)+".(";
+				reduced.append((OntViewConstants.AND) + ".(");
 				i=1;
 				for ( OWLDataRange op : dInter.getOperands()){
-					reduced += getReducedDataRange(op);
+					reduced.append(getReducedDataRange(op));
 					if (i<dInter.getOperands().size())
-						reduced+=",\n";;
+						reduced.append(",\n");
 					i++;
 				}
 				break;
 			case DATA_ONE_OF:
-				OWLDataOneOf dOneof = (OWLDataOneOf)o;
-				reduced+=("oneOf")+".(";
+				OWLDataOneOf dOneOf = (OWLDataOneOf)o;
+				reduced.append(("oneOf") + ".(");
 				i=1;
-				for (OWLLiteral  op : dOneof.getValues()){
-					reduced += op.getLiteral();
-					if (i<dOneof.getValues().size())
-						reduced+=",";
+				for (OWLLiteral  op : dOneOf.getValues()){
+					reduced.append(op.getLiteral());
+					if (i<dOneOf.getValues().size())
+						reduced.append(",");
 					i++;
 				}
-				reduced +=")";
+				reduced.append(")");
 				break;
 			case DATA_UNION_OF:
 				OWLDataUnionOf dUnion= (OWLDataUnionOf)o;
-				reduced+=(OntViewConstants.OR)+".(";
+				reduced.append((OntViewConstants.OR) + ".(");
 				i=1;
 				for ( OWLDataRange op : dUnion.getOperands()){
-					reduced += getReducedDataRange(op);
+					reduced.append(getReducedDataRange(op));
 					if (i<dUnion.getOperands().size())
-						reduced+=",";
+						reduced.append(",");
 					i++;
 				}
-				reduced +=")";
+				reduced.append(")");
 
 				break;
 			case DATATYPE:
 				OWLDatatype dType = (OWLDatatype)o;
-				reduced+= obtainEntityNameFromIRI(dType.getIRI());
+				reduced.append(obtainEntityNameFromIRI(dType.getIRI()));
 				break;
 			case DATATYPE_RESTRICTION:
 				OWLDatatypeRestriction dTypeRest = (OWLDatatypeRestriction)o;
-				OWLDatatype a = dTypeRest.getDatatype();
-//				reduced += "(facet)"+getReducedDataRange(a)+"(";
-				i=1;
+                dTypeRest.getDatatype();
+                i=1;
 				Set<OWLFacetRestriction> facets = dTypeRest.getFacetRestrictions();
 				for (OWLFacetRestriction fRest : facets){
-					reduced+= "("+obtainEntityNameFromIRI(fRest.getFacet().getIRI())+","+fRest.getFacetValue().toString().replaceAll("\"","")+")";
+					reduced.append("(").append(obtainEntityNameFromIRI(fRest.getFacet().getIRI())).append(",").append(fRest.getFacetValue().toString().replaceAll("\"", "")).append(")");
 					if (i<facets.size())
-						reduced+=",";
+						reduced.append(",");
 					i++;
 				}
-				reduced +=")";
+				reduced.append(")");
 				break;
 			default :
 				return o.toString();
 		}
-		return reduced;
+		return reduced.toString();
 	}
 
 	public static String getReducedObjectPropertyExpression(OWLObjectPropertyExpression o){
-		
 		if (o instanceof OWLObjectProperty) {
 			return obtainEntityNameFromIRI(o.asOWLObjectProperty().getIRI());
 		}
@@ -559,7 +519,6 @@ public class ExpressionManager {
 			return e.toString();
 	}
 
-
 	public static String getReducedDataPropertyExpression(OWLDataPropertyExpression o){
 		if (o instanceof OWLDataProperty) {
 			return obtainEntityNameFromIRI(o.asOWLDataProperty().getIRI());
@@ -569,7 +528,6 @@ public class ExpressionManager {
 		}
 	}
 
-
 	public static String getReducedQualifiedDataPropertyExpression(OWLDataPropertyExpression e){
 		if (e instanceof OWLDataProperty) {
 			return obtainQualifiedEntityNameFromIRI(e.asOWLDataProperty().getIRI());
@@ -578,8 +536,6 @@ public class ExpressionManager {
 			return e.toString();
 		}
 	}
-
-
 
 	public static String replaceString(String in){
 		String rep;
@@ -625,7 +581,8 @@ public class ExpressionManager {
 	public static String obtainQualifiedEntityNameFromIRI(IRI iri) {
 		if (manager == null) System.out.println("manager null");
 		else if (iri == null) System.out.println(" iri null");
-		return manager.getQName(iri.toString());
+        assert iri != null;
+        return manager.getQName(iri.toString());
 	}
 
 	public static String qualifyLabel(OWLClass c, String label) {
@@ -641,6 +598,4 @@ public class ExpressionManager {
         result = replaceString(result);
 		return result;
 	}
-
-
 }
