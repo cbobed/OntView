@@ -28,7 +28,7 @@ public class ImageMerger {
             int maxRow = -1;
             int maxCol = -1;
 
-            // Patrón para archivos: i_{row}_{col}.png
+            // Archive: i_{row}_{col}.png
             Pattern pattern = Pattern.compile("i_(\\d+)_(\\d+)\\.png");
 
             for (File file : files) {
