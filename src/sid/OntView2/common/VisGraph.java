@@ -698,7 +698,6 @@ public class VisGraph implements Runnable{
 		   for (OWLAnnotation  an : EntitySearcher.getAnnotations(ce.asOWLClass(), activeOntology).toList() ){
 			   if (an.getProperty().toString().equals("rdfs:label")){
                    String auxLabel = replaceString(an.getValue().toString().replaceAll("\"", ""));
-                   System.out.println("Label: "+auxLabel);
 				   vis.explicitLabel.add(auxLabel);
 				   auxQLabel = qualifyLabel(ce.asOWLClass(), auxLabel);
 				   if (!"null".equalsIgnoreCase(auxQLabel)) {
@@ -853,7 +852,6 @@ public class VisGraph implements Runnable{
 	 //removes connectors that are implied by others
          HashSet<Shape> parents = new HashSet<>();
 		 for (Entry<String,Shape> entry : shapeMap.entrySet()){
-			 System.out.println("Processing "+entry.getValue().asVisClass().getLabel()); 
 			 Shape shape = entry.getValue();
 			 for (VisConnector in : shape.inConnectors){
 				 parents.add(in.from);
@@ -887,7 +885,6 @@ public class VisGraph implements Runnable{
 			 for (Shape pj : parents){
 				 if (pi!=pj){
 					 if (existSubsumptionPath(pi,pj, OWLThingShape)) {
-						 System.out.println(pi.getLabel()+" ==> "+pj.getLabel()); 
 						 if (pi.getVisLevel().getID() != pj.getVisLevel().getID()){
 	
 							 Shape candidate = (pi.getVisLevel().getID() < pj.getVisLevel().getID() ? pi:pj);

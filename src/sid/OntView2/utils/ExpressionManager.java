@@ -400,7 +400,7 @@ public class ExpressionManager {
 				for (OWLClassExpression op : u.getOperands()){
 					reduced += ExpressionManager.getReducedQualifiedClassExpressionSub(op,level+1);
 					if (i<u.getOperands().size()){
-						reduced+=",";
+						reduced+=",\n";;
 						for (int j=0; j<level; j++) {
 							reduced+="\t";
 						}
@@ -479,7 +479,7 @@ public class ExpressionManager {
 				for ( OWLDataRange op : dInter.getOperands()){
 					reduced += getReducedDataRange(op);
 					if (i<dInter.getOperands().size())
-						reduced+=",";
+						reduced+=",\n";;
 					i++;
 				}
 				break;
@@ -538,7 +538,7 @@ public class ExpressionManager {
 			return obtainEntityNameFromIRI(o.asOWLObjectProperty().getIRI());
 		}
 		else if (o instanceof OWLObjectInverseOf) {
-			OWLObjectPropertyExpression invProp = ((OWLObjectInverseOf) o).getInverseProperty(); 
+			OWLObjectPropertyExpression invProp = o.getInverseProperty();
 			return "inverseOf ("+getReducedObjectPropertyExpression(invProp)+")"; 
 		}
 		else 
