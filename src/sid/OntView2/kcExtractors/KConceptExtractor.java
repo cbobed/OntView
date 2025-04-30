@@ -37,7 +37,7 @@ public abstract class KConceptExtractor {
         }
         for (Shape s: nonHiddenShape){
             if (s.getState()!=Shape.OPEN) {
-                s.updateHiddenDescendants();
+                //s.updateHiddenDescendants();
             }
         }
         graph.addDashedConnectors();

@@ -321,13 +321,13 @@ public abstract class Shape {
         this.visible = false;
         for (VisConnector c : inConnectors) {
             c.hide();
-            c.from.hiddenDescendantsSet.add(this);
-            c.from.checkAndUpdateChildrenVisibilityStates();
+            //c.from.hiddenDescendantsSet.add(this);
+            //c.from.checkAndUpdateChildrenVisibilityStates();
         }
 
         for (VisConnector c : outConnectors) {
             c.hide();
-            c.to.checkAndUpdateParentVisibilityStates();
+            //c.to.checkAndUpdateParentVisibilityStates();
         }
 
         // Wake observer thread on hide event
@@ -351,7 +351,7 @@ public abstract class Shape {
     public boolean allSubHidden() {
         //if all subclasses are hidden
         for (VisConnector c : this.outConnectors) {
-            if (c.visible)
+            if (c.visible && !c.to.asVisClass().isBottom)
                 return false;
         }
         return true;
@@ -628,7 +628,7 @@ public abstract class Shape {
                 Set<Shape> relevantDescendants = new HashSet<>(visibleDescendantsSet);
                 relevantDescendants.retainAll(parent.asVisClass().orderedDescendants);
                 parent.hiddenDescendantsSet.addAll(relevantDescendants);
-                //parent.checkAndUpdateChildrenVisibilityStates();
+                parent.checkAndUpdateChildrenVisibilityStates();
                 parent.addHiddenDescendantsToAncestors(visibleDescendantsSet, visited);
             }
         }
@@ -665,7 +665,7 @@ public abstract class Shape {
     public void updateParents() {
         Set<Shape> descendantsToProcess = new HashSet<>();
         descendantsToProcess.add(this);
-        this.addHiddenDescendantsToAncestors(descendantsToProcess, new HashSet<>());
+        addHiddenDescendantsToAncestors(descendantsToProcess, new HashSet<>());
     }
 
     /**
