@@ -21,7 +21,6 @@ public class VisClass extends Shape {
 	
     //Graphic
 	public static final int FIRST_X_SEPARATION = 200;
-	public static final int RELATIVE_POS = 0;
 	public static Color color;
 	
 	String   label;
@@ -134,7 +133,7 @@ public class VisClass extends Shape {
 	
 	private Set<OWLClass> getDisjointClasses() {
 		OWLReasoner reasoner = graph.paintframe.getReasoner();
-		return reasoner.getDisjointClasses(this.getLinkedClassExpression()).getFlattened(); 
+		return reasoner.getDisjointClasses(this.getLinkedClassExpression()).entities().collect(Collectors.toSet());
 		 
 	}
 	
@@ -145,13 +144,13 @@ public class VisClass extends Shape {
 	public void addAssertedDisjointConnectors() {
 		if (getDisJointClassesAxioms()!=null){
 			for (OWLDisjointClassesAxiom axiom: getDisJointClassesAxioms()){
-				for (OWLClassExpression e : axiom.getClassExpressions()){
-					if(e != this.getLinkedClassExpression()){
-						if (graph.getVisualExtension(e)!=null){
-							addDisjointConnector(graph.getVisualExtension(e));
-						}
-					}
-				}
+                axiom.classExpressions()
+                    .filter(e -> !e.equals(this.getLinkedClassExpression()))
+                    .forEach(e -> {
+                        if (graph.getVisualExtension(e) != null) {
+                            addDisjointConnector(graph.getVisualExtension(e));
+                        }
+                    });
 		    }	 
 		}
 	}
@@ -440,7 +439,7 @@ public class VisClass extends Shape {
 		g.fillRoundRect(x - (double) getWidth()/2 + 5, y - (double) currentHeight / 2 + 6, 19, 14, roundCornerValue, roundCornerValue);
 		g.setFill(Color.BLACK);
 		g.strokeRoundRect(x - (double) getWidth()/2 + 5, y - (double) currentHeight / 2 + 6, 19, 14, roundCornerValue, roundCornerValue);
-		g.fillText(OntViewConstants.UPSIDE_DOWN_TRIANGLE, x - (double) getWidth()/2 + 7, y - (double) currentHeight / 2 + 17);
+		g.fillText("P"+OntViewConstants.UPSIDE_DOWN_TRIANGLE, x - (double) getWidth()/2 + 7, y - (double) currentHeight / 2 + 17);
 	}
 
 	private void disjointDraw(GraphicsContext g, int x, int y, int roundCornerValue) {
@@ -625,10 +624,12 @@ public class VisClass extends Shape {
 			OWLOntology activeOntology = graph.paintframe.getOntology();
 			//all properties
 		
-			Set<OWLObjectProperty> objPropSet = activeOntology.getObjectPropertiesInSignature();
+			Set<OWLObjectProperty> objPropSet = activeOntology.objectPropertiesInSignature().collect(Collectors.toSet());
 			for (OWLObjectProperty prop : objPropSet){
-				Set<Node<OWLClass>> domainNodes = reasoner.getObjectPropertyDomains(prop, false).getNodes();
-				Set<Node<OWLClass>> directNodes = reasoner.getObjectPropertyDomains(prop, true).getNodes();
+				Set<Node<OWLClass>> domainNodes = reasoner.getObjectPropertyDomains(prop, false).nodes()
+                    .collect(Collectors.toSet());
+				Set<Node<OWLClass>> directNodes = reasoner.getObjectPropertyDomains(prop, true).nodes()
+                    .collect(Collectors.toSet());
 				for (Node<OWLClass>directNode : directNodes) {
 					if (directNode.contains((OWLClass) this.getLinkedClassExpression())){
 						inherited.add(prop);
@@ -644,13 +645,13 @@ public class VisClass extends Shape {
 									Set<Node<OWLClass>> domainNodes,Set<OWLObjectProperty> objPropertySet) {
 		// TODO Auto-generated method stub
 		for (Node<OWLClass> node : domainNodes){
-			for (OWLClass oClass : node.getEntities()) {
-				for (OWLObjectProperty prop : objPropertySet){
-					NodeSet<OWLClass> p= reasoner.getObjectPropertyDomains(prop, true);
-						if (p.containsEntity(oClass))
-							inherited2.add(prop);
-				}
-			}
+            node.entities().forEach(oClass -> {
+                for (OWLObjectProperty prop : objPropertySet) {
+                    if (reasoner.getObjectPropertyDomains(prop, true).containsEntity(oClass)) {
+                        inherited2.add(prop);
+                    }
+                }
+            });
 		}
 	}
 	
@@ -658,16 +659,15 @@ public class VisClass extends Shape {
 			Set<Node<OWLClass>> domainNodes,Set<OWLDataProperty> objPropertySet) {
 		// TODO Auto-generated method stub
 		for (Node<OWLClass> node : domainNodes){
-			for (OWLClass oClass : node.getEntities()) {
-				for (OWLDataProperty prop : objPropertySet){
-					NodeSet<OWLClass> p= reasoner.getDataPropertyDomains(prop, true);
-					if (p.containsEntity(oClass))
-						dInherited.add(prop);
-				}
-			}
+            node.entities().forEach(owlClass -> {
+                for (OWLDataProperty prop : objPropertySet) {
+                    if (reasoner.getDataPropertyDomains(prop, true).containsEntity(owlClass)) {
+                        dInherited.add(prop);
+                    }
+                }
+            });
 		}
 	}
-	
 	
 	public void getInheritedDataProperties(){
 		if (dInherited==null){
@@ -676,10 +676,12 @@ public class VisClass extends Shape {
 			OWLOntology activeOntology = graph.paintframe.getOntology();
 			//all properties
 		
-			Set<OWLDataProperty> objPropSet = activeOntology.getDataPropertiesInSignature();
+			Set<OWLDataProperty> objPropSet = activeOntology.dataPropertiesInSignature().collect(Collectors.toSet());
 			for (OWLDataProperty prop : objPropSet){
-				Set<Node<OWLClass>> domainNodes = reasoner.getDataPropertyDomains(prop, false).getNodes();
-				Set<Node<OWLClass>> directNodes = reasoner.getDataPropertyDomains(prop, true).getNodes();
+				Set<Node<OWLClass>> domainNodes = reasoner.getDataPropertyDomains(prop, false).nodes()
+                    .collect(Collectors.toSet());
+				Set<Node<OWLClass>> directNodes = reasoner.getDataPropertyDomains(prop, true).nodes()
+                    .collect(Collectors.toSet());
 				for (Node<OWLClass>directNode : directNodes) {
 					if (directNode.contains((OWLClass) this.getLinkedClassExpression())){
 						dInherited.add(prop);
