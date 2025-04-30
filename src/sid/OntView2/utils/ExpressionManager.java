@@ -140,7 +140,7 @@ public class ExpressionManager {
 				break;
 			case OBJECT_HAS_VALUE:
 				OWLObjectHasValue h = (OWLObjectHasValue) o;
-				reduced = new StringBuilder(OntViewConstants.HASVALUE + "(");
+				reduced = new StringBuilder(OntViewConstants.HAS_VALUE + "(");
 				reduced.append(getReducedObjectPropertyExpression(h.getProperty()));
 				reduced.append(":").append(obtainEntityNameFromIRI(h.getFiller().asOWLNamedIndividual().getIRI())).append(")");
 				break;
@@ -204,7 +204,7 @@ public class ExpressionManager {
 
 			case DATA_HAS_VALUE :
 				OWLDataHasValue dHas= (OWLDataHasValue) o;
-				reduced = new StringBuilder(OntViewConstants.HASVALUE + ".(");
+				reduced = new StringBuilder(OntViewConstants.HAS_VALUE + ".(");
 				reduced.append(getReducedDataPropertyExpression(dHas.getProperty())).append(":");
 				reduced.append(dHas.getFiller()).append(")");
 				reduced.append(")");
@@ -329,7 +329,7 @@ public class ExpressionManager {
 				break;
 			case OBJECT_HAS_VALUE:
 				OWLObjectHasValue h = (OWLObjectHasValue) o;
-				reduced = new StringBuilder(OntViewConstants.HASVALUE + "(");
+				reduced = new StringBuilder(OntViewConstants.HAS_VALUE + "(");
 				reduced.append(getReducedQualifiedObjectPropertyExpression(h.getProperty()));
 				reduced.append(":").append(obtainQualifiedEntityNameFromIRI(h.getFiller().asOWLNamedIndividual().getIRI())).append(")");
 				break;
@@ -392,7 +392,7 @@ public class ExpressionManager {
 
 			case DATA_HAS_VALUE :
 				OWLDataHasValue dHas= (OWLDataHasValue) o;
-				reduced = new StringBuilder(OntViewConstants.HASVALUE + ".(");
+				reduced = new StringBuilder(OntViewConstants.HAS_VALUE + ".(");
 				reduced.append(getReducedQualifiedDataPropertyExpression(dHas.getProperty())).append(":");
 				reduced.append(dHas.getFiller()).append(")");
 				reduced.append(")");
