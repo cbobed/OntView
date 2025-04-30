@@ -1,5 +1,6 @@
 package sid.OntView2.kcExtractors;
 
+import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLOntology;
 
 import sid.OntView2.common.Shape;
@@ -30,15 +31,13 @@ public abstract class KConceptExtractor {
             if (isNonKeyConcept(entry.getKey(), conceptSet, shapeMap)) {
                 shape.hide();
             } else {
-                if (!(shape.getLabel().matches("Nothing"))) {
+                if (!shape.asVisClass().isBottom) {
                     nonHiddenShape.add(shape);
                 }
             }
         }
         for (Shape s: nonHiddenShape){
-            if (s.getState()!=Shape.OPEN) {
-                //s.updateHiddenDescendants();
-            }
+            s.updateHiddenDescendants();
         }
         graph.addDashedConnectors();
     }

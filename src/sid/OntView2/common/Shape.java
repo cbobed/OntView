@@ -321,13 +321,10 @@ public abstract class Shape {
         this.visible = false;
         for (VisConnector c : inConnectors) {
             c.hide();
-            //c.from.hiddenDescendantsSet.add(this);
-            //c.from.checkAndUpdateChildrenVisibilityStates();
         }
 
         for (VisConnector c : outConnectors) {
             c.hide();
-            //c.to.checkAndUpdateParentVisibilityStates();
         }
 
         // Wake observer thread on hide event
@@ -641,21 +638,22 @@ public abstract class Shape {
      * and collects only those that are hidden.
      */
     public void updateHiddenDescendants() {
-        Set<Shape> hiddenDescendantsSet = new HashSet<>();
-        collectHiddenDescendants(this, hiddenDescendantsSet);
+        Set<Shape> collected = new HashSet<>();
+        collectHiddenDescendants(this, collected, new HashSet<>());
         this.hiddenDescendantsSet.clear();
-        this.hiddenDescendantsSet.addAll(hiddenDescendantsSet);
+        this.hiddenDescendantsSet.addAll(collected);
     }
 
-    private void collectHiddenDescendants(Shape current, Set<Shape> hiddenDescendantsSet) {
-        if (current.outConnectors.isEmpty()) {
-            return;
-        }
+    private void collectHiddenDescendants(Shape current, Set<Shape> collected, Set<Shape> visited) {
+        if (!visited.add(current)) return;
+        if (current.outConnectors.isEmpty()) return;
 
         for (VisConnector c : current.outConnectors) {
             Shape child = c.to;
-            if (!child.isVisible()) hiddenDescendantsSet.add(child);
-            collectHiddenDescendants(child, hiddenDescendantsSet);
+            if (!child.isVisible()) collected.add(child);
+            checkAndUpdateChildrenVisibilityStates();
+            checkAndUpdateParentVisibilityStates();
+            collectHiddenDescendants(child, collected, visited);
         }
     }
 
