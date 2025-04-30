@@ -1,7 +1,10 @@
 package sid.OntView2.utils;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.LinkedHashSet;
+import java.util.stream.Collectors;
 
 import org.semanticweb.owlapi.rdf.rdfxml.renderer.OWLOntologyXMLNamespaceManager;
 import org.semanticweb.owlapi.model.ClassExpressionType;
@@ -75,10 +78,11 @@ public class ExpressionManager {
 			case OBJECT_ONE_OF:
 				reduced = new StringBuilder("OneOf(");
 				OWLObjectOneOf oneOf = (OWLObjectOneOf) o;
+                List<OWLIndividual> individuals = oneOf.individuals().toList();
 				i = 1;
-				for (OWLIndividual op :oneOf.getIndividuals()) {
+				for (OWLIndividual op :individuals) {
 					reduced.append(obtainEntityNameFromIRI(op.asOWLNamedIndividual().getIRI()));
-					if (i<oneOf.getIndividuals().size()) {
+					if (i<individuals.size()) {
 						reduced.append(",\n");
                         reduced.append("\t".repeat(Math.max(0, level)));
 					}
@@ -138,15 +142,16 @@ public class ExpressionManager {
 				OWLObjectHasValue h = (OWLObjectHasValue) o;
 				reduced = new StringBuilder(OntViewConstants.HASVALUE + "(");
 				reduced.append(getReducedObjectPropertyExpression(h.getProperty()));
-				reduced.append(":").append(obtainEntityNameFromIRI(h.getValue().asOWLNamedIndividual().getIRI())).append(")");
+				reduced.append(":").append(obtainEntityNameFromIRI(h.getFiller().asOWLNamedIndividual().getIRI())).append(")");
 				break;
 			case OBJECT_INTERSECTION_OF:
 				OWLObjectIntersectionOf inter = (OWLObjectIntersectionOf) o;
 				reduced = new StringBuilder(OntViewConstants.AND + ".(");
+                List<OWLClassExpression> operandsInter = inter.operands().toList();
 				i = 1;
-				for (OWLClassExpression op : inter.getOperands()){
+				for (OWLClassExpression op : operandsInter){
 					reduced.append(getReducedClassExpressionSub(op, level + 1));
-					if (i<inter.getOperands().size()) {
+					if (i<operandsInter.size()) {
 						reduced.append(",\n");
                         reduced.append("\t".repeat(Math.max(0, level)));
 					}
@@ -184,9 +189,11 @@ public class ExpressionManager {
 				OWLObjectUnionOf u = (OWLObjectUnionOf) o;
 				i=1;
 				reduced = new StringBuilder(OntViewConstants.OR + ".(");
-				for (OWLClassExpression op : u.getOperands()){
+                List<OWLClassExpression> operandsU = u.operands().toList();
+
+                for (OWLClassExpression op : operandsU){
 					reduced.append(getReducedClassExpressionSub(op, level + 1));
-					if (i<u.getOperands().size())  {
+					if (i<operandsU.size())  {
 						reduced.append(",\n");
                         reduced.append("\t".repeat(Math.max(0, level)));
 					}
@@ -199,7 +206,7 @@ public class ExpressionManager {
 				OWLDataHasValue dHas= (OWLDataHasValue) o;
 				reduced = new StringBuilder(OntViewConstants.HASVALUE + ".(");
 				reduced.append(getReducedDataPropertyExpression(dHas.getProperty())).append(":");
-				reduced.append(dHas.getValue()).append(")");
+				reduced.append(dHas.getFiller()).append(")");
 				reduced.append(")");
 				break;
 			case DATA_ALL_VALUES_FROM:
@@ -259,10 +266,11 @@ public class ExpressionManager {
 			case OBJECT_ONE_OF:
 				reduced = new StringBuilder("OneOf(");
 				OWLObjectOneOf oneOf = (OWLObjectOneOf) o;
-				i = 1;
-				for (OWLIndividual op :oneOf.getIndividuals()) {
+                List<OWLIndividual> individuals = oneOf.individuals().toList();
+                i = 1;
+				for (OWLIndividual op :individuals) {
 					reduced.append(obtainQualifiedEntityNameFromIRI(op.asOWLNamedIndividual().getIRI()));
-					if (i<oneOf.getIndividuals().size()) {
+					if (i<individuals.size()) {
 						reduced.append(",\n");
                         reduced.append("\t".repeat(Math.max(0, level)));
 					}
@@ -323,15 +331,16 @@ public class ExpressionManager {
 				OWLObjectHasValue h = (OWLObjectHasValue) o;
 				reduced = new StringBuilder(OntViewConstants.HASVALUE + "(");
 				reduced.append(getReducedQualifiedObjectPropertyExpression(h.getProperty()));
-				reduced.append(":").append(obtainQualifiedEntityNameFromIRI(h.getValue().asOWLNamedIndividual().getIRI())).append(")");
+				reduced.append(":").append(obtainQualifiedEntityNameFromIRI(h.getFiller().asOWLNamedIndividual().getIRI())).append(")");
 				break;
 			case OBJECT_INTERSECTION_OF:
 				OWLObjectIntersectionOf inter = (OWLObjectIntersectionOf) o;
 				reduced = new StringBuilder(OntViewConstants.AND + ".(");
+                List<OWLClassExpression> operandsInter = inter.operands().toList();
 				i = 1;
-				for (OWLClassExpression op : inter.getOperands()){
+				for (OWLClassExpression op : operandsInter){
 					reduced.append(ExpressionManager.getReducedQualifiedClassExpressionSub(op, level + 1));
-					if (i<inter.getOperands().size()) {
+					if (i<operandsInter.size()) {
 						reduced.append(",\n");
                         reduced.append("\t".repeat(Math.max(0, level)));
 					}
@@ -369,9 +378,10 @@ public class ExpressionManager {
 				OWLObjectUnionOf u = (OWLObjectUnionOf) o;
 				i=1;
 				reduced = new StringBuilder(OntViewConstants.OR + ".(");
-				for (OWLClassExpression op : u.getOperands()){
+                List<OWLClassExpression> operandsU = u.operands().toList();
+                for (OWLClassExpression op : operandsU){
 					reduced.append(ExpressionManager.getReducedQualifiedClassExpressionSub(op, level + 1));
-					if (i<u.getOperands().size()){
+					if (i<operandsU.size()){
 						reduced.append(",\n");
                         reduced.append("\t".repeat(Math.max(0, level)));
 					}
@@ -384,7 +394,7 @@ public class ExpressionManager {
 				OWLDataHasValue dHas= (OWLDataHasValue) o;
 				reduced = new StringBuilder(OntViewConstants.HASVALUE + ".(");
 				reduced.append(getReducedQualifiedDataPropertyExpression(dHas.getProperty())).append(":");
-				reduced.append(dHas.getValue()).append(")");
+				reduced.append(dHas.getFiller()).append(")");
 				reduced.append(")");
 				break;
 			case DATA_ALL_VALUES_FROM:
@@ -437,10 +447,11 @@ public class ExpressionManager {
 			case DATA_INTERSECTION_OF:
 				OWLDataIntersectionOf dInter = (OWLDataIntersectionOf) o;
 				reduced.append((OntViewConstants.AND) + ".(");
-				i=1;
-				for ( OWLDataRange op : dInter.getOperands()){
+                List<OWLDataRange> rangesDI = dInter.operands().toList();
+                i=1;
+				for ( OWLDataRange op : rangesDI){
 					reduced.append(getReducedDataRange(op));
-					if (i<dInter.getOperands().size())
+					if (i<rangesDI.size())
 						reduced.append(",\n");
 					i++;
 				}
@@ -448,10 +459,11 @@ public class ExpressionManager {
 			case DATA_ONE_OF:
 				OWLDataOneOf dOneOf = (OWLDataOneOf)o;
 				reduced.append(("oneOf") + ".(");
+                List<OWLLiteral> valuesDOF = dOneOf.values().toList();
 				i=1;
-				for (OWLLiteral  op : dOneOf.getValues()){
+				for (OWLLiteral  op : valuesDOF){
 					reduced.append(op.getLiteral());
-					if (i<dOneOf.getValues().size())
+					if (i<valuesDOF.size())
 						reduced.append(",");
 					i++;
 				}
@@ -460,10 +472,11 @@ public class ExpressionManager {
 			case DATA_UNION_OF:
 				OWLDataUnionOf dUnion= (OWLDataUnionOf)o;
 				reduced.append((OntViewConstants.OR) + ".(");
-				i=1;
-				for ( OWLDataRange op : dUnion.getOperands()){
+                List<OWLDataRange> rangesDU = dUnion.operands().toList();
+                i=1;
+				for ( OWLDataRange op : rangesDU){
 					reduced.append(getReducedDataRange(op));
-					if (i<dUnion.getOperands().size())
+					if (i<rangesDU.size())
 						reduced.append(",");
 					i++;
 				}
@@ -478,9 +491,10 @@ public class ExpressionManager {
 				OWLDatatypeRestriction dTypeRest = (OWLDatatypeRestriction)o;
                 dTypeRest.getDatatype();
                 i=1;
-				Set<OWLFacetRestriction> facets = dTypeRest.getFacetRestrictions();
-				for (OWLFacetRestriction fRest : facets){
-					reduced.append("(").append(obtainEntityNameFromIRI(fRest.getFacet().getIRI())).append(",").append(fRest.getFacetValue().toString().replaceAll("\"", "")).append(")");
+                Set<OWLFacetRestriction> facets = dTypeRest.facetRestrictions().collect(Collectors.toCollection(LinkedHashSet::new));
+                for (OWLFacetRestriction fRest : facets){
+					reduced.append("(").append(obtainEntityNameFromIRI(fRest.getFacet().getIRI())).append(",")
+                        .append(fRest.getFacetValue().toString().replaceAll("\"", "")).append(")");
 					if (i<facets.size())
 						reduced.append(",");
 					i++;
