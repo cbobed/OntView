@@ -562,8 +562,51 @@ public class VisClass extends Shape {
 	public HashSet<OWLClassExpression> getEquivalentClasses(){
 		return equivalentClasses;
 	}
-	
-	public String getToolTipInfo() {
+
+    public String getToolTipInfo() {
+        StringBuilder other = new StringBuilder();
+        if (!isAnonymous){
+            getInheritedObjectProperties();
+            getInheritedDataProperties();
+
+            if (!getVisibleDefinitionLabels().isEmpty()) {
+                for (String defLabel : getVisibleDefinitionLabels()) {
+                    other = new StringBuilder((isAnonymous ? removeFormatInformation(defLabel) : defLabel) + "\n\n");
+                }
+            } else {
+                other = new StringBuilder((isAnonymous ? removeFormatInformation(this.visibleLabel) : this.visibleLabel) + "\n\n");
+            }
+
+            if (getDisjointClasses() != null && !getDisjointClasses().isEmpty()) {
+                other.append("Disjoint:\n");
+                VisClass auxVisClass;
+                Set<OWLClassExpression> auxSet;
+                for (OWLClass cl: getDisjointClasses()) {
+                    auxVisClass = graph.getVisualExtension(cl);
+                    if (auxVisClass != null) {
+                        if (auxVisClass.label.startsWith(sid.OntView2.expressionNaming.SIDClassExpressionNamer.className)) {
+                            auxSet = auxVisClass.getEquivalentClasses();
+                            if (auxSet != null){
+                                for (OWLClassExpression ce: auxSet) {
+                                    other.append("- ").append(qualifiedRendering ?
+                                        ExpressionManager.getReducedQualifiedClassExpression(ce) :
+                                        ExpressionManager.getReducedClassExpression(ce)).append("\n");
+                                }
+                            }
+                        } else {
+                            other.append("- ").append(qualifiedRendering ?
+                                ExpressionManager.getReducedQualifiedClassExpression(cl) :
+                                ExpressionManager.getReducedClassExpression(cl)).append("\n");
+                        }
+                    }
+                }
+            }
+        }
+        return other.toString();
+    }
+
+
+    public String getToolTipInfo2() {
 	/*
 	 * Renders html for class info
 	 */			

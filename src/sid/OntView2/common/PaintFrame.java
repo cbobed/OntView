@@ -10,18 +10,22 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.geometry.*;
+import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.Cursor;
 
 import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Modality;
@@ -521,10 +525,7 @@ public class PaintFrame extends Canvas {
 	public boolean hideRange = false;
 	private Embedable parentFrame;
 	private final Tooltip tooltip = new Tooltip();
-	private final WebView web = new WebView();
-	private final WebEngine webEngine = web.getEngine();
     private Point2D pinchPoint = null;
-
 
     public void cleanConnectors() {
 		selectedShapes.clear();
@@ -641,7 +642,11 @@ public class PaintFrame extends Canvas {
 		Shape shape = visGraph.findShape(p);
 
 		if (shape != null) {
-			configurationTooltip(shape.getToolTipInfo());
+            if (!shape.getToolTipInfo().isBlank()) {
+                configurationTooltip(shape.getToolTipInfo());
+            } else {
+                configurationTooltip("No information' for this node");
+            }
 		} else {
 			Tooltip.uninstall(this, tooltip);
 			prop = movedOnVisPropertyDescription(x, y);
@@ -684,49 +689,56 @@ public class PaintFrame extends Canvas {
 		}
 	}
 
-	private void configurationTooltip(String tip) {
-		String styledContent = "<html><head><style>"
-				+ "body {"
-				+ "  font-size: 13px;"
-				+ "  background-color: rgba(0, 0, 0, 0.9);"
-				+ "  color: white;"
-				+ "  margin: 0;"
-				+ "  padding: 5px;"
-				+ "}"
-				+ "b {"
-				+ "  color: lightblue;"
-				+ "  font-size: 14px;"
-				+ "}"
-				+ "</style></head><body>"
-				+ tip
-				+ "</body></html>";
+    public void configurationTooltip(String content) {
+        double maxHeight = 500;
+        double maxWidth = 300;
 
-		webEngine.loadContent(styledContent);
-		tooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-		web.setPrefSize(0, 0);
-		webEngine.documentProperty().addListener((obs, oldDoc, newDoc) -> {
-			if (newDoc != null) {
-				webEngine.executeScript("document.body.style.width = 'auto'; document.body.style.height = 'auto';");
-				Object scrollWidth = webEngine.executeScript("document.body.scrollWidth");
-				Object scrollHeight = webEngine.executeScript("document.body.scrollHeight");
+        Text textNode = new Text(content);
+        textNode.setFont(Font.font(13));
+        double textWidth = textNode.getLayoutBounds().getWidth();
+        double textHeight = textNode.getLayoutBounds().getHeight();
+        textNode.setWrappingWidth(Math.min(textWidth + 20, maxWidth));
 
-				double width = ((Number) scrollWidth).doubleValue();
-				double height = ((Number) scrollHeight).doubleValue();
+        VBox container = new VBox(textNode);
+        container.setPadding(new Insets(5));
+        container.setBackground(new Background(
+            new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)
+        ));
 
-				if (height > 600) {
-					web.setPrefSize(width, 600);
-				} else {
-					web.setPrefSize(width, height);
-				}
-			}
-		});
-		tooltip.setGraphic(web);
-		Tooltip.install(this, tooltip);
-	}
+        ScrollPane scroll = new ScrollPane(container);
+        scroll.setMaxWidth(Math.min(textWidth + 20, maxWidth));
+        scroll.setMaxHeight(Math.min(textHeight, maxHeight));
+        scroll.setFitToWidth(true);
+        scroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scroll.setFocusTraversable(true);
+
+        scroll.setBackground(new Background(
+            new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)
+        ));
+        scroll.setBorder(new Border(new BorderStroke(
+            Color.BLUE, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderStroke.THIN
+        )));
+
+        scroll.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
+            if (e.getCode() == KeyCode.DOWN) {
+                scroll.setVvalue(Math.min(scroll.getVvalue() + 0.1, 1.0));
+                e.consume();
+            } else if (e.getCode() == KeyCode.UP) {
+                scroll.setVvalue(Math.max(scroll.getVvalue() - 0.1, 0.0));
+                e.consume();
+            }
+        });
+
+        tooltip.setGraphic(scroll);
+        tooltip.setOnShown(evt -> scroll.requestFocus());
+        tooltip.setStyle("-fx-background-color: white; -fx-border-color: blue; -fx-border-width: 1;");
+
+        Tooltip.install(this, tooltip);
+    }
 
 
-
-	/**
+    /**
 	 * Method to check if it needs to expand the canvas size
 	 */
     public void checkAndResizeCanvas() {
