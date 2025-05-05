@@ -645,7 +645,7 @@ public class PaintFrame extends Canvas {
             if (!shape.getToolTipInfo().isBlank()) {
                 configurationTooltip(shape.getToolTipInfo());
             } else {
-                configurationTooltip("No information' for this node");
+                configurationTooltip("No information for this node");
             }
 		} else {
 			Tooltip.uninstall(this, tooltip);
@@ -691,52 +691,62 @@ public class PaintFrame extends Canvas {
 
     public void configurationTooltip(String content) {
         double maxHeight = 500;
-        double maxWidth = 300;
+        double maxWidth  = 500;
+        int additionalSpace = 30;
 
         Text textNode = new Text(content);
-        textNode.setFont(Font.font(13));
-        double textWidth = textNode.getLayoutBounds().getWidth();
-        double textHeight = textNode.getLayoutBounds().getHeight();
-        textNode.setWrappingWidth(Math.min(textWidth + 20, maxWidth));
+        textNode.setFont(Font.font(12));
+        double rawWidth  = textNode.getLayoutBounds().getWidth();
+        double wrappedHeight = textNode.getLayoutBounds().getHeight();
 
         VBox container = new VBox(textNode);
-        container.setPadding(new Insets(5));
+        container.setPadding(new Insets(2));
         container.setBackground(new Background(
             new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)
         ));
 
-        ScrollPane scroll = new ScrollPane(container);
-        scroll.setMaxWidth(Math.min(textWidth + 20, maxWidth));
-        scroll.setMaxHeight(Math.min(textHeight, maxHeight));
-        scroll.setFitToWidth(true);
-        scroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scroll.setFocusTraversable(true);
+        boolean needScroll = (rawWidth > maxWidth) || (wrappedHeight > maxHeight);
 
-        scroll.setBackground(new Background(
-            new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)
-        ));
-        scroll.setBorder(new Border(new BorderStroke(
-            Color.BLUE, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderStroke.THIN
-        )));
+        Node graphic;
+        if (needScroll) {
+            ScrollPane scroll = new ScrollPane(container);
+            scroll.setPrefWidth(Math.min(rawWidth + additionalSpace, maxWidth));
+            scroll.setPrefHeight(Math.min(wrappedHeight, maxHeight));
+            scroll.setMaxWidth(Math.min(rawWidth + additionalSpace, maxWidth));
+            scroll.setMaxHeight(Math.min(wrappedHeight, maxHeight));
 
-        scroll.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
-            if (e.getCode() == KeyCode.DOWN) {
-                scroll.setVvalue(Math.min(scroll.getVvalue() + 0.1, 1.0));
-                e.consume();
-            } else if (e.getCode() == KeyCode.UP) {
-                scroll.setVvalue(Math.max(scroll.getVvalue() - 0.1, 0.0));
-                e.consume();
+            scroll.setBackground(new Background(
+                new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)
+            ));
+            scroll.setBorder(new Border(new BorderStroke(
+                Color.BLUE, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderStroke.THIN
+            )));
+
+            scroll.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
+                if (e.getCode() == KeyCode.DOWN) {
+                    scroll.setVvalue(Math.min(scroll.getVvalue() + 0.02, 1.0));
+                    e.consume();
+                } else if (e.getCode() == KeyCode.UP) {
+                    scroll.setVvalue(Math.max(scroll.getVvalue() - 0.02, 0.0));
+                    e.consume();
+                }
+            });
+
+            graphic = scroll;
+        } else {
+            graphic = container;
+        }
+
+        tooltip.setGraphic(graphic);
+        tooltip.setStyle("-fx-background-color: white; -fx-border-color: blue; -fx-border-width: 1;");
+        tooltip.setOnShown(evt -> {
+            if (needScroll) {
+                graphic.requestFocus();
             }
         });
 
-        tooltip.setGraphic(scroll);
-        tooltip.setOnShown(evt -> scroll.requestFocus());
-        tooltip.setStyle("-fx-background-color: white; -fx-border-color: blue; -fx-border-width: 1;");
-
         Tooltip.install(this, tooltip);
     }
-
 
     /**
 	 * Method to check if it needs to expand the canvas size
