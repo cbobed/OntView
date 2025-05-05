@@ -157,13 +157,14 @@ public class VisGraph implements Runnable{
         addVisClass(Shape.getKey(topClass), topClass, activeOntology, reasoner);
         this.reasonedTraversal(activeOntology,reasoner, null, rootCpts);
 
-        linkDefinitionsToDefinedClasses(activeOntology);
-
         if (!VisConfig.APPLY_RENAMING_DEBUG_PURPOSES) {
             OWLDataFactory dFactory = activeOntology.getOWLOntologyManager().getOWLDataFactory();
             OWLClass topDetailedCpt = dFactory.getOWLThing();
             OWLClass bottomDetailedCpt = dFactory.getOWLNothing();
             insertClassExpressions(activeOntology, reasoner, topDetailedCpt, bottomDetailedCpt);
+        }
+        else {
+        	linkDefinitionsToDefinedClasses(activeOntology);
         }
 
         createLevels(activeOntology);
@@ -203,6 +204,18 @@ public class VisGraph implements Runnable{
         paintframe.getParentFrame().loadSearchCombo();
         paintframe.setStateChanged(true);
         System.out.println("<--buildReasonedGraph");
+        
+        for (Entry<String, Shape> entry: shapeMap.entrySet()) {
+        	System.out.println("Shape: "+entry.getKey()); 
+        	System.out.println("\t\t"+entry.getValue().getLabel()); 
+        	for (OWLClassExpression equiv: entry.getValue().asVisClass().getEquivalentClasses()) {
+        		System.out.println("\t\t\t"+equiv); 
+        	}
+        	for (Shape s:entry.getValue().asVisClass().getChildren()) {
+        		System.out.println("--> "+s.asVisClass().getLabel()); 
+        	}
+        }
+        
     }
 
 	private void insertClassExpressions (OWLOntology activeOntology, 
@@ -281,6 +294,10 @@ public class VisGraph implements Runnable{
 				System.out.println("\t gathered: "+e); 
 				System.out.println("\t prevExp: "+directParent.asVisClass().getLinkedClassExpression()); 
 				directParent.asVisClass().addEquivalentExpression(e);
+				String candKey = Shape.getKey(e); 
+				if (!shapeMap.containsKey(candKey)) {
+					shapeMap.put(candKey, directParent); 
+				}
 				return; 
 			}
 		}
@@ -304,7 +321,7 @@ public class VisGraph implements Runnable{
 			}
 		}
 		
-		VisClass addedVis = addVisClass(e.toString(), e,activeOntology,reasoner);
+		VisClass addedVis = addVisClass(Shape.getKey(e), e,activeOntology,reasoner);
 		
 		createParentConnections(addedVis, directParents.stream()
 														.map(Shape::getLinkedClassExpression)
@@ -415,34 +432,34 @@ public class VisGraph implements Runnable{
 	 * it links definitions to defined classes.
 	 *  Note that this must be done after having created the reasoned graph with the named classes 
 	 */
-	private void linkDefinitionsToDefinedClasses(OWLOntology activeOntology) {
-		for (Entry<String, Shape> entry : shapeMap.entrySet()){
-			Shape shape = entry.getValue();
-			if ((shape instanceof VisClass) && (shape.asVisClass().isDefined)){
-				VisClass defClassShape = entry.getValue().asVisClass();
-				if (defClassShape.getLinkedClassExpression() instanceof OWLClass){
-					EntitySearcher.getEquivalentClasses(defClassShape.getLinkedClassExpression().asOWLClass(), activeOntology).forEach(
-						definition -> {
-							// we add all the equivalences 
-							// CBL: 27/8/2024 => We can add all the equivalences here, though it would be the assertions, not the actual 
-							// 	equivalent classes -- OWL-API considers any class with an equivalence as defined.
-							if (definition.isAnonymous()) {
-								// <CBL 25/9/13>
-								// We also add the definition to the aliases handling
-								shape.asVisClass().addEquivalentExpression(definition);
-								shapeMap.put(Shape.getKey(definition), shape); 
-							}
-						}
-					);
-				}
-				// <CBL 25/9/13> 
-				// if we have added definitions
-				// we have to update the width of the shape
-				shape.asVisClass().setWidth(shape.asVisClass().calculateWidth());
-				shape.asVisClass().setHeight(shape.asVisClass().calculateHeight());
-			}
-		}
-	}
+    private void linkDefinitionsToDefinedClasses(OWLOntology activeOntology) {
+        for (Entry<String, Shape> entry : shapeMap.entrySet()){
+            Shape shape = entry.getValue();
+            if ((shape instanceof VisClass) && (shape.asVisClass().isDefined)){
+                VisClass defClassShape = entry.getValue().asVisClass();
+                if (defClassShape.getLinkedClassExpression() instanceof OWLClass){
+                    EntitySearcher.getEquivalentClasses(defClassShape.getLinkedClassExpression().asOWLClass(), activeOntology).forEach(
+                        definition -> {
+                            // we add all the equivalences
+                            // CBL: 27/8/2024 => We can add all the equivalences here, though it would be the assertions, not the actual
+                            // 	equivalent classes -- OWLAPI considers any class with an equivalence as defined.
+                            if (definition.isAnonymous()) {
+                                // <CBL 25/9/13>
+                                // We also add the definition to the aliases handling
+                                shape.asVisClass().addEquivalentExpression(definition);
+                                shapeMap.put(Shape.getKey(definition), shape);
+                            }
+                        }
+                    );
+                }
+                // <CBL 25/9/13>
+                // if we have added definitions
+                // we have to update the width of the shape
+                shape.asVisClass().setWidth(shape.asVisClass().calculateWidth());
+                shape.asVisClass().setHeight(shape.asVisClass().calculateHeight());
+            }
+        }
+    }
 	
 	private void placeProperties(OWLOntology activeOntology2,
 			                        OWLReasoner reasoner2) {
@@ -559,6 +576,7 @@ public class VisGraph implements Runnable{
 		for (OWLClassExpression ce: currentCELevel) {
 			// all the Shapes in currentCELevel :: AlreadyCreated 
 			// this implies that TOP must be created outside
+			System.out.println("Processing "+ce); 
 			VisClass vis = getShapeFromOWLClassExpression(ce).asVisClass(); 
 			HashSet<OWLClassExpression> subSet = new HashSet<> ();
 			reasoner.getSubClasses(ce, true).entities().forEach(subSet::add); 
@@ -576,15 +594,13 @@ public class VisGraph implements Runnable{
 		}
 		
 		if (!nextLevel.isEmpty()) {
-			System.out.println("---"); 
-			System.out.println("currentCELevel: "+currentCELevel.size());
-			System.out.println("nextLevel: "+nextLevel.size()); 
 			reasonedTraversal(activeOntology, 
 					reasoner,
 					currentCELevel,
 					nextLevel); 
 		}
 		else {
+			System.out.println("--> calling bottomNode"); 
 			addBottomNode(reasoner, activeOntology); 
 		}
 	}
@@ -602,7 +618,8 @@ public class VisGraph implements Runnable{
 		reasoner.getBottomClassNode().forEach(e -> {
 			Shape o = getShapeFromOWLClassExpression(e);
 			 if (o==null){
-				addVisClass(e.asOWLClass().getIRI().toString(), e, activeOntology, reasoner); 
+				addVisClass(Shape.getKey(e.asOWLClass()), e, activeOntology, reasoner);
+				System.out.println(Shape.getKey(e.asOWLClass())); 
 			 }
 			for (OWLClassExpression exp : EntitySearcher.getEquivalentClasses(e, activeOntology).toList()){
 		    	 if (!(exp instanceof OWLClass) && (shapeMap.get(Shape.getKey(exp))==null)){
@@ -613,14 +630,12 @@ public class VisGraph implements Runnable{
 	}
 	
 	private void createParentConnections(VisClass vis,Set<OWLClassExpression> superSet){
-
 		for (OWLClassExpression e : superSet){
 			connect(vis,(VisClass) getShapeFromOWLClassExpression(e),connectorList);
 		}
 	}
-
-    private void createChildConnections(VisClass vis, Set<OWLClassExpression> subSet){
-		
+	
+	private void createChildConnections(VisClass vis, Set<OWLClassExpression> subSet){
 		for (OWLClassExpression child : subSet) {
 			Shape val = getShapeFromOWLClassExpression(child);
 			if (val!= null){
@@ -694,6 +709,7 @@ public class VisGraph implements Runnable{
 		String auxQLabel;
 		VisClass vis = new VisClass(0, ce, label, this); 
 		shapeMap.put(label, vis);
+		System.out.println("Adding "+label+ " to shape map ... "); 
 		if (ce instanceof OWLClass){
 		   for (OWLAnnotation  an : EntitySearcher.getAnnotations(ce.asOWLClass(), activeOntology).toList() ){
 			   if (an.getProperty().toString().equals("rdfs:label")){
@@ -729,14 +745,13 @@ public class VisGraph implements Runnable{
        if (reasoner != null){
     	   Node<OWLClass> equivClasses = reasoner.getEquivalentClasses(ce);    	   
     	   equivClasses.entities().forEach(x-> {
-    		   if (x.isOWLNothing()) vis.isBottom=true; 
-    		   if (!x.equals(ce)) {
-    			   vis.addEquivalentExpression(x);
-    			   shapeMap.put(Shape.getKey(x), vis);
-    			   // to make it appear in the SearchCombo
-                   getQualifiedLabelMap().put(ExpressionManager.getReducedClassExpression(x), x.asOWLClass().getIRI().toString());
-               }
-    	   }); 
+    		   if (x.isOWLNothing()) vis.isBottom=true;
+			   vis.addEquivalentExpression(x);
+			   shapeMap.put(Shape.getKey(x), vis);
+				System.out.println("\tAdding "+Shape.getKey(x)+ " to shape map - as equivalent class ... "); 
+			   // to make it appear in the SearchCombo
+               getQualifiedLabelMap().put(ExpressionManager.getReducedClassExpression(x), x.asOWLClass().getIRI().toString());
+           });
        }
        
        vis.setWidth(vis.calculateWidth());
@@ -843,8 +858,8 @@ public class VisGraph implements Runnable{
 	}
 	
 	 public Shape getShapeFromOWLClassExpression (OWLClassExpression e){
-		String key = Shape.getKey(e);
-         return shapeMap.get(key);
+		Shape retShape = shapeMap.get(Shape.getKey(e));
+		return retShape;
 	 }
 
 	 // TODO: another candidate to check performance issues 
@@ -952,7 +967,7 @@ public class VisGraph implements Runnable{
 	 }
 
 	/**
-	 * Initiates the traversal of all nodes in shapeMap and stores their descendants.
+	 * Initiates the traversal of all nodes in shapeMap 	and stores their descendants.
 	 */
 	private void storeDescendants() {
 		Set<Shape> childrenToProcess = new HashSet<>(shapeMap.values());
