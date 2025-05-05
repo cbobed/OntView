@@ -32,8 +32,8 @@ public class VisDataProperty extends VisProperty {
 	Font circleFont;
 	boolean isFunctional  =  false;
 	boolean qualifiedRendering = false;
-	public int getPosX(){return getDomain().getPosX()-(getDomain().getWidth()/2)+2;}
-	public int getPosY(){return getDomain().getPosY()+(getDomain().getHeight())+getLabelHeight()* vOffset;}
+	public int getPosX(){return getDomain().getLeftCorner() + 2;}
+	public int getPosY(){return 15 + getDomain().getBottomShapeCorner() + getLabelHeight() * vOffset;}
 
     public VisDataProperty( VisPropertyBox ppbox, OWLDataPropertyExpression dExp, int pvoffset,String prange,OWLOntology ontology) {
 		pBox = ppbox;
@@ -60,11 +60,12 @@ public class VisDataProperty extends VisProperty {
 	public void add(VisConnectorPropProp pParent){
 		parent = pParent;
 	}
-	
+
 	public int getLabelHeight() {
 		if (height ==0) {
-			Font font = Font.font("DejaVu Sans", FontWeight.NORMAL, 9);
-			height = VisProperty.stringHeight(font) + 8;
+            int spaceBetweenLines = 8;
+            Font font = Font.font("DejaVu Sans", FontWeight.NORMAL, 10);
+			height = VisProperty.stringHeight(font) + spaceBetweenLines;
 		}
 		return height;
 	}
@@ -92,8 +93,8 @@ public class VisDataProperty extends VisProperty {
 		}
 		return false;
 	}
-	
-	public VisClass getDomain( ) {
+
+	public VisClass getDomain() {
 		return pBox.vClass;
 	}
 

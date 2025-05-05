@@ -46,9 +46,10 @@ public class VisObjectProperty extends VisProperty {
 	boolean isIrreflexive=  false;
 	boolean isInverseFunctional = false;
 	OWLSubPropertyChainOfAxiom propertyChainAxiom = null;
-	public int getPosX(){return getDomain().getPosX()-(getDomain().getWidth()/2);}
-	public int getPosY(){return  15+getDomain().getPosY()+(getDomain().getHeight()/2)+getLabelHeight()* vOffset;}
-	public OWLReasoner getReasoner(){return pBox.vClass.graph.paintframe.getReasoner();}
+	public int getPosX(){return getDomain().getLeftCorner(); }
+    public int getPosY(){return 15 + getDomain().getBottomShapeCorner() + getLabelHeight() * vOffset; }
+
+	public OWLReasoner getReasoner(){return getDomain().graph.paintframe.getReasoner();}
 	
 	public boolean onProperty(Point2D p){
 		return ((p.getX() >= getPosX()-20)&&(p.getX() <= getPosX())&& (p.getY() >= getPosY()-10)&&(p.getY() <= getPosY()));
@@ -136,7 +137,7 @@ public class VisObjectProperty extends VisProperty {
 
 		connectionPoints = new ArrayList<>();
 		if (getDomain() != range) {
-			rangeConnector = new VisConnectorPropertyRange(ppbox, pBox.vClass, range, this);
+			rangeConnector = new VisConnectorPropertyRange(ppbox, getDomain(), range, this);
 		}
 		if (EntitySearcher.isFunctional(oPropExp, ontology)) isFunctional = true;
 		if (EntitySearcher.isTransitive(oPropExp, ontology)) isTransitive = true;
@@ -147,8 +148,8 @@ public class VisObjectProperty extends VisProperty {
 		if (EntitySearcher.isAsymmetric(oPropExp, ontology)) isAsymmetric = true;
 		if (EntitySearcher.isIrreflexive(oPropExp, ontology)) isIrreflexive = true;
 		if (EntitySearcher.isInverseFunctional(oPropExp, ontology))	isInverseFunctional = true;
-		if (pBox.vClass.graph.chainPropertiesMap!=null)
-			propertyChainAxiom = pBox.vClass.graph.chainPropertiesMap.get(getKey (oPropExp));
+		if (getDomain().graph.chainPropertiesMap!=null)
+			propertyChainAxiom = getDomain().graph.chainPropertiesMap.get(getKey (oPropExp));
 	}
 	
 	public void add(VisObjectProperty pParent){
@@ -159,11 +160,12 @@ public class VisObjectProperty extends VisProperty {
 		}
 		parentConnectors.add(new VisConnectorHeritance(this, pParent));
 	}
-	
+
 	public int getLabelHeight() {
 		if (height ==0) {
-			Font font = Font.font("DejaVu Sans", FontWeight.NORMAL, 9);
-			height = VisProperty.stringHeight(font) + 8;
+            int spaceBetweenLines = 8;
+			Font font = Font.font("DejaVu Sans", FontWeight.NORMAL, 11);
+			height = VisProperty.stringHeight(font) + spaceBetweenLines;
 		}	
 		return height;
 	}
@@ -191,8 +193,8 @@ public class VisObjectProperty extends VisProperty {
 		}
 		return false;
 	}
-	
-	public VisClass getDomain( ) {
+
+	public VisClass getDomain() {
 		return pBox.vClass;
 	}
 
@@ -200,7 +202,7 @@ public class VisObjectProperty extends VisProperty {
 		if (g == null){
 			return;
 		}
-		if ((pBox.visible)&&(visible)&&(pBox.vClass.visible)){
+		if ((pBox.visible)&&(visible)&&(getDomain().visible)){
 			g.setFont(textFont);
 			g.setFill(Color.BLACK);
 
@@ -232,7 +234,7 @@ public class VisObjectProperty extends VisProperty {
 				rangeConnector.draw(g);
 			if (parents.size()>1){
 				g.setFont(circleFont);
-				if (pBox.vClass.visible){
+				if (getDomain().visible){
 					g.strokeOval(getPosX()-17, getPosY()-14, 14,14);
 					g.fillText(OntViewConstants.AND, getPosX()-14, getPosY()-2);
 				}

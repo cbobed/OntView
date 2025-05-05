@@ -365,6 +365,8 @@ public class PaintFrame extends Canvas {
 					shape.drawShape(g);
 				}
 				drawPropertyBoxes(g);
+
+
            } else {
 				System.err.println("visGraph is null in draw method.");
 			}
@@ -680,7 +682,6 @@ public class PaintFrame extends Canvas {
 			}
 			showContextMenu((int) e.getScreenX(), (int) e.getScreenY());
 		}
-		//Platform.runLater(redrawRunnable);
 	}
 
 	private void configurationTooltip(String tip) {
@@ -824,7 +825,6 @@ public class PaintFrame extends Canvas {
 		}
 		return false;
 	}
-
 
 	private boolean clickedOnShape(int x, int y, MouseEvent e, Shape shape) {
 		if (visGraph == null) {
