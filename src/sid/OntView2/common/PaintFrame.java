@@ -690,8 +690,7 @@ public class PaintFrame extends Canvas {
 	}
 
     public void configurationTooltip(String content) {
-        double maxHeight = 500;
-        double maxWidth  = 500;
+        double maxHeight = 500, maxWidth  = 500;
         int additionalSpace = 30;
 
         Text textNode = new Text(content);
@@ -714,6 +713,7 @@ public class PaintFrame extends Canvas {
             scroll.setPrefHeight(Math.min(wrappedHeight, maxHeight));
             scroll.setMaxWidth(Math.min(rawWidth + additionalSpace, maxWidth));
             scroll.setMaxHeight(Math.min(wrappedHeight, maxHeight));
+            scroll.setFitToWidth(true);
 
             scroll.setBackground(new Background(
                 new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)
@@ -731,7 +731,6 @@ public class PaintFrame extends Canvas {
                     e.consume();
                 }
             });
-
             graphic = scroll;
         } else {
             graphic = container;

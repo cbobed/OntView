@@ -54,68 +54,69 @@ public class VisObjectProperty extends VisProperty {
 	public boolean onProperty(Point2D p){
 		return ((p.getX() >= getPosX()-20)&&(p.getX() <= getPosX())&& (p.getY() >= getPosY()-10)&&(p.getY() <= getPosY()));
 	}
-	
-	public String getTooltipText(){
-		StringBuilder description = new StringBuilder();
-		if (description.toString().isEmpty()){
-			description.append("<html><b>").append(visibleLabel).append("</b><br><br>");
-			if ((parents != null)&&(parents.size()>1)){
-				description.append("<b>Subproperty of</b><br><ul>");
-				for (VisObjectProperty p : parents){
-					if (!description.toString().contains("<li>" + p.visibleLabel + " </li>")) {
-						description.append("<li>").append(p.visibleLabel).append(" </li>");
-					}				}
-				description.append("<br></ul>");
-			}
 
-			if (!getDomain().getVisibleDefinitionLabels().isEmpty()) {
-				for (String defLabel : getDomain().getVisibleDefinitionLabels()) {
-					description.append("<b>Domain: </b> ").append(defLabel).append("<br>");
-				}
-			} else {
-				description.append("<b>Domain: </b> ").append(getDomain().visibleLabel).append("<br>");
-			}
+    public String getTooltipText() {
+        StringBuilder description = new StringBuilder();
+        description.append(visibleLabel).append("\n\n");
 
-			description.append("<b>Range: </b>");
-			description.append(qualifiedRendering ?
-                    ExpressionManager.getReducedQualifiedClassExpression(range.getLinkedClassExpression()) :
-                    ExpressionManager.getReducedClassExpression(range.getLinkedClassExpression())).append("<br><br>");
-			description.append("<b>Property Description</b><br><ul>");
+        if (parents != null && parents.size() > 1) {
+            description.append("Subproperty of:\n");
+            for (VisObjectProperty p : parents) {
+                String item = "- " + p.visibleLabel;
+                if (!description.toString().contains(item)) {
+                    description.append(item).append("\n");
+                }
+            }
+            description.append("\n");
+        }
 
-			if (isTransitive)
-				description.append("<li>Transitive</li>");
-			if (isFunctional)
-				description.append("<li>Functional</li>");
-			if (isReflexive)
-				description.append("<li>Reflexive</li>");
-			if (isSymmetric)
-				description.append("<li>Symmetric</li>");
-			if (hasInverse){
-				description.append("Inverse of <b> <br><ul>");
-				for (OWLObjectPropertyExpression inv : inverseOf.getEntitiesMinusTop()){
-					if (inv instanceof OWLObjectProperty) {
-						description.append("<li>").append(qualifiedRendering ?
-		                        ExpressionManager.getReducedQualifiedObjectPropertyExpression(inv) :
-		                        ExpressionManager.getReducedObjectPropertyExpression(inv)).append("</li>");
-					}
-				}
-				description.append("</b></ul>");
-			}
-			if (propertyChainAxiom != null) {
-				description.append("<b>Chain Property</b><ul>");
-				for (OWLObjectPropertyExpression c: propertyChainAxiom.getPropertyChain()){
-					description.append("<li>").append(qualifiedRendering ?
-                            ExpressionManager.getReducedQualifiedObjectPropertyExpression(c) :
-                            ExpressionManager.getReducedObjectPropertyExpression(c)).append("</li>");
-				}
-				description.append("</ul>");
-			}
-			
-			description.append("</ul></html>");
-		}
-		return description.toString();
-		
-	}
+        if (!getDomain().getVisibleDefinitionLabels().isEmpty()) {
+            for (String defLabel : getDomain().getVisibleDefinitionLabels()) {
+                description.append("Domain: ").append(defLabel).append("\n");
+            }
+        } else {
+            description.append("Domain: ").append(getDomain().visibleLabel).append("\n");
+        }
+
+        String rangeText = qualifiedRendering
+            ? ExpressionManager.getReducedQualifiedClassExpression(range.getLinkedClassExpression())
+            : ExpressionManager.getReducedClassExpression(range.getLinkedClassExpression());
+        description.append("Range: ").append(rangeText).append("\n\n");
+
+        description.append("Property Description:\n");
+        if (isTransitive)   description.append("- Transitive\n");
+        if (isFunctional)   description.append("- Functional\n");
+        if (isReflexive)    description.append("- Reflexive\n");
+        if (isSymmetric)    description.append("- Symmetric\n");
+
+        if (hasInverse) {
+            StringBuilder invDesc = new StringBuilder();
+            for (OWLObjectPropertyExpression inv : inverseOf.getEntitiesMinusTop()) {
+                if (inv instanceof OWLObjectProperty) {
+                    String invText = qualifiedRendering
+                        ? ExpressionManager.getReducedQualifiedObjectPropertyExpression(inv)
+                        : ExpressionManager.getReducedObjectPropertyExpression(inv);
+                    invDesc.append("- ").append(invText).append("\n");
+                }
+            }
+            if (!invDesc.isEmpty()) {
+                description.append("Inverse of:\n");
+                description.append(invDesc);
+                description.append("\n");
+            }
+        }
+
+        if (propertyChainAxiom != null) {
+            description.append("Chain Property:\n");
+            for (OWLObjectPropertyExpression c : propertyChainAxiom.getPropertyChain()) {
+                String chainText = qualifiedRendering
+                    ? ExpressionManager.getReducedQualifiedObjectPropertyExpression(c)
+                    : ExpressionManager.getReducedObjectPropertyExpression(c);
+                description.append("- ").append(chainText).append("\n");
+            }
+        }
+        return description.toString();
+    }
 	
 	public VisObjectProperty(VisPropertyBox ppbox, OWLObjectPropertyExpression po, int pvoffset, Shape prange, OWLOntology ontology) {
 		pBox = ppbox;
@@ -144,7 +145,8 @@ public class VisObjectProperty extends VisProperty {
 		if (EntitySearcher.isSymmetric(oPropExp, ontology)) isSymmetric  = true;
 		inverseOf  = getReasoner().getInverseObjectProperties(po);
 		hasInverse = ((inverseOf !=null)&& !inverseOf.getEntities().isEmpty());
-		if (EntitySearcher.isReflexive(oPropExp, ontology)) isReflexive =true;
+
+        if (EntitySearcher.isReflexive(oPropExp, ontology)) isReflexive =true;
 		if (EntitySearcher.isAsymmetric(oPropExp, ontology)) isAsymmetric = true;
 		if (EntitySearcher.isIrreflexive(oPropExp, ontology)) isIrreflexive = true;
 		if (EntitySearcher.isInverseFunctional(oPropExp, ontology))	isInverseFunctional = true;

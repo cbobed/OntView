@@ -604,61 +604,6 @@ public class VisClass extends Shape {
         }
         return other.toString();
     }
-
-
-    public String getToolTipInfo2() {
-	/*
-	 * Renders html for class info
-	 */			
-		StringBuilder other = new StringBuilder();
-		if (!isAnonymous){
-			getInheritedObjectProperties();
-			getInheritedDataProperties();
-
-			if (!getVisibleDefinitionLabels().isEmpty()) {
-				for (String defLabel : getVisibleDefinitionLabels()) {
-					other = new StringBuilder("<b>"
-							+ (isAnonymous ? removeFormatInformation(defLabel) : defLabel)
-							+ "</b><br><br>");
-				}
-			} else {
-				other = new StringBuilder("<b>"
-						+ (isAnonymous ? removeFormatInformation(this.visibleLabel) : this.visibleLabel)
-						+ "</b><br><br>");
-			}
-			if ((getDisjointClasses() !=null)&& (!getDisjointClasses().isEmpty())) {
-				other.append("<b>Disjoint</b><ul>");
-				
-				VisClass auxVisClass;
-				Set<OWLClassExpression> auxSet;
-				for (OWLClass cl: getDisjointClasses()) {
-					auxVisClass = graph.getVisualExtension(cl); 
-					if (auxVisClass != null) {
-						
-						if (auxVisClass.label.startsWith(sid.OntView2.expressionNaming.SIDClassExpressionNamer.className)) {
-							auxSet = auxVisClass.getEquivalentClasses();
-							if (auxSet != null){ 
-								for (OWLClassExpression ce: auxSet) {
-									other.append("<li>").append(qualifiedRendering ?
-                                            ExpressionManager.getReducedQualifiedClassExpression(ce) :
-                                            ExpressionManager.getReducedClassExpression(ce)).append("</li>");
-								}
-							}
-						}
-						else {	
-							other.append("<li>").append(qualifiedRendering ?
-                                    ExpressionManager.getReducedQualifiedClassExpression(cl) :
-                                    ExpressionManager.getReducedClassExpression(cl)).append("</li>");
-						}
-					}
-				}
-				other.append("</ul>");
-			}
-			other.append("</ul>");
-		}
-		return other.toString();
-	}
-
 	
 	public void getInheritedObjectProperties(){
 		if (inherited==null){
