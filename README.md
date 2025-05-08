@@ -7,7 +7,7 @@ Tool for the visualization and analysis of complex ontology structures.
 
 ---
 
-## 🚀 Key Features
+## Key Features
 
 This visualizer offers features such as observing the class and properties hierarchies, handling anonymous classes and GCIs, and summarizing the information showed to the user. Moreover, it allows to modify the layout of the different visual elements, and export both visual states and images, making it a powerful tool for both ontology creators and users.
 
@@ -31,11 +31,13 @@ This visualizer offers features such as observing the class and properties hiera
 
 ---
 
-## 🛠️ Getting Started
+## 🛠️ Getting Started 🛠️
+
+Although it's completely independent of the underlying OS (the only potential dependency is to have the appropriate version of JavaFX installed), for convenience, we provide two scripts for Linux-like OS environments to install the dependencies and run OntView. 
 
 ### Install dependencies
 
-Script to install the necessary JAR files before launching the application.
+Script to install the necessary JAR files before launching the application (the script downloads Maven if it is not available in the environment). 
 
 ```bash
 sh ./install_dependencies.sh
