@@ -37,9 +37,7 @@ public class ClassExpression extends Stage {
         this.parent = parent;
         initModality(Modality.APPLICATION_MODAL);
         setTitle("Query (Class Expression)");
-        setMinWidth(800);
-        setMinHeight(500);
-        setMaxHeight(700);
+        setResizable(false);
 
         // Main layout container
         VBox classExpressionBox = new VBox(10);
@@ -55,13 +53,10 @@ public class ClassExpression extends Stage {
         HBox.setHgrow(childBoxContainer, Priority.ALWAYS);
 
         HBox submitHelp = new HBox(5);
-        Button helpButton = getHelpButtonCE();
-        Button submitButton = submitCE();
-
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        submitHelp.getChildren().addAll(helpButton, spacer, submitButton);
+        submitHelp.getChildren().addAll(getHelpButtonCE(), spacer, submitCE());
         submitHelp.setStyle("-fx-alignment: center-left;");
 
         classExpressionBox.getChildren().addAll(bottomSection, submitHelp);
@@ -201,14 +196,25 @@ public class ClassExpression extends Stage {
      * Returns the set of Shape objects to be used as the base list based on the current selection state.
      */
     private Set<Shape> getBaseSet() {
+        Set<Shape> result = new HashSet<>();
         if (selectedParent != null) {
-            return selectedParent.getDescendants();
+            for (Shape s : selectedParent.getDescendants()) {
+                if (!s.asVisClass().isAnonymous()) {
+                    result.add(s);
+                }
+            }
         } else if (selectedChild != null) {
-            return selectedChild.getAncestors();
+            for (Shape s : selectedChild.getAncestors()) {
+                if (!s.asVisClass().isAnonymous()) {
+                    result.add(s);
+                }
+            }
         } else {
             return getAllShapeMap();
         }
+        return result;
     }
+
 
     /**
      * Repopulates the ListView with CheckBoxes from the base list (parents or children) that contain the search text.
@@ -243,7 +249,7 @@ public class ClassExpression extends Stage {
         if (parent.artPanel.getVisGraph() != null) {
             Map<String, Shape> shapeMap = parent.artPanel.getVisGraph().shapeMap;
             for (Shape shape : shapeMap.values()) {
-                if (shape instanceof VisClass) {
+                if (!shape.asVisClass().isAnonymous()) {
                     allNodes.add(shape);
                 }
             }
@@ -294,6 +300,7 @@ public class ClassExpression extends Stage {
         if (selectedChild != null && selectedParent != null) {
             parent.artPanel.getVisGraph().rebuildGraphSelectedNodes(selectedParent.getLinkedClassExpression(), selectedChild.getLinkedClassExpression());
             System.out.println("selectedChild " + selectedChild.getLabel() + " selectedParent " + selectedParent.getLabel());
+            close();
         }
     }
 
