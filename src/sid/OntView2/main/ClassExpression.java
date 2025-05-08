@@ -141,70 +141,61 @@ public class ClassExpression extends Stage {
     }
 
     /**
-     * Handles the selection of a checkbox in the parent panel.
+     * Generic handler for checkbox selection in either panel.
      */
-    private void handleParentCheckBoxSelection(CheckBox selectedCheckBox, ObservableList<CheckBox> ignore) {
-        boolean isSelected = selectedCheckBox.isSelected();
-        for (CheckBox cb : parentCheckBoxList.getItems()) {
+    private void handleCheckBoxSelection(CheckBox selectedCheckBox, boolean isParentPanel) {
+        ListView<CheckBox> listView = isParentPanel ? parentCheckBoxList : childCheckBoxList;
+        for (CheckBox cb : listView.getItems()) {
             if (cb != selectedCheckBox) {
                 cb.setSelected(false);
             }
         }
 
-        if (isSelected) {
-            selectedParent = getShapeByLabel(selectedCheckBox.getText());
-            parentSearchField.setPromptText(selectedCheckBox.getText());
-        } else {
-            selectedParent = null;
-            parentSearchField.setPromptText("Search node...");
-        }
-
-        if (!isSelected && selectedChild == null && parentSearchField.getText().isEmpty()
-                && childSearchField.getText().isEmpty()) {
-            parentCheckBoxList.setItems(toCheckBoxList(getAllShapeMap(), true));
-            childCheckBoxList.setItems(toCheckBoxList(getAllShapeMap(), false));
-            return;
-        }
-
-        if (selectedChild != null) return;
-
-        String filterText = childSearchField.getText();
-        filterAndResetCheckboxes(false, filterText == null ? "" : filterText);
-    }
-
-    /**
-     * Handles the selection of a checkbox in the child panel.
-     */
-    private void handleChildCheckBoxSelection(CheckBox selectedCheckBox, ObservableList<CheckBox> ignore) {
         boolean isSelected = selectedCheckBox.isSelected();
-        for (CheckBox cb : childCheckBoxList.getItems()) {
-            if (cb != selectedCheckBox) {
-                cb.setSelected(false);
+        if (isParentPanel) {
+            if (isSelected) {
+                selectedParent = getShapeByLabel(selectedCheckBox.getText());
+                parentSearchField.setPromptText(selectedCheckBox.getText());
+            } else {
+                selectedParent = null;
+                parentSearchField.setPromptText("Search node...");
+            }
+        } else {
+            if (isSelected) {
+                selectedChild = getShapeByLabel(selectedCheckBox.getText());
+                childSearchField.setPromptText(selectedCheckBox.getText());
+            } else {
+                selectedChild = null;
+                childSearchField.setPromptText("Search node...");
             }
         }
 
-        if (isSelected) {
-            selectedChild = getShapeByLabel(selectedCheckBox.getText());
-            childSearchField.setPromptText(selectedCheckBox.getText());
-        } else {
-            selectedChild = null;
-            childSearchField.setPromptText("Search node...");
-        }
-
-        if (!isSelected && selectedParent == null && parentSearchField.getText().isEmpty()
-                && childSearchField.getText().isEmpty()) {
+        boolean otherHasSelection = isParentPanel ? selectedChild != null : selectedParent != null;
+        boolean bothSearchEmpty = parentSearchField.getText().isEmpty() && childSearchField.getText().isEmpty();
+        if (!isSelected && !otherHasSelection && bothSearchEmpty) {
             parentCheckBoxList.setItems(toCheckBoxList(getAllShapeMap(), true));
             childCheckBoxList.setItems(toCheckBoxList(getAllShapeMap(), false));
             return;
         }
 
-        if (selectedParent != null) {
-            return;
-        }
+        if (otherHasSelection) return;
 
-        String filterText = parentSearchField.getText();
-        filterAndResetCheckboxes(true, filterText == null ? "" : filterText);
+        String filterText = (isParentPanel ? childSearchField : parentSearchField).getText();
+        filterAndResetCheckboxes(!isParentPanel, filterText == null ? "" : filterText);
     }
+
+
+    /** Handles the selection of a checkbox in the parent panel. */
+    private void handleParentCheckBoxSelection(CheckBox cb, ObservableList<CheckBox> ignore) {
+        handleCheckBoxSelection(cb, true);
+    }
+
+    /** Handles the selection of a checkbox in the child panel. */
+    private void handleChildCheckBoxSelection(CheckBox cb, ObservableList<CheckBox> ignore) {
+        handleCheckBoxSelection(cb, false);
+    }
+
+
 
     /**
      * Returns the set of Shape objects to be used as the base list based on the current selection state.
