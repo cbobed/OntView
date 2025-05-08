@@ -140,6 +140,86 @@ public class VisGraph implements Runnable{
 		paintframe.scroll.setHmax(x);
 		paintframe.scroll.setVmax(y);
     }
+
+    /**
+     *
+     */
+    public void rebuildGraphSelectedNodes(OWLClassExpression topNode, OWLClassExpression bottomNode){
+        buildReasonedGraphSelectedNodes(getActiveOntology(), getReasoner(), set, topNode, bottomNode);
+    }
+
+    private void buildReasonedGraphSelectedNodes(OWLOntology activeOntology,OWLReasoner reasoner, Set<OWLClassExpression> rootCpts, OWLClassExpression topNode, OWLClassExpression bottomNode) {
+
+        System.out.println("-->buildReasonedGraph");
+        //It's important to set config constants before creating
+        //will have to move this elsewhere
+        clearAll();
+        OWLClass topClass = activeOntology.getOWLOntologyManager().getOWLDataFactory().getOWLThing();
+        // we start from a fresh graph, so it is safe to create OWLThing directly
+        addVisClass(Shape.getKey(topClass), topClass, activeOntology, reasoner);
+        this.reasonedTraversal(activeOntology,reasoner, null, rootCpts);
+
+        if (!VisConfig.APPLY_RENAMING_DEBUG_PURPOSES) {
+            insertClassExpressions(activeOntology, reasoner, topNode, bottomNode);
+        }
+        else {
+            linkDefinitionsToDefinedClasses(activeOntology);
+        }
+
+        createLevels(activeOntology);
+        arrangePos();
+        VisLevel.shrinkLevelSet(levelSet);
+
+        VisLevel.adjustWidthAndPos(levelSet);
+
+        // here, we should add the disjointness
+        System.out.println("Disjointness ... ");
+        for (Entry<String, Shape> entry : shapeMap.entrySet()){
+            Shape shape = entry.getValue();
+            if (shape instanceof VisClass) {
+                shape.asVisClass().addAssertedDisjointConnectors();
+            }
+            labelMap.put(entry.getValue().getLabel(), entry.getKey()); // convert <String, Shape> to <String, String>
+        }
+
+        placeProperties(activeOntology,reasoner);
+        arrangePos();
+        VisLevel.shrinkLevelSet(levelSet);
+        VisLevel.adjustWidthAndPos(levelSet);
+
+        System.out.println("Redundant ... ");
+        removeRedundantConnector();
+        System.gc();
+        reorder = new GraphReorder(this);
+        System.out.println("Visual reordering ... ");
+        reorder.visualReorder();
+        adjustPanelSize((float) 1.0);
+        clearDashedConnectorList();
+        updatePosition();
+        System.out.println("Applying KCE Option if required ...");
+        paintframe.doKceOptionAction();
+        //showAll();
+        VisLevel.adjustWidthAndPos(getLevelSet());
+        paintframe.getParentFrame().loadSearchCombo();
+        paintframe.setStateChanged(true);
+        System.out.println("<--buildReasonedGraph");
+
+        for (Entry<String, Shape> entry: shapeMap.entrySet()) {
+            System.out.println("Shape: "+entry.getKey());
+            System.out.println("\t\t"+entry.getValue().getLabel());
+            for (OWLClassExpression equiv: entry.getValue().asVisClass().getEquivalentClasses()) {
+                System.out.println("\t\t\t"+equiv);
+            }
+            for (Shape s:entry.getValue().asVisClass().getChildren()) {
+                System.out.println("--> "+s.asVisClass().getLabel());
+            }
+        }
+
+        storeDescendants();
+        storeAncestors();
+        getShapeOrderedByRDFRank();
+        Platform.runLater(paintframe.redrawRunnable);
+    }
 	
 	/**
 	 *  builds the complete graph
@@ -1103,13 +1183,14 @@ public class VisGraph implements Runnable{
     public static void voluntaryCancel(boolean cancelValue) { voluntaryCancel = cancelValue; }
     public static boolean isVoluntaryCancel() { return voluntaryCancel; }
 
+    HashSet<OWLClassExpression> topSet;
 
     @Override
 	public void run() {
 		try {
             System.out.println("..>Starting the graph building process");
             if (Thread.currentThread().isInterrupted()) { return; }
-            HashSet<OWLClassExpression> topSet = new HashSet<>();
+            topSet = new HashSet<>();
             topSet.add(getActiveOntology().getOWLOntologyManager().getOWLDataFactory().getOWLThing());
 
             if (Thread.currentThread().isInterrupted()) { return; }

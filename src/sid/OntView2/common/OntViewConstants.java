@@ -13,4 +13,5 @@ public abstract class OntViewConstants {
     public static final String RIGHT_ARROW = "\u2192";
     public static final String QUESTION_MARK = "\u22EE";
     public static final String UPSIDE_DOWN_TRIANGLE = "\u25BC";
+    public static final String THREE_DOTS = "\u22EE";
 }

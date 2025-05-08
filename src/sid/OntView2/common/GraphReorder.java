@@ -89,7 +89,10 @@ public class GraphReorder {
 				if (!c.isRedundant()){
 					Node or  = graph.getNode(entry.getKey());
 					Node dst = graph.getNode(Shape.getKey(c.to.getLinkedClassExpression()));
-					dst.setIdDad(or.getId());
+                    if (dst == null) {
+                        System.out.println("or: " + entry.getValue().getLabel() + " c.to " + c.to.getLabel() + " " + c.to.getLinkedClassExpression());
+                    }
+                    dst.setIdDad(or.getId());
 					graph.addEdge(new Edge(or,dst));
 				}
 			}
