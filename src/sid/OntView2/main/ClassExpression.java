@@ -4,9 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Cursor;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -30,7 +28,6 @@ import java.util.Set;
 
 public class ClassExpression extends Stage {
     private final Mine parent;
-    private VBox parentListBox, childListBox;
     private VisClass selectedParent, selectedChild;
     private TextField parentSearchField, childSearchField;
     private ListView<CheckBox> parentCheckBoxList , childCheckBoxList;
@@ -103,7 +100,7 @@ public class ClassExpression extends Stage {
     }
 
     private VBox selectParentCheckBox() {
-        parentListBox = new VBox(5);
+        VBox parentListBox = new VBox(5);
         StackPane parentTitle = createTitlePane("Parent");
         parentSearchField = new TextField();
         parentSearchField.setPromptText("Search node...");
@@ -113,7 +110,9 @@ public class ClassExpression extends Stage {
         ObservableList<CheckBox> checkBoxList = toCheckBoxList(getAllShapeMap(), true);
         parentCheckBoxList.setItems(checkBoxList);
 
-        parentSearchField.textProperty().addListener((observable, oldValue, newValue) -> filterCheckBoxes(checkBoxList, newValue, parentCheckBoxList));
+        parentSearchField.textProperty().addListener((obs, oldV, newV) ->
+            filterAndResetCheckboxes(true, newV)
+        );
 
         parentListBox.getChildren().addAll(parentTitle, parentSearchField, parentCheckBoxList);
         parentListBox.setMaxWidth(Double.MAX_VALUE);
@@ -122,7 +121,7 @@ public class ClassExpression extends Stage {
     }
 
     private VBox selectChildCheckBox() {
-        childListBox = new VBox(5);
+        VBox childListBox = new VBox(5);
         StackPane childTitle = createTitlePane("Child");
         childSearchField = new TextField();
         childSearchField.setPromptText("Search node...");
@@ -132,66 +131,122 @@ public class ClassExpression extends Stage {
         ObservableList<CheckBox> checkBoxList = toCheckBoxList(getAllShapeMap(), false);
         childCheckBoxList.setItems(checkBoxList);
 
-        childSearchField.textProperty().addListener((observable, oldValue, newValue) -> filterCheckBoxes(checkBoxList, newValue, childCheckBoxList));
-
+        childSearchField.textProperty().addListener((obs, oldV, newV) ->
+            filterAndResetCheckboxes(false, newV)
+        );
         childListBox.getChildren().addAll(childTitle, childSearchField, childCheckBoxList);
         childListBox.setMaxWidth(Double.MAX_VALUE);
 
         return childListBox;
     }
 
-    private void handleParentCheckBoxSelection(CheckBox selectedCheckBox, ObservableList<CheckBox> checkBoxList) {
+    /**
+     * Handles the selection of a checkbox in the parent panel.
+     */
+    private void handleParentCheckBoxSelection(CheckBox selectedCheckBox, ObservableList<CheckBox> ignore) {
         boolean isSelected = selectedCheckBox.isSelected();
-        for (CheckBox checkBox : checkBoxList) {
-            if (checkBox != selectedCheckBox) {
-                checkBox.setSelected(false);
+        for (CheckBox cb : parentCheckBoxList.getItems()) {
+            if (cb != selectedCheckBox) {
+                cb.setSelected(false);
             }
         }
 
         if (isSelected) {
-            parentSearchField.setPromptText(selectedCheckBox.getText());
             selectedParent = getShapeByLabel(selectedCheckBox.getText());
-            if (selectedChild != null) return;
-            if (selectedParent != null) {
-                Set<Shape> descendants = selectedParent.getDescendants();
-                childCheckBoxList.setItems(toCheckBoxList(descendants, false));
-            }
+            parentSearchField.setPromptText(selectedCheckBox.getText());
         } else {
-            parentSearchField.setPromptText("Search node...");
             selectedParent = null;
-            if (selectedChild == null) {
-                childCheckBoxList.setItems(toCheckBoxList(getAllShapeMap(), false));
-                parentCheckBoxList.setItems(toCheckBoxList(getAllShapeMap(), true));
-            }
+            parentSearchField.setPromptText("Search node...");
         }
+
+        if (!isSelected && selectedChild == null && parentSearchField.getText().isEmpty()
+                && childSearchField.getText().isEmpty()) {
+            parentCheckBoxList.setItems(toCheckBoxList(getAllShapeMap(), true));
+            childCheckBoxList.setItems(toCheckBoxList(getAllShapeMap(), false));
+            return;
+        }
+
+        if (selectedChild != null) return;
+
+        String filterText = childSearchField.getText();
+        filterAndResetCheckboxes(false, filterText == null ? "" : filterText);
     }
 
-    private void handleChildCheckBoxSelection(CheckBox selectedCheckBox, ObservableList<CheckBox> checkBoxList) {
+    /**
+     * Handles the selection of a checkbox in the child panel.
+     */
+    private void handleChildCheckBoxSelection(CheckBox selectedCheckBox, ObservableList<CheckBox> ignore) {
         boolean isSelected = selectedCheckBox.isSelected();
-        for (CheckBox checkBox : checkBoxList) {
-            if (checkBox != selectedCheckBox) {
-                checkBox.setSelected(false);
+        for (CheckBox cb : childCheckBoxList.getItems()) {
+            if (cb != selectedCheckBox) {
+                cb.setSelected(false);
             }
         }
 
         if (isSelected) {
-            childSearchField.setPromptText(selectedCheckBox.getText());
             selectedChild = getShapeByLabel(selectedCheckBox.getText());
-            if (selectedParent != null) return;
-            if (selectedChild != null) {
-                Set<Shape> ancestors = selectedChild.getAncestors();
-                parentCheckBoxList.setItems(toCheckBoxList(ancestors, true));
-            }
+            childSearchField.setPromptText(selectedCheckBox.getText());
         } else {
-            childSearchField.setPromptText("Search node...");
             selectedChild = null;
-            if (selectedParent == null) {
-                parentCheckBoxList.setItems(toCheckBoxList(getAllShapeMap(), true));
-                childCheckBoxList.setItems(toCheckBoxList(getAllShapeMap(), false));
-            }
+            childSearchField.setPromptText("Search node...");
+        }
+
+        if (!isSelected && selectedParent == null && parentSearchField.getText().isEmpty()
+                && childSearchField.getText().isEmpty()) {
+            parentCheckBoxList.setItems(toCheckBoxList(getAllShapeMap(), true));
+            childCheckBoxList.setItems(toCheckBoxList(getAllShapeMap(), false));
+            return;
+        }
+
+        if (selectedParent != null) {
+            return;
+        }
+
+        String filterText = parentSearchField.getText();
+        filterAndResetCheckboxes(true, filterText == null ? "" : filterText);
+    }
+
+    /**
+     * Returns the set of Shape objects to be used as the base list based on the current selection state.
+     */
+    private Set<Shape> getBaseSet() {
+        if (selectedParent != null) {
+            return selectedParent.getDescendants();
+        } else if (selectedChild != null) {
+            return selectedChild.getAncestors();
+        } else {
+            return getAllShapeMap();
         }
     }
 
+    /**
+     * Repopulates the ListView with CheckBoxes from the base list (parents or children) that contain the search text.
+     */
+    private void filterAndResetCheckboxes(boolean isParentPanel, String searchText) {
+        Set<Shape> baseSet = getBaseSet();
+        ObservableList<CheckBox> filtered = FXCollections.observableArrayList();
+        for (Shape node : baseSet) {
+            String label = node.getLabel().toLowerCase();
+            if (label.contains(searchText.toLowerCase())) {
+                CheckBox cb = new CheckBox(node.getLabel());
+                if (isParentPanel) {
+                    cb.setOnAction(evt -> handleParentCheckBoxSelection(cb, null));
+                } else {
+                    cb.setOnAction(evt -> handleChildCheckBoxSelection(cb, null));
+                }
+                filtered.add(cb);
+            }
+        }
+        if (isParentPanel) {
+            parentCheckBoxList.setItems(filtered);
+        } else {
+            childCheckBoxList.setItems(filtered);
+        }
+    }
+
+    /**
+     * Retrieves all shapes
+     */
     private Set<Shape> getAllShapeMap() {
         Set<Shape> allNodes = new HashSet<>();
         if (parent.artPanel.getVisGraph() != null) {
@@ -205,6 +260,10 @@ public class ClassExpression extends Stage {
         return allNodes;
     }
 
+    /**
+     * Converts a collection of Shape nodes into an ObservableList of CheckBoxes,
+     * attaching the appropriate selection handler for each.
+     */
     private ObservableList<CheckBox> toCheckBoxList(Set<Shape> nodeList, Boolean isParent) {
         ObservableList<CheckBox> checkBoxList = FXCollections.observableArrayList();
         for (Shape node : nodeList) {
@@ -219,6 +278,9 @@ public class ClassExpression extends Stage {
         return checkBoxList;
     }
 
+    /**
+     * Finds and returns the VisClass whose label matches the given text.
+     */
     private VisClass getShapeByLabel(String label) {
         if (parent.artPanel.getVisGraph() != null) {
             Map<String, Shape> shapeMap = parent.artPanel.getVisGraph().shapeMap;
@@ -229,16 +291,6 @@ public class ClassExpression extends Stage {
             }
         }
         return null;
-    }
-
-    private void filterCheckBoxes(ObservableList<CheckBox> checkBoxList, String searchText, ListView<CheckBox> childCheckBoxList) {
-        ObservableList<CheckBox> filteredList = FXCollections.observableArrayList();
-        for (CheckBox checkBox : checkBoxList) {
-            if (checkBox.getText().toLowerCase().contains(searchText.toLowerCase())) {
-                filteredList.add(checkBox);
-            }
-        }
-        childCheckBoxList.setItems(filteredList);
     }
 
     private void submitButtonCEActionActionPerformed(ActionEvent event) {
@@ -264,15 +316,6 @@ public class ClassExpression extends Stage {
         titlePane.getChildren().add(titledPane);
 
         return titlePane;
-    }
-
-    private VBox createContainerNoSize(Node... children) {
-        VBox container = new VBox(7);
-        container.getChildren().addAll(children);
-        container.setPadding(new Insets(10, 10, 10, 10));
-        container.getStyleClass().add("custom-container");
-        container.setAlignment(Pos.CENTER);
-        return container;
     }
 }
 
