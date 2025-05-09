@@ -1,5 +1,5 @@
-https://protege.stanford.edu/ontologies/koala.owl
 https://protege.stanford.edu/ontologies/pizza/pizza.owl
+https://protege.stanford.edu/ontologies/koala.owl
 file:/home/carlota/Desktop/pizza.owl
 file:/home/carlota/Desktop/OntView/onts/dbpedia_3.8.owl
 http://purl.obolibrary.org/obo/envo.owl

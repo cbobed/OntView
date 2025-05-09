@@ -148,7 +148,9 @@ public class VisGraph implements Runnable{
         buildReasonedGraphSelectedNodes(getActiveOntology(), getReasoner(), set, topNode, bottomNode);
     }
 
-    private void buildReasonedGraphSelectedNodes(OWLOntology activeOntology,OWLReasoner reasoner, Set<OWLClassExpression> rootCpts, OWLClassExpression topNode, OWLClassExpression bottomNode) {
+    private void buildReasonedGraphSelectedNodes(OWLOntology activeOntology,OWLReasoner reasoner,
+                                                 Set<OWLClassExpression> rootCpts, OWLClassExpression topNode,
+                                                 OWLClassExpression bottomNode) {
 
         System.out.println("-->buildReasonedGraph");
         //It's important to set config constants before creating
@@ -227,7 +229,6 @@ public class VisGraph implements Runnable{
 	 */
     public void buildReasonedGraph(OWLOntology activeOntology,OWLReasoner reasoner, Set<OWLClassExpression> rootCpts) throws XPathExpressionException, ParserConfigurationException, SAXException, IOException {
 
-        System.out.println("-->buildReasonedGraph");
         //It's important to set config constants before creating
         //will have to move this elsewhere
         clearAll();
@@ -522,7 +523,7 @@ public class VisGraph implements Runnable{
                         definition -> {
                             // we add all the equivalences
                             // CBL: 27/8/2024 => We can add all the equivalences here, though it would be the assertions, not the actual
-                            // 	equivalent classes -- OWLAPI considers any class with an equivalence as defined.
+                            // 	equivalent classes -- OWL-API considers any class with an equivalence as defined.
                             if (definition.isAnonymous()) {
                                 // <CBL 25/9/13>
                                 // We also add the definition to the aliases handling
@@ -828,7 +829,7 @@ public class VisGraph implements Runnable{
     		   if (x.isOWLNothing()) vis.isBottom=true;
 			   vis.addEquivalentExpression(x);
 			   shapeMap.put(Shape.getKey(x), vis);
-				System.out.println("\tAdding "+Shape.getKey(x)+ " to shape map - as equivalent class ... "); 
+               System.out.println("\tAdding "+Shape.getKey(x)+ " to shape map - as equivalent class ... ");
 			   // to make it appear in the SearchCombo
                getQualifiedLabelMap().put(ExpressionManager.getReducedClassExpression(x), x.asOWLClass().getIRI().toString());
            });
@@ -872,7 +873,7 @@ public class VisGraph implements Runnable{
 	}
 	 
 	/**
-     * Searches sublevels for nodes that are still visible/referenced
+     * Searches subLevels for nodes that are still visible/referenced
      * and adds a dashedLine connecting them
      */
 	private void dashLink(Shape source,Shape current, int pathLength) {
@@ -938,8 +939,7 @@ public class VisGraph implements Runnable{
 	}
 	
 	 public Shape getShapeFromOWLClassExpression (OWLClassExpression e){
-		Shape retShape = shapeMap.get(Shape.getKey(e));
-		return retShape;
+         return shapeMap.get(Shape.getKey(e));
 	 }
 
 	 // TODO: another candidate to check performance issues 
@@ -955,8 +955,7 @@ public class VisGraph implements Runnable{
 			 parents.clear();
 			 
 		 }
-		 System.out.println("--> Exit redundancy removal ... "); 
-		 
+		 System.out.println("--> Exit redundancy removal ... ");
 	 }
 	 
 	 private void remove(HashSet<Shape>parents, Shape son){

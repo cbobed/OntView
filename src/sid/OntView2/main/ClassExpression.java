@@ -298,8 +298,8 @@ public class ClassExpression extends Stage {
             System.out.println("Please select a parent node");
         }
         if (selectedChild != null && selectedParent != null) {
+            parent.artPanel.cleanConnectors();
             parent.artPanel.getVisGraph().rebuildGraphSelectedNodes(selectedParent.getLinkedClassExpression(), selectedChild.getLinkedClassExpression());
-            System.out.println("selectedChild " + selectedChild.getLabel() + " selectedParent " + selectedParent.getLabel());
             close();
         }
     }
