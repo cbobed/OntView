@@ -9,6 +9,7 @@ import org.semanticweb.owlapi.model.parameters.Imports;
 import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import org.semanticweb.owlapi.reasoner.OWLReasonerRuntimeException;
 import org.semanticweb.owlapi.search.EntitySearcher;
 import org.xml.sax.SAXException;
 
@@ -157,8 +158,10 @@ public class VisGraph implements Runnable{
         //will have to move this elsewhere
         clearAll();
         OWLClass topClass = activeOntology.getOWLOntologyManager().getOWLDataFactory().getOWLThing();
-        // we start from a fresh graph, so it is safe to create OWLThing directly
+        OWLClass bottomClass = activeOntology.getOWLOntologyManager().getOWLDataFactory().getOWLNothing();
+        // we start from a fresh graph, so it is safe to create OWLThing and OWLNothing directly
         addVisClass(Shape.getKey(topClass), topClass, activeOntology, reasoner);
+        addVisClass(Shape.getKey(bottomClass), bottomClass, activeOntology, reasoner);
         this.reasonedTraversal(activeOntology,reasoner, null, rootCpts);
 
         if (!VisConfig.APPLY_RENAMING_DEBUG_PURPOSES) {
@@ -222,7 +225,7 @@ public class VisGraph implements Runnable{
         getShapeOrderedByRDFRank();
         Platform.runLater(paintframe.redrawRunnable);
     }
-	
+
 	/**
 	 *  builds the complete graph
 	 *  relies on weather it's expanded or not, and rearranging visual info
@@ -234,8 +237,10 @@ public class VisGraph implements Runnable{
         clearAll();
         set.forEach(x->System.out.println("Build 1st set: "+x));
         OWLClass topClass = activeOntology.getOWLOntologyManager().getOWLDataFactory().getOWLThing();
-        // we start from a fresh graph, so it is safe to create OWLThing directly
+        OWLClass bottomClass = activeOntology.getOWLOntologyManager().getOWLDataFactory().getOWLNothing();
+        // we start from a fresh graph, so it is safe to create OWLThing and OWLNothing directly
         addVisClass(Shape.getKey(topClass), topClass, activeOntology, reasoner);
+        addVisClass(Shape.getKey(bottomClass), bottomClass, activeOntology, reasoner);
         this.reasonedTraversal(activeOntology,reasoner, null, rootCpts);
 
         if (!VisConfig.APPLY_RENAMING_DEBUG_PURPOSES) {
@@ -688,10 +693,10 @@ public class VisGraph implements Runnable{
 	
 	private void createShapes(Set<OWLClassExpression> ceToCreate) {
 		for (OWLClassExpression ce: ceToCreate) {
-			if(getShapeFromOWLClassExpression(ce) != null){
+			if(getShapeFromOWLClassExpression(ce) != null || ce.isOWLNothing()) {
 				continue;
 			}
-			addVisClass(Shape.getKey(ce), ce, activeOntology, reasoner);
+            addVisClass(Shape.getKey(ce), ce, activeOntology, reasoner);
 		}
 	}
 
@@ -785,65 +790,75 @@ public class VisGraph implements Runnable{
 	 * Creates a new VisClass instance and adds it to the set(hashmap) of VisClasses
 	 * Creates or adjusts new VisLevels width
 	 */
-	public VisClass addVisClass(String label, OWLClassExpression ce, OWLOntology activeOntology, OWLReasoner reasoner) {
+    public VisClass addVisClass(String label, OWLClassExpression ce, OWLOntology activeOntology, OWLReasoner reasoner) {
+        String auxQLabel;
+        VisClass vis;
+        OWLDataFactory df = activeOntology.getOWLOntologyManager().getOWLDataFactory();
 
-		String auxQLabel;
-		VisClass vis = new VisClass(0, ce, label, this); 
-		shapeMap.put(label, vis);
-		System.out.println("Adding "+label+ " to shape map ... "); 
-		if (ce instanceof OWLClass){
-		   for (OWLAnnotation  an : EntitySearcher.getAnnotations(ce.asOWLClass(), activeOntology).toList() ){
-			   if (an.getProperty().toString().equals("rdfs:label")){
-                   String auxLabel = replaceString(an.getValue().toString().replaceAll("\"", ""));
-				   vis.explicitLabel.add(auxLabel);
-				   auxQLabel = qualifyLabel(ce.asOWLClass(), auxLabel);
-				   if (!"null".equalsIgnoreCase(auxQLabel)) {
-					   vis.explicitQualifiedLabel.add(auxQLabel);
-				   }
-				   else {
-					   vis.explicitQualifiedLabel.add(auxLabel);
-				   }
-                   if (auxLabel.contains("@")) {
-                       paintframe.languagesLabels.add(auxLabel.split("@")[1]);
-                   }
-			   }
-		   }
-       }
-	   vis.label = ExpressionManager.getReducedClassExpression(ce);
-	   vis.visibleLabel = vis.label; 
-	   auxQLabel = ExpressionManager.getReducedQualifiedClassExpression(ce); 
-       if (!"null".equalsIgnoreCase(auxQLabel))
-    	   vis.qualifiedLabel = auxQLabel; 
-       else 
-    	   vis.qualifiedLabel = vis.label;
+        // Redirect the unsatisfiable OWLClassExpression to the existing OWLNothing node
+        if (reasoner != null && !reasoner.isSatisfiable(ce) && !ce.isOWLNothing()) {
+            OWLClass nothing = df.getOWLNothing();
+            String bottomKey = nothing.asOWLClass().getIRI().toString();
+            VisClass bottomVis = shapeMap.get(bottomKey).asVisClass();;
+            bottomVis.addEquivalentExpression(ce);
+            shapeMap.put(Shape.getKey(ce), bottomVis);
+            System.out.println("Redirecting inconsistent " + Shape.getKey(ce) + " to existing OWLNothing shape.");
+            return bottomVis;
+        }
 
-	   if (ce.isAnonymous()) {
-           vis.isAnonymous = true;
-	   }
-	   if ((ce instanceof OWLClass) && (EntitySearcher.isDefined(ce.asOWLClass(), activeOntology) )) {
-           vis.isDefined = true;
-	   }
-       if (reasoner != null){
-    	   Node<OWLClass> equivClasses = reasoner.getEquivalentClasses(ce);    	   
-    	   equivClasses.entities().forEach(x-> {
-    		   if (x.isOWLNothing()) vis.isBottom=true;
-			   vis.addEquivalentExpression(x);
-			   shapeMap.put(Shape.getKey(x), vis);
-               System.out.println("\tAdding "+Shape.getKey(x)+ " to shape map - as equivalent class ... ");
-			   // to make it appear in the SearchCombo
-               getQualifiedLabelMap().put(ExpressionManager.getReducedClassExpression(x), x.asOWLClass().getIRI().toString());
-           });
-       }
-       
-       vis.setWidth(vis.calculateWidth());
-       vis.setHeight(vis.calculateHeight());
-	   
-	   if (ce instanceof OWLClass){
-    	   getQualifiedLabelMap().put(vis.label, ce.asOWLClass().getIRI().toString());
-       }
-	   return vis; 
-	}
-	
+        vis = new VisClass(0, ce, label, this);
+        shapeMap.put(label, vis);
+        System.out.println("Adding " + label + " to shape map ...");
+
+        if (ce instanceof OWLClass){
+            for (OWLAnnotation  an : EntitySearcher.getAnnotations(ce.asOWLClass(), activeOntology).toList() ){
+                if (an.getProperty().toString().equals("rdfs:label")){
+                    String auxLabel = replaceString(an.getValue().toString().replaceAll("\"", ""));
+                    vis.explicitLabel.add(auxLabel);
+                    auxQLabel = qualifyLabel(ce.asOWLClass(), auxLabel);
+                    if (!"null".equalsIgnoreCase(auxQLabel)) {
+                        vis.explicitQualifiedLabel.add(auxQLabel);
+                    }
+                    else {
+                        vis.explicitQualifiedLabel.add(auxLabel);
+                    }
+                    if (auxLabel.contains("@")) {
+                        paintframe.languagesLabels.add(auxLabel.split("@")[1]);
+                    }
+                }
+            }
+        }
+
+        vis.label = ExpressionManager.getReducedClassExpression(ce);
+        vis.visibleLabel = vis.label;
+        auxQLabel = ExpressionManager.getReducedQualifiedClassExpression(ce);
+        vis.qualifiedLabel = !"null".equalsIgnoreCase(auxQLabel) ? auxQLabel : vis.label;
+        vis.isBottom = ce.isOWLNothing();
+        vis.isAnonymous = ce.isAnonymous();
+        if ((ce instanceof OWLClass) && (EntitySearcher.isDefined(ce.asOWLClass(), activeOntology) )) {
+            vis.isDefined = true;
+        }
+
+        if (reasoner != null) {
+            Node<OWLClass> equivClasses = reasoner.getEquivalentClasses(ce);
+            for (OWLClass x : equivClasses) {
+                if (x.isOWLNothing()) vis.isBottom=true;
+                vis.addEquivalentExpression(x);
+                shapeMap.put(Shape.getKey(x), vis);
+                System.out.println("\tAdding " + Shape.getKey(x) + " to shape map - as equivalent class ... ");
+                // for SearchCombo
+                getQualifiedLabelMap().put(ExpressionManager.getReducedClassExpression(x), x.asOWLClass().getIRI().toString());
+            }
+        }
+
+        vis.setWidth(vis.calculateWidth());
+        vis.setHeight(vis.calculateHeight());
+
+        if (ce instanceof OWLClass){
+            getQualifiedLabelMap().put(vis.label, ce.asOWLClass().getIRI().toString());
+        }
+        return vis;
+    }
 	
 	public Set<Entry<String,Shape>> getClassesInGraph(){
 		 return shapeMap.entrySet();
@@ -1181,7 +1196,6 @@ public class VisGraph implements Runnable{
     private static volatile boolean voluntaryCancel = false;
     public static void voluntaryCancel(boolean cancelValue) { voluntaryCancel = cancelValue; }
     public static boolean isVoluntaryCancel() { return voluntaryCancel; }
-
     HashSet<OWLClassExpression> topSet;
 
     @Override

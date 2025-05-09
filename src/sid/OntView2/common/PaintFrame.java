@@ -38,6 +38,7 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import sid.OntView2.main.TopPanel;
 import sid.OntView2.kcExtractors.KConceptExtractor;
 import sid.OntView2.kcExtractors.KConceptExtractorFactory;
+import uk.ac.manchester.cs.owl.owlapi.OWLClassAxiomImpl;
 
 public class PaintFrame extends Canvas {
 	private static final long serialVersionUID = 1L;
@@ -849,6 +850,10 @@ public class PaintFrame extends Canvas {
 			return false;
 		}
 		if (shape != null) {
+            System.out.println("clicked on shape: " + shape.getLabel() + " -------------------------------------------------------");
+            for (OWLClassExpression s: shape.asVisClass().getEquivalentClasses()){
+                System.out.println("equivalent class: " + s);
+            }
 			if (e.getClickCount() == 2 && !e.isConsumed() && e.getButton() == MouseButton.PRIMARY) {
 				// double click
 				e.consume();

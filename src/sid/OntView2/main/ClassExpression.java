@@ -203,6 +203,7 @@ public class ClassExpression extends Stage {
                     result.add(s);
                 }
             }
+            result.add(getShapeByLabel("Nothing"));
         } else if (selectedChild != null) {
             for (Shape s : selectedChild.getAncestors()) {
                 if (!s.asVisClass().isAnonymous()) {
