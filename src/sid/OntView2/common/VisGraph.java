@@ -304,8 +304,7 @@ public class VisGraph implements Runnable{
         
     }
 
-	private void insertClassExpressions (OWLOntology activeOntology, 
-											OWLReasoner reasoner, 
+	private void insertClassExpressions (OWLOntology activeOntology, OWLReasoner reasoner,
 											OWLClassExpression startingPoint, 
 											OWLClassExpression endPoint) {
 		SIDClassExpressionNamer renamer = new SIDClassExpressionNamer(activeOntology, reasoner);

@@ -139,36 +139,19 @@ public class OWLClassExpressionHarvester implements OWLAxiomVisitor {
 	
 	@Override
 	public void visit(OWLEquivalentClassesAxiom axiom) {
-		
-		// this is a special case: 
-		// the defined concepts are treated using the reasoner 
-		// not in this process
-		// 
-		// here, we only consider C1 == .. == Cn, with all being 
-		// anonymous classExpressions
-		
+
 		Set<OWLClassExpression> operands = axiom.getClassExpressions(); 
 		
 		Iterator<OWLClassExpression> it = operands.iterator(); 
-		boolean anyNamed = false;
-		ArrayList<OWLClassExpression> auxArray = new ArrayList<OWLClassExpression>(); 
-		OWLClassExpression auxCE = null; 
-		while (it.hasNext() && !anyNamed) {
+		ArrayList<OWLClassExpression> auxArray = new ArrayList<OWLClassExpression>();
+		OWLClassExpression auxCE;
+		while (it.hasNext()) {
 			auxCE = it.next(); 
 			if (auxCE.isAnonymous()) {
 				auxArray.add(auxCE); 
 			}
-			else {
-				anyNamed = true; 
-			}
 		}
-		
-		if (!anyNamed) {
-			// if everyone is anonymous, then we consider them
-			// otherwise, they will appear as the definition of 
-			// a defined Concept
-			harvestedClasses.addAll(auxArray); 
-		}		
+        harvestedClasses.addAll(auxArray);
 	}
 
 	@Override

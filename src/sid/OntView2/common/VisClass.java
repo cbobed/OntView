@@ -197,7 +197,7 @@ public class VisClass extends Shape {
         if (visible) {
             int propSpace = (propertyBox != null) ? 20 : 0;
 
-            if (!isDefined) {
+            if (!isDefined || asVisClass().getEquivalentClasses().isEmpty()) {
                 drawPrimitiveAndAnonymous(g, x, y, ascent, roundCornerValue, propSpace);
             } else if (!label.startsWith(SIDClassExpressionNamer.className)) {
                 drawDefined(g, x, y, fontHeight, ascent, roundCornerValue, propSpace);
@@ -544,8 +544,8 @@ public class VisClass extends Shape {
 				// TO_DO: add two new methods to obtain the reducedClassExpression 
 				// using the labels and the qualified labels for each of the terms. 
 				explicitDefinitionLabels = definitionLabels; 
-				explicitQualifiedDefinitionLabels = qualifiedDefinitionLabels; 
-			}	
+				explicitQualifiedDefinitionLabels = qualifiedDefinitionLabels;
+            }
 			// CBL: we add the different labels
 			String label = ExpressionManager.getReducedClassExpression(def);
 			definitionLabels.add(label);
@@ -553,9 +553,9 @@ public class VisClass extends Shape {
 	       if (!"null".equalsIgnoreCase(auxQLabel))
 	    	   qualifiedDefinitionLabels.add(auxQLabel); 
 	       else 
-	    	   qualifiedDefinitionLabels.add(label); 
-	       
-		   visibleDefinitionLabels = definitionLabels;
+	    	   qualifiedDefinitionLabels.add(label);
+
+           visibleDefinitionLabels = definitionLabels;
 		}
 	   
 	}
