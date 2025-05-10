@@ -191,16 +191,18 @@ public class VisClass extends Shape {
 		double ascent = textNode.getBaselineOffset() + 5.5;
 	    
 	    if (currentHeight == 0) {
-            currentHeight = (!isAnonymous && !isDefined) ? getHeight() : calculateHeight();
+            currentHeight = (!isAnonymous && !isDefined && asVisClass().getEquivalentClasses().isEmpty()) ? getHeight() : calculateHeight();
 		}
         setWidth(calculateWidth());
 
         if (visible) {
             int propSpace = (propertyBox != null) ? 20 : 0;
 
-            if (!isDefined || asVisClass().getEquivalentClasses().isEmpty()) {
+            if (!isDefined && asVisClass().getEquivalentClasses().isEmpty()) {
                 drawPrimitiveAndAnonymous(g, x, y, ascent, roundCornerValue, propSpace);
             } else if (!label.startsWith(SIDClassExpressionNamer.className)) {
+                drawDefined(g, x, y, fontHeight, ascent, roundCornerValue, propSpace);
+            } else if (!asVisClass().getEquivalentClasses().isEmpty()){
                 drawDefined(g, x, y, fontHeight, ascent, roundCornerValue, propSpace);
             } else {
                 drawAuxDefinition(g, x, y, fontHeight, ascent, roundCornerValue, propSpace);
@@ -389,7 +391,8 @@ public class VisClass extends Shape {
 		double height = 13;
 		double rectY = y - (double) currentHeight / 2 - height - 5;
 
-		if (isDefined && !label.startsWith(SIDClassExpressionNamer.className)) rectY -= 5;
+		if ((isDefined && !label.startsWith(SIDClassExpressionNamer.className))
+            || !asVisClass().getEquivalentClasses().isEmpty()) rectY -= 5;
 
 		double visiblePercentage = (double) (descendants.size() - hiddenNodes) / descendants.size();
 		double hiddenPercentage = 1.0 - visiblePercentage;
@@ -700,13 +703,12 @@ public class VisClass extends Shape {
         int candidate;
         try {
             if (!isAnonymous) {
-                if (!label.startsWith(SIDClassExpressionNamer.className)) {
+                if (!label.startsWith(SIDClassExpressionNamer.className) ) {
                     textNode.setText(visibleLabel);
                     max = (int) textNode.getLayoutBounds().getWidth() + 25 ;
                 }
                 //<CBL> for the defined, max might not be the desired value
-                if (isDefined) {
-
+                if (isDefined || !asVisClass().getEquivalentClasses().isEmpty()) {
                     // we have to do the same as for the anonymous ones
                     // for each of the definitions
                     for (String auxLabel: getVisibleDefinitionLabels()) {
@@ -783,7 +785,7 @@ public class VisClass extends Shape {
 	    else {
 	    	// <CBL 24/9/13> <
 	    	// first step to the new representation of defined concepts
-	    	if (!isDefined) { 
+	    	if (!isDefined && asVisClass().getEquivalentClasses().isEmpty()) {
 	    		result += fontHeight + 5;
 	    	}
 	    	else {
