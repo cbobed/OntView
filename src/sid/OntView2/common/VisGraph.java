@@ -285,13 +285,12 @@ public class VisGraph implements Runnable{
         updatePosition();
         System.out.println("Applying KCE Option if required ...");
         paintframe.doKceOptionAction();
-        //showAll();
         VisLevel.adjustWidthAndPos(getLevelSet());
         paintframe.getParentFrame().loadSearchCombo();
         paintframe.setStateChanged(true);
         System.out.println("<--buildReasonedGraph");
         
-        for (Entry<String, Shape> entry: shapeMap.entrySet()) {
+        /*for (Entry<String, Shape> entry: shapeMap.entrySet()) {
         	System.out.println("Shape: "+entry.getKey()); 
         	System.out.println("\t\t"+entry.getValue().getLabel()); 
         	for (OWLClassExpression equiv: entry.getValue().asVisClass().getEquivalentClasses()) {
@@ -300,7 +299,7 @@ public class VisGraph implements Runnable{
         	for (Shape s:entry.getValue().asVisClass().getChildren()) {
         		System.out.println("--> "+s.asVisClass().getLabel()); 
         	}
-        }
+        }*/
         
     }
 
@@ -375,9 +374,9 @@ public class VisGraph implements Runnable{
 		// We check for the equivalences 
 		for (Shape directParent: directParents) {
 			if (subsumes(e, directParent.asVisClass().getLinkedClassExpression(), reasoner, dataFactory)) {
-				System.out.println("equivalence detected in a gathered anonymous expression: "); 
-				System.out.println("\t gathered: "+e); 
-				System.out.println("\t prevExp: "+directParent.asVisClass().getLinkedClassExpression()); 
+				//System.out.println("equivalence detected in a gathered anonymous expression: ");
+				//System.out.println("\t gathered: "+e);
+				//System.out.println("\t prevExp: "+directParent.asVisClass().getLinkedClassExpression());
 				directParent.asVisClass().addEquivalentExpression(e);
 				String candKey = Shape.getKey(e); 
 				if (!shapeMap.containsKey(candKey)) {
@@ -424,8 +423,8 @@ public class VisGraph implements Runnable{
 	   nextLevel.add(getShapeFromOWLClassExpression(topCE).asVisClass());
 	   int depthLevel = 0; 
 	   while (!nextLevel.isEmpty()) {
-		   System.out.println("Creating level "+depthLevel+"..."+nextLevel.size()); 
-		   nextLevel.forEach(x-> System.out.println("including ... ("+x.getChildren().size()+") "+x.getLinkedClassExpression()));
+		   //System.out.println("Creating level "+depthLevel+"..."+nextLevel.size());
+		   //nextLevel.forEach(x-> System.out.println("including ... ("+x.getChildren().size()+") "+x.getLinkedClassExpression()));
 		   VisLevel vLevel;
 	       int levelPosx = VisClass.FIRST_X_SEPARATION;
 	       vLevel = VisLevel.getLevelFromID(levelSet, depthLevel);
@@ -461,6 +460,7 @@ public class VisGraph implements Runnable{
                     shape.asVisClass().setMaxSizeHiddenNodesIndicator();
                 }
 				shape.asVisClass().setWidth(shape.asVisClass().calculateWidth());
+                shape.asVisClass().setHeight(shape.asVisClass().calculateHeight());
 			}
 		}
 	}
@@ -661,7 +661,7 @@ public class VisGraph implements Runnable{
 		for (OWLClassExpression ce: currentCELevel) {
 			// all the Shapes in currentCELevel :: AlreadyCreated 
 			// this implies that TOP must be created outside
-			System.out.println("Processing "+ce); 
+			//System.out.println("Processing "+ce);
 			VisClass vis = getShapeFromOWLClassExpression(ce).asVisClass(); 
 			HashSet<OWLClassExpression> subSet = new HashSet<> ();
 			reasoner.getSubClasses(ce, true).entities().forEach(subSet::add); 
@@ -807,7 +807,7 @@ public class VisGraph implements Runnable{
 
         vis = new VisClass(0, ce, label, this);
         shapeMap.put(label, vis);
-        System.out.println("Adding " + label + " to shape map ...");
+        //System.out.println("Adding " + label + " to shape map ...");
 
         if (ce instanceof OWLClass){
             for (OWLAnnotation  an : EntitySearcher.getAnnotations(ce.asOWLClass(), activeOntology).toList() ){
@@ -844,7 +844,7 @@ public class VisGraph implements Runnable{
                 if (x.isOWLNothing()) vis.isBottom=true;
                 vis.addEquivalentExpression(x);
                 shapeMap.put(Shape.getKey(x), vis);
-                System.out.println("\tAdding " + Shape.getKey(x) + " to shape map - as equivalent class ... ");
+                //System.out.println("\tAdding " + Shape.getKey(x) + " to shape map - as equivalent class ... ");
                 // for SearchCombo
                 getQualifiedLabelMap().put(ExpressionManager.getReducedClassExpression(x), x.asOWLClass().getIRI().toString());
             }

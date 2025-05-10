@@ -69,6 +69,7 @@ public class VisClass extends Shape {
 	boolean labelRendering = false;
 	public int topToBarDistance = 0;
 	int tabSize = 15;
+    private int lineSpacing = 6;
 
     Color mini = Color.rgb(224, 224, 224);
     Color lightgray = Color.rgb(234, 234, 234);
@@ -266,7 +267,7 @@ public class VisClass extends Shape {
         if (visibleDefinitionLabels != null) {
             for (String auxDefString: visibleDefinitionLabels) {
                 drawFormattedString(g, auxDefString, x - (getWidth() - 12) / 2, (int) (auxY + ascent)+5);
-                auxY += (countLines(auxDefString)*fontH) + 5;
+                auxY += textHeight(g, auxDefString);
             }
         }
 
@@ -300,7 +301,7 @@ public class VisClass extends Shape {
             for (String auxDefString: visibleDefinitionLabels) {
                 g.setFill(Color.BLACK);
                 drawFormattedString(g, auxDefString, x - (getWidth() - 10) / 2 + propSpace, (int) (auxY + ascent)-1);
-                auxY += (countLines(auxDefString)*fontH) + 5;
+                auxY += textHeight(g, auxDefString);
             }
         }
     }
@@ -804,22 +805,21 @@ public class VisClass extends Shape {
 		    		
 	    		}
 	    	}
-	    	
-	    }
+        }
 		return result + SPACE;
 	}
 
 	private int calculateTextHeight(String text) {
 		String[] lines = text.split("\n");
-		int totalHeight = 0, lineSpacing = 5, padding = 5;
+		int totalHeight = 0;
 
 		for (String line : lines) {
 			Text textNode = new Text(line);
 			textNode.setFont(Font.font("DejaVu Sans", FontWeight.BOLD, 10));
-			totalHeight += (int) textNode.getLayoutBounds().getHeight();
+			totalHeight += (int) textNode.getLayoutBounds().getHeight() + lineSpacing;
 		}
 
-		return totalHeight + (lines.length - 1) * lineSpacing + padding * 2;
+		return totalHeight + (lines.length - 1);
 	}
 	
 	public ArrayList<String> getVisibleDefinitionLabels() {
@@ -862,11 +862,28 @@ public class VisClass extends Shape {
 	public String removeFormatInformation(String str) {
 		return str.replace("\n", "").replace("\t", "");
 	}
+
+    private double textHeight(String text) {
+        Font font = Font.font("DejaVu Sans", FontWeight.NORMAL, 9);
+        int lines = countLines(text) + 1;
+
+        Text helper = new Text("ONTVIEW");
+        helper.setFont(font);
+        double lineHeight = helper.getLayoutBounds().getHeight();
+
+        return lines * lineHeight;
+    }
+
+    private double textHeight(GraphicsContext g, String text) {
+        int numLines = countLines(text);
+        Text helper = new Text(text);
+        helper.setFont(g.getFont());
+        return helper.getLayoutBounds().getHeight() + numLines*lineSpacing;
+    }
 	
 	public int countLines(String str) {
 		int lines=1; 
-		for (int i=0; i<str.length(); i++)
-		{
+		for (int i=0; i<str.length(); i++) {
 			if (str.charAt(i) == '\n') {
 				lines++; 
 			}
@@ -897,9 +914,7 @@ public class VisClass extends Shape {
 			token = sTokenizer.nextToken();
 			currentX = x+tabsSize(token); 
 			g.fillText(removeFormatInformation(token), currentX, currentY);
-			Font font = Font.font("DejaVu Sans", FontWeight.NORMAL, 9);
-
-			currentY += VisProperty.stringHeight(font)+6;
+			currentY += VisProperty.stringHeight(g.getFont())+6;
 		}
 	}
 

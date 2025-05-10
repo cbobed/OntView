@@ -850,6 +850,7 @@ public class PaintFrame extends Canvas {
 			return false;
 		}
 		if (shape != null) {
+            System.out.println("clicked on shape --- " + shape.getLabel() + " top = " + shape.getTopCorner() + " bottom = " + shape.getBottomCorner());
 			if (e.getClickCount() == 2 && !e.isConsumed() && e.getButton() == MouseButton.PRIMARY) {
 				// double click
 				e.consume();
