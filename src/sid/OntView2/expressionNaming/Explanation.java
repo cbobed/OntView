@@ -6,7 +6,6 @@ import org.semanticweb.owlapi.dlsyntax.renderer.DLSyntaxObjectRenderer;
 public class Explanation {
 
 	public static DLSyntaxObjectRenderer renderer = new DLSyntaxObjectRenderer();
-
 	OWLClassExpression ce1;
 	OWLClassExpression ce2;
 
@@ -18,5 +17,4 @@ public class Explanation {
 	public String toString (){
 		return renderer.render(ce1) + " \n EquivalentTo \n "+renderer.render(ce2);
 	}
-
 }

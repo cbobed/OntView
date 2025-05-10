@@ -2,6 +2,7 @@ package sid.OntView2.expressionNaming;
 
 import org.semanticweb.owlapi.model.*;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -9,12 +10,12 @@ import java.util.Set;
 
 public class OWLClassExpressionHarvester implements OWLAxiomVisitor {
 
-	ArrayList<OWLClassExpression> harvestedClasses = null;
-	ArrayList<OWLClassExpression> domainClasses = null; 
-	ArrayList<OWLClassExpression> rangeClasses = null; 
+	ArrayList<OWLClassExpression> harvestedClasses;
+	ArrayList<OWLClassExpression> domainClasses;
+	ArrayList<OWLClassExpression> rangeClasses;
 	
 	public OWLClassExpressionHarvester () {
-		this.harvestedClasses = new ArrayList<OWLClassExpression>(); 
+		this.harvestedClasses = new ArrayList<>();
 		this.domainClasses = new ArrayList<>(); 
 		this.rangeClasses = new ArrayList<>(); 
 	}
@@ -22,65 +23,38 @@ public class OWLClassExpressionHarvester implements OWLAxiomVisitor {
 	public ArrayList<OWLClassExpression> getHarvestedClasses() {
 		return harvestedClasses;
 	}
-	
-	public ArrayList<OWLClassExpression> getDomainClasses() {
-		return domainClasses;
-	}
 
-	public ArrayList<OWLClassExpression> getRangeClasses() {
-		return rangeClasses;
-	}
+    //// VISITOR PATTERN AXIOMS
 	
-	//// VISITOR PATTERN AXIOMS 
-	
-	public void visit(OWLAnnotationAssertionAxiom axiom) {
-		return;
-	}
+	public void visit(@Nonnull OWLAnnotationAssertionAxiom axiom) {}
 
 	@Override
-	public void visit(OWLSubAnnotationPropertyOfAxiom axiom) {
-		return;
-	}
+	public void visit(@Nonnull OWLSubAnnotationPropertyOfAxiom axiom) {}
 
 	@Override
-	public void visit(OWLAnnotationPropertyDomainAxiom axiom) {
-		return;
-	}
+	public void visit(@Nonnull OWLAnnotationPropertyDomainAxiom axiom) {}
 
 	@Override
-	public void visit(OWLAnnotationPropertyRangeAxiom axiom) {
-		return;
-	}
+	public void visit(@Nonnull OWLAnnotationPropertyRangeAxiom axiom) {}
 	
 	@Override
-	public void visit(OWLDifferentIndividualsAxiom axiom) {
-		return;
-	}
+	public void visit(@Nonnull OWLDifferentIndividualsAxiom axiom) {}
 
 	@Override
-	public void visit(OWLObjectPropertyAssertionAxiom axiom) {
-		return;
-	}
+	public void visit(@Nonnull OWLObjectPropertyAssertionAxiom axiom) {}
 
 	@Override
-	public void visit(SWRLRule rule) {
-		return;
-	}
+	public void visit(@Nonnull SWRLRule rule) {}
 	
 	@Override
-	public void visit(OWLSameIndividualAxiom axiom) {
-		return;
-	}
+	public void visit(@Nonnull OWLSameIndividualAxiom axiom) {}
 	
 	@Override
-	public void visit(OWLSubPropertyChainOfAxiom axiom) {
-		return;
-	}
+	public void visit(@Nonnull OWLSubPropertyChainOfAxiom axiom) {}
 	
 	@Override
-	public void visit(OWLDeclarationAxiom axiom) {
+	public void visit(@Nonnull OWLDeclarationAxiom axiom) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
@@ -93,24 +67,21 @@ public class OWLClassExpressionHarvester implements OWLAxiomVisitor {
 		if (axiom.getSuperClass().isAnonymous()) {
 			harvestedClasses.add(axiom.getSuperClass()); 
 		}
-
 	}
 
 	@Override
-	public void visit(OWLNegativeObjectPropertyAssertionAxiom axiom) {
+	public void visit(@Nonnull OWLNegativeObjectPropertyAssertionAxiom axiom) {
 		// TODO Auto-generated method stub
 	}
 
 	@Override
-	public void visit(OWLAsymmetricObjectPropertyAxiom axiom) {
+	public void visit(@Nonnull OWLAsymmetricObjectPropertyAxiom axiom) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
-	public void visit(OWLReflexiveObjectPropertyAxiom axiom) {
+	public void visit(@Nonnull OWLReflexiveObjectPropertyAxiom axiom) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
@@ -128,8 +99,7 @@ public class OWLClassExpressionHarvester implements OWLAxiomVisitor {
 
 	@Override
 	public void visit(OWLDisjointUnionAxiom axiom) {
-		OWLAxiom newAxiom = null;
-		Set<OWLClassExpression> operands = axiom.getClassExpressions();
+        Set<OWLClassExpression> operands = axiom.getClassExpressions();
 		for (OWLClassExpression ce: operands) {
 			if (ce.isAnonymous()) {
 				harvestedClasses.add(ce); 
@@ -139,11 +109,10 @@ public class OWLClassExpressionHarvester implements OWLAxiomVisitor {
 	
 	@Override
 	public void visit(OWLEquivalentClassesAxiom axiom) {
-
 		Set<OWLClassExpression> operands = axiom.getClassExpressions(); 
 		
 		Iterator<OWLClassExpression> it = operands.iterator(); 
-		ArrayList<OWLClassExpression> auxArray = new ArrayList<OWLClassExpression>();
+		ArrayList<OWLClassExpression> auxArray = new ArrayList<>();
 		OWLClassExpression auxCE;
 		while (it.hasNext()) {
 			auxCE = it.next(); 
@@ -175,35 +144,29 @@ public class OWLClassExpressionHarvester implements OWLAxiomVisitor {
 	}
 
 	@Override
-	public void visit(OWLEquivalentObjectPropertiesAxiom axiom) {
+	public void visit(@Nonnull OWLEquivalentObjectPropertiesAxiom axiom) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
-	public void visit(OWLNegativeDataPropertyAssertionAxiom axiom) {
+	public void visit(@Nonnull OWLNegativeDataPropertyAssertionAxiom axiom) {
 		// TODO Auto-generated method stub
-
 	}
 
 
 	@Override
-	public void visit(OWLDisjointDataPropertiesAxiom axiom) {
+	public void visit(@Nonnull OWLDisjointDataPropertiesAxiom axiom) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
-	public void visit(OWLDisjointObjectPropertiesAxiom axiom) {
+	public void visit(@Nonnull OWLDisjointObjectPropertiesAxiom axiom) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void visit(OWLObjectPropertyRangeAxiom axiom) {
-		OWLAxiom newAxiom = null;
-		
-		OWLClassExpression range = axiom.getRange();
+        OWLClassExpression range = axiom.getRange();
 		
 		if (range.isAnonymous()) {
 			harvestedClasses.add(range);
@@ -212,91 +175,74 @@ public class OWLClassExpressionHarvester implements OWLAxiomVisitor {
 	}
 
 	@Override
-	public void visit(OWLFunctionalObjectPropertyAxiom axiom) {
+	public void visit(@Nonnull OWLFunctionalObjectPropertyAxiom axiom) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
-	public void visit(OWLSubObjectPropertyOfAxiom axiom) {
+	public void visit(@Nonnull OWLSubObjectPropertyOfAxiom axiom) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
-	public void visit(OWLSymmetricObjectPropertyAxiom axiom) {
+	public void visit(@Nonnull OWLSymmetricObjectPropertyAxiom axiom) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
-	public void visit(OWLDataPropertyRangeAxiom axiom) {
+	public void visit(@Nonnull OWLDataPropertyRangeAxiom axiom) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
-	public void visit(OWLFunctionalDataPropertyAxiom axiom) {
+	public void visit(@Nonnull OWLFunctionalDataPropertyAxiom axiom) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
-	public void visit(OWLEquivalentDataPropertiesAxiom axiom) {
+	public void visit(@Nonnull OWLEquivalentDataPropertiesAxiom axiom) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
-	public void visit(OWLClassAssertionAxiom axiom) {
-		return;
-	}
+	public void visit(@Nonnull OWLClassAssertionAxiom axiom) {}
 
 	@Override
-	public void visit(OWLDataPropertyAssertionAxiom axiom) {
+	public void visit(@Nonnull OWLDataPropertyAssertionAxiom axiom) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
-	public void visit(OWLTransitiveObjectPropertyAxiom axiom) {
+	public void visit(@Nonnull OWLTransitiveObjectPropertyAxiom axiom) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
-	public void visit(OWLIrreflexiveObjectPropertyAxiom axiom) {
+	public void visit(@Nonnull OWLIrreflexiveObjectPropertyAxiom axiom) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
-	public void visit(OWLSubDataPropertyOfAxiom axiom) {
+	public void visit(@Nonnull OWLSubDataPropertyOfAxiom axiom) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
-	public void visit(OWLInverseFunctionalObjectPropertyAxiom axiom) {
+	public void visit(@Nonnull OWLInverseFunctionalObjectPropertyAxiom axiom) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
-	public void visit(OWLInverseObjectPropertiesAxiom axiom) {
+	public void visit(@Nonnull OWLInverseObjectPropertiesAxiom axiom) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
-	public void visit(OWLHasKeyAxiom axiom) {
+	public void visit(@Nonnull OWLHasKeyAxiom axiom) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
-	public void visit(OWLDatatypeDefinitionAxiom axiom) {
-		return;
-	}
+	public void visit(@Nonnull OWLDatatypeDefinitionAxiom axiom) {}
 
 }

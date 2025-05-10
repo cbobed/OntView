@@ -531,6 +531,8 @@ public class VisClass extends Shape {
 	// instead of setDefinition, we now add a new one
 	// and update the labels
 	public void addEquivalentExpression(OWLClassExpression def){
+
+        if (def.equals(linkedClassExpression)) return;
 		
 		if (!equivalentClasses.contains(def)) {
 			equivalentClasses.add(def);

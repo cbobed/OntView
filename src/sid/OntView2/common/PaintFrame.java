@@ -44,7 +44,7 @@ public class PaintFrame extends Canvas {
 	private static final long serialVersionUID = 1L;
     public Stage loadingStage = null;
 	public ScrollPane scroll;
-	static final int BORDER_PANEL = 50;
+	static final int BORDER_PANEL = 60;
 	static final int MIN_SPACE = 20;
 	static final int MIN_INITIAL_SPACE = 40;
 	private static final int DOWN = 0;

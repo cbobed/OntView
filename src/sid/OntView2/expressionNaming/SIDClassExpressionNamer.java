@@ -16,19 +16,14 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.parameters.Imports;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
-import org.semanticweb.owlapi.dlsyntax.renderer.DLSyntaxObjectRenderer;
-
 public class SIDClassExpressionNamer {
 
-	static DLSyntaxObjectRenderer renderer = new DLSyntaxObjectRenderer();
+    ArrayList<OWLClassExpression> classesToAdd;
+	ArrayList<Explanation> classesFiltered;
+	Set<OWLEquivalentClassesAxiom> axiomsToAdd;
 
-
-	ArrayList<OWLClassExpression> classesToAdd = null;
-	ArrayList<Explanation> classesFiltered = null;
-	Set<OWLEquivalentClassesAxiom> axiomsToAdd = null ;
-
-	OWLOntology ontology = null;
-	OWLReasoner reasoner = null;
+	OWLOntology ontology;
+	OWLReasoner reasoner;
 
 	private int classID = 1;
 	public static String className = "SIDClass_";
@@ -37,8 +32,8 @@ public class SIDClassExpressionNamer {
 		this.ontology = ont;
 		this.reasoner = reasoner;
 		this.classesToAdd = null;
-		this.classesFiltered = new ArrayList<Explanation>();
-		this.axiomsToAdd = new HashSet<OWLEquivalentClassesAxiom> ();
+		this.classesFiltered = new ArrayList<>();
+		this.axiomsToAdd = new HashSet<> ();
 	}
 	
 	public void applyNaming (boolean refreshReasoner) {
@@ -47,10 +42,9 @@ public class SIDClassExpressionNamer {
 		// are anonymous (TOP LEVEL)
 		// Adapted from the code of Alessandro
 
-		
 		try {
 			retrieveClassExpressions(); 
-			applySyntactiSieve(); 
+			applySyntacticSieve();
 		}
 		catch (NonGatheredClassExpressionsException e) {
 			System.err.println("Not possible -- we have just called retrieveClassExpressions()"); 
@@ -58,12 +52,12 @@ public class SIDClassExpressionNamer {
 
 		OWLOntologyManager manager = ontology.getOWLOntologyManager();
 		OWLDataFactory dataFactory = manager.getOWLDataFactory();
-		OWLEquivalentClassesAxiom equivalentAxiom = null;
+		OWLEquivalentClassesAxiom equivalentAxiom;
 
 		// we have the minimum set of class expressions that have to be named
 		// it should be enough to assert the new class as part of the equivalence
 		// to be considered
-		OWLClass auxiliarClass = null;
+		OWLClass auxiliaryClass;
 
 		axiomsToAdd.clear();
 		String baseIRI = ontology.getOntologyID().getOntologyIRI().get().toString();
@@ -76,9 +70,9 @@ public class SIDClassExpressionNamer {
 		}
 
 		for (OWLClassExpression ce: classesToAdd) {
-			auxiliarClass = dataFactory.getOWLClass(IRI.create(baseIRI+className+classID));
+			auxiliaryClass = dataFactory.getOWLClass(IRI.create(baseIRI+className+classID));
 			classID++;
-			equivalentAxiom = dataFactory.getOWLEquivalentClassesAxiom(auxiliarClass, ce);
+			equivalentAxiom = dataFactory.getOWLEquivalentClassesAxiom(auxiliaryClass, ce);
 			axiomsToAdd.add(equivalentAxiom);
 		}
 
@@ -88,12 +82,11 @@ public class SIDClassExpressionNamer {
 		if (refreshReasoner) {
 			reasoner.flush();
 		}
-
 	}
 	
 	public void gatherAllExpressionsFiltering() throws NonGatheredClassExpressionsException {
 		retrieveClassExpressions();
-		applySyntactiSieve();
+		applySyntacticSieve();
 	}
 	
 	private void retrieveClassExpressions () {
@@ -106,14 +99,14 @@ public class SIDClassExpressionNamer {
 		classesToAdd = axiomVisitor.getHarvestedClasses();		
 	}
 	
-	private void applySyntactiSieve() throws NonGatheredClassExpressionsException {
+	private void applySyntacticSieve() throws NonGatheredClassExpressionsException {
 		
 		if (this.classesToAdd == null) throw new NonGatheredClassExpressionsException(); 
 		System.out.println("--> "+classesToAdd.size() + " class expressions harvested");
 		// CBL: due to the large amount of tests in huge ontologies
 		// we first perform a syntactic sieve
 
-		Hashtable<Integer, OWLClassExpression> syntacticalSieve = new Hashtable<Integer, OWLClassExpression>();
+		Hashtable<Integer, OWLClassExpression> syntacticalSieve = new Hashtable<>();
 		Integer auxInt;
 		for (OWLClassExpression auxClass: classesToAdd) {
 			auxInt = auxClass.toString().hashCode();
@@ -123,8 +116,7 @@ public class SIDClassExpressionNamer {
 		System.out.println("--> "+syntacticalSieve.size()+" class expressions after syntactic sieve");
 
 		classesToAdd.clear();
-		classesToAdd.addAll(syntacticalSieve.values()) ;
-		
+		classesToAdd.addAll(syntacticalSieve.values());
 	}
 
 	public ArrayList<OWLClassExpression> getClassesToAdd() {
@@ -142,5 +134,4 @@ public class SIDClassExpressionNamer {
 	public Set<OWLEquivalentClassesAxiom> getAxiomsToAdd() {
 		return axiomsToAdd;
 	}
-
 }
