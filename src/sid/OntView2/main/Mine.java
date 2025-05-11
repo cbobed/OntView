@@ -79,7 +79,7 @@ public class Mine extends Application implements Embedable{
 	public Stage getPrimaryStage() { return primaryStage; }
 
     public static void createAndShowGUI(Stage primaryStage) {
-		primaryStage.setTitle("Viewer");
+		primaryStage.setTitle("OntView");
 		primaryStage.setMinWidth(1400);
 		primaryStage.setOnCloseRequest(event -> System.exit(0));
 		ClassLoader c = Thread.currentThread().getContextClassLoader(); 

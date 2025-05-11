@@ -215,7 +215,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
     public boolean ignoreSliderListener = false;
 	Slider getZoomSlider() {
 		if (zoomSlider == null) {
-			zoomSlider = new Slider(0.25, 3.0, 1.0);
+			zoomSlider = new Slider(0.25, 2.0, 1.0);
 			zoomSlider.setOrientation(Orientation.VERTICAL);
             zoomSlider.setShowTickLabels(true);
             zoomSlider.setMinWidth(30);
