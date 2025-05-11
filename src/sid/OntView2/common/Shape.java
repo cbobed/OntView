@@ -543,6 +543,8 @@ public abstract class Shape {
         for (VisConnector outConnector : currentNode.outConnectors) {
             Shape childNode = outConnector.to;
 
+            if (childNode.asVisClass().isBottom) continue;
+
             if (childNode.isVisible()) {
                 hasVisibleDescendants.set(true);
             } else {
@@ -588,8 +590,6 @@ public abstract class Shape {
         for (VisConnector connector : inConnectors) {
             Shape parent = connector.from;
             if (parent != null) {
-                if (visited.contains(parent)) return;
-
                 Set<Shape> relevantDescendants = new HashSet<>(visibleDescendantsSet);
                 relevantDescendants.retainAll(parent.asVisClass().orderedDescendants);
                 parent.hiddenDescendantsSet.addAll(relevantDescendants);
