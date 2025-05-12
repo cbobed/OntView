@@ -60,7 +60,7 @@ public abstract class KConceptExtractor {
             isNonKeyConcept = false;
         } else {
             if (s instanceof VisClass) {
-                if ((s.asVisClass().isAnonymous()) && (isKeyConceptDefinition(s, keyConcepts))) {
+                if ((s.asVisClass().isAnonymous()) && (isKeyConceptEquivalent(s, keyConcepts))) {
                     isNonKeyConcept = false;
                 }
             }
@@ -73,7 +73,7 @@ public abstract class KConceptExtractor {
      * in keyConcepts
      * @return boolean
      */
-    protected boolean isKeyConceptDefinition(Shape s, Set<String> keyConcepts) {
+    protected boolean isKeyConceptEquivalent(Shape s, Set<String> keyConcepts) {
     	
     	Set<String> auxDefinitions = new HashSet<>();  
     	s.asVisClass().getEquivalentClasses().forEach(x -> {auxDefinitions.add(Shape.getKey(x));}); 

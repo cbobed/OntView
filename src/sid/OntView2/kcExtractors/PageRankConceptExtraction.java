@@ -23,9 +23,9 @@ public class PageRankConceptExtraction extends KConceptExtractor {
         // Implementation with JGraphT => clearer and cleaner
         DefaultDirectedGraph<String, DefaultEdge> pageRankGraph = new DefaultDirectedGraph<>(DefaultEdge.class);
 
-        for (Entry<String, Shape> entry : shapeMap.entrySet()){
-            VisClass node = entry.getValue().asVisClass();
-            String nodeStr = Shape.getKey(node.getLinkedClassExpression());
+        for (Shape value: shapeMap.values()) {
+        	VisClass node = value.asVisClass();
+        	String nodeStr = Shape.getKey(node.getLinkedClassExpression());
             pageRankGraph.addVertex(nodeStr);
             for (Shape ch: node.getChildren()) {
                 String childNodeStr = Shape.getKey(ch.getLinkedClassExpression());
