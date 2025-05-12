@@ -46,7 +46,7 @@ public class PaintFrame extends Canvas {
     public Stage loadingStage = null;
 	public ScrollPane scroll;
 	static final int BORDER_PANEL = 60;
-	static final int MIN_SPACE = 20;
+	static final int MIN_SPACE = 30;
 	static final int MIN_INITIAL_SPACE = 40;
 	private static final int DOWN = 0;
 	private static final int UP = -1;
@@ -852,7 +852,6 @@ public class PaintFrame extends Canvas {
 			return false;
 		}
 		if (shape != null) {
-            System.out.println("clicked on shape --- " + shape.getLabel() + " top = " + shape.getTopCorner() + " bottom = " + shape.getBottomCorner());
 			if (e.getClickCount() == 2 && !e.isConsumed() && e.getButton() == MouseButton.PRIMARY) {
 				// double click
 				e.consume();
@@ -1230,7 +1229,8 @@ public class PaintFrame extends Canvas {
 			getVisGraph().showAll();
 		}
 		else {
-            KConceptExtractor extractor = KConceptExtractorFactory.getInstance(getKceOption(), getSelectedConcepts());
+            CustomKCEModal modal = new CustomKCEModal(getVisGraph().shapeMap, new ArrayList<>());
+            KConceptExtractor extractor = KConceptExtractorFactory.getInstance(getKceOption(), modal.getSelectedConcepts());
 
             switch (getKceOption()) {
                 case VisConstants.KCECOMBOOPTION1,
@@ -1247,9 +1247,9 @@ public class PaintFrame extends Canvas {
                 }
                 case VisConstants.CUSTOMCOMBOOPTION3 -> { // "Custom"
                     getVisGraph().showAll();
-                    showConceptSelectionPopup(getVisGraph().shapeMap);
-                    if (getSelectedConcepts().isEmpty()) return;
-                    extractor.hideNonKeyConcepts(activeOntology, this.getVisGraph(), getSelectedConcepts().size());
+                    modal.showConceptSelectionPopup();
+                    if (modal.getSelectedConcepts().isEmpty()) return;
+                    extractor.hideNonKeyConcepts(activeOntology, this.getVisGraph(), modal.getSelectedConcepts().size());
 
                 }
             }
@@ -1344,127 +1344,6 @@ public class PaintFrame extends Canvas {
 		} else {
 			gc.clearRect(0, 0, getWidth(), getHeight());
 		}
-	}
-
-	private final Set<Shape> selectedConcepts = new HashSet<>();
-
-	public Set<Shape> getSelectedConcepts() {
-		return selectedConcepts;
-	}
-
-	public void showConceptSelectionPopup(Map<String, Shape> shapeMap) {
-		Stage popupStage = new Stage();
-		popupStage.initModality(Modality.APPLICATION_MODAL);
-		popupStage.setTitle("Select Key Concepts");
-
-		ObservableList<Shape> allConcepts = FXCollections.observableArrayList(shapeMap.values());
-		ObservableList<Shape> selectedConceptsList = FXCollections.observableArrayList(selectedConcepts);
-
-		ListView<Shape> allConceptsView = createConceptListView(allConcepts);
-		ListView<Shape> selectedConceptsView = createConceptListView(selectedConceptsList);
-
-		setupDoubleClickActions(allConceptsView, selectedConceptsView, selectedConceptsList);
-
-		TextField searchAllField = createSearchField(allConcepts, allConceptsView);
-		TextField searchSelectedField = createSearchField(selectedConceptsList, selectedConceptsView);
-
-		Button addButton = createAddButton(allConceptsView, selectedConceptsList);
-		Button removeButton = createRemoveButton(selectedConceptsView, selectedConceptsList);
-		Button saveButton = createSaveButton(selectedConceptsList, popupStage);
-
-		HBox buttonBox = new HBox(5, addButton, removeButton);
-		buttonBox.setAlignment(Pos.CENTER);
-
-		VBox allConceptsBox = new VBox(5, searchAllField, allConceptsView);
-		VBox selectedConceptsBox = new VBox(5, searchSelectedField, selectedConceptsView);
-
-		HBox mainLayout = new HBox(10, allConceptsBox, buttonBox, selectedConceptsBox);
-		VBox root = new VBox(10, mainLayout, saveButton);
-		root.setAlignment(Pos.CENTER);
-		root.setPadding(new Insets(20));
-
-		Scene scene = new Scene(root, 600, 400);
-		ClassLoader c = Thread.currentThread().getContextClassLoader();
-		scene.getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
-		popupStage.setScene(scene);
-		popupStage.showAndWait();
-	}
-
-	private void setupDoubleClickActions(ListView<Shape> allConceptsView, ListView<Shape> selectedConceptsView,
-										 ObservableList<Shape> selectedConceptsList) {
-		allConceptsView.setOnMouseClicked(event -> {
-			if (event.getClickCount() == 2) {
-				Shape selected = allConceptsView.getSelectionModel().getSelectedItem();
-				if (selected != null && !selectedConceptsList.contains(selected)) {
-					selectedConceptsList.add(selected);
-				}
-			}
-		});
-
-		selectedConceptsView.setOnMouseClicked(event -> {
-			if (event.getClickCount() == 2) {
-				Shape selected = selectedConceptsView.getSelectionModel().getSelectedItem();
-				if (selected != null) {
-					selectedConceptsList.remove(selected);
-				}
-			}
-		});
-	}
-
-	private ListView<Shape> createConceptListView(ObservableList<Shape> concepts) {
-		ListView<Shape> listView = new ListView<>(concepts);
-		listView.setCellFactory(param -> new ListCell<>() {
-			@Override
-			protected void updateItem(Shape item, boolean empty) {
-				super.updateItem(item, empty);
-				if (empty || item == null) {
-					setText(null);
-				} else {
-					setText(item.getLabel());
-				}
-			}
-		});
-		return listView;
-	}
-
-	private TextField createSearchField(ObservableList<Shape> concepts, ListView<Shape> listView) {
-		TextField searchField = new TextField();
-		searchField.setPromptText("Search nodes");
-		searchField.textProperty().addListener((observable, oldValue, newValue) ->
-            listView.setItems(concepts.filtered(item -> item.getLabel().toLowerCase().contains(newValue.toLowerCase()))));
-		return searchField;
-	}
-
-	private Button createAddButton(ListView<Shape> allConceptsView, ObservableList<Shape> selectedConceptsList) {
-		Button addButton = new Button(OntViewConstants.RIGHT_ARROW);
-		addButton.setOnAction(e -> {
-			Shape selected = allConceptsView.getSelectionModel().getSelectedItem();
-			if (selected != null && !selectedConceptsList.contains(selected)) {
-				selectedConceptsList.add(selected);
-			}
-		});
-		return addButton;
-	}
-
-	private Button createRemoveButton(ListView<Shape> selectedConceptsView, ObservableList<Shape> selectedConceptsList) {
-		Button removeButton = new Button(OntViewConstants.LEFT_ARROW);
-		removeButton.setOnAction(e -> {
-			Shape selected = selectedConceptsView.getSelectionModel().getSelectedItem();
-			if (selected != null) {
-				selectedConceptsList.remove(selected);
-			}
-		});
-		return removeButton;
-	}
-
-	private Button createSaveButton(ObservableList<Shape> selectedConceptsList, Stage popupStage) {
-		Button saveButton = new Button("Save");
-		saveButton.setOnAction(e -> {
-			selectedConcepts.clear();
-			selectedConcepts.addAll(selectedConceptsList);
-			popupStage.close();
-		});
-		return saveButton;
 	}
 
 	public Stage showLoadingStage(Task<?> task) {

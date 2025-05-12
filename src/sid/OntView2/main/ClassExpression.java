@@ -179,7 +179,6 @@ public class ClassExpression extends Stage {
         filterAndResetCheckboxes(!isParentPanel, filterText == null ? "" : filterText);
     }
 
-
     /** Handles the selection of a checkbox in the parent panel. */
     private void handleParentCheckBoxSelection(CheckBox cb, ObservableList<CheckBox> ignore) {
         handleCheckBoxSelection(cb, true);
@@ -189,8 +188,6 @@ public class ClassExpression extends Stage {
     private void handleChildCheckBoxSelection(CheckBox cb, ObservableList<CheckBox> ignore) {
         handleCheckBoxSelection(cb, false);
     }
-
-
 
     /**
      * Returns the set of Shape objects to be used as the base list based on the current selection state.
