@@ -12,7 +12,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class CustomKCEModal {
     private final Map<String, Shape> shapeMap;
