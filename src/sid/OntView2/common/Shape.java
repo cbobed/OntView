@@ -1,9 +1,13 @@
 
 package sid.OntView2.common;
 
+import javafx.animation.PauseTransition;
 import javafx.geometry.Point2D;
+import javafx.scene.Cursor;
+import javafx.scene.ImageCursor;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
+import javafx.util.Duration;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import sid.OntView2.selectionStrategy.*;
@@ -153,7 +157,6 @@ public abstract class Shape {
 
     private final Set<Shape> hiddenDescendantsSet = new HashSet<>();
     private final Set<Shape> visibleDescendantsSet = new HashSet<>();
-    private final Set<Shape> hiddenParentsSet = new HashSet<>();
 
     /**************************************************************/
     public Shape() {
@@ -216,6 +219,7 @@ public abstract class Shape {
         }
         hiddenDescendantsSet.addAll(hiddenDescendants);
         checkAndUpdateChildrenVisibilityStates();
+        checkAndUpdateParentVisibilityStates();
 
     }
 
@@ -229,13 +233,10 @@ public abstract class Shape {
 
             if (parent.getLabel().matches("Thing")) {
                 parent.checkAndUpdateChildrenVisibilityStates();
-                //parent.updateHiddenDescendants();
                 break;
             }
 
             if (parent.hasOtherVisibleChildren(this)) {
-                connector.hide();
-                parent.setState(PARTIALLY_CLOSED);
                 continue;
             }
             connector.hide();
@@ -244,12 +245,19 @@ public abstract class Shape {
                 parent.checkAndHideParents(closedShape, countedParents);
             }
         }
-        for (Shape s : countedParents) {
-            System.out.println("----- " + s.getLabel());
+        if (countedParents.isEmpty()) {
+            Cursor prohibitedCursor = new ImageCursor(graph.paintframe.prohibitedImage);
+            graph.paintframe.setCursor(prohibitedCursor);
+            PauseTransition pause = new PauseTransition(Duration.seconds(2));
+            pause.setOnFinished(e -> graph.paintframe.setCursor(Cursor.DEFAULT));
+            pause.play();
         }
+
         for (Shape s: countedParents) {
             s.addHiddenDescendantsToAncestors(countedParents, new HashSet<>());
         }
+        checkAndUpdateChildrenVisibilityStates();
+        checkAndUpdateParentVisibilityStates();
 
         countedParents.clear();
 
@@ -464,6 +472,8 @@ public abstract class Shape {
         for (Shape s: visibleDescendantsSet){
             s.updateParentsShowLeft(visibleDescendantsSet);
         }
+        checkAndUpdateChildrenVisibilityStates();
+        checkAndUpdateParentVisibilityStates();
     }
 
     public void setVisLevel(VisLevel v) {
@@ -498,7 +508,7 @@ public abstract class Shape {
         boolean allParentsVisible = true;
 
         for (VisConnector connector : inConnectors) {
-            if (connector.from.isVisible()) {
+            if (connector.isVisible()) {
                 allParentsHidden = false;
             } else {
                 allParentsVisible = false;
@@ -598,6 +608,7 @@ public abstract class Shape {
                 relevantDescendants.retainAll(parent.asVisClass().orderedDescendants);
                 parent.hiddenDescendantsSet.addAll(relevantDescendants);
                 parent.checkAndUpdateChildrenVisibilityStates();
+                parent.checkAndUpdateParentVisibilityStates();
                 parent.addHiddenDescendantsToAncestors(visibleDescendantsSet, visited);
             }
         }
@@ -639,90 +650,6 @@ public abstract class Shape {
     }
 
     /**
-     * Updates the hidden descendants count for the first visible parent of nodes in hiddenDescendantsSet.
-     */
-    public void updateHiddenDescendantsForParents() {
-        Set<Shape> descendantsToProcess = new HashSet<>(hiddenDescendantsSet);
-        Set<Shape> visitedNodes = new HashSet<>();
-
-        updateAncestorsForHiddenDescendants(this, visitedNodes, hiddenDescendantsSet);
-
-        visitedNodes.clear();
-        for (Shape child : descendantsToProcess) {
-            updateSameLevelParentsDescendants(child, visitedNodes, descendantsToProcess);
-        }
-    }
-
-    /**
-     * Updates the hidden descendants count for its ancestors.
-     */
-    private void updateAncestorsForHiddenDescendants(Shape currentNode, Set<Shape> visitedNodes, Set<Shape> hiddenChildrenSet) {
-        if (visitedNodes.contains(currentNode)) return;
-
-        visitedNodes.add(currentNode);
-        for (VisConnector inConnector : currentNode.inConnectors) {
-            Shape parent = inConnector.from;
-            if (visitedNodes.contains(parent)) continue;
-
-            parent.hiddenDescendantsSet.addAll(hiddenChildrenSet);
-            updateAncestorsForHiddenDescendants(parent, visitedNodes, hiddenChildrenSet);
-        }
-    }
-
-    /**
-     * Updates the descendants count for the first visible parent of node.
-     */
-    private void updateSameLevelParentsDescendants(Shape currentNode, Set<Shape> visitedNodes, Set<Shape> visibleDescendantsSet) {
-        if (visitedNodes.contains(currentNode)) return;
-        visitedNodes.add(currentNode);
-
-        for (VisConnector inConnector : currentNode.inConnectors) {
-            Shape parent = inConnector.from;
-
-            if (visitedNodes.contains(parent)) continue;
-
-            if (parent.isVisible()) {
-                parent.hiddenDescendantsSet.clear();
-                for (VisConnector outConnector : parent.outConnectors) {
-                    Shape childNode = outConnector.to;
-                    addHiddenDescendants(childNode, parent.hiddenDescendantsSet);
-                }
-                parent.updateAncestorsForVisibleChildren(parent, new HashSet<>(), visibleDescendantsSet);
-            } else {
-                updateSameLevelParentsDescendants(parent, visitedNodes, visibleDescendantsSet);
-            }
-        }
-    }
-
-    /**
-     * Adds all hidden descendants of a node to the provided set.
-     */
-    private void addHiddenDescendants(Shape s, Set<Shape> countedChildren) {
-        if (!s.isVisible()) {
-            countedChildren.add(s);
-        }
-        for (VisConnector outConnector : s.outConnectors) {
-            addHiddenDescendants(outConnector.to, countedChildren);
-        }
-    }
-
-    /**
-     * Updates the hidden descendants count for its ancestors.
-     */
-    private void updateAncestorsForVisibleChildren(Shape currentNode, Set<Shape> visitedNodes, Set<Shape> visibleDescendantsSet) {
-        if (visitedNodes.contains(currentNode)) return;
-
-        visitedNodes.add(currentNode);
-        for (VisConnector inConnector : currentNode.inConnectors) {
-            Shape parent = inConnector.from;
-            if (visitedNodes.contains(parent)) continue;
-
-            parent.hiddenDescendantsSet.removeAll(visibleDescendantsSet);
-            updateAncestorsForVisibleChildren(parent, visitedNodes, visibleDescendantsSet);
-        }
-    }
-
-    /**
      * Updates the parents hidden descendants count by removing the hidden the visible nodes in hiddenDescendantsSet.
      */
     public void updateParentsShowLeft(Set<Shape> visibleDescendantsSet) {
@@ -736,8 +663,8 @@ public abstract class Shape {
         visitedNodes.add(currentNode);
         for (VisConnector inConnector : currentNode.inConnectors) {
             Shape parent = inConnector.from;
-            if (visitedNodes.contains(parent)) continue;
-
+            parent.checkAndUpdateChildrenVisibilityStates();
+            parent.checkAndUpdateParentVisibilityStates();
             parent.hiddenDescendantsSet.removeAll(visibleDescendantsSet);
             updateAncestorsForHiddenDescendantsShowLeft(parent, visitedNodes, visibleDescendantsSet);
         }

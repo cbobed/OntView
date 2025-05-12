@@ -15,6 +15,7 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
@@ -128,6 +129,7 @@ public class PaintFrame extends Canvas {
     public void setSliderStage(Stage stage) { sliderStage = stage; }
     public Shape selectedShape = null;
     public Shape focusOnShape = null;
+    public Image prohibitedImage;
 
 	public PaintFrame(double width, double height) {
 		super();
