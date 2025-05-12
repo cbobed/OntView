@@ -346,8 +346,9 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 			ObservableList<String> items = FXCollections.observableArrayList();
 			comboBox.setItems(items);
+            comboBox.setVisibleRowCount(5);
 			HBox.setHgrow(comboBox, Priority.ALWAYS);
-            comboBox.setOnAction(event -> comboBox0ItemItemStateChanged(comboBox.getEditor().getText()));
+            comboBox.setOnAction(event -> comboBox0ItemItemStateChanged(comboBox.getSelectionModel().getSelectedItem()));
 
 			TextField editor = comboBox.getEditor();
 			editor.addEventHandler(KeyEvent.KEY_RELEASED, event -> handleAutoComplete(editor.getText(), items));
@@ -908,6 +909,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
         parent.artPanel.clearCanvas();
         parent.artPanel.languagesLabels.clear();
         parent.artPanel.selectedShape = null;
+        getComboSearchBox().setValue("");
     }
 
 	void loadReasonerButtonActionTask(ActionEvent event) {
@@ -1044,6 +1046,10 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		for (Entry<String, Shape> s : parent.artPanel.getVisGraph().shapeMap.entrySet()) {
             labelSet.add(s.getValue().getLabel());
 		}
+
+        for (String label : labelSet) {
+            System.out.println("----Label: " + label);
+        }
 
         List<String> sortedLabels = new ArrayList<>(labelSet);
         Collections.sort(sortedLabels);
