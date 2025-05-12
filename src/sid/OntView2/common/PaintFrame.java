@@ -1250,10 +1250,6 @@ public class PaintFrame extends Canvas {
                     getVisGraph().showAll();
                     modal.showConceptSelectionPopup();
                     if (modal.getSelectedConcepts().isEmpty()) return;
-                    for (Shape s: modal.getSelectedConcepts()) {
-                        System.out.println("- Selected shape: " + Shape.getKey(s.getLinkedClassExpression()));
-                        System.out.println("+ Selected label: " + s.getLabel());
-                    }
                     extractor.hideNonKeyConcepts(activeOntology, this.getVisGraph(), modal.getSelectedConcepts().size());
 
                 }
