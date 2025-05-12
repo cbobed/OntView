@@ -173,7 +173,7 @@ public abstract class Shape {
 
     public void closeLeft() {
         setLeftState(LEFTCLOSED);
-        hideParents(this, hiddenParentsSet);
+        hideParents(this, new HashSet<>());
     }
 
     public void resetHiddenChildrenCount() {
@@ -226,7 +226,6 @@ public abstract class Shape {
         Shape parent;
         for (VisConnector connector : inConnectors) {
             parent = connector.from;
-            countedParents.clear();
 
             if (parent.getLabel().matches("Thing")) {
                 parent.checkAndUpdateChildrenVisibilityStates();
@@ -237,8 +236,6 @@ public abstract class Shape {
             if (parent.hasOtherVisibleChildren(this)) {
                 connector.hide();
                 parent.setState(PARTIALLY_CLOSED);
-                parent.updateHiddenDescendants(); // update hidden descendants for the parent
-                parent.updateHiddenDescendantsForParents(); // update hidden descendants for the parent's parents
                 continue;
             }
             connector.hide();
@@ -247,6 +244,13 @@ public abstract class Shape {
                 parent.checkAndHideParents(closedShape, countedParents);
             }
         }
+        for (Shape s : countedParents) {
+            System.out.println("----- " + s.getLabel());
+        }
+        for (Shape s: countedParents) {
+            s.addHiddenDescendantsToAncestors(countedParents, new HashSet<>());
+        }
+
         countedParents.clear();
 
     }
