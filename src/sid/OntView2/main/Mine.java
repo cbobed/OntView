@@ -80,7 +80,7 @@ public class Mine extends Application implements Embedable{
 
     public static void createAndShowGUI(Stage primaryStage) {
 		primaryStage.setTitle("OntView");
-		primaryStage.setMinWidth(1400);
+		primaryStage.setMinWidth(1700);
 		primaryStage.setOnCloseRequest(event -> System.exit(0));
 		ClassLoader c = Thread.currentThread().getContextClassLoader(); 
 		primaryStage.getIcons().add(new Image(Objects.requireNonNull(c.getResource("icon.png")).toExternalForm()));
@@ -159,7 +159,7 @@ public class Mine extends Application implements Embedable{
         viewer.artPanel.setStyle("-fx-background-color: white;");
 		viewer.nTopPanel.setStyle("-fx-border-color: black; -fx-border-width: 1;");
 
-		Scene scene = new Scene(root, 1500, 600);
+		Scene scene = new Scene(root, 1700, 600);
 		scene.getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
 		viewer.primaryStage.setScene(scene);
 		viewer.primaryStage.setMaximized(true);
