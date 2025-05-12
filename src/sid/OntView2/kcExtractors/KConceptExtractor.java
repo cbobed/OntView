@@ -26,16 +26,28 @@ public abstract class KConceptExtractor {
         conceptSet.add(VisConstants.THING_ENTITY);
         conceptSet.add(VisConstants.NOTHING_ENTITY);
 
-        for (Map.Entry<String, Shape> entry : shapeMap.entrySet()) {
-            Shape shape = entry.getValue();
-            if (isNonKeyConcept(entry.getKey(), conceptSet, shapeMap)) {
-                shape.hide();
+//        for (Map.Entry<String, Shape> entry : shapeMap.entrySet()) {
+//            Shape shape = entry.getValue();
+//            if (isNonKeyConcept(entry.getKey(), conceptSet, shapeMap)) {
+//                shape.hide();
+//            } else {
+//                if (!shape.asVisClass().isBottom) {
+//                    nonHiddenShape.add(shape);
+//                }
+//            }
+//        }
+        
+        for (Shape value: shapeMap.values()) {
+           
+            if (isNonKeyConcept(Shape.getKey(value.getLinkedClassExpression()), conceptSet, shapeMap)) {
+                value.hide();
             } else {
-                if (!shape.asVisClass().isBottom) {
-                    nonHiddenShape.add(shape);
+                if (!value.asVisClass().isBottom) {
+                    nonHiddenShape.add(value);
                 }
             }
         }
+        
         for (Shape s: nonHiddenShape){
             s.updateHiddenDescendants();
         }
