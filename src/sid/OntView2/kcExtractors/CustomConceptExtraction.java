@@ -3,10 +3,8 @@ package sid.OntView2.kcExtractors;
 import org.semanticweb.owlapi.model.OWLOntology;
 import sid.OntView2.common.Shape;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class CustomConceptExtraction extends KConceptExtractor {
     private final Set<Shape> selectedConcepts;
@@ -22,18 +20,22 @@ public class CustomConceptExtraction extends KConceptExtractor {
     public Set<String> retrieveKeyConcepts(OWLOntology activeOntology, Map<String, Shape> shapeMap, int limitResultSize) {
         Set<String> keyConcepts = new HashSet<>();
 
-        Map<Shape, String> shapeToKeyMap = new HashMap<>();
-        for (Map.Entry<String, Shape> entry : shapeMap.entrySet()) {
-            shapeToKeyMap.put(entry.getValue(), entry.getKey());
-        }
+        Map<Shape, List<String>> shapeToKeyMap = shapeMap.entrySet().stream()
+            .collect(Collectors.groupingBy(
+                Map.Entry::getValue,
+                Collectors.mapping(
+                    Map.Entry::getKey,
+                    Collectors.toList()
+                )
+            ));
 
         for (Shape shape : selectedConcepts) {
-            String key = shapeToKeyMap.get(shape);
+            List<String> key = shapeToKeyMap.get(shape);
             if (key != null) {
-                keyConcepts.add(key);
+                keyConcepts.addAll(key);
             }
         }
-
+        
         return keyConcepts;
 
     }
