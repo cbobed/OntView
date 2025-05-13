@@ -6,8 +6,6 @@ import java.util.concurrent.CountDownLatch;
 
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.geometry.*;
 import javafx.scene.Node;
@@ -39,7 +37,6 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import sid.OntView2.main.TopPanel;
 import sid.OntView2.kcExtractors.KConceptExtractor;
 import sid.OntView2.kcExtractors.KConceptExtractorFactory;
-import uk.ac.manchester.cs.owl.owlapi.OWLClassAxiomImpl;
 
 public class PaintFrame extends Canvas {
 	private static final long serialVersionUID = 1L;
@@ -757,13 +754,15 @@ public class PaintFrame extends Canvas {
 
         for (VisLevel level : visGraph.getLevelSet().values()) {
             for (Shape shape : level.levelShapes) {
-                double shapeMaxY = shape.getBottomCorner();
-                double shapeMinY = shape.getTopCorner();
-                double shapeMaxX = shape.getRightCorner();
+                if (shape.isVisible()) {
+                    double shapeMaxY = shape.getBottomCorner();
+                    double shapeMinY = shape.getTopCorner();
+                    double shapeMaxX = shape.getRightCorner();
 
-                maxY = Math.max(maxY, shapeMaxY);
-                minY = Math.min(minY, shapeMinY);
-                maxX = Math.max(maxX, shapeMaxX);
+                    maxY = Math.max(maxY, shapeMaxY);
+                    minY = Math.min(minY, shapeMinY);
+                    maxX = Math.max(maxX, shapeMaxX);
+                }
             }
         }
 
@@ -1256,6 +1255,7 @@ public class PaintFrame extends Canvas {
             }
         }
         compactGraph();
+        Platform.runLater(canvasAdjusterRunnable);
         if (menuVisShapeContext != null) {
             menuVisShapeContext.updateSliderView();
         }

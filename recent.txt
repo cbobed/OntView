@@ -1,6 +1,8 @@
 https://protege.stanford.edu/ontologies/koala.owl
-https://protege.stanford.edu/ontologies/pizza/pizza.owl
 file:/home/carlota/Desktop/OntView/onts/dbpedia_3.8.owl
+file:/home/carlota/Downloads/personasonto.owl
+file:/home/carlota/Downloads/ontologias/personasonto.owl
+https://protege.stanford.edu/ontologies/pizza/pizza.owl
 file:/home/carlota/Desktop/pizza.owl
 http://purl.obolibrary.org/obo/envo.owl
 file:/home/carlota/Desktop/OntView/onts/ontosem.owl
@@ -11,5 +13,3 @@ file:/home/carlota/Desktop/OntView/onts/core-plus-office.owl
 file:/home/carlota/Desktop/visualizadores/ontologias/AfricanWildlifeOntology1.owl
 file:/home/carlota/Desktop/ontologias/stuff.owl
 file:/home/carlota/Desktop/OntView/onts/concept.owl
-file:/home/carlota/Downloads/library_ontology.owl
-file:/home/carlota/Downloads/ontology_subniveles.owl
