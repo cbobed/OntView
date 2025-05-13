@@ -56,7 +56,7 @@ public class ClassExpression extends Stage {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        submitHelp.getChildren().addAll(getHelpButtonCE(), spacer, submitCE());
+        submitHelp.getChildren().addAll(spacer, submitCE());
         submitHelp.setStyle("-fx-alignment: center-left;");
 
         classExpressionBox.getChildren().addAll(bottomSection, submitHelp);
