@@ -73,6 +73,7 @@ public class PaintFrame extends Canvas {
     private int percentageShown = 0;
     private String strategyOptionStep = VisConstants.STEPSTRATEGY_RDFRANK;
     private String strategyOptionGlobal = VisConstants.GLOBALSTRATEGY_RDFRANK;
+    public String selectedLanguage = "";
     public String getStrategyOptionStep() { return strategyOptionStep; }
     public void setStrategyOptionStep(String strategyOptionStep) { this.strategyOptionStep = strategyOptionStep; }
     public String getStrategyOptionGlobal() { return strategyOptionGlobal; }

@@ -151,7 +151,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		if (parent.artPanel != null) {
 			parent.artPanel.qualifiedNames = getQualifiedNames().isSelected();
 			parent.artPanel.getVisGraph().changeRenderMethod(parent.artPanel.renderLabel, parent.artPanel.qualifiedNames,
-                    "");
+                parent.artPanel.selectedLanguage);
 			Platform.runLater(parent.artPanel.getRedrawRunnable());
 		}
 	}
@@ -1187,6 +1187,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
     /** Label language */
     private void selectLanguageActionPerformed(ActionEvent event) {
         if (!getRenderLabel().isSelected()) {
+            parent.artPanel.selectedLanguage = "";
             renderLabelActionActionPerformed(event,"");
         } else {
 
@@ -1238,9 +1239,9 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
         submitButton.setOnAction(e -> {
             RadioButton selected = (RadioButton) languageGroup.getSelectedToggle();
-            String selectedLanguage = selected.getText();
+            parent.artPanel.selectedLanguage = selected.getText();
             getRenderLabel().setSelected(true);
-            renderLabelActionActionPerformed(e, selectedLanguage);
+            renderLabelActionActionPerformed(e,  parent.artPanel.selectedLanguage);
             stage.close();
         });
 
