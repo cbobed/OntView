@@ -335,7 +335,8 @@ public class PaintFrame extends Canvas {
 				// draw levels
 				g.setStroke(Color.LIGHTGRAY);
                 for (VisLevel lvl : visGraph.levelSet.values()) {
-                    g.strokeLine(lvl.getXpos(), 0, lvl.getXpos(), canvasHeight);
+                    double neededHeight = Math.max(getHeight(), canvasHeight);
+                    g.strokeLine(lvl.getXpos(), 0, lvl.getXpos(), neededHeight);
 					// Uncomment this to get a vertical line in every level
 					g.setStroke(Color.LIGHTGRAY);
 				}
