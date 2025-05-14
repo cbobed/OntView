@@ -5,7 +5,7 @@ Tool for the visualization and analysis of complex ontology structures.
 ![java](https://img.shields.io/badge/java–17-blue)
 ![maven](https://img.shields.io/badge/maven–3.9.6-blue)
 
-We are currently studying the licenses of the APIs used to define the most appropriate one, but we are aiming at Apache 2.0 License, MIT, or GPL 3.0. 
+We are currently studying the licenses of the APIs used to define the most appropriate one, but we are aiming at Apache 2.0, MIT, or GPL 3.0 License. 
 
 ---
 
