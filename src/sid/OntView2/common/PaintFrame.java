@@ -1256,7 +1256,6 @@ public class PaintFrame extends Canvas {
             }
         }
         compactGraph();
-        Platform.runLater(canvasAdjusterRunnable);
         if (menuVisShapeContext != null) {
             menuVisShapeContext.updateSliderView();
         }
@@ -1300,6 +1299,7 @@ public class PaintFrame extends Canvas {
 		VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
 		setStateChanged(true);
 		Platform.runLater(relaxerRunnable);
+        Platform.runLater(canvasAdjusterRunnable);
 	}
 
 	/**
