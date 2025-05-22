@@ -1,7 +1,9 @@
 package sid.OntView2.main;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -43,6 +45,7 @@ import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
 
 import sid.OntView2.common.*;
 import sid.OntView2.expressionNaming.SIDClassExpressionNamer;
+import sid.OntView2.utils.ErrorHandler;
 import sid.OntView2.utils.ExpressionManager;
 import sid.OntView2.utils.ImageMerger;
 
@@ -246,14 +249,15 @@ public class Mine extends Application implements Embedable{
 		task.setOnFailed(e -> {
 			task.getException().printStackTrace();
 			loadingStage.close();
-            artPanel.showAlertDialog("Error", "Ontology could not be loaded.", task.getException().getMessage(),
-					Alert.AlertType.ERROR);
+            artPanel.showAlertDialog("Error", "Ontology could not be loaded.",
+                ErrorHandler.getOntologyLoadError(task.getException()), Alert.AlertType.ERROR);
 		});
 
 		new Thread(task).start();
 	}
 
-	protected void loadActiveOntology(IRI source) {
+
+    protected void loadActiveOntology(IRI source) {
 		manager = OWLManager.createOWLOntologyManager();
 		artPanel.setCursor(Cursor.WAIT);
 		try {
@@ -324,7 +328,7 @@ public class Mine extends Application implements Embedable{
 			} catch (Exception e) {
 				e.printStackTrace();
 				Platform.runLater(() -> artPanel.showAlertDialog("Error", "Failed to load reasoner.",
-						e.getMessage(), AlertType.ERROR));
+                    ErrorHandler.getReasonerError(e), AlertType.ERROR));
 				return false;
 			}
 		} else {
