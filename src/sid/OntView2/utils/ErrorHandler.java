@@ -1,5 +1,9 @@
 package sid.OntView2.utils;
 
+import com.ctc.wstx.exc.WstxParsingException;
+import org.apache.axiom.om.OMException;
+import org.semanticweb.HermiT.datatypes.MalformedLiteralException;
+import org.semanticweb.HermiT.datatypes.UnsupportedDatatypeException;
 import org.semanticweb.owlapi.io.OWLOntologyCreationIOException;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.UnloadableImportException;
@@ -44,8 +48,20 @@ public class ErrorHandler {
     public static String getReasonerError(Throwable ex) {
         Throwable cause = unwrapCause(ex);
 
+        if (cause instanceof UnsupportedDatatypeException) {
+            return "The ontology uses a datatype that the reasoner cannot handle.";
+        }
+        if (cause instanceof MalformedLiteralException) {
+            return "Error: Malformed literal in the ontology (MalformedLiteralException).";
+        }
+        if (cause instanceof OMException) {
+            return "Error: Malformed XML structure.";
+        }
+        if (cause instanceof WstxParsingException) {
+            return "Error: XML parsing issue due to undeclared namespace or invalid syntax.";
+        }
         if (cause instanceof ClassNotFoundException || cause instanceof NoClassDefFoundError) {
-            return "Error: Required reasoner libraries are missing (check your classpath).";
+            return "Error: Required reasoner libraries are missing.";
         }
         if (cause instanceof LinkageError) {
             return "Error: OWL-API version is incompatible with the reasoner.";
@@ -77,7 +93,7 @@ public class ErrorHandler {
     private static String truncateMessage(Throwable cause) {
         String msg = cause.getMessage();
         if (msg != null && msg.length() > 100) {
-            msg = msg.substring(0, 100) + "…";
+            msg = msg.substring(0, 100) + " …";
         }
         return "Error: " + (msg != null ? msg + "." : "unknown.");
     }

@@ -655,9 +655,7 @@ public class VisGraph implements Runnable{
 			Set<OWLClassExpression> previousCELevel, 
 			Set<OWLClassExpression> currentCELevel){
 		
-		HashSet<OWLClassExpression> nextLevel = new HashSet<>(); 
-		System.out.println("previousCELevel: "+((previousCELevel != null)?previousCELevel.size():"null")); 
-		System.out.println("currentCELevel: "+currentCELevel.size()); 
+		HashSet<OWLClassExpression> nextLevel = new HashSet<>();
 		for (OWLClassExpression ce: currentCELevel) {
 			// all the Shapes in currentCELevel :: AlreadyCreated 
 			// this implies that TOP must be created outside
