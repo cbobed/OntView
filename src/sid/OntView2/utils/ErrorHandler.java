@@ -8,9 +8,14 @@ import org.semanticweb.owlapi.io.OWLOntologyCreationIOException;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.UnloadableImportException;
 
+import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.ConnectException;
 import java.net.UnknownHostException;
+import java.util.concurrent.CancellationException;
 
 public class ErrorHandler {
 
@@ -52,7 +57,7 @@ public class ErrorHandler {
             return "The ontology uses a datatype that the reasoner cannot handle.";
         }
         if (cause instanceof MalformedLiteralException) {
-            return "Error: Malformed literal in the ontology (MalformedLiteralException).";
+            return "Error: Malformed literal in the ontology.";
         }
         if (cause instanceof OMException) {
             return "Error: Malformed XML structure.";
@@ -71,6 +76,46 @@ public class ErrorHandler {
         }
         if (cause instanceof ConnectException) {
             return "Error: Could not connect to the reasoner server.";
+        }
+
+        return truncateMessage(cause);
+    }
+
+    /**
+     * Returns a user-friendly message for errors occurring during load and reasoning tasks.
+     */
+    public static String getLoadAndReasonError(Throwable ex) {
+        Throwable cause = unwrapCause(ex);
+
+        if (cause instanceof CancellationException) {
+            return "Error: Operation cancelled by user.";
+        }
+        if (cause instanceof InterruptedException) {
+            return "Error: Operation was interrupted.";
+        }
+        return getReasonerError(ex);
+    }
+
+    /**
+     * Returns a user-friendly message for errors occurring during graph state XML saving.
+     */
+    public static String getGraphSaveError(Throwable ex) {
+        Throwable cause = unwrapCause(ex);
+
+        if (cause instanceof IOException) {
+            return "Error: I/O error while saving graph state to XML (disk or file issue).";
+        }
+        if (cause instanceof ParserConfigurationException || cause instanceof TransformerException) {
+            return "Error: XML processing error (configuration or transformation issue).";
+        }
+        if (cause instanceof JAXBException) {
+            return "Error: XML marshalling/unmarshalling failure.";
+        }
+        if (cause instanceof SecurityException) {
+            return "Error: Insufficient permissions to write the XML file.";
+        }
+        if (cause instanceof InterruptedException) {
+            return "Error: Operation was interrupted while saving the graph state.";
         }
 
         return truncateMessage(cause);

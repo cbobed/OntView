@@ -458,8 +458,8 @@ public class Mine extends Application implements Embedable{
             Path path = Paths.get("src/canvasImages/");
             ImageMerger.deleteDirectory(path.toFile());
             loadingStage.close();
-            artPanel.showAlertDialog("Error", "Unable to save the ontology view.", task.getException().getMessage(),
-                AlertType.ERROR);
+            artPanel.showAlertDialog("Error", "Unable to save the ontology view.",
+                ErrorHandler.getGraphSaveError(task.getException()), AlertType.ERROR);
         });
         new Thread(task).start();
 	}
@@ -561,8 +561,8 @@ public class Mine extends Application implements Embedable{
 		task.setOnFailed(e -> {
 			task.getException().printStackTrace();
 			loadingStage.close();
-			artPanel.showAlertDialog("Error", "Unable to save the ontology view.", task.getException().getMessage(),
-					AlertType.ERROR);
+			artPanel.showAlertDialog("Error", "Unable to save the ontology view.",
+                ErrorHandler.getGraphSaveError(task.getException()), AlertType.ERROR);
 		});
 		new Thread(task).start();
 	}

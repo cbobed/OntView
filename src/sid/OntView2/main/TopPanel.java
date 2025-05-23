@@ -25,6 +25,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.semanticweb.owlapi.model.IRI;
 import sid.OntView2.common.*;
+import sid.OntView2.utils.ErrorHandler;
 
 import java.io.*;
 import java.util.*;
@@ -935,8 +936,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		task.setOnSucceeded(e -> parent.artPanel.loadingStage.close());
 		task.setOnFailed(e -> {
 			task.getException().printStackTrace();
-			parent.artPanel.showAlertDialog("Error", "Reasoner could not be loaded.",  "Try another reasoner.",
-					Alert.AlertType.ERROR);
+			parent.artPanel.showAlertDialog("Error", "Reasoner could not be loaded.",
+                ErrorHandler.getLoadAndReasonError(task.getException()), Alert.AlertType.ERROR);
             parent.artPanel.loadingStage.close();
 		});
 
@@ -983,8 +984,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 			} catch (Exception e) {
 				e.printStackTrace();
-				parent.artPanel.showAlertDialog("Error", "Reasoner could not be loaded.", e.getMessage(),
-						Alert.AlertType.ERROR);
+				parent.artPanel.showAlertDialog("Error", "Reasoner could not be loaded.",
+                    ErrorHandler.getLoadAndReasonError(e), Alert.AlertType.ERROR);
 				throw new RuntimeException(e);
 			}
 		}
