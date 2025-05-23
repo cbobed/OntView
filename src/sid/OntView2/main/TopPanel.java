@@ -1059,7 +1059,6 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 	private void propertiesActionActionPerformed(ActionEvent event) {
 		Set<Entry<String, Shape>> classesInGraph = parent.artPanel.getVisGraph().getClassesInGraph();
-		AtomicBoolean isGraphTooLarge = new AtomicBoolean(false);
 
 		Task<Void> task = new Task<>() {
 			@Override
@@ -1092,13 +1091,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		task.setOnFailed(e -> {
 			loadingStage.close();
 			getPropertiesCheckBox().setSelected(false);
-			if (isGraphTooLarge.get()) {
-				parent.artPanel.showAlertDialog("Information Dialog", "Graph is too large to show properties.",
-						"We recommend displaying the node properties one at a time.", Alert.AlertType.INFORMATION);
-			} else {
-				parent.artPanel.showAlertDialog("Error", "Properties could not be loaded.", "Try again.",
-						Alert.AlertType.ERROR);
-			}
+			parent.artPanel.showAlertDialog("Error", "Properties could not be loaded.", "Try again.",
+                Alert.AlertType.ERROR);
 		});
 
 		task.setOnCancelled(e -> getPropertiesCheckBox().setSelected(false));
