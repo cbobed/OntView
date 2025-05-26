@@ -57,7 +57,7 @@ public class VisClass extends Shape {
     // associated to the class
     // we have the four variants: normal, qualified, labels and qualified labels
     ArrayList<String> visibleDefinitionLabels;
-    ArrayList<String> definitionLabels; 
+    ArrayList<String> definitionLabels;
     ArrayList<String> explicitDefinitionLabels; 
 	ArrayList<String> qualifiedDefinitionLabels;
 	ArrayList<String> explicitQualifiedDefinitionLabels;
@@ -481,22 +481,35 @@ public class VisClass extends Shape {
 				// we do not want to use labels
 				if (qualifiedRendering) {
 					if (!qualifiedLabel.isEmpty()) {
-						visibleLabel = qualifiedLabel; 
+						visibleLabel = qualifiedLabel;
 					}
+                    if (qualifiedDefinitionLabels != null) {
+                        visibleDefinitionLabels = qualifiedDefinitionLabels;
+                    }
 				}
 				else  {
 					if (!label.isEmpty()){
-						visibleLabel = label; 
+						visibleLabel = label;
+                        visibleDefinitionLabels = definitionLabels;
 					}
+                    if (definitionLabels != null) {
+                        visibleDefinitionLabels = definitionLabels;
+                    }
 				}
 			}
 		}
 		else {
 			if (qualifiedRendering) {
-				visibleLabel = qualifiedLabel; 
+				visibleLabel = qualifiedLabel;
+                if (qualifiedDefinitionLabels != null) {
+                    visibleDefinitionLabels = qualifiedDefinitionLabels;
+                }
 			}
 			else {
-				visibleLabel = label; 
+				visibleLabel = label;
+                if (definitionLabels != null) {
+                    visibleDefinitionLabels = definitionLabels;
+                }
 			}
 		}
 		setWidth(calculateWidth());
@@ -562,9 +575,9 @@ public class VisClass extends Shape {
 	    	   qualifiedDefinitionLabels.add(label);
 
            visibleDefinitionLabels = definitionLabels;
-		}
-	   
+        }
 	}
+
 	public HashSet<OWLClassExpression> getEquivalentClasses(){
 		return equivalentClasses;
 	}
@@ -575,7 +588,7 @@ public class VisClass extends Shape {
             getInheritedObjectProperties();
             getInheritedDataProperties();
 
-            if (!getVisibleDefinitionLabels().isEmpty()) {
+            if (getVisibleDefinitionLabels() != null && !getVisibleDefinitionLabels().isEmpty()) {
                 for (String defLabel : getVisibleDefinitionLabels()) {
                     other = new StringBuilder((isAnonymous ? removeFormatInformation(defLabel) : defLabel) + "\n\n");
                 }
@@ -797,7 +810,7 @@ public class VisClass extends Shape {
 		    		for (String auxLabel: getVisibleDefinitionLabels()) {
 						result += calculateTextHeight(auxLabel);
 					}
-		    		if (!getVisibleDefinitionLabels().isEmpty())
+		    		if (getVisibleDefinitionLabels() != null && !getVisibleDefinitionLabels().isEmpty())
 		    			result += (getVisibleDefinitionLabels().size()-1) * 5;
 	    		}
 	    		else {

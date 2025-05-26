@@ -136,7 +136,7 @@ public class VisDataProperty extends VisProperty {
 				description.append("</ul>");
 			}
 
-			if (!getDomain().getVisibleDefinitionLabels().isEmpty()) {
+			if (getDomain().getVisibleDefinitionLabels() != null && !getDomain().getVisibleDefinitionLabels().isEmpty()) {
 				for (String defLabel : getDomain().getVisibleDefinitionLabels()) {
 					description.append("<b>Domain:</b> ").append(defLabel).append("<br>");
 				}

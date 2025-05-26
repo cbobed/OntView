@@ -1,3 +1,4 @@
+file:/home/carlota/Desktop/OntView/onts/dbpedia_3.8.owl
 file:/home/carlota/Desktop/OntView/onts/animals.owl
 file:/home/carlota/Desktop/OntView/onts/Expression.owl
 file:/home/carlota/Desktop/OntView/onts/extendedCamera.owl
@@ -5,7 +6,6 @@ https://protege.stanford.edu/ontologies/koala.owl
 file:/home/carlota/Desktop/OntView/onts/PatientOntology.owl
 file:/home/carlota/Desktop/OntView/onts/univ-bench.owl
 https://protege.stanford.edu/ontologies/pizza/pizza.owl
-file:/home/carlota/Desktop/OntView/onts/dbpedia_3.8.owl
 file:/home/carlota/Downloads/dbpedia_3.8.owl
 file:/home/carlota/Downloads/personasonto.owl
 file:/home/carlota/Downloads/ontologias/personasonto.owl
@@ -13,4 +13,3 @@ file:/home/carlota/Desktop/pizza.owl
 http://purl.obolibrary.org/obo/envo.owl
 file:/home/carlota/Desktop/OntView/onts/ontosem.owl
 file:/home/carlota/Desktop/OntView/onts/SUMO.owl
-file:/home/carlota/Desktop/OntView/onts/proyectos.owl

@@ -70,7 +70,7 @@ public class VisObjectProperty extends VisProperty {
             description.append("\n");
         }
 
-        if (!getDomain().getVisibleDefinitionLabels().isEmpty()) {
+        if (getDomain().getVisibleDefinitionLabels() != null && !getDomain().getVisibleDefinitionLabels().isEmpty()) {
             for (String defLabel : getDomain().getVisibleDefinitionLabels()) {
                 description.append("Domain: ").append(defLabel).append("\n");
             }
