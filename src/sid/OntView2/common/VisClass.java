@@ -588,13 +588,7 @@ public class VisClass extends Shape {
             getInheritedObjectProperties();
             getInheritedDataProperties();
 
-            if (getVisibleDefinitionLabels() != null && !getVisibleDefinitionLabels().isEmpty()) {
-                for (String defLabel : getVisibleDefinitionLabels()) {
-                    other = new StringBuilder((isAnonymous ? removeFormatInformation(defLabel) : defLabel) + "\n\n");
-                }
-            } else {
-                other = new StringBuilder((isAnonymous ? removeFormatInformation(this.visibleLabel) : this.visibleLabel) + "\n\n");
-            }
+            other = new StringBuilder((isAnonymous ? removeFormatInformation(this.visibleLabel) : this.visibleLabel) + "\n\n");
 
             if (getDisjointClasses() != null && !getDisjointClasses().isEmpty()) {
                 other.append("Disjoint:\n");
