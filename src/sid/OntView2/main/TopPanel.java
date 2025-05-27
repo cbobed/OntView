@@ -1005,7 +1005,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	}
 
 	private void comboBox0ItemItemStateChanged(String selectedItem) {
-		if (parent.artPanel.getVisGraph() == null) return;
+		if (parent.artPanel.getVisGraph() == null || selectedItem == null || selectedItem.isBlank()) return;
         String key = parent.artPanel.getVisGraph().labelMap.get(selectedItem);
 		if (key != null) {
             parent.artPanel.focusOnShape(key, null);
@@ -1047,10 +1047,6 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		for (Entry<String, Shape> s : parent.artPanel.getVisGraph().shapeMap.entrySet()) {
             labelSet.add(s.getValue().getLabel());
 		}
-
-        for (String label : labelSet) {
-            System.out.println("----Label: " + label);
-        }
 
         List<String> sortedLabels = new ArrayList<>(labelSet);
         Collections.sort(sortedLabels);

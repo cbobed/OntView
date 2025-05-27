@@ -599,7 +599,7 @@ public class ExpressionManager {
         return manager.getQName(iri.toString());
 	}
 
-	public static String qualifyLabel(OWLClass c, String label) {
+    public static String qualifyLabel(OWLClass c, String label) {
 		String result = label;
 		String aux = manager.getQName(c.getIRI().toString());
 

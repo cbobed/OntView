@@ -11,11 +11,15 @@ import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import org.semanticweb.owlapi.search.EntitySearcher;
 import sid.OntView2.expressionNaming.SIDClassExpressionNamer;
 import sid.OntView2.utils.ExpressionManager;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static sid.OntView2.utils.ExpressionManager.qualifyLabel;
+import static sid.OntView2.utils.ExpressionManager.replaceString;
 
 public class VisClass extends Shape {
 	
@@ -58,9 +62,10 @@ public class VisClass extends Shape {
     // we have the four variants: normal, qualified, labels and qualified labels
     ArrayList<String> visibleDefinitionLabels;
     ArrayList<String> definitionLabels;
-    ArrayList<String> explicitDefinitionLabels; 
-	ArrayList<String> qualifiedDefinitionLabels;
-	ArrayList<String> explicitQualifiedDefinitionLabels;
+    //ArrayList<String> explicitDefinitionLabels;
+    Map<OWLClassExpression, List<String>> explicitDefinitionLabels;
+    ArrayList<String> qualifiedDefinitionLabels;
+    Map<OWLClassExpression, List<String>> explicitQualifiedDefinitionLabels;
 	// </CBL>
     
     String visibleLabel;
@@ -455,10 +460,61 @@ public class VisClass extends Shape {
 
 	}
 
-	public void swapLabel(Boolean labelRendering, Boolean qualifiedRendering, String language) {
+    public void swapLabelEquivalentClasses(Boolean labelRendering, Boolean qualifiedRendering, String language) {
+        if (labelRendering) {
+            if (qualifiedRendering) {
+                if (explicitQualifiedDefinitionLabels == null || explicitQualifiedDefinitionLabels.isEmpty()) return;
+
+                ArrayList<String> aux = new ArrayList<>();
+                for (OWLClassExpression eqDef : getEquivalentClasses()) {
+                    List<String> labels = explicitQualifiedDefinitionLabels.getOrDefault(eqDef, Collections.emptyList());
+                    List<String> matches = labels.stream().filter(s -> s.contains("@" + language)).toList();
+
+                    if (!matches.isEmpty()) {
+                        aux.addAll(matches);
+                    } else {
+                        String reduced = qualifyLabel(eqDef.asOWLClass(), getLabel());
+                        aux.add(reduced);
+                    }
+                }
+                if (!aux.isEmpty()) visibleDefinitionLabels = aux;
+            } else {
+                if (explicitDefinitionLabels == null || explicitDefinitionLabels.isEmpty()) return;
+
+                ArrayList<String> aux = new ArrayList<>();
+                for (OWLClassExpression eqDef : getEquivalentClasses()) {
+                    List<String> labels = explicitDefinitionLabels.getOrDefault(eqDef, Collections.emptyList());
+                    List<String> matches = labels.stream().filter(s -> s.contains("@" + language)).toList();
+
+                    if (!matches.isEmpty()) {
+                        aux.addAll(matches);
+                    } else {
+                        String reduced = ExpressionManager.getReducedClassExpression(eqDef);
+                        aux.add(reduced);
+                    }
+                }
+                if (!aux.isEmpty()) visibleDefinitionLabels = aux;
+            }
+        } else {
+            if (qualifiedRendering){
+                if (qualifiedDefinitionLabels != null) {
+                    visibleDefinitionLabels = qualifiedDefinitionLabels;
+                }
+            }
+            else {
+                if (definitionLabels != null) {
+                    visibleDefinitionLabels = definitionLabels;
+                }
+            }
+        }
+    }
+
+    public void swapLabel(Boolean labelRendering, Boolean qualifiedRendering, String language) {
 		this.qualifiedRendering = qualifiedRendering; 
 		this.labelRendering = labelRendering;
         this.isKorean = language.equals("ko");
+
+        swapLabelEquivalentClasses(labelRendering, qualifiedRendering, language);
 		
 		if (!explicitLabel.isEmpty()) {
 			if (labelRendering) {
@@ -483,33 +539,20 @@ public class VisClass extends Shape {
 					if (!qualifiedLabel.isEmpty()) {
 						visibleLabel = qualifiedLabel;
 					}
-                    if (qualifiedDefinitionLabels != null) {
-                        visibleDefinitionLabels = qualifiedDefinitionLabels;
-                    }
 				}
 				else  {
 					if (!label.isEmpty()){
 						visibleLabel = label;
-                        visibleDefinitionLabels = definitionLabels;
 					}
-                    if (definitionLabels != null) {
-                        visibleDefinitionLabels = definitionLabels;
-                    }
 				}
 			}
 		}
 		else {
 			if (qualifiedRendering) {
 				visibleLabel = qualifiedLabel;
-                if (qualifiedDefinitionLabels != null) {
-                    visibleDefinitionLabels = qualifiedDefinitionLabels;
-                }
 			}
-			else {
+			else if (!labelRendering) {
 				visibleLabel = label;
-                if (definitionLabels != null) {
-                    visibleDefinitionLabels = definitionLabels;
-                }
 			}
 		}
 		setWidth(calculateWidth());
@@ -555,26 +598,41 @@ public class VisClass extends Shape {
 			equivalentClasses.add(def);
 			
 			if (definitionLabels == null) {
-				definitionLabels = new ArrayList<>();
-				qualifiedDefinitionLabels = new ArrayList<> ();
-				// <CBL> for the time being, we are not considering the rendering 
-				// of labels in the anonymous expressions, just qualified/nonQualified names of the 
-				// concepts 
-				// TO_DO: add two new methods to obtain the reducedClassExpression 
-				// using the labels and the qualified labels for each of the terms. 
-				explicitDefinitionLabels = definitionLabels; 
-				explicitQualifiedDefinitionLabels = qualifiedDefinitionLabels;
+                definitionLabels = new ArrayList<>();
+                qualifiedDefinitionLabels = new ArrayList<> ();
+                explicitDefinitionLabels = new HashMap<>();
+                explicitQualifiedDefinitionLabels = new HashMap<>();
             }
-			// CBL: we add the different labels
+
+            List<String> labelsForDef = new ArrayList<>();
+            List<String> qualifiedLabelsForDef = new ArrayList<>();
+            if (def instanceof OWLClass) {
+                for (OWLAnnotation  an : EntitySearcher.getAnnotations(def.asOWLClass(), graph.getActiveOntology()).toList() ){
+                    if (an.getProperty().toString().equals("rdfs:label")){
+                        String auxLabel = replaceString(an.getValue().toString().replaceAll("\"", ""));
+                        labelsForDef.add(auxLabel);
+                        String auxQLabel = qualifyLabel(def.asOWLClass(), auxLabel);
+                        qualifiedLabelsForDef.add(auxQLabel != null ? auxQLabel : auxLabel);
+
+                        if (auxLabel.contains("@")) {
+                            graph.paintframe.languagesLabels.add(auxLabel.split("@")[1]);
+                        }
+                    }
+                }
+            }
+            explicitDefinitionLabels.put(def, labelsForDef);
+            explicitQualifiedDefinitionLabels.put(def, qualifiedLabelsForDef);
+
+            // CBL: we add the different labels
 			String label = ExpressionManager.getReducedClassExpression(def);
 			definitionLabels.add(label);
-			String auxQLabel = ExpressionManager.getReducedQualifiedClassExpression(def); 
-	       if (!"null".equalsIgnoreCase(auxQLabel))
-	    	   qualifiedDefinitionLabels.add(auxQLabel); 
-	       else 
-	    	   qualifiedDefinitionLabels.add(label);
+			String auxQLabel = ExpressionManager.getReducedQualifiedClassExpression(def);
+            if (!"null".equalsIgnoreCase(auxQLabel))
+                qualifiedDefinitionLabels.add(auxQLabel);
+            else
+                qualifiedDefinitionLabels.add(label);
 
-           visibleDefinitionLabels = definitionLabels;
+            visibleDefinitionLabels = definitionLabels;
         }
 	}
 
