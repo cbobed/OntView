@@ -3,6 +3,8 @@ package sid.OntView2.expressionNaming.test;
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLDataFactory;
@@ -13,13 +15,15 @@ import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 import openllet.owlapi.OpenlletReasonerFactory;
+import reducer.StructuralReducer;
 import sid.OntView2.expressionNaming.Explanation;
 import sid.OntView2.expressionNaming.SIDClassExpressionNamer;
 
 
 public class TestRenamer {
+    private static final Logger logger = LogManager.getLogger(TestRenamer.class);
 
-	public static OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+    public static OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 	public static OWLDataFactory dataFactory = OWLManager.getOWLDataFactory();
 	public static OWLOntology onto = null;
 	
@@ -38,16 +42,16 @@ public class TestRenamer {
 		SIDClassExpressionNamer renamer = new SIDClassExpressionNamer(onto, reasoner); 
 		
 		long start = System.nanoTime();
-		renamer.applyNaming(true); 
-		System.out.println("Took " + (System.nanoTime() - start) / 1000000 + "ms");
+		renamer.applyNaming(true);
+        logger.debug("Took {}ms", (System.nanoTime() - start) / 1000000);
 		save(onto, ontoFile.replace("/", "/reduced/").replace(".","_red."), manager);
-		
-		System.out.println("Added "+renamer.getClassesToAdd().size()+" new concepts");
-		System.out.println("in the form of "+renamer.getAxiomsToAdd().size()+" new axioms"); 
-		System.out.println("The reasoner filtered "+renamer.getClassesFiltered().size()+" classes to be added"); 
+
+        logger.debug("Added {} new concepts", renamer.getClassesToAdd().size());
+        logger.debug("in the form of {} new axioms", renamer.getAxiomsToAdd().size());
+        logger.debug("The reasoner filtered {} classes to be added", renamer.getClassesFiltered().size());
 		
 		for (Explanation exp: renamer.getClassesFiltered()) {
-			System.out.println(exp); 
+            logger.debug(exp);
 		}
 	}
 	
