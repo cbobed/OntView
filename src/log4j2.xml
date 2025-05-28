@@ -9,7 +9,7 @@
         <Logger name="org.semanticweb.owlapi" level="info" additivity="false">
             <AppenderRef ref="Console"/>
         </Logger>
-        <Root level="DEBUG">
+        <Root level="INFO">
             <AppenderRef ref="Console"/>
         </Root>
     </Loggers>

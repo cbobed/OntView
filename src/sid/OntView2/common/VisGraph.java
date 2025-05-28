@@ -1210,7 +1210,7 @@ public class VisGraph implements Runnable{
                 paintframe.clearCanvas();
             }
 			latch.countDown();
-            logger.debug("<--Graph building process finished");
+            logger.info("<--Graph building process finished");
 		}
 	}
 	
