@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Set;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
@@ -15,9 +17,10 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.parameters.Imports;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import sid.OntView2.utils.ImageMerger;
 
 public class SIDClassExpressionNamer {
-
+    private static final Logger logger = LogManager.getLogger(SIDClassExpressionNamer.class);
     ArrayList<OWLClassExpression> classesToAdd;
 	ArrayList<Explanation> classesFiltered;
 	Set<OWLEquivalentClassesAxiom> axiomsToAdd;
@@ -101,8 +104,8 @@ public class SIDClassExpressionNamer {
 	
 	private void applySyntacticSieve() throws NonGatheredClassExpressionsException {
 		
-		if (this.classesToAdd == null) throw new NonGatheredClassExpressionsException(); 
-		System.out.println("--> "+classesToAdd.size() + " class expressions harvested");
+		if (this.classesToAdd == null) throw new NonGatheredClassExpressionsException();
+        logger.debug("--> {} class expressions harvested", classesToAdd.size());
 		// CBL: due to the large amount of tests in huge ontologies
 		// we first perform a syntactic sieve
 
@@ -113,8 +116,7 @@ public class SIDClassExpressionNamer {
 			if (!syntacticalSieve.containsKey(auxInt))
 				syntacticalSieve.put(auxInt, auxClass);
 		}
-		System.out.println("--> "+syntacticalSieve.size()+" class expressions after syntactic sieve");
-
+        logger.debug("--> {} class expressions after syntactic sieve", syntacticalSieve.size());
 		classesToAdd.clear();
 		classesToAdd.addAll(syntacticalSieve.values());
 	}
