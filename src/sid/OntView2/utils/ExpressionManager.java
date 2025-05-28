@@ -6,6 +6,8 @@ import java.util.Set;
 import java.util.LinkedHashSet;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.semanticweb.owlapi.rdf.rdfxml.renderer.OWLOntologyXMLNamespaceManager;
 import org.semanticweb.owlapi.model.ClassExpressionType;
 import org.semanticweb.owlapi.model.IRI;
@@ -47,10 +49,12 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 import sid.OntView2.common.OntViewConstants;
+import sid.OntView2.main.ClassExpression;
 
 public class ExpressionManager {
+    private static final Logger logger = LogManager.getLogger(ExpressionManager.class);
 
-	public static OWLOntologyXMLNamespaceManager manager = null;
+    public static OWLOntologyXMLNamespaceManager manager = null;
 	public static String currentOntologyIRI = null;
 
 	public static void setNamespaceManager (OWLOntologyManager om, OWLOntology o) {
@@ -593,8 +597,8 @@ public class ExpressionManager {
 	}
 
 	public static String obtainQualifiedEntityNameFromIRI(IRI iri) {
-		if (manager == null) System.out.println("manager null");
-		else if (iri == null) System.out.println(" iri null");
+		if (manager == null) logger.warn("manager null");
+		else if (iri == null) logger.warn(" iri null");
         assert iri != null;
         return manager.getQName(iri.toString());
 	}

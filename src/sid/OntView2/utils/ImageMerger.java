@@ -3,6 +3,8 @@ package sid.OntView2.utils;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.imageio.ImageIO;
 import java.io.File;
@@ -13,6 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ImageMerger {
+    private static final Logger logger = LogManager.getLogger(ImageMerger.class);
 
     public static void mergeImages(String directoryPath, String outputPath) {
         try {
@@ -98,7 +101,7 @@ public class ImageMerger {
             }
 
             ImageIO.write(SwingFXUtils.fromFXImage(combinedImage, null), "png", new File(outputPath));
-            System.out.println("Merge done");
+            logger.debug("Merge done");
 
             deleteDirectory(directory);
 
