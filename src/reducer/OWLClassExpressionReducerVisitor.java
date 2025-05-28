@@ -2,12 +2,12 @@ package reducer;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.Stack;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLClassExpressionVisitor;
-import org.semanticweb.owlapi.model.OWLClassExpressionVisitorEx;
 import org.semanticweb.owlapi.model.OWLDataAllValuesFrom;
 import org.semanticweb.owlapi.model.OWLDataExactCardinality;
 import org.semanticweb.owlapi.model.OWLDataHasValue;
@@ -30,8 +30,8 @@ import sid.OntView2.utils.Params;
 import sid.OntView2.utils.Util;
 
 
-public class OWLClassExpressioneReducerVisitor implements
-		OWLClassExpressionVisitor {
+public class OWLClassExpressionReducerVisitor implements OWLClassExpressionVisitor {
+    private static final Logger logger = LogManager.getLogger(OWLClassExpressionReducerVisitor.class);
 
 	@Override
 	public void visit(OWLClass ce) {
@@ -41,7 +41,7 @@ public class OWLClassExpressioneReducerVisitor implements
 	@Override
 	public void visit(OWLObjectIntersectionOf ce) {
 		if(Params.verbose)
-			System.out.println(ce.getClass() + " reduction");
+            logger.debug("{} reduction", ce.getClass());
 		
 		Set<OWLClassExpression> reducedOp = new HashSet<OWLClassExpression>();
 		OWLClass newClass = null;
@@ -74,7 +74,7 @@ public class OWLClassExpressioneReducerVisitor implements
 	@Override
 	public void visit(OWLObjectUnionOf ce) {
 		if(Params.verbose)
-			System.out.println(ce.getClass() + " reduction");
+            logger.debug("{} reduction", ce.getClass());
 
 		Set<OWLClassExpression> reducedOp = new HashSet<OWLClassExpression>();
 		OWLClass newClass = null;
@@ -107,7 +107,7 @@ public class OWLClassExpressioneReducerVisitor implements
 	@Override
 	public void visit(OWLObjectComplementOf ce) {
 		if(Params.verbose)
-			System.out.println(ce.getClass() + " reduction");
+            logger.debug("{} reduction", ce.getClass());
 
 		OWLClassExpression reducedOp = null,
 				op = ce.getOperand();
@@ -139,7 +139,7 @@ public class OWLClassExpressioneReducerVisitor implements
 	@Override
 	public void visit(OWLObjectSomeValuesFrom ce) {
 		if(Params.verbose)
-			System.out.println(ce.getClass() + " reduction");
+            logger.debug("{} reduction", ce.getClass());
 
 		OWLClassExpression reducedOp = null,
 				op = ce.getFiller();
@@ -171,7 +171,7 @@ public class OWLClassExpressioneReducerVisitor implements
 	@Override
 	public void visit(OWLObjectAllValuesFrom ce) {
 		if(Params.verbose)
-			System.out.println(ce.getClass() + " reduction");
+            logger.debug("{} reduction", ce.getClass());
 
 		OWLClassExpression reducedOp = null,
 				op = ce.getFiller();
@@ -203,7 +203,7 @@ public class OWLClassExpressioneReducerVisitor implements
 	@Override
 	public void visit(OWLObjectMinCardinality ce) {
 		if(Params.verbose)
-			System.out.println(ce.getClass() + " reduction");
+            logger.debug("{} reduction", ce.getClass());
 
 		OWLClassExpression reducedOp = null,
 				op = ce.getFiller();
@@ -235,7 +235,7 @@ public class OWLClassExpressioneReducerVisitor implements
 	@Override
 	public void visit(OWLObjectExactCardinality ce) {
 		if(Params.verbose)
-			System.out.println(ce.getClass() + " reduction");
+            logger.debug("{} reduction", ce.getClass());
 
 		OWLClassExpression reducedOp = null,
 				op = ce.getFiller();
@@ -267,7 +267,7 @@ public class OWLClassExpressioneReducerVisitor implements
 	@Override
 	public void visit(OWLObjectMaxCardinality ce) {
 		if(Params.verbose)
-			System.out.println(ce.getClass() + " reduction");
+            logger.debug("{} reduction", ce.getClass());
 
 		OWLClassExpression reducedOp = null,
 				op = ce.getFiller();

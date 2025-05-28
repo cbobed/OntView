@@ -3,24 +3,19 @@ package reducer;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLClassExpressionVisitor;
 import org.semanticweb.owlapi.model.OWLDataFactory;
-import org.semanticweb.owlapi.model.OWLDataPropertyDomainAxiom;
-import org.semanticweb.owlapi.model.OWLDataPropertyRangeAxiom;
-import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
-import org.semanticweb.owlapi.model.OWLObjectPropertyDomainAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
@@ -28,11 +23,11 @@ import org.semanticweb.owlapi.model.parameters.Imports;
 
 import sid.OntView2.utils.Params;
 import sid.OntView2.utils.Util;
-import uk.ac.manchester.cs.owl.owlapi.OWLDataPropertyDomainAxiomImpl;
 
 public class StructuralReducer {
+    private static final Logger logger = LogManager.getLogger(StructuralReducer.class);
 
-	public static OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+    public static OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 	public static OWLDataFactory dataFactory = OWLManager.getOWLDataFactory();
 	public static Map<OWLClassExpression, OWLClass> map = new HashMap<OWLClassExpression, OWLClass>();
 	public static Stack<OWLClassExpression> stack = new Stack<OWLClassExpression>();
@@ -51,7 +46,7 @@ public class StructuralReducer {
 		boolean direct = true;
 		
 		if(Params.verbose)
-			System.out.println("Processing " + ontoFile);
+            logger.debug("Processing {}", ontoFile);
 		
 		OWLOntology onto = Util.load(ontoFile, direct, manager);
 		if(!Params.forComparison)
@@ -59,7 +54,7 @@ public class StructuralReducer {
 		
 		long start = System.nanoTime();
 		applyStructuralReduction(onto);
-		System.out.println("Took " + (System.nanoTime() - start) / 1000000 + "ms");
+        logger.debug("Took {}ms", (System.nanoTime() - start) / 1000000);
 		Util.save(onto, ontoFile.replace("/", "/reduced/").replace(".","_red."), manager);
 	}
 	
@@ -68,16 +63,16 @@ public class StructuralReducer {
 		OWLAxiomReducerVisitor axVisitor = new OWLAxiomReducerVisitor();
 		
 		for (OWLAxiom ax : onto.getTBoxAxioms(Imports.EXCLUDED)) {
-			System.out.println("\n" + ax);
+            logger.debug("\n{}", ax);
 			ax.accept(axVisitor);									
 		}
 
-		System.out.println(toAdd.size() + "/" + onto.getTBoxAxioms(Imports.EXCLUDED).size());
+        logger.debug("{}/{}", toAdd.size(), onto.getTBoxAxioms(Imports.EXCLUDED).size());
 		
 		OWLClassExpression ce = null;
-		OWLClassExpressionVisitor visitor = new OWLClassExpressioneReducerVisitor();
+		OWLClassExpressionVisitor visitor = new OWLClassExpressionReducerVisitor();
 		int b = 0;
-		System.out.println("Initial stack " + stack.size());
+        logger.debug("Initial stack {}", stack.size());
 		
 		while(!stack.isEmpty()){
 			ce = stack.pop();
@@ -87,7 +82,7 @@ public class StructuralReducer {
 			toAdd.add(dataFactory.getOWLEquivalentClassesAxiom(newClass, ce));
 			++b;
 		}
-		System.out.println(b);
+        logger.debug(b);
 		
 		manager.removeAxioms(onto, toDelete);
 		manager.addAxioms(onto, toAdd);
@@ -107,13 +102,12 @@ public class StructuralReducer {
 		}
 		
 		OWLClassExpression ce = null;
-		OWLClassExpressionVisitor visitor = new OWLClassExpressioneReducerVisitor();
+		OWLClassExpressionVisitor visitor = new OWLClassExpressionReducerVisitor();
 		int b = 0;
 		
 		while(!stack.isEmpty()){
 			ce = stack.pop();
 			if (extMap.get(ce.toString()) != null) {
-//				System.out.println("ya esta");
 				continue;
 			}	 
 //			ce.accept(visitor);

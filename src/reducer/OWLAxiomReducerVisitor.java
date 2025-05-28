@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLAnnotationPropertyDomainAxiom;
 import org.semanticweb.owlapi.model.OWLAnnotationPropertyRangeAxiom;
@@ -48,11 +50,13 @@ import org.semanticweb.owlapi.model.OWLSymmetricObjectPropertyAxiom;
 import org.semanticweb.owlapi.model.OWLTransitiveObjectPropertyAxiom;
 import org.semanticweb.owlapi.model.SWRLRule;
 
+import sid.OntView2.kcExtractors.RDFRankConceptExtraction;
 import sid.OntView2.utils.Params;
 import sid.OntView2.utils.Util;
 
 
 public class OWLAxiomReducerVisitor implements OWLAxiomVisitor {
+    private static final Logger logger = LogManager.getLogger(OWLAxiomReducerVisitor.class);
 
 	@Override
 	public void visit(OWLAnnotationAssertionAxiom axiom) {
@@ -110,7 +114,7 @@ public class OWLAxiomReducerVisitor implements OWLAxiomVisitor {
 		OWLAxiom newAxiom = null;
 		
 		if(Params.verbose)
-			System.out.println(axiom.getClass() + " reduction");
+            logger.debug("{} reduction", axiom.getClass());
 		
 		OWLClassExpression sub = null, sup = null;
 		boolean reduced = true;
@@ -157,7 +161,7 @@ public class OWLAxiomReducerVisitor implements OWLAxiomVisitor {
 							sup, 
 							axiom.getAnnotations()));
 			if(Params.verbose)
-				System.out.println(newAxiom + "\n");
+                logger.debug("{}\n", newAxiom);
 		}
 	}
 
@@ -183,7 +187,7 @@ public class OWLAxiomReducerVisitor implements OWLAxiomVisitor {
 		OWLAxiom newAxiom = null;
 		
 		if(Params.verbose)
-			System.out.println(axiom.getClass() + " reduction");
+            logger.debug("{} reduction", axiom.getClass());
 		
 		boolean reduced = true;
 		List<OWLClassExpression> operands = axiom.getClassExpressionsAsList();
@@ -226,7 +230,7 @@ public class OWLAxiomReducerVisitor implements OWLAxiomVisitor {
 							expr,
 							axiom.getAnnotations()));
 			if(Params.verbose)
-				System.out.println(newAxiom + "\n");
+                logger.debug("{}\n", newAxiom);
 		}
 	}
 	
@@ -236,7 +240,7 @@ public class OWLAxiomReducerVisitor implements OWLAxiomVisitor {
 		OWLAxiom newAxiom = null;
 		
 		if(Params.verbose)
-			System.out.println(axiom.getClass() + " reduction");
+            logger.debug("{} reduction", axiom.getClass());
 		
 		boolean reduced = true;
 		Set<OWLClassExpression> operands = axiom.getClassExpressions();
@@ -267,7 +271,7 @@ public class OWLAxiomReducerVisitor implements OWLAxiomVisitor {
 							reducedOp,
 							axiom.getAnnotations()));
 			if(Params.verbose)
-				System.out.println(newAxiom + "\n");
+                logger.debug("{}\n", newAxiom);
 		}
 	}
 	
@@ -276,7 +280,7 @@ public class OWLAxiomReducerVisitor implements OWLAxiomVisitor {
 		OWLAxiom newAxiom = null;
 		
 		if(Params.verbose)
-			System.out.println(axiom.getClass() + " reduction");
+            logger.debug("{} reduction", axiom.getClass());
 		
 		boolean reduced = true;
 		Set<OWLClassExpression> operands = axiom.getClassExpressions();
@@ -308,7 +312,7 @@ public class OWLAxiomReducerVisitor implements OWLAxiomVisitor {
 							reducedOp,
 							axiom.getAnnotations()));
 			if(Params.verbose)
-				System.out.println(newAxiom + "\n");
+                logger.debug("{}\n", newAxiom);
 		}
 	}
 
@@ -317,7 +321,7 @@ public class OWLAxiomReducerVisitor implements OWLAxiomVisitor {
 		OWLAxiom newAxiom = null;
 		
 		if(Params.verbose)
-			System.out.println(axiom.getClass() + " reduction");
+            logger.debug("{} reduction", axiom.getClass());
 		OWLClass newClass = null;
 		OWLClassExpression domain = axiom.getDomain();
 		
@@ -338,7 +342,7 @@ public class OWLAxiomReducerVisitor implements OWLAxiomVisitor {
 								newClass,
 								axiom.getAnnotations()));
 				if(Params.verbose)
-					System.out.println(newAxiom + "\n");
+                    logger.debug("{}\n", newAxiom);
 			}
 		}
 	}
@@ -348,7 +352,7 @@ public class OWLAxiomReducerVisitor implements OWLAxiomVisitor {
 		OWLAxiom newAxiom = null;
 		
 		if(Params.verbose)
-			System.out.println(axiom.getClass() + " reduction");
+            logger.debug("{} reduction", axiom.getClass());
 		OWLClass newClass = null;
 		OWLClassExpression domain = axiom.getDomain();
 		
@@ -369,7 +373,7 @@ public class OWLAxiomReducerVisitor implements OWLAxiomVisitor {
 								newClass,
 								axiom.getAnnotations()));
 				if(Params.verbose)
-					System.out.println(newAxiom + "\n");
+                    logger.debug("{}\n", newAxiom);
 			}
 		}
 	}
@@ -404,7 +408,7 @@ public class OWLAxiomReducerVisitor implements OWLAxiomVisitor {
 		OWLAxiom newAxiom = null;
 		
 		if(Params.verbose)
-			System.out.println(axiom.getClass() + " reduction");
+            logger.debug("{} reduction", axiom.getClass());
 		OWLClass newClass = null;
 		OWLClassExpression range = axiom.getRange();
 		
@@ -425,7 +429,7 @@ public class OWLAxiomReducerVisitor implements OWLAxiomVisitor {
 								newClass,
 								axiom.getAnnotations()));
 				if(Params.verbose)
-					System.out.println(newAxiom + "\n");
+                    logger.debug("{}\n", newAxiom);
 			}
 		}
 	}
