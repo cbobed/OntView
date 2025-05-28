@@ -2,14 +2,14 @@
 <Configuration status="WARN">
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{HH:mm:ss} %logger{36} - %msg%n"/>
+            <PatternLayout pattern="%msg%n"/>
         </Console>
     </Appenders>
     <Loggers>
         <Logger name="org.semanticweb.owlapi" level="info" additivity="false">
             <AppenderRef ref="Console"/>
         </Logger>
-        <Root level="info">
+        <Root level="DEBUG">
             <AppenderRef ref="Console"/>
         </Root>
     </Loggers>

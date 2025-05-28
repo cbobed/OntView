@@ -954,7 +954,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			try {
 				boolean loaded = parent.loadReasoner(x);
 				if(!loaded) {
-					System.out.println("Reasoner could not be loaded.");
+					System.err.println("Reasoner could not be loaded.");
 					return;
 				}
 				createButtonActionActionPerformed(event);

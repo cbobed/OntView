@@ -216,7 +216,7 @@ public class Mine extends Application implements Embedable{
 			while (!artPanel.isStable()){
 				try {
 					Thread.sleep(2000);
-					System.err.println("wait");
+                    logger.error("wait");
 				}
 				catch (InterruptedException e) {
 					e.printStackTrace();
@@ -545,7 +545,7 @@ public class Mine extends Application implements Embedable{
                 }
             }
         }
-        System.out.println("Done creating images");
+        logger.debug("Done creating images in {}", tempDir.toAbsolutePath());
         ImageMerger.mergeImages("src/canvasImages/", directory.toString());
     }
 

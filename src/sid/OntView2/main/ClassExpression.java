@@ -18,6 +18,8 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import sid.OntView2.common.Shape;
 import sid.OntView2.common.VisClass;
 
@@ -27,6 +29,8 @@ import java.util.Objects;
 import java.util.Set;
 
 public class ClassExpression extends Stage {
+    private static final Logger logger = LogManager.getLogger(ClassExpression.class);
+
     private final Mine parent;
     private VisClass selectedParent, selectedChild;
     private TextField parentSearchField, childSearchField;
@@ -290,10 +294,10 @@ public class ClassExpression extends Stage {
 
     private void submitButtonCEActionActionPerformed(ActionEvent event) {
         if ( selectedChild == null) {
-            System.out.println("Please select a child node");
+            logger.warn("Please select a child node class expression query.");
         }
         if ( selectedParent == null) {
-            System.out.println("Please select a parent node");
+            logger.warn("Please select a parent node for class expression query.");
         }
         if (selectedChild != null && selectedParent != null) {
             parent.artPanel.cleanConnectors();
