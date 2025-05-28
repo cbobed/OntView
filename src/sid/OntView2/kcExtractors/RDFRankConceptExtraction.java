@@ -3,6 +3,8 @@ package sid.OntView2.kcExtractors;
 import java.util.*;
 import java.util.Map.Entry;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jgrapht.alg.scoring.PageRank;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
@@ -15,6 +17,7 @@ import sid.OntView2.common.VisGraph;
 import sid.OntView2.utils.PageRankScoreComparator;
 
 public class RDFRankConceptExtraction extends KConceptExtractor { //true
+    private static final Logger logger = LogManager.getLogger(RDFRankConceptExtraction.class);
     public final static boolean RDFRankDebug = true;
 
     @Override
@@ -40,11 +43,11 @@ public class RDFRankConceptExtraction extends KConceptExtractor { //true
         PageRank<String, DefaultEdge> pageRankScorer = new PageRank<>(rdfRankGraph);
 
         if (RDFRankDebug) {
-            System.out.println("Vertices: "+rdfRankGraph.vertexSet().size());
-            System.out.println("Edges: "+rdfRankGraph.edgeSet().size());
-            System.out.println(PageRank.DAMPING_FACTOR_DEFAULT);
-            System.out.println(PageRank.MAX_ITERATIONS_DEFAULT);
-            System.out.println(PageRank.TOLERANCE_DEFAULT);
+            logger.debug("Vertices: {}", rdfRankGraph.vertexSet().size());
+            logger.debug("Edges: {}", rdfRankGraph.edgeSet().size());
+            logger.debug(PageRank.DAMPING_FACTOR_DEFAULT);
+            logger.debug(PageRank.MAX_ITERATIONS_DEFAULT);
+            logger.debug(PageRank.TOLERANCE_DEFAULT);
         }
 
         Map<String, Double> scoreMap = pageRankScorer.getScores();
@@ -55,7 +58,7 @@ public class RDFRankConceptExtraction extends KConceptExtractor { //true
         int added = 0;
         for (int i=0; added<limitResultSize && i<scoreList.size(); i++) {
             if (RDFRankDebug) {
-                System.out.println(scoreList.get(i).getKey()+" :: "+scoreList.get(i).getValue());
+                logger.debug("{} :: {}", scoreList.get(i).getKey(), scoreList.get(i).getValue());
             }
             OWLClassExpression auxExp = shapeMap.get(scoreList.get(i).getKey()).asVisClass().getLinkedClassExpression();
             if (!(auxExp.isOWLThing() || auxExp.isOWLNothing())) {
@@ -77,8 +80,6 @@ public class RDFRankConceptExtraction extends KConceptExtractor { //true
                 orderedShapes.add(shape);
             }
         }
-
         return orderedShapes;
     }
-
 }
