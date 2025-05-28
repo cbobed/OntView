@@ -13,39 +13,35 @@ import it.essepuntato.taxonomy.exceptions.RootException;
 import it.essepuntato.taxonomy.maker.ITaxonomyMaker;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.io.StringDocumentSource;
 import org.semanticweb.owlapi.model.*;
 
-import java.io.InputStream;
 import java.util.*;
 
 
 /**
  * A generator of a simple taxonomy for any ontology that happens to be readable by OWL API 3.0
  * the default one for NeOn Toolkit 2.3. It contains methods simply going
- * through the ontology in question and deriving all its sub-classes, instances, etc.
- * 
+ * through the ontology in question and deriving all its subclasses, instances, etc.
  * This taxonomy is then used as an input to calculating the vector of N key concepts...
  * (It is an equivalent for WatsonTaxonomyMaker defined in Silvio's it.essepuntato.ontoalg.)
- * 
+ *
  * @author Ning Li, KMi
- * 
- * 
+ *
+ *
  */
 
- /**
+/**
   * Modification log : Copied the whole class in order to add a constructor with OwlOntology as parameter
   * @author bob
   *
   */
 
 public class OWLAPITaxonomyMakerExtended implements ITaxonomyMaker{
-     private static final Logger logger = LogManager.getLogger(ImageMerger.class);
+    private static final Logger logger = LogManager.getLogger(ImageMerger.class);
 
-     private Number nSize = null;
-    private OWLAPIManager owlAPIManager = null;
-    private OWLOntology ontology = null;
+    private Number nSize = null;
+    private final OWLAPIManager owlAPIManager;
+    private final OWLOntology ontology;
 
     public final static String rootName = "http://www.essepuntato.it/OntoAlgorithm#ESSEPUNTATO";
 
@@ -72,13 +68,13 @@ public class OWLAPITaxonomyMakerExtended implements ITaxonomyMaker{
          logger.debug("done");
 
          logger.debug("Finding all the root classes of the taxonomy:");
-         ArrayList<String> rootClasses = this.getRootClasses(this.owlAPIManager, subClasses);
+         ArrayList<String> rootClasses = this.getRootClasses(subClasses);
 
-         boolean isOneRoot = (rootClasses.size() == 1 ? true : false);
+         boolean isOneRoot = (rootClasses.size() == 1);
 
          /* I make the taxonomy */
          HTaxonomy t = new HTaxonomy();
-         Category root = null;
+         Category root;
          if (isOneRoot) {
              root = new Category(rootClasses.get(0));
          }
@@ -181,7 +177,7 @@ public class OWLAPITaxonomyMakerExtended implements ITaxonomyMaker{
 		
     private Set<OWLClass> cleanClassList(Set<OWLClass> classes) {
         Iterator<OWLClass> classesIterator = classes.iterator();
-        Set<OWLClass> result = new HashSet<OWLClass>();
+        Set<OWLClass> result = new HashSet<>();
         while (classesIterator.hasNext()) {
             OWLClass curClass = classesIterator.next();
             String curClassStr= curClass.getIRI().toString();
@@ -200,20 +196,17 @@ public class OWLAPITaxonomyMakerExtended implements ITaxonomyMaker{
     /**
      * Goes through the acquired list of classes in the ontology and categorize them into
      * aClass -> (aSubClass1, aSubClass2,...)
-     * @param owlMgr
-     * @param classes
-     * @return
      */
     private Hashtable<String, ArrayList<String>> categorizeAllSubclasses(
             OWLAPIManager owlMgr,
             Set<OWLClass> classes) {
 
-        Hashtable<String, ArrayList<String>> result = new Hashtable<String, ArrayList<String>>();
+        Hashtable<String, ArrayList<String>> result = new Hashtable<>();
 
         /* I initialize the Hashtable */
         Iterator<OWLClass> classesIterator = classes.iterator();
         while (classesIterator.hasNext()) {
-            result.put(classesIterator.next().getIRI().toString(), new ArrayList<String>());
+            result.put(classesIterator.next().getIRI().toString(), new ArrayList<>());
         }
 
         /* I find the subclasses */
@@ -242,18 +235,12 @@ public class OWLAPITaxonomyMakerExtended implements ITaxonomyMaker{
     }
     /**
      * Identifies root classes in the list = classes with no named parent class
-     * @param owlMgr
-     * @param allSubClasses
-     * @return
      */
     private ArrayList<String> getRootClasses(
-            OWLAPIManager owlMgr, Hashtable<String, ArrayList<String>> allSubClasses) {
-        ArrayList<String> result = new ArrayList<String>();
+            Hashtable<String, ArrayList<String>> allSubClasses) {
+        ArrayList<String> result = new ArrayList<>();
 
-        Iterator<String> classesIterator = allSubClasses.keySet().iterator();
-
-        while (classesIterator.hasNext()) {
-            String aClass = classesIterator.next();
+        for (String aClass : allSubClasses.keySet()) {
             Iterator<ArrayList<String>> subclassesIterator = allSubClasses.values().iterator();
 
             boolean isInSubclasses = false;
@@ -271,14 +258,8 @@ public class OWLAPITaxonomyMakerExtended implements ITaxonomyMaker{
         return result;
     }
     /**
-     * Creates taxonomic relations between current top and its instances / sub-classes
-     * and goes recursively to do the same for sub-classes found here
-     * @param t
-     * @param owlMgr
-     * @param subClasses
-     * @param curTopCategory
-     * @param alreadyProcessed
-     * @return
+     * Creates taxonomic relations between current top and its instances / subclasses
+     * and goes recursively to do the same for subclasses found here
      */
     private HTaxonomy makeTaxonomyStartingFrom(
             HTaxonomy t,
