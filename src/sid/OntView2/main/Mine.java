@@ -224,7 +224,6 @@ public class Mine extends Application implements Embedable{
 				}
 			}
 			nTopPanel.restorePropertyCheckboxes();
-			artPanel.start();
 		}
 	}
 
@@ -334,7 +333,6 @@ public class Mine extends Application implements Embedable{
 				return false;
 			}
 		} else {
-			artPanel.stop();
 			Platform.runLater(() -> artPanel.showAlertDialog("Error", "No active ontology.",
 				"Please load an ontology before loading a reasoner.", AlertType.ERROR));
 

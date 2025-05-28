@@ -864,7 +864,6 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	}
 
 	void OntologyButtonActionActionPerformed(ActionEvent event) {
-		parent.artPanel.stop();
 		String x = (String) getOntologyCombo().getValue();
 		if ((x != null) && (!x.isEmpty())) {
 			parent.loadActiveOntologyTask(IRI.create(x));

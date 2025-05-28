@@ -28,6 +28,8 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
@@ -39,7 +41,8 @@ import sid.OntView2.kcExtractors.KConceptExtractor;
 import sid.OntView2.kcExtractors.KConceptExtractorFactory;
 
 public class PaintFrame extends Canvas {
-	private static final long serialVersionUID = 1L;
+    private static final Logger logger = LogManager.getLogger(GraphReorder.class);
+    private static final long serialVersionUID = 1L;
     public Stage loadingStage = null;
 	public ScrollPane scroll;
 	static final int BORDER_PANEL = 60;
@@ -473,7 +476,7 @@ public class PaintFrame extends Canvas {
 
 		if (stable) {
 			while (stateChanged) {
-				System.out.println("relax");
+                logger.debug("relax");
 				stateChanged = false;
 
 				// Faster version
@@ -817,15 +820,6 @@ public class PaintFrame extends Canvas {
 				return entry.getValue();
 		}
 		return null;
-	}
-
-	public void start() {
-		System.out.println("start");
-		//Platform.runLater(relaxerRunnable);
-	}
-
-	public void stop() {
-		System.out.println("stop"); 
 	}
 
 	private boolean isInsidePropertyBox(int x, int y) {

@@ -1,16 +1,19 @@
 package sid.OntView2.common;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import pedviz.algorithms.Sugiyama;
 import pedviz.algorithms.sugiyama.SugiyamaNodeView;
 import pedviz.graph.Edge;
 import pedviz.graph.Graph;
 import pedviz.graph.LayoutedGraph;
 import pedviz.graph.Node;
+import sid.OntView2.expressionNaming.SIDClassExpressionNamer;
 
 import java.util.Map.Entry;
 
 public class GraphReorder {
-
+    private static final Logger logger = LogManager.getLogger(GraphReorder.class);
 	VisGraph vGraph;
 	int vGraphHeight;
 	public GraphReorder(VisGraph v){
@@ -25,12 +28,12 @@ public class GraphReorder {
 		float maxY = 0;
 		vGraphHeight = vGraph.getHeight();
 		//Step 2
-		System.out.println("-->Sugiyama"); 
+        logger.debug("-->Sugiyama");
 		Sugiyama s = new Sugiyama(graph);
 		s.getLayoutedGraph();
-		System.out.println("-->Sugiyama - run"); 
+        logger.debug("-->Sugiyama - run");
 		s.run();
-		System.out.println("<--Sugiyama"); 
+        logger.debug("<--Sugiyama");
 		@SuppressWarnings("rawtypes")
 		LayoutedGraph layoutedGraph = s.getLayoutedGraph();
 		SugiyamaNodeView nodeView;
@@ -75,7 +78,7 @@ public class GraphReorder {
 	}
 
 	public static void cloneGraph(Graph graph, VisGraph vGraph){
-		System.out.println("-->clone graph"); 
+        logger.debug("-->clone graph");
 		for (Entry<String, Shape> entry : vGraph.shapeMap.entrySet()){
 			Shape shape = entry.getValue();
 			if (!(shape.outConnectors.isEmpty()) ||(!(shape.inConnectors.isEmpty()))){
@@ -90,13 +93,14 @@ public class GraphReorder {
 					Node or  = graph.getNode(entry.getKey());
 					Node dst = graph.getNode(Shape.getKey(c.to.getLinkedClassExpression()));
                     if (dst == null) {
-                        System.out.println("or: " + entry.getValue().getLabel() + " c.to " + c.to.getLabel() + " " + c.to.getLinkedClassExpression());
+                        logger.debug("or: {} c.to {} {}",
+                                entry.getValue().getLabel(), c.to.getLabel(), c.to.getLinkedClassExpression());
                     }
                     dst.setIdDad(or.getId());
 					graph.addEdge(new Edge(or,dst));
 				}
 			}
 		}
-		System.out.println("<--clone graph"); 
+        logger.debug("<--clone graph");
 	}
 }
