@@ -62,7 +62,6 @@ public class VisClass extends Shape {
     // we have the four variants: normal, qualified, labels and qualified labels
     ArrayList<String> visibleDefinitionLabels;
     ArrayList<String> definitionLabels;
-    //ArrayList<String> explicitDefinitionLabels;
     Map<OWLClassExpression, List<String>> explicitDefinitionLabels;
     ArrayList<String> qualifiedDefinitionLabels;
     Map<OWLClassExpression, List<String>> explicitQualifiedDefinitionLabels;
@@ -210,7 +209,7 @@ public class VisClass extends Shape {
             } else if (!asVisClass().getEquivalentClasses().isEmpty()){
                 drawDefined(g, x, y, fontHeight, ascent, roundCornerValue, propSpace);
             } else {
-                drawAuxDefinition(g, x, y, fontHeight, ascent, roundCornerValue, propSpace);
+                drawAuxDefinition(g, x, y, ascent, roundCornerValue, propSpace);
             }
 
             // Draw hidden descendants indicator
@@ -287,7 +286,7 @@ public class VisClass extends Shape {
     /**
      * Draws the auxiliary definition
      */
-    private void drawAuxDefinition(GraphicsContext g, int x, int y, double fontH, double ascent, int roundCorner, int propSpace) {
+    private void drawAuxDefinition(GraphicsContext g, int x, int y, double ascent, int roundCorner, int propSpace) {
         // CBL: it is an auxiliary definition
         // CBL if it is not defined, we use the previous representation
         g.setFill(Color.WHITE);

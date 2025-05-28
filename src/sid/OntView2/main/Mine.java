@@ -1,9 +1,7 @@
 package sid.OntView2.main;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -43,6 +41,9 @@ import org.semanticweb.owlapi.reasoner.OWLReasonerConfiguration;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import sid.OntView2.common.*;
 import sid.OntView2.expressionNaming.SIDClassExpressionNamer;
 import sid.OntView2.utils.ErrorHandler;
@@ -50,6 +51,7 @@ import sid.OntView2.utils.ExpressionManager;
 import sid.OntView2.utils.ImageMerger;
 
 public class Mine extends Application implements Embedable{
+    private static final Logger logger = LogManager.getLogger(Mine.class);
 	private Stage primaryStage;
 	private static final long serialVersionUID = 1L;
 
@@ -280,8 +282,8 @@ public class Mine extends Application implements Embedable{
 			ExpressionManager.setNamespaceManager(manager, activeOntology);
 
 			for (String ns: ExpressionManager.getNamespaceManager().getNamespaces()) {
-				System.out.println("prefix: "+ExpressionManager.getNamespaceManager().getPrefixForNamespace(ns));
-				System.out.println("  ns: "+ns);
+                logger.info("prefix: {}", ExpressionManager.getNamespaceManager().getPrefixForNamespace(ns));
+                logger.info("  ns: {}", ns);
 			}
 		}
 
