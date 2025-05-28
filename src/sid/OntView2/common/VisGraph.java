@@ -3,6 +3,8 @@ package sid.OntView2.common;
 import javafx.application.Platform;
 import javafx.geometry.Point2D;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.model.parameters.Imports;
@@ -33,7 +35,7 @@ import static sid.OntView2.utils.ExpressionManager.qualifyLabel;
 import static sid.OntView2.utils.ExpressionManager.replaceString;
 
 public class VisGraph implements Runnable{
-
+    private static final Logger logger = LogManager.getLogger(VisGraph.class);
     Hashtable<Integer, VisLevel>       levelSet;
     ArrayList<VisConnector> connectorList;
 	ArrayList<VisConnector> dashedConnectorList;
@@ -153,7 +155,7 @@ public class VisGraph implements Runnable{
                                                  Set<OWLClassExpression> rootCpts, OWLClassExpression topNode,
                                                  OWLClassExpression bottomNode) {
 
-        System.out.println("-->buildReasonedGraph");
+        logger.debug("-->buildReasonedGraphSelectedNodes");
         //It's important to set config constants before creating
         //will have to move this elsewhere
         clearAll();
@@ -178,7 +180,7 @@ public class VisGraph implements Runnable{
         VisLevel.adjustWidthAndPos(levelSet);
 
         // here, we should add the disjointness
-        System.out.println("Disjointness ... ");
+        logger.debug("Disjointness ... ");
         for (Entry<String, Shape> entry : shapeMap.entrySet()){
             Shape shape = entry.getValue();
             if (shape instanceof VisClass) {
@@ -192,31 +194,31 @@ public class VisGraph implements Runnable{
         VisLevel.shrinkLevelSet(levelSet);
         VisLevel.adjustWidthAndPos(levelSet);
 
-        System.out.println("Redundant ... ");
+        logger.debug("Redundant ... ");
         removeRedundantConnector();
         System.gc();
         reorder = new GraphReorder(this);
-        System.out.println("Visual reordering ... ");
+        logger.debug("Visual reordering ... ");
         reorder.visualReorder();
         adjustPanelSize((float) 1.0);
         clearDashedConnectorList();
         updatePosition();
-        System.out.println("Applying KCE Option if required ...");
+        logger.debug("Applying KCE Option if required ...");
         paintframe.doKceOptionAction();
         //showAll();
         VisLevel.adjustWidthAndPos(getLevelSet());
         paintframe.getParentFrame().loadSearchCombo();
         paintframe.setStateChanged(true);
-        System.out.println("<--buildReasonedGraph");
+        logger.debug("<--buildReasonedGraphSelectedNodes");
 
         for (Entry<String, Shape> entry: shapeMap.entrySet()) {
-            System.out.println("Shape: "+entry.getKey());
-            System.out.println("\t\t"+entry.getValue().getLabel());
+            logger.debug("Shape: {}", entry.getKey());
+            logger.debug("\t\t{}", entry.getValue().getLabel());
             for (OWLClassExpression equiv: entry.getValue().asVisClass().getEquivalentClasses()) {
-                System.out.println("\t\t\t"+equiv);
+                logger.debug("\t\t\t{}", equiv);
             }
             for (Shape s:entry.getValue().asVisClass().getChildren()) {
-                System.out.println("--> "+s.asVisClass().getLabel());
+                logger.debug("--> {}", s.asVisClass().getLabel());
             }
         }
 
@@ -235,7 +237,7 @@ public class VisGraph implements Runnable{
         //It's important to set config constants before creating
         //will have to move this elsewhere
         clearAll();
-        set.forEach(x->System.out.println("Build 1st set: "+x));
+        set.forEach(x->logger.debug("Build 1st set: {}",x));
         OWLClass topClass = activeOntology.getOWLOntologyManager().getOWLDataFactory().getOWLThing();
         OWLClass bottomClass = activeOntology.getOWLOntologyManager().getOWLDataFactory().getOWLNothing();
         // we start from a fresh graph, so it is safe to create OWLThing and OWLNothing directly
@@ -260,7 +262,7 @@ public class VisGraph implements Runnable{
         VisLevel.adjustWidthAndPos(levelSet);
 
         // here, we should add the disjointness
-        System.out.println("Disjointness ... ");
+        logger.debug("Disjointness ... ");
         for (Entry<String, Shape> entry : shapeMap.entrySet()){
             Shape shape = entry.getValue();
             if (shape instanceof VisClass) {
@@ -274,33 +276,21 @@ public class VisGraph implements Runnable{
         VisLevel.shrinkLevelSet(levelSet);
         VisLevel.adjustWidthAndPos(levelSet);
 
-        System.out.println("Redundant ... ");
+        logger.debug("Redundant ... ");
         removeRedundantConnector();
         System.gc();
         reorder = new GraphReorder(this);
-        System.out.println("Visual reordering ... ");
+        logger.debug("Visual reordering ... ");
         reorder.visualReorder();
         adjustPanelSize((float) 1.0);
         clearDashedConnectorList();
         updatePosition();
-        System.out.println("Applying KCE Option if required ...");
+        logger.debug("Applying KCE Option if required ...");
         paintframe.doKceOptionAction();
         VisLevel.adjustWidthAndPos(getLevelSet());
         paintframe.getParentFrame().loadSearchCombo();
         paintframe.setStateChanged(true);
-        System.out.println("<--buildReasonedGraph");
-        
-        /*for (Entry<String, Shape> entry: shapeMap.entrySet()) {
-        	System.out.println("Shape: "+entry.getKey()); 
-        	System.out.println("\t\t"+entry.getValue().getLabel()); 
-        	for (OWLClassExpression equiv: entry.getValue().asVisClass().getEquivalentClasses()) {
-        		System.out.println("\t\t\t"+equiv); 
-        	}
-        	for (Shape s:entry.getValue().asVisClass().getChildren()) {
-        		System.out.println("--> "+s.asVisClass().getLabel()); 
-        	}
-        }*/
-        
+        logger.debug("<--buildReasonedGraph");
     }
 
 	private void insertClassExpressions (OWLOntology activeOntology, OWLReasoner reasoner,
@@ -326,14 +316,14 @@ public class VisGraph implements Runnable{
 						(endPoint.isOWLNothing() || subsumes(ce, endPoint, reasoner, dFactory )) ){
 					addGatheredClassExpression(ce, activeOntology.getOWLOntologyManager().getOWLDataFactory().getOWLThing(), reasoner, activeOntology, dFactory);
 					i++; 
-					if (i%5==0) 
-						System.out.println(i+" out of "+renamer.getClassesToAdd().size()+" ... "); 
+					if (i%5==0)
+                        logger.debug("{} out of {} ... ", i, renamer.getClassesToAdd().size());
 				}else {
-					System.out.println("Skipping ..."); 
+                    logger.debug("Skipping ...");
 				}
 			}
 			else {
-				System.out.println(ce + " already included in a shape"); 
+                logger.debug("{} already included in a shape", ce);
 			}
 		}
 	}
@@ -374,9 +364,9 @@ public class VisGraph implements Runnable{
 		// We check for the equivalences 
 		for (Shape directParent: directParents) {
 			if (subsumes(e, directParent.asVisClass().getLinkedClassExpression(), reasoner, dataFactory)) {
-				//System.out.println("equivalence detected in a gathered anonymous expression: ");
-				//System.out.println("\t gathered: "+e);
-				//System.out.println("\t prevExp: "+directParent.asVisClass().getLinkedClassExpression());
+                logger.debug("equivalence detected in a gathered anonymous expression: ");
+                logger.debug("\t gathered: {}", e);
+                logger.debug("\t prevExp: {}", directParent.asVisClass().getLinkedClassExpression());
 				directParent.asVisClass().addEquivalentExpression(e);
 				String candKey = Shape.getKey(e); 
 				if (!shapeMap.containsKey(candKey)) {
@@ -423,8 +413,6 @@ public class VisGraph implements Runnable{
 	   nextLevel.add(getShapeFromOWLClassExpression(topCE).asVisClass());
 	   int depthLevel = 0; 
 	   while (!nextLevel.isEmpty()) {
-		   //System.out.println("Creating level "+depthLevel+"..."+nextLevel.size());
-		   //nextLevel.forEach(x-> System.out.println("including ... ("+x.getChildren().size()+") "+x.getLinkedClassExpression()));
 		   VisLevel vLevel;
 	       int levelPosx = VisClass.FIRST_X_SEPARATION;
 	       vLevel = VisLevel.getLevelFromID(levelSet, depthLevel);
@@ -659,7 +647,6 @@ public class VisGraph implements Runnable{
 		for (OWLClassExpression ce: currentCELevel) {
 			// all the Shapes in currentCELevel :: AlreadyCreated 
 			// this implies that TOP must be created outside
-			//System.out.println("Processing "+ce);
 			VisClass vis = getShapeFromOWLClassExpression(ce).asVisClass(); 
 			HashSet<OWLClassExpression> subSet = new HashSet<> ();
 			reasoner.getSubClasses(ce, true).entities().forEach(subSet::add); 
@@ -683,7 +670,7 @@ public class VisGraph implements Runnable{
 					nextLevel); 
 		}
 		else {
-			System.out.println("--> calling bottomNode"); 
+            logger.debug("--> calling bottomNode");
 			addBottomNode(reasoner, activeOntology); 
 		}
 	}
@@ -702,7 +689,7 @@ public class VisGraph implements Runnable{
 			Shape o = getShapeFromOWLClassExpression(e);
 			 if (o==null){
 				addVisClass(Shape.getKey(e.asOWLClass()), e, activeOntology, reasoner);
-				System.out.println(Shape.getKey(e.asOWLClass())); 
+                logger.debug(Shape.getKey(e.asOWLClass()));
 			 }
 			for (OWLClassExpression exp : EntitySearcher.getEquivalentClasses(e, activeOntology).toList()){
 		    	 if (!(exp instanceof OWLClass) && (shapeMap.get(Shape.getKey(exp))==null)){
@@ -799,13 +786,12 @@ public class VisGraph implements Runnable{
             VisClass bottomVis = shapeMap.get(bottomKey).asVisClass();;
             bottomVis.addEquivalentExpression(ce);
             shapeMap.put(Shape.getKey(ce), bottomVis);
-            System.out.println("Redirecting inconsistent " + Shape.getKey(ce) + " to existing OWLNothing shape.");
+            logger.debug("Redirecting inconsistent {} to existing OWLNothing shape.", Shape.getKey(ce));
             return bottomVis;
         }
 
         vis = new VisClass(0, ce, label, this);
         shapeMap.put(label, vis);
-        //System.out.println("Adding " + label + " to shape map ...");
 
         if (ce instanceof OWLClass){
             for (OWLAnnotation  an : EntitySearcher.getAnnotations(ce.asOWLClass(), activeOntology).toList() ){
@@ -842,7 +828,6 @@ public class VisGraph implements Runnable{
                 if (x.isOWLNothing()) vis.isBottom=true;
                 vis.addEquivalentExpression(x);
                 shapeMap.put(Shape.getKey(x), vis);
-                //System.out.println("\tAdding " + Shape.getKey(x) + " to shape map - as equivalent class ... ");
                 // for SearchCombo
                 getQualifiedLabelMap().put(ExpressionManager.getReducedClassExpression(x), x.asOWLClass().getIRI().toString());
             }
@@ -932,11 +917,11 @@ public class VisGraph implements Runnable{
 
 							VisLevel newLevel = VisLevel.getLevelFromID(levelSet, parentShape.getVisLevel().getID()+1);
 							if (newLevel == null) {
-								System.out.println("is bottom");
-					    		 newLevel = new VisLevel(this, parentLevel.getID()+1,
-					    				                   parentLevel.getXpos()+parentLevel.getWidth()+30);
-						    	 levelSet.put(newLevel.getID(), newLevel);
-								 currentShape.setVisLevel(VisLevel.getLevelFromID(levelSet, currentShapeLevel-1));
+                                logger.debug("is bottom");
+                                newLevel = new VisLevel(this, parentLevel.getID()+1,
+					    			                   parentLevel.getXpos()+parentLevel.getWidth()+30);
+						    	levelSet.put(newLevel.getID(), newLevel);
+								currentShape.setVisLevel(VisLevel.getLevelFromID(levelSet, currentShapeLevel-1));
      	                    }
 							else if ( VisLevel.getLevelFromID(levelSet, parentShape.getVisLevel().getID()+1).isBottomLevel()){
 								VisLevel.insertLevel(levelSet, parentShape.getVisLevel().getID()+1, this);
@@ -967,7 +952,7 @@ public class VisGraph implements Runnable{
 			 parents.clear();
 			 
 		 }
-		 System.out.println("--> Exit redundancy removal ... ");
+         logger.debug("--> Exit redundancy removal ... ");
 	 }
 	 
 	 private void remove(HashSet<Shape>parents, Shape son){
@@ -1198,17 +1183,17 @@ public class VisGraph implements Runnable{
     @Override
 	public void run() {
 		try {
-            System.out.println("..>Starting the graph building process");
+            logger.info("-->Starting the graph building process");
             if (Thread.currentThread().isInterrupted()) { return; }
             topSet = new HashSet<>();
             topSet.add(getActiveOntology().getOWLOntologyManager().getOWLDataFactory().getOWLThing());
 
             if (Thread.currentThread().isInterrupted()) { return; }
-            System.out.println("-->buildReasonedGraph");
+            logger.debug("-->buildReasonedGraph");
 			this.buildReasonedGraph(getActiveOntology(), getReasoner(), topSet);
 
             if (Thread.currentThread().isInterrupted()) { return; }
-            System.out.println("-->storeDescendants");
+            logger.debug("-->storeDescendants");
 			storeDescendants();
 			storeAncestors();
             getShapeOrderedByRDFRank();
@@ -1219,12 +1204,13 @@ public class VisGraph implements Runnable{
             }
 		} finally {
 			// Release the latch to unblock the main thread
-			System.out.println("-->releasing the latch ");
+            logger.debug("-->releasing the latch");
             if (Thread.currentThread().isInterrupted()) {
                 Platform.runLater(() -> paintframe.loadingStage.close());
                 paintframe.clearCanvas();
             }
 			latch.countDown();
+            logger.debug("<--Graph building process finished");
 		}
 	}
 	
