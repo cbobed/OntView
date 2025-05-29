@@ -111,7 +111,7 @@ public class VisGraph implements Runnable{
     public int getWidth() {
     	VisLevel lvl = VisLevel.getLevelFromID(levelSet, VisLevel.lastLevel(levelSet));
 		if (lvl == null) {
-			System.err.println("VisLevel is null in getWidth method.");
+            logger.error("VisLevel is null in getWidth method.");
 			return 0;
 		}
         return (lvl.getWidth()+lvl.getXpos()+VisConstants.WIDTH_MARGIN);
@@ -127,7 +127,7 @@ public class VisGraph implements Runnable{
     
     public void adjustPanelSize(float factor){
 		if (paintframe == null) {
-			System.err.println("PaintFrame is null in adjustPanelSize method.");
+            logger.error("PaintFrame is null in adjustPanelSize method.");
 			return;
 		}
         double viewPortHeight = paintframe.scroll.getViewportBounds().getHeight();
@@ -301,7 +301,7 @@ public class VisGraph implements Runnable{
 			renamer.gatherAllExpressionsFiltering();
 		}
 		catch (NonGatheredClassExpressionsException e) {
-			System.err.println("Problem gathering anonymous classes");
+            logger.error("Problem gathering anonymous classes");
 			renamer.nullifyClassesToAdd();
 		}
 		

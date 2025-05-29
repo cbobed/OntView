@@ -2,16 +2,20 @@ package sid.OntView2.kcExtractors;
 
 import it.essepuntato.semanticweb.kce.engine.Engine;
 import it.essepuntato.taxonomy.HTaxonomy;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.semanticweb.owlapi.model.OWLOntology;
 
 import sid.OntView2.common.Shape;
 import sid.OntView2.common.VisConstants;
+import sid.OntView2.main.Mine;
 import sid.OntView2.utils.OWLAPITaxonomyMakerExtended;
 
 import java.util.Map;
 import java.util.Set;
 
 public class KCEConceptExtraction extends KConceptExtractor {
+    private static final Logger logger = LogManager.getLogger(KCEConceptExtraction.class);
 
 	/**
 	 * Replaced by overloaded version
@@ -32,7 +36,7 @@ public class KCEConceptExtraction extends KConceptExtractor {
 			return conceptSet;
 
 		} else {
-			System.err.println("hideNonKeyConcepts is WIP in protege version. Check source string");
+            logger.error("hideNonKeyConcepts is WIP in protege version. Check source string");
 			return null;
 		}
 	}

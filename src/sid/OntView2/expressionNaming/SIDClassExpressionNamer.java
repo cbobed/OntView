@@ -50,7 +50,7 @@ public class SIDClassExpressionNamer {
 			applySyntacticSieve();
 		}
 		catch (NonGatheredClassExpressionsException e) {
-			System.err.println("Not possible -- we have just called retrieveClassExpressions()"); 
+            logger.error("Not possible -- we have just called retrieveClassExpressions()");
 		}
 
 		OWLOntologyManager manager = ontology.getOWLOntologyManager();

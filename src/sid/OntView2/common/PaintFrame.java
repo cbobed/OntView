@@ -374,7 +374,7 @@ public class PaintFrame extends Canvas {
 
 
            } else {
-				System.err.println("visGraph is null in draw method.");
+                logger.error("visGraph is null in draw method.");
 			}
 		}
 	}
@@ -468,7 +468,7 @@ public class PaintFrame extends Canvas {
 	// properly according to javaFX requirements
 	public synchronized void relax() {
 		if (visGraph == null) {
-			System.err.println("visGraph is null in relax method.");
+            logger.error("VisGraph is null in relax method.");
 			return;
 		}
 
@@ -1361,7 +1361,7 @@ public class PaintFrame extends Canvas {
             task.cancel();
             loadingLabel.setText("Cancelling task...");
             cancelButton.setDisable(true);
-            System.err.println("Task cancelled");
+            logger.info("Task cancellation requested");
         });
 
 		VBox loadingBox = new VBox(15.0, progressIndicator, loadingLabel, cancelButton);

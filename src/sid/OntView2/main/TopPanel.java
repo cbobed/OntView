@@ -23,6 +23,8 @@ import javafx.stage.Modality;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.semanticweb.owlapi.model.IRI;
 import sid.OntView2.common.*;
 import sid.OntView2.utils.ErrorHandler;
@@ -34,6 +36,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 //VS4E -- DO NOT REMOVE THIS LINE!
 public class TopPanel extends Canvas implements ControlPanelInterface {
+    private static final Logger logger = LogManager.getLogger(TopPanel.class);
 
 	//private static final long serialVersionUID = 1L;
 	private Button loadOntologyButton, loadReasonerButton, saveViewButton, restoreViewButton,
@@ -953,7 +956,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			try {
 				boolean loaded = parent.loadReasoner(x);
 				if(!loaded) {
-					System.err.println("Reasoner could not be loaded.");
+                    logger.error("Reasoner could not be loaded.");
 					return;
 				}
 				createButtonActionActionPerformed(event);

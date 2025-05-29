@@ -1,16 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN">
     <Appenders>
-        <Console name="Console" target="SYSTEM_OUT">
+        <!-- Appender para INFO, DEBUG, WARN en stdout -->
+        <Console name="Stdout" target="SYSTEM_OUT">
+            <ThresholdFilter level="error" onMatch="DENY" onMismatch="ACCEPT"/>
             <PatternLayout pattern="%msg%n"/>
         </Console>
+
+        <!-- Appender para ERROR y FATAL en stderr, en rojo -->
+        <Console name="Stderr" target="SYSTEM_ERR">
+            <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="%msg%n{ERROR=red bold, FATAL=red bold}"/>
+        </Console>
     </Appenders>
+
     <Loggers>
+        <!-- Logger específico, sin additivity, enviará según el nivel a los appenders -->
         <Logger name="org.semanticweb.owlapi" level="info" additivity="false">
-            <AppenderRef ref="Console"/>
+            <AppenderRef ref="Stdout"/>
+            <AppenderRef ref="Stderr"/>
         </Logger>
-        <Root level="INFO">
-            <AppenderRef ref="Console"/>
+
+        <!-- Root logger idem -->
+        <Root level="info">
+            <AppenderRef ref="Stdout"/>
+            <AppenderRef ref="Stderr"/>
         </Root>
     </Loggers>
 </Configuration>

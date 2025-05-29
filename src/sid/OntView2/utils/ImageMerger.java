@@ -22,7 +22,7 @@ public class ImageMerger {
             File directory = new File(directoryPath);
             File[] files = directory.listFiles();
             if (files == null) {
-                System.err.println("The directory does not exist or cannot be read: " + directoryPath);
+                logger.error("The directory does not exist or cannot be read: " + directoryPath);
                 return;
             }
 
@@ -120,7 +120,7 @@ public class ImageMerger {
             }
         }
         if (!dir.delete()) {
-            System.err.println("Could not delete : " + dir.getAbsolutePath());
+            logger.error("Could not delete directory: {}", dir.getAbsolutePath());
         }
     }
 

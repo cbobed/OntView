@@ -85,12 +85,12 @@ public class OWLAPITaxonomyMakerExtended implements ITaxonomyMaker{
              t.addCategory(root);
              t.setRoot(root);
          } catch (NoCategoryException e) {
-             System.err.println("[TaxonomyMaker: makeTaxonomy] ERROR - The category '" +
-                     root.getName() + "' isn't in the taxonomy");
+             logger.error("[TaxonomyMaker: makeTaxonomy] ERROR - The category ' {} ' isn't in the taxonomy",
+                 root.getName());
              e.printStackTrace();
          } catch (RootException e) { /* This exception is almost impossible */
-             System.err.println("[TaxonomyMaker: makeTaxonomy] ERROR - The category '" +
-                     root.getName() + "' cannot be a root category");
+             logger.error("[TaxonomyMaker: makeTaxonomy] ERROR - The category ' {} ' cannot be a root category",
+                 root.getName());
              e.printStackTrace();
          }
 
@@ -108,12 +108,12 @@ public class OWLAPITaxonomyMakerExtended implements ITaxonomyMaker{
                      Category category = t.getCategoryByName(name);
                      t.subCategoryOf(category, t.getRoot());
                  } catch (NoCategoryException ex) {
-                     System.err.println("[TaxonomyMaker: makeTaxonomy] ERROR - The category '" +
-                             name + "' isn't in the taxonomy");
+                     logger.error("[TaxonomyMaker: makeTaxonomy] ERROR - The category ' {} ' isn't in the taxonomy",
+                         name);
                      ex.printStackTrace();
                  } catch (RootException ex) {
-                     System.err.println("[TaxonomyMaker: makeTaxonomy] ERROR - The category '" +
-                             name + "' isn't the root");
+                     logger.error("[TaxonomyMaker: makeTaxonomy] ERROR - The category ' {} ' isn't the root",
+                             name);
                      ex.printStackTrace();
                  }
              }
@@ -127,8 +127,8 @@ public class OWLAPITaxonomyMakerExtended implements ITaxonomyMaker{
                  t = this.makeTaxonomyStartingFrom(
                          t, this.owlAPIManager, subClasses, curTopCat, new ArrayList<Category>());
              } catch (NoCategoryException e) {
-                 System.err.println("[TaxonomyMaker: makeTaxonomy] ERROR - The category '" +
-                         rootClass + "' isn't in the taxonomy");
+                 logger.error("[TaxonomyMaker: makeTaxonomy] ERROR - The category ' {} ' isn't in the taxonomy",
+                         rootClass);
                  e.printStackTrace();
              }
          }
@@ -144,12 +144,12 @@ public class OWLAPITaxonomyMakerExtended implements ITaxonomyMaker{
                  try {
                      t.setDomain(property, t.getCategoryByName(curClass.getIRI().toString()));
                  } catch (NoCategoryException e) {
-                     System.err.println("[TaxonomyMaker: makeTaxonomy] ERROR - The category '" +
-                             curClass.getIRI().toString() + "' isn't in the taxonomy");
+                     logger.error("[TaxonomyMaker: makeTaxonomy] ERROR - The category ' {} ' isn't in the taxonomy",
+                         curClass.getIRI().toString());
                      e.printStackTrace();
                  } catch (NoPropertyException e) {
-                     System.err.println("[TaxonomyMaker: makeTaxonomy] ERROR - The property '" +
-                             property.getName() + "' isn't in the taxonomy");
+                     logger.error("[TaxonomyMaker: makeTaxonomy] ERROR - The property ' {} ' isn't in the taxonomy",
+                         property.getName());
                      e.printStackTrace();
                  }
              }
@@ -161,12 +161,12 @@ public class OWLAPITaxonomyMakerExtended implements ITaxonomyMaker{
                  try {
                      t.setDomain(property, t.getCategoryByName(curClass.getIRI().toString()));
                  } catch (NoCategoryException e) {
-                     System.err.println("[TaxonomyMaker: makeTaxonomy] ERROR - The category '" +
-                             curClass.getIRI().toString() + "' isn't in the taxonomy");
+                     logger.error("[TaxonomyMaker: makeTaxonomy] ERROR - The category ' {} ' isn't in the taxonomy",
+                         curClass.getIRI().toString());
                      e.printStackTrace();
                  } catch (NoPropertyException e) {
-                     System.err.println("[TaxonomyMaker: makeTaxonomy] ERROR - The property '" +
-                             property.getName() + "' isn't in the taxonomy");
+                     logger.error("[TaxonomyMaker: makeTaxonomy] ERROR - The property ' {} ' isn't in the taxonomy",
+                             property.getName());
                      e.printStackTrace();
                  }
              }
@@ -280,12 +280,12 @@ public class OWLAPITaxonomyMakerExtended implements ITaxonomyMaker{
                 try {
                     t.instanceOf(instance, curTopCategory);
                 } catch (NoInstanceException e) {
-                    System.err.println("[TaxonomyMaker: makeTaxonomyStartingFrom] ERROR - The instance '" +
-                            instance.getName() + "' isn't in the taxonomy");
+                    logger.error("[TaxonomyMaker: makeTaxonomyStartingFrom] ERROR - The instance ' {} ' isn't in the taxonomy",
+                            instance.getName());
                     e.printStackTrace();
                 } catch (NoCategoryException e) {
-                    System.err.println("[TaxonomyMaker: makeTaxonomyStartingFrom] ERROR - The category '" +
-                            curTopCategory.getName() + "' isn't in the taxonomy");
+                    logger.error("[TaxonomyMaker: makeTaxonomyStartingFrom] ERROR - The category ' {} ' isn't in the taxonomy",
+                            curTopCategory.getName());
                     e.printStackTrace();
                 }
             }
@@ -305,12 +305,12 @@ public class OWLAPITaxonomyMakerExtended implements ITaxonomyMaker{
 
                 }
                 catch (NoCategoryException ex) {
-                    System.err.println("[TaxonomyMaker: makeTaxonomyStartingFrom] ERROR - The category '" +
-                            curTopCategory.getName() + "' isn't in the taxonomy");
+                    logger.error("[TaxonomyMaker: makeTaxonomyStartingFrom] ERROR - The category ' {} ' isn't in the taxonomy",
+                            curTopCategory.getName());
                     ex.printStackTrace();
                 } catch (RootException ex) {
-                    System.err.println("[TaxonomyMaker: makeTaxonomyStartingFrom] ERROR - The category '" +
-                            curTopCategory.getName() + "' isn't the root");
+                    logger.error("[TaxonomyMaker: makeTaxonomyStartingFrom] ERROR - The category ' {} ' isn't the root",
+                            curTopCategory.getName());
                     ex.printStackTrace();
                 }
             }
