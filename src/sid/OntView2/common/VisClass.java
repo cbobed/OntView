@@ -42,7 +42,7 @@ public class VisClass extends Shape {
     ArrayList<VisConnectorDisjoint> disjointList;
 	ArrayList<String>  properties; // those that have this class as its domain
 	VisPropertyBox propertyBox;
-	HashSet<OWLClassExpression> equivalentClasses;
+    Set<OWLClassExpression> equivalentClasses;
 	Set<String>  explicitLabel = new HashSet<>();
 
 	boolean isAnonymous;
@@ -108,7 +108,7 @@ public class VisClass extends Shape {
         parents     = new ArrayList<>();
         properties  = new ArrayList<>();
         
-        equivalentClasses = new HashSet<>();
+        equivalentClasses = new LinkedHashSet<>();
         visibleDefinitionLabels = new ArrayList<>();
       
 	}
@@ -472,7 +472,7 @@ public class VisClass extends Shape {
                     if (!matches.isEmpty()) {
                         aux.addAll(matches);
                     } else {
-                        String reduced = qualifyLabel(eqDef.asOWLClass(), getLabel());
+                        String reduced = qualifyLabel(eqDef.asOWLClass(), ExpressionManager.getReducedClassExpression(eqDef));
                         aux.add(reduced);
                     }
                 }
@@ -592,50 +592,69 @@ public class VisClass extends Shape {
 	public void addEquivalentExpression(OWLClassExpression def){
 
         if (def.equals(linkedClassExpression)) return;
-		
+
 		if (!equivalentClasses.contains(def)) {
 			equivalentClasses.add(def);
-			
+
 			if (definitionLabels == null) {
                 definitionLabels = new ArrayList<>();
                 qualifiedDefinitionLabels = new ArrayList<> ();
-                explicitDefinitionLabels = new HashMap<>();
-                explicitQualifiedDefinitionLabels = new HashMap<>();
+                explicitDefinitionLabels = new LinkedHashMap<>();
+                explicitQualifiedDefinitionLabels = new LinkedHashMap<>();
             }
-
-            List<String> labelsForDef = new ArrayList<>();
-            List<String> qualifiedLabelsForDef = new ArrayList<>();
-            if (def instanceof OWLClass) {
-                for (OWLAnnotation  an : EntitySearcher.getAnnotations(def.asOWLClass(), graph.getActiveOntology()).toList() ){
-                    if (an.getProperty().toString().equals("rdfs:label")){
-                        String auxLabel = replaceString(an.getValue().toString().replaceAll("\"", ""));
-                        labelsForDef.add(auxLabel);
-                        String auxQLabel = qualifyLabel(def.asOWLClass(), auxLabel);
-                        qualifiedLabelsForDef.add(auxQLabel != null ? auxQLabel : auxLabel);
-
-                        if (auxLabel.contains("@")) {
-                            graph.paintframe.languagesLabels.add(auxLabel.split("@")[1]);
-                        }
-                    }
-                }
-            }
-            explicitDefinitionLabels.put(def, labelsForDef);
-            explicitQualifiedDefinitionLabels.put(def, qualifiedLabelsForDef);
-
-            // CBL: we add the different labels
-			String label = ExpressionManager.getReducedClassExpression(def);
-			definitionLabels.add(label);
-			String auxQLabel = ExpressionManager.getReducedQualifiedClassExpression(def);
-            if (!"null".equalsIgnoreCase(auxQLabel))
-                qualifiedDefinitionLabels.add(auxQLabel);
-            else
-                qualifiedDefinitionLabels.add(label);
-
-            visibleDefinitionLabels = definitionLabels;
         }
 	}
 
-	public HashSet<OWLClassExpression> getEquivalentClasses(){
+    public void reorderEquivalentClasses() {
+        Set<OWLClassExpression> named = new LinkedHashSet<>();
+        Set<OWLClassExpression> noNamed = new LinkedHashSet<>();
+        for (OWLClassExpression def : getEquivalentClasses()){
+            if (def.isNamed()) named.add(def);
+            else noNamed.add(def);
+        }
+
+        equivalentClasses.clear();
+        equivalentClasses.addAll(noNamed);
+        equivalentClasses.addAll(named);
+
+        for (OWLClassExpression def : equivalentClasses) {
+            saveLabelsQualifiedNamesEquivalentClasses(def);
+        }
+    }
+
+    private void saveLabelsQualifiedNamesEquivalentClasses(OWLClassExpression def) {
+        List<String> labelsForDef = new ArrayList<>();
+        List<String> qualifiedLabelsForDef = new ArrayList<>();
+        if (def instanceof OWLClass) {
+            for (OWLAnnotation  an : EntitySearcher.getAnnotations(def.asOWLClass(), graph.getActiveOntology()).toList() ){
+                if (an.getProperty().toString().equals("rdfs:label")){
+                    String auxLabel = replaceString(an.getValue().toString().replaceAll("\"", ""));
+                    labelsForDef.add(auxLabel);
+                    String auxQLabel = qualifyLabel(def.asOWLClass(), auxLabel);
+                    qualifiedLabelsForDef.add(auxQLabel != null ? auxQLabel : auxLabel);
+
+                    if (auxLabel.contains("@")) {
+                        graph.paintframe.languagesLabels.add(auxLabel.split("@")[1]);
+                    }
+                }
+            }
+        }
+        explicitDefinitionLabels.put(def, labelsForDef);
+        explicitQualifiedDefinitionLabels.put(def, qualifiedLabelsForDef);
+
+        // CBL: we add the different labels
+        String label = ExpressionManager.getReducedClassExpression(def);
+        definitionLabels.add(label);
+        String auxQLabel = ExpressionManager.getReducedQualifiedClassExpression(def);
+        if (!"null".equalsIgnoreCase(auxQLabel))
+            qualifiedDefinitionLabels.add(auxQLabel);
+        else
+            qualifiedDefinitionLabels.add(label);
+
+        visibleDefinitionLabels = definitionLabels;
+    }
+
+	public Set<OWLClassExpression> getEquivalentClasses(){
 		return equivalentClasses;
 	}
 

@@ -173,6 +173,7 @@ public class VisGraph implements Runnable{
             linkDefinitionsToDefinedClasses(activeOntology);
         }
 
+        reorderEquivalentClasses();
         createLevels(activeOntology);
         arrangePos();
         VisLevel.shrinkLevelSet(levelSet);
@@ -255,6 +256,7 @@ public class VisGraph implements Runnable{
         	linkDefinitionsToDefinedClasses(activeOntology);
         }
 
+        reorderEquivalentClasses();
         createLevels(activeOntology);
         arrangePos();
         VisLevel.shrinkLevelSet(levelSet);
@@ -291,6 +293,14 @@ public class VisGraph implements Runnable{
         paintframe.getParentFrame().loadSearchCombo();
         paintframe.setStateChanged(true);
         logger.debug("<--buildReasonedGraph");
+    }
+
+    private void reorderEquivalentClasses() {
+        for (Shape shape : new LinkedHashSet<>(shapeMap.values())) {
+            if (!shape.asVisClass().getEquivalentClasses().isEmpty()) {
+                shape.asVisClass().reorderEquivalentClasses();
+            }
+        }
     }
 
 	private void insertClassExpressions (OWLOntology activeOntology, OWLReasoner reasoner,
