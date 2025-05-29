@@ -173,56 +173,8 @@ public class VisGraph implements Runnable{
             linkDefinitionsToDefinedClasses(activeOntology);
         }
 
-        reorderEquivalentClasses();
-        createLevels(activeOntology);
-        arrangePos();
-        VisLevel.shrinkLevelSet(levelSet);
-
-        VisLevel.adjustWidthAndPos(levelSet);
-
-        // here, we should add the disjointness
-        logger.debug("Disjointness ... ");
-        for (Entry<String, Shape> entry : shapeMap.entrySet()){
-            Shape shape = entry.getValue();
-            if (shape instanceof VisClass) {
-                shape.asVisClass().addAssertedDisjointConnectors();
-            }
-            labelMap.put(entry.getValue().getLabel(), entry.getKey()); // convert <String, Shape> to <String, String>
-        }
-
-        placeProperties(activeOntology,reasoner);
-        arrangePos();
-        VisLevel.shrinkLevelSet(levelSet);
-        VisLevel.adjustWidthAndPos(levelSet);
-
-        logger.debug("Redundant ... ");
-        removeRedundantConnector();
-        System.gc();
-        reorder = new GraphReorder(this);
-        logger.debug("Visual reordering ... ");
-        reorder.visualReorder();
-        adjustPanelSize((float) 1.0);
-        clearDashedConnectorList();
-        updatePosition();
-        logger.debug("Applying KCE Option if required ...");
-        paintframe.doKceOptionAction();
-        //showAll();
-        VisLevel.adjustWidthAndPos(getLevelSet());
-        paintframe.getParentFrame().loadSearchCombo();
-        paintframe.setStateChanged(true);
+        layoutAndRenderGraph(activeOntology, reasoner);
         logger.debug("<--buildReasonedGraphSelectedNodes");
-
-        for (Entry<String, Shape> entry: shapeMap.entrySet()) {
-            logger.debug("Shape: {}", entry.getKey());
-            logger.debug("\t\t{}", entry.getValue().getLabel());
-            for (OWLClassExpression equiv: entry.getValue().asVisClass().getEquivalentClasses()) {
-                logger.debug("\t\t\t{}", equiv);
-            }
-            for (Shape s:entry.getValue().asVisClass().getChildren()) {
-                logger.debug("--> {}", s.asVisClass().getLabel());
-            }
-        }
-
         storeDescendants();
         storeAncestors();
         getShapeOrderedByRDFRank();
@@ -256,6 +208,11 @@ public class VisGraph implements Runnable{
         	linkDefinitionsToDefinedClasses(activeOntology);
         }
 
+        layoutAndRenderGraph(activeOntology, reasoner);
+        logger.debug("<--buildReasonedGraph");
+    }
+
+    private void layoutAndRenderGraph(OWLOntology activeOntology, OWLReasoner reasoner) {
         reorderEquivalentClasses();
         createLevels(activeOntology);
         arrangePos();
@@ -292,7 +249,6 @@ public class VisGraph implements Runnable{
         VisLevel.adjustWidthAndPos(getLevelSet());
         paintframe.getParentFrame().loadSearchCombo();
         paintframe.setStateChanged(true);
-        logger.debug("<--buildReasonedGraph");
     }
 
     private void reorderEquivalentClasses() {
