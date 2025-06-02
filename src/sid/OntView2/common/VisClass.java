@@ -586,6 +586,10 @@ public class VisClass extends Shape {
 		return linkedClassExpression;
 	}
 
+    public void setLinkedClassExpression(OWLClassExpression linkedClassExpression) {
+        this.linkedClassExpression = linkedClassExpression;
+    }
+
 	// <CBL 24/9/13> 
 	// instead of setDefinition, we now add a new one
 	// and update the labels

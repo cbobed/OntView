@@ -11,7 +11,6 @@ import org.semanticweb.owlapi.model.parameters.Imports;
 import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
-import org.semanticweb.owlapi.reasoner.OWLReasonerRuntimeException;
 import org.semanticweb.owlapi.search.EntitySearcher;
 import org.xml.sax.SAXException;
 
@@ -40,7 +39,7 @@ public class VisGraph implements Runnable{
     ArrayList<VisConnector> connectorList;
 	ArrayList<VisConnector> dashedConnectorList;
 	
-    final public Map<String, Shape>    shapeMap;
+    public Map<String, Shape>    shapeMap;
     final public Map<String, String>   labelMap;
 	HashMap<String, VisObjectProperty>     propertyMap;
 	HashMap<String, VisDataProperty> dPropertyMap;
@@ -213,6 +212,7 @@ public class VisGraph implements Runnable{
     }
 
     private void layoutAndRenderGraph(OWLOntology activeOntology, OWLReasoner reasoner) {
+        checkOntologyPrefixes(activeOntology);
         reorderEquivalentClasses();
         createLevels(activeOntology);
         arrangePos();
@@ -249,6 +249,60 @@ public class VisGraph implements Runnable{
         VisLevel.adjustWidthAndPos(getLevelSet());
         paintframe.getParentFrame().loadSearchCombo();
         paintframe.setStateChanged(true);
+
+        for (Entry<String, Shape> entry: shapeMap.entrySet()) {
+            System.out.println("Shape: "+entry.getKey());
+            System.out.println("\t\t"+entry.getValue().getLabel());
+            for (OWLClassExpression equiv: entry.getValue().asVisClass().getEquivalentClasses()) {
+                System.out.println("\t\t\t"+equiv);
+            }
+        }
+
+    }
+
+    public void checkOntologyPrefixes(OWLOntology activeOntology) {
+        String ontologyPrefix = getOntologyPrefix(activeOntology);
+
+        Map<String, Shape> shapeMap = this.shapeMap;
+
+        for (Map.Entry<String, Shape> entry : shapeMap.entrySet()) {
+            Shape shape = entry.getValue();
+
+            if (shape.asVisClass().getEquivalentClasses().isEmpty()) continue;
+
+            OWLClassExpression ce = shape.getLinkedClassExpression();
+            String reduced = ExpressionManager.getReducedQualifiedClassExpression(ce);
+
+            if (!reduced.startsWith(ontologyPrefix)) {
+                OWLClassExpression primary = shape.getLinkedClassExpression();
+
+                for (OWLClassExpression equiv : shape.asVisClass().getEquivalentClasses()) {
+                    String equivReduced = ExpressionManager.getReducedQualifiedClassExpression(equiv);
+                    if (equivReduced.startsWith(ontologyPrefix)) {
+                        primary = equiv;
+                        break;
+                    }
+                }
+
+                if (primary != ce) {
+                    System.out.println("Replacing " + reduced + " with " + ExpressionManager.getReducedQualifiedClassExpression(primary));
+                }
+            }
+        }
+
+        this.shapeMap = shapeMap;
+    }
+
+    public static String getOntologyPrefix(OWLOntology ontology) {
+        OWLOntologyManager mgr = ontology.getOWLOntologyManager();
+        IRI documentIRI = mgr.getOntologyDocumentIRI(ontology);
+
+        String fileName = documentIRI.getShortForm();
+        if (fileName.endsWith(".owl")) fileName = fileName.substring(0, fileName.length() - 4);
+
+
+        String base = fileName.contains(".") ? fileName.substring(0, fileName.indexOf('.')) : fileName;
+        return base + ":";
     }
 
     private void reorderEquivalentClasses() {
