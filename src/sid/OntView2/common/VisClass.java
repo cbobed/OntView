@@ -609,6 +609,10 @@ public class VisClass extends Shape {
         }
 	}
 
+    public void removeEquivalentExpression(OWLClassExpression def) {
+        equivalentClasses.remove(def);
+    }
+
     public void reorderEquivalentClasses() {
         Set<OWLClassExpression> named = new LinkedHashSet<>();
         Set<OWLClassExpression> noNamed = new LinkedHashSet<>();

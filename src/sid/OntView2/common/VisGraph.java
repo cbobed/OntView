@@ -222,15 +222,16 @@ public class VisGraph implements Runnable{
 
         // here, we should add the disjointness
         logger.debug("Disjointness ... ");
-        for (Entry<String, Shape> entry : shapeMap.entrySet()){
+        for (Entry<String, Shape> entry : shapeMap.entrySet()) {
             Shape shape = entry.getValue();
+
             if (shape instanceof VisClass) {
                 shape.asVisClass().addAssertedDisjointConnectors();
             }
             labelMap.put(entry.getValue().getLabel(), entry.getKey()); // convert <String, Shape> to <String, String>
         }
 
-        placeProperties(activeOntology,reasoner);
+        placeProperties(activeOntology, reasoner);
         arrangePos();
         VisLevel.shrinkLevelSet(levelSet);
         VisLevel.adjustWidthAndPos(levelSet);
@@ -249,24 +250,12 @@ public class VisGraph implements Runnable{
         VisLevel.adjustWidthAndPos(getLevelSet());
         paintframe.getParentFrame().loadSearchCombo();
         paintframe.setStateChanged(true);
-
-        for (Entry<String, Shape> entry: shapeMap.entrySet()) {
-            System.out.println("Shape: "+entry.getKey());
-            System.out.println("\t\t"+entry.getValue().getLabel());
-            for (OWLClassExpression equiv: entry.getValue().asVisClass().getEquivalentClasses()) {
-                System.out.println("\t\t\t"+equiv);
-            }
-        }
-
     }
 
     public void checkOntologyPrefixes(OWLOntology activeOntology) {
         String ontologyPrefix = getOntologyPrefix(activeOntology);
 
-        Map<String, Shape> shapeMap = this.shapeMap;
-
-        for (Map.Entry<String, Shape> entry : shapeMap.entrySet()) {
-            Shape shape = entry.getValue();
+        for (Shape shape : shapeMap.values()) {
 
             if (shape.asVisClass().getEquivalentClasses().isEmpty()) continue;
 
@@ -285,12 +274,14 @@ public class VisGraph implements Runnable{
                 }
 
                 if (primary != ce) {
-                    System.out.println("Replacing " + reduced + " with " + ExpressionManager.getReducedQualifiedClassExpression(primary));
+                    shape.asVisClass().setLinkedClassExpression(primary);
+                    changeLabels(primary, shape);
+                    shape.asVisClass().addEquivalentExpression(ce);
+                    shape.asVisClass().removeEquivalentExpression(primary);
                 }
             }
         }
 
-        this.shapeMap = shapeMap;
     }
 
     public static String getOntologyPrefix(OWLOntology ontology) {
@@ -311,6 +302,33 @@ public class VisGraph implements Runnable{
                 shape.asVisClass().reorderEquivalentClasses();
             }
         }
+    }
+
+    public void changeLabels(OWLClassExpression ce, Shape shape) {
+        shape.asVisClass().explicitLabel.clear();
+        shape.asVisClass().explicitQualifiedLabel.clear();
+
+        String auxQLabel;
+        if (ce instanceof OWLClass){
+            for (OWLAnnotation  an : EntitySearcher.getAnnotations(ce.asOWLClass(), activeOntology).toList() ){
+                if (an.getProperty().toString().equals("rdfs:label")){
+                    String auxLabel = replaceString(an.getValue().toString().replaceAll("\"", ""));
+                    shape.asVisClass().explicitLabel.add(auxLabel);
+                    auxQLabel = qualifyLabel(ce.asOWLClass(), auxLabel);
+                    if (!"null".equalsIgnoreCase(auxQLabel)) {
+                        shape.asVisClass().explicitQualifiedLabel.add(auxQLabel);
+                    }
+                    else {
+                        shape.asVisClass().explicitQualifiedLabel.add(auxLabel);
+                    }
+                }
+            }
+        }
+
+        shape.asVisClass().label = ExpressionManager.getReducedClassExpression(ce);
+        shape.asVisClass().visibleLabel = shape.asVisClass().label;
+        auxQLabel = ExpressionManager.getReducedQualifiedClassExpression(ce);
+        shape.asVisClass().qualifiedLabel = !"null".equalsIgnoreCase(auxQLabel) ? auxQLabel : shape.asVisClass().label;
     }
 
 	private void insertClassExpressions (OWLOntology activeOntology, OWLReasoner reasoner,

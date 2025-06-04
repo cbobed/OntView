@@ -39,6 +39,7 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import sid.OntView2.main.TopPanel;
 import sid.OntView2.kcExtractors.KConceptExtractor;
 import sid.OntView2.kcExtractors.KConceptExtractorFactory;
+import sid.OntView2.utils.ExpressionManager;
 
 public class PaintFrame extends Canvas {
     private static final Logger logger = LogManager.getLogger(GraphReorder.class);

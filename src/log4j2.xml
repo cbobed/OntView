@@ -13,7 +13,7 @@
     </Appenders>
 
     <Loggers>
-        <Logger name="org.semanticweb.owlapi" level="info" additivity="false">
+        <Logger name="org.semanticweb.owlapi" level="error" additivity="false">
             <AppenderRef ref="Stdout"/>
             <AppenderRef ref="Stderr"/>
         </Logger>
