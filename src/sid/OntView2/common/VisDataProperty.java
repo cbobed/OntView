@@ -64,7 +64,7 @@ public class VisDataProperty extends VisProperty {
 	public int getLabelHeight() {
 		if (height ==0) {
             int spaceBetweenLines = 8;
-            Font font = Font.font("DejaVu Sans", FontWeight.NORMAL, 10);
+            Font font = Font.font("DejaVu Sans", FontWeight.NORMAL, 11);
 			height = VisProperty.stringHeight(font) + spaceBetweenLines;
 		}
 		return height;
