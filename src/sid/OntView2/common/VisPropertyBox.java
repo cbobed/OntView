@@ -71,8 +71,8 @@ public class VisPropertyBox {
 		Text f = new Text();
 		f.setFont(context.getFont());
 		int ascent = (int)f.getLayoutBounds().getHeight();
-		height = (ascent + 3) * (propertyList.size()+dPropertyList.size());
-		objectPropHeight =  (ascent + 3) * (propertyList.size());
+		height = (ascent + 4) * (propertyList.size()+dPropertyList.size());
+		objectPropHeight =  (ascent + 4) * (propertyList.size());
 	}
 	
 	public void draw(GraphicsContext g){

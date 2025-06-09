@@ -1171,15 +1171,15 @@ public class PaintFrame extends Canvas {
 
 						int upperShapeHeight = (upperShape instanceof VisClass && upperShape.asVisClass().propertyBox != null
 								&& upperShape.asVisClass().propertyBox.visible)
-								? upperShape.getTotalHeight()
-								: upperShape.getHeight();
+								? (upperShape.asVisClass().propertyBox.height + upperShape.getHeight()/2)
+								: upperShape.getHeight()/2;
 
 						int repellingTopCorner = repellingShape.getTopCorner() - repellingShape.asVisClass().topToBarDistance;
 
-						int upperShapeLimit = upperShape.getPosY() + upperShapeHeight / 2 + MIN_SPACE;
+                        int upperShapeLimit = upperShape.getBottomCorner();
 
-						if (repellingTopCorner < upperShapeLimit) {
-							upperShape.setPosY(upperShape.getPosY() - upperShapeHeight / 2);
+						if (repellingTopCorner < upperShapeLimit  + MIN_SPACE) {
+                            upperShape.setPosY(repellingTopCorner - MIN_SPACE - upperShapeHeight);
 						}
 
 						shapeRepulsion(upperShape, direction);
@@ -1194,15 +1194,11 @@ public class PaintFrame extends Canvas {
 						if (lowerShape == null)
 							return;
 
-						int lowerShapeHeight = (lowerShape instanceof VisClass && lowerShape.asVisClass().propertyBox != null
-								&& lowerShape.asVisClass().propertyBox.visible)
-								? lowerShape.getTotalHeight()
-								: lowerShape.getHeight();
-
 						int lowerShapeTopCorner = lowerShape.getTopCorner() - lowerShape.asVisClass().topToBarDistance;
 
 						if (repellingShape.getBottomCorner() + MIN_SPACE > lowerShapeTopCorner) {
-							lowerShape.setPosY(lowerShape.getPosY() + lowerShapeHeight / 2);
+							lowerShape.setPosY(repellingShape.getBottomCorner() + MIN_SPACE + lowerShape.getHeight()/2
+                                + lowerShape.asVisClass().topToBarDistance);
 						}
 
 						shapeRepulsion(lowerShape, direction);
