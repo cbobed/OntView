@@ -776,7 +776,7 @@ public class PaintFrame extends Canvas {
             // Adjust the shape position
             for (VisLevel level : visGraph.getLevelSet().values()) {
                 for (Shape shape : level.orderedList()) {
-                    shape.setPosY((int) ((shape.getPosY() * factor - minY + BORDER_PANEL) / factor));
+                    shape.setPosY((int) ((shape.getPosY() - minY + BORDER_PANEL)));
                     maxY = Math.max(maxY, shape.getBottomCorner());
                 }
             }
