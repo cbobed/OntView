@@ -587,7 +587,7 @@ public class PaintFrame extends Canvas {
 		setCursor(Cursor.DEFAULT);
 
         Platform.runLater(canvasAdjusterRunnable);
-        Platform.runLater(redrawRunnable);
+        Platform.runLater(relaxerRunnable);
 	}
 
 	/*
@@ -784,13 +784,11 @@ public class PaintFrame extends Canvas {
 
         if (minY > BORDER_PANEL) {
             double offset = minY - BORDER_PANEL;
-
             for (VisLevel level : visGraph.getLevelSet().values()) {
                 for (Shape shape : level.orderedList()) {
-                    shape.setPosY((int) ((shape.getPosY() - offset) / factor));
+                    shape.setPosY((int) (shape.getPosY() - offset));
                 }
             }
-
             maxY -= offset;
         }
 
