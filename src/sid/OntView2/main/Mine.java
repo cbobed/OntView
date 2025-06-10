@@ -394,7 +394,10 @@ public class Mine extends Application implements Embedable{
 		};
 
 		artPanel.loadingStage = artPanel.showLoadingStage(task);
-
+        task.setOnCancelled(e -> {
+            if (!cancelledOutOfVisGraph) VisGraph.voluntaryCancel(true);
+            cancelledOutOfVisGraph = false;
+        });
 		task.setOnSucceeded(e -> {
             artPanel.loadingStage.close();
 			Platform.runLater(artPanel.getRedrawRunnable());

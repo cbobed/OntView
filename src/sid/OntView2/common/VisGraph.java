@@ -38,7 +38,6 @@ public class VisGraph implements Runnable{
     Hashtable<Integer, VisLevel>       levelSet;
     ArrayList<VisConnector> connectorList;
 	ArrayList<VisConnector> dashedConnectorList;
-	
     public Map<String, Shape>    shapeMap;
     final public Map<String, String>   labelMap;
 	HashMap<String, VisObjectProperty>     propertyMap;

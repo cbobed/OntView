@@ -238,14 +238,8 @@ public class PaintFrame extends Canvas {
 			redraw();
 		}
 	}
-	
-	public class Compacter implements Runnable {
-		public void run() {
-			compactGraph();
-		}
-	}
 
-	public class CanvasAdjuster implements Runnable {
+    public class CanvasAdjuster implements Runnable {
 		public void run() {
 			checkAndResizeCanvas();
 		}
@@ -468,10 +462,7 @@ public class PaintFrame extends Canvas {
 	// Relax is already encapsulated in the relaxerRunnable so all the calls should already be done 
 	// properly according to javaFX requirements
 	public synchronized void relax() {
-		if (visGraph == null) {
-            logger.error("VisGraph is null in relax method.");
-			return;
-		}
+		if (visGraph == null) { return; }
 
 		boolean recentChange = false;
 
@@ -754,6 +745,8 @@ public class PaintFrame extends Canvas {
 	 * Method to check if it needs to expand the canvas size
 	 */
     public void checkAndResizeCanvas() {
+        if (visGraph == null) { return; }
+
         double maxY = Double.MIN_VALUE;
         double minY = Double.MAX_VALUE;
         double maxX = Double.MIN_VALUE;
