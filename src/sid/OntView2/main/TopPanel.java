@@ -828,6 +828,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 				Named Classes: Gray
 				Defined Classes: Light Green
 				Anonymous Classes: White
+				(1): Functional property
 				"""
 		);
 
@@ -1070,10 +1071,10 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
                         }
                     }
                 }
-                Platform.runLater(parent.artPanel.getCanvasAdjusterRunnable());
                 parent.artPanel.setStateChanged(true);
                 Platform.runLater(parent.artPanel.getRelaxerRunnable());
-				return null;
+                Platform.runLater(parent.artPanel.getCanvasAdjusterRunnable());
+                return null;
 			}
 		};
 
