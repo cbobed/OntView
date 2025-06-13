@@ -404,34 +404,37 @@ public class ExpressionManager {
 			case DATA_ALL_VALUES_FROM:
 				OWLDataAllValuesFrom dAll= (OWLDataAllValuesFrom) o;
 				reduced = new StringBuilder(OntViewConstants.FOR_ALL + ".(");
-				reduced.append(getReducedQualifiedDataPropertyExpression(dAll.getProperty()));
+				reduced.append(getReducedQualifiedDataPropertyExpression(dAll.getProperty())).append(",");
 				reduced.append(getReducedDataRange(dAll.getFiller()));
-
 				reduced.append(")");
 				break;
 			case DATA_EXACT_CARDINALITY:
 				OWLDataExactCardinality dExact = (OWLDataExactCardinality) o;
 				reduced = new StringBuilder("=" + dExact.getCardinality() + "(");
-				reduced.append(getReducedQualifiedDataPropertyExpression(dExact.getProperty()));
+				reduced.append(getReducedQualifiedDataPropertyExpression(dExact.getProperty())).append(",");
 				reduced.append(getReducedDataRange(dExact.getFiller()));
+                reduced.append(")");
 				break;
 			case DATA_MAX_CARDINALITY:
 				OWLDataMaxCardinality dMax = (OWLDataMaxCardinality) o;
 				reduced = new StringBuilder(OntViewConstants.LOWER_EQUAL + dMax.getCardinality() + "(");
-				reduced.append(getReducedQualifiedDataPropertyExpression(dMax.getProperty()));
+				reduced.append(getReducedQualifiedDataPropertyExpression(dMax.getProperty())).append(",");
 				reduced.append(getReducedDataRange(dMax.getFiller()));
+                reduced.append(")");
 				break;
 			case DATA_MIN_CARDINALITY:
 				OWLDataMinCardinality dMin = (OWLDataMinCardinality) o;
 				reduced = new StringBuilder(OntViewConstants.GREATER_EQUAL + dMin.getCardinality() + "(");
-				reduced.append(getReducedQualifiedDataPropertyExpression(dMin.getProperty()));
+				reduced.append(getReducedQualifiedDataPropertyExpression(dMin.getProperty())).append(",");
 				reduced.append(getReducedDataRange(dMin.getFiller()));
+                reduced.append(")");
 				break;
 			case DATA_SOME_VALUES_FROM:
 				OWLDataSomeValuesFrom dSome = (OWLDataSomeValuesFrom) o;
 				reduced = new StringBuilder(OntViewConstants.SOME + "(");
-				reduced.append(getReducedQualifiedDataPropertyExpression(dSome.getProperty()));
+				reduced.append(getReducedQualifiedDataPropertyExpression(dSome.getProperty())).append(",");
 				reduced.append(getReducedDataRange(dSome.getFiller()));
+                reduced.append(")");
 				break;
 			default :
 				reduced.append(o);

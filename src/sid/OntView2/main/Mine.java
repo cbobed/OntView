@@ -377,10 +377,18 @@ public class Mine extends Application implements Embedable{
 		}
 	}
 
+    private void selectOptionsFromRestoreView(String[] info) {
+        nTopPanel.getOntologyCombo().setValue(info[2]);
+        nTopPanel.getReasonerCombo().setValue(info[3]);
+        nTopPanel.getKceComboBox().setValue(info[4]);
+    }
+
 	public void restoreViewTask(ActionEvent arg0, String[] info) {
 		// load ontology and reasoner
 		nTopPanel.getOntologyCombo().setValue(info[0]);
 		nTopPanel.getReasonerCombo().setValue(info[1]);
+
+        //selectOptionsFromRestoreView(info);
 
 		Task<Void> task = new Task<>() {
 			@Override

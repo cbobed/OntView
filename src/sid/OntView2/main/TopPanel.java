@@ -142,7 +142,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		return saveImagePartialButton;
 	}
 
-	private CheckBox getQualifiedNames() {
+	public CheckBox getQualifiedNames() {
 		if (qualifiedNames == null) {
 			qualifiedNames = new CheckBox("qualified names");
 			qualifiedNames.setCursor(Cursor.HAND);
@@ -160,7 +160,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		}
 	}
 
-	private CheckBox getRenderLabel() {
+	public CheckBox getRenderLabel() {
 		if (renderLabel == null) {
 			renderLabel = new CheckBox("label");
 			renderLabel.setCursor(Cursor.HAND);
@@ -266,7 +266,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		return fileSystemButton;
 	}
 
-	private CheckBox getPropertiesCheckBox() {
+	public CheckBox getPropertiesCheckBox() {
 		if (Properties == null) {
 			Properties = new CheckBox("properties");
 			Properties.setCursor(Cursor.HAND);
