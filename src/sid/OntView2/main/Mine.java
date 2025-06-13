@@ -439,6 +439,11 @@ public class Mine extends Application implements Embedable{
 		// TODO Auto-generated method stub
 		FileChooser selector = new FileChooser();
 		selector.setInitialDirectory(new File(System.getProperty("user.dir")));
+
+        FileChooser.ExtensionFilter xmlFilter = new FileChooser.ExtensionFilter(".xml", "*.xml");
+        selector.getExtensionFilters().add(xmlFilter);
+        selector.setSelectedExtensionFilter(xmlFilter);
+
 		File file = selector.showOpenDialog(primaryStage);
 		if (file != null) {
 			String path = null;
