@@ -889,7 +889,7 @@ public class VisClass extends Shape {
 						result += calculateTextHeight(auxLabel);
 					}
 		    		if (getVisibleDefinitionLabels() != null && !getVisibleDefinitionLabels().isEmpty())
-		    			result += (getVisibleDefinitionLabels().size()-1) * 5;
+		    			result +=  (getVisibleDefinitionLabels().size()-1);
 	    		}
 	    		else {
 	    			for (String auxLabel: getVisibleDefinitionLabels()) {
