@@ -61,7 +61,20 @@ public class VisPositionConfig {
 		expr = xpath.compile(s);
 		Object reasoner = expr.evaluate(doc, XPathConstants.STRING);
 
-		return new String[]{(String) ontologyName, (String) reasoner};
+        s="//options/properties/text()";
+        expr = xpath.compile(s);
+        Object properties = expr.evaluate(doc, XPathConstants.STRING);
+
+        s="//options/label/text()";
+        expr = xpath.compile(s);
+        Object label = expr.evaluate(doc, XPathConstants.STRING);
+
+        s="//options/qualifiedNames/text()";
+        expr = xpath.compile(s);
+        Object qualifiedNames = expr.evaluate(doc, XPathConstants.STRING);
+
+		return new String[]{(String) ontologyName, (String) reasoner,
+                (String) properties, (String) label, (String) qualifiedNames};
 	}
 	
 	public static void restoreState(VisGraph graph){
@@ -182,6 +195,12 @@ public class VisPositionConfig {
 
 			 out.write("\t<ontologyName>" + graph.paintframe.getActiveOntologySource() + "</ontologyName>\n");
 			 out.write("\t<reasoner>" + graph.paintframe.getReasoner().getReasonerName() + "</reasoner>\n");
+
+             out.write("\t<options>\n");
+             out.write("\t\t<properties>" + graph.paintframe.nTopPanel.getPropertiesCheckBox().isSelected() + "</properties>\n");
+             out.write("\t\t<label>" + graph.paintframe.nTopPanel.getRenderLabel().isSelected() + "</label>\n");
+             out.write("\t\t<qualifiedNames>" + graph.paintframe.nTopPanel.getQualifiedNames().isSelected() + "</qualifiedNames>\n");
+             out.write( "\t</options>\n");
 
 			 for (Entry<String, Shape> entry : graph.shapeMap.entrySet()){
 				 Shape shape = entry.getValue();

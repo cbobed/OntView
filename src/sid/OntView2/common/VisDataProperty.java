@@ -2,6 +2,7 @@ package sid.OntView2.common;
 
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Font;
 
@@ -113,7 +114,8 @@ public class VisDataProperty extends VisProperty {
 			Point2D circlePos = new Point2D(getPosX()-16, getPosY()-10);
 			if (isFunctional){
 				g.setFont(circleFont);
-				g.fillOval(circlePos.getX(),circlePos.getY()+5, 5,5);
+                g.strokeOval(circlePos.getX(), circlePos.getY() + 1.5, 10, 10);
+                g.fillText("1", circlePos.getX() + 2.3, circlePos.getY() + 10,5);
 				g.setFont(textFont);
 			}
 		}

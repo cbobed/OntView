@@ -142,7 +142,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		return saveImagePartialButton;
 	}
 
-	private CheckBox getQualifiedNames() {
+	public CheckBox getQualifiedNames() {
 		if (qualifiedNames == null) {
 			qualifiedNames = new CheckBox("qualified names");
 			qualifiedNames.setCursor(Cursor.HAND);
@@ -160,7 +160,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		}
 	}
 
-	private CheckBox getRenderLabel() {
+	public CheckBox getRenderLabel() {
 		if (renderLabel == null) {
 			renderLabel = new CheckBox("label");
 			renderLabel.setCursor(Cursor.HAND);
@@ -266,7 +266,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		return fileSystemButton;
 	}
 
-	private CheckBox getPropertiesCheckBox() {
+	public CheckBox getPropertiesCheckBox() {
 		if (Properties == null) {
 			Properties = new CheckBox("properties");
 			Properties.setCursor(Cursor.HAND);
@@ -828,6 +828,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 				Named Classes: Gray
 				Defined Classes: Light Green
 				Anonymous Classes: White
+				(1): Functional property
 				"""
 		);
 
@@ -888,7 +889,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		parent.createImageFromVisibleRect();
 	}
 
-	private void applyCheckBoxFunctions(ActionEvent e) {
+	void applyCheckBoxFunctions(ActionEvent e) {
 		if (getPropertiesCheckBox().isSelected()) {
 			propertiesActionActionPerformed(e);
 		}
@@ -1070,10 +1071,10 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
                         }
                     }
                 }
-                Platform.runLater(parent.artPanel.getCanvasAdjusterRunnable());
                 parent.artPanel.setStateChanged(true);
                 Platform.runLater(parent.artPanel.getRelaxerRunnable());
-				return null;
+                Platform.runLater(parent.artPanel.getCanvasAdjusterRunnable());
+                return null;
 			}
 		};
 
@@ -1138,11 +1139,6 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		if ((x != null) && (!x.isEmpty())) {
 			getOntologyCombo().setValue(x);
 		}
-	}
-
-	public void restorePropertyCheckboxes() {
-		getPropertiesCheckBox().setSelected(false);
-		getPropertiesCheckBox().setDisable(false);
 	}
 
 	public void restoreSliderValue() {
