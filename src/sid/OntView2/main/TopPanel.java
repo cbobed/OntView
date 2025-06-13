@@ -889,7 +889,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		parent.createImageFromVisibleRect();
 	}
 
-	private void applyCheckBoxFunctions(ActionEvent e) {
+	void applyCheckBoxFunctions(ActionEvent e) {
 		if (getPropertiesCheckBox().isSelected()) {
 			propertiesActionActionPerformed(e);
 		}
@@ -1139,11 +1139,6 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		if ((x != null) && (!x.isEmpty())) {
 			getOntologyCombo().setValue(x);
 		}
-	}
-
-	public void restorePropertyCheckboxes() {
-		getPropertiesCheckBox().setSelected(false);
-		getPropertiesCheckBox().setDisable(false);
 	}
 
 	public void restoreSliderValue() {

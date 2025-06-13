@@ -626,7 +626,6 @@ public class VisClass extends Shape {
         equivalentClasses.addAll(named);
 
         for (OWLClassExpression def : equivalentClasses) {
-            System.out.println("Reordered equivalent class: " + def);
             saveLabelsQualifiedNamesEquivalentClasses(def);
         }
     }

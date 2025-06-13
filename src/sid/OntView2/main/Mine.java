@@ -223,7 +223,6 @@ public class Mine extends Application implements Embedable{
 					throw new RuntimeException(e);
 				}
 			}
-			nTopPanel.restorePropertyCheckboxes();
 		}
 	}
 
@@ -377,10 +376,18 @@ public class Mine extends Application implements Embedable{
 		}
 	}
 
-    private void selectOptionsFromRestoreView(String[] info) {
-        nTopPanel.getOntologyCombo().setValue(info[2]);
-        nTopPanel.getReasonerCombo().setValue(info[3]);
-        nTopPanel.getKceComboBox().setValue(info[4]);
+    private void selectOptionsFromRestoreView(ActionEvent arg0, String[] info) {
+        nTopPanel.getPropertiesCheckBox().setSelected(Boolean.parseBoolean(info[2]));
+        nTopPanel.getRenderLabel().setSelected(Boolean.parseBoolean(info[3]));
+        nTopPanel.getQualifiedNames().setSelected(Boolean.parseBoolean(info[4]));
+
+        nTopPanel.applyCheckBoxFunctions(arg0);
+    }
+
+    private void resetOptions() {
+        nTopPanel.getPropertiesCheckBox().setSelected(false);
+        nTopPanel.getRenderLabel().setSelected(false);
+        nTopPanel.getQualifiedNames().setSelected(false);
     }
 
 	public void restoreViewTask(ActionEvent arg0, String[] info) {
@@ -388,7 +395,7 @@ public class Mine extends Application implements Embedable{
 		nTopPanel.getOntologyCombo().setValue(info[0]);
 		nTopPanel.getReasonerCombo().setValue(info[1]);
 
-        //selectOptionsFromRestoreView(info);
+        resetOptions();
 
 		Task<Void> task = new Task<>() {
 			@Override
@@ -408,6 +415,7 @@ public class Mine extends Application implements Embedable{
         });
 		task.setOnSucceeded(e -> {
             artPanel.loadingStage.close();
+            selectOptionsFromRestoreView(arg0, info);
 			Platform.runLater(artPanel.getRedrawRunnable());
 		});
 		task.setOnFailed(e -> {
