@@ -86,7 +86,7 @@ public class VisShapeContext extends ContextMenu {
 			showInstances = new MenuItem("Show Instances");
             ArrayList<String> instanceArray = getInstances();
             if (instanceArray.isEmpty()) {
-                showInstances.setDisable(true);
+               // showInstances.setDisable(true);
                 showInstances.setText("No Instances");
             }
 			showInstances.setOnAction(event -> showInstancesAction(instanceArray));
@@ -151,8 +151,14 @@ public class VisShapeContext extends ContextMenu {
 			VBox.setMargin(listView, new Insets(10, 0, 0, 0));
 			vbox.setPadding(new Insets(10));
 
-			Scene scene = new Scene(vbox, 300, 400);
+            // needed height = text + cell size + min padding
+            double totalHeight = textFlow.getBoundsInLocal().getHeight() + items.size() * 20 + 100;
+
+            Scene scene = new Scene(vbox);
 			stage.setScene(scene);
+            stage.setHeight(totalHeight);
+            stage.setMinHeight(150);
+            stage.setMinWidth(250);
 			stage.setX(posx);
 			stage.setY(posy);
 			stage.show();
