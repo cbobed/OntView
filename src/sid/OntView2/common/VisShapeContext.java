@@ -86,7 +86,7 @@ public class VisShapeContext extends ContextMenu {
 			showInstances = new MenuItem("Show Instances");
             ArrayList<String> instanceArray = getInstances();
             if (instanceArray.isEmpty()) {
-               // showInstances.setDisable(true);
+                showInstances.setDisable(true);
                 showInstances.setText("No Instances");
             }
 			showInstances.setOnAction(event -> showInstancesAction(instanceArray));
