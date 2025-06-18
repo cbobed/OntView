@@ -84,9 +84,14 @@ public class VisShapeContext extends ContextMenu {
 	private MenuItem getShowInstancesItem(){
 		if (showInstances == null) {
 			showInstances = new MenuItem("Show Instances");
-			showInstances.setOnAction(event -> showInstancesAction());
+            ArrayList<String> instanceArray = getInstances();
+            if (instanceArray.isEmpty()) {
+                showInstances.setDisable(true);
+                showInstances.setText("No Instances");
+            }
+			showInstances.setOnAction(event -> showInstancesAction(instanceArray));
 		}
-		return showInstances;
+        return showInstances;
 	}
 
     private MenuItem getSliderPercentage(){
@@ -113,16 +118,22 @@ public class VisShapeContext extends ContextMenu {
 		}
 		return hideProperties;
 	}
+
+    private ArrayList<String> getInstances(){
+        ArrayList<String> instanceArray = new ArrayList<>();
+        if ((shape instanceof VisClass)) {
+            NodeSet<OWLNamedIndividual> instanceSet = ((VisClass) shape).getInstances();
+            for (org.semanticweb.owlapi.reasoner.Node<OWLNamedIndividual> instanceNode : instanceSet.getNodes()) {
+                for (OWLNamedIndividual instance : instanceNode.getEntities()) {
+                    instanceArray.add(instance.getIRI().getFragment());
+                }
+            }
+        }
+        return instanceArray;
+    }
 	
-	private void showInstancesAction(){
-		ArrayList<String> instanceArray = new ArrayList<>();
+	private void showInstancesAction(ArrayList<String> instanceArray){
 		if ((shape instanceof VisClass)){
-			NodeSet<OWLNamedIndividual> instanceSet = ((VisClass) shape).getInstances();
-			for (org.semanticweb.owlapi.reasoner.Node<OWLNamedIndividual>  instanceNode : instanceSet.getNodes() ){
-				for (OWLNamedIndividual instance : instanceNode.getEntities()){
-					instanceArray.add(instance.getIRI().getFragment());
-				}
-			}
 			Stage stage = new Stage();
 			stage.setTitle("Instances of " + shape.asVisClass().label);
 
