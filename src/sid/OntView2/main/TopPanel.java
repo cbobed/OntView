@@ -795,7 +795,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		TextFlow elementsInfoContent = createElementsInfoContent();
 		elementsInfoTab.setContent(elementsInfoContent);
 
-        Tab tutorialTab = new Tab("Tutorial");
+        Tab tutorialTab = new Tab("Video tutorial");
         tutorialTab.setClosable(false);
         TextFlow tutorialInfoContent = createTutorialContent();
         tutorialTab.setContent(tutorialInfoContent);
