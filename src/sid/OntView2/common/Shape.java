@@ -2,6 +2,7 @@
 package sid.OntView2.common;
 
 import javafx.animation.PauseTransition;
+import javafx.application.Platform;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.ImageCursor;
@@ -404,6 +405,8 @@ public abstract class Shape {
 
     public void openRight() {
         showSubLevels(getShapesFromStrategySteps(false, graph.paintframe.getPercentageShown()));
+        graph.paintframe.setStateChanged(true);
+        Platform.runLater(graph.paintframe.relaxerRunnable);
     }
 
     public void openLeft() {
