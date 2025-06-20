@@ -773,7 +773,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
         Stage helpStage = new Stage();
         helpStage.setTitle("Help");
 
-        TabPane tabPane = createHelpTabsPane();
+        TabPane tabPane = createHelpTabsPane(helpStage);
         BorderPane root = new BorderPane(tabPane);
 
         Scene scene = new Scene(root, 600, 300);
@@ -782,7 +782,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
         helpStage.show();
     }
 
-	private TabPane createHelpTabsPane() {
+	private TabPane createHelpTabsPane(Stage helpStage) {
 		TabPane tabPane = new TabPane();
 
 		Tab helpTab = new Tab("Help");
@@ -801,6 +801,19 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
         tutorialTab.setContent(tutorialInfoContent);
 
         ClassLoader c = Thread.currentThread().getContextClassLoader();
+
+        tabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
+            if (newTab == tutorialTab) {
+                helpStage.setWidth(1300);
+                helpStage.setHeight(900);
+                helpStage.centerOnScreen();
+            } else {
+                helpStage.setWidth(600);
+                helpStage.setHeight(300);
+                helpStage.centerOnScreen();
+            }
+        });
+
 
         tutorialTab.setOnSelectionChanged(event -> {
             if (tutorialTab.isSelected()) {
