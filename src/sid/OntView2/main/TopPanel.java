@@ -306,7 +306,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 	private ToggleButton getConnectorsSwitch() {
 		if (toggleSwitch == null) {
-			toggleSwitch = new ToggleButton("Show");
+			toggleSwitch = new ToggleButton("Hide");
 			toggleSwitch.getStyleClass().add("button");
 			toggleSwitch.setMinWidth(60);
 
@@ -1028,9 +1028,10 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 	 void loadReasonerButtonActionActionPerformed(ActionEvent event) {
 		String x = getReasonerCombo().getValue();
-		//parent.artPanel.setShowConnectors(true);
 		if(toggleSwitch != null)
-			toggleSwitch.setSelected(false);
+            parent.artPanel.setShowConnectors(true);
+
+         //toggleSwitch.setSelected();
 
 		if ((x != null) && (!x.isEmpty())) {
 			try {
@@ -1229,9 +1230,9 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
     private void resetConnectorsSwitch() {
         if (toggleSwitch != null) {
-            toggleSwitch.setSelected(false);
-            toggleSwitch.setText("Show");
-            parent.artPanel.setShowConnectors(false);
+            toggleSwitch.setSelected(true);
+            toggleSwitch.setText("Hide");
+            parent.artPanel.setShowConnectors(true);
         }
     }
 
