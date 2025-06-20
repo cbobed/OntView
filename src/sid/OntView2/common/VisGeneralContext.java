@@ -94,6 +94,7 @@ public class VisGeneralContext extends ContextMenu {
 
 	private void rangeItemClicked() {
 		parent.hideRange = !parent.hideRange;
+        Platform.runLater(parent.redrawRunnable);
 		updateMenuItemTexts();
 	}
 
@@ -111,9 +112,9 @@ public class VisGeneralContext extends ContextMenu {
 		}
 
 		if (!parent.hideRange) {
-			getMenuItem3().setText("Show Ranges");
-		} else {
 			getMenuItem3().setText("Hide Ranges");
+		} else {
+			getMenuItem3().setText("Show Ranges");
 		}
 	}
 }
