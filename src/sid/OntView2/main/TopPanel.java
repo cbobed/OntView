@@ -818,7 +818,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
         tutorialTab.setOnSelectionChanged(event -> {
             if (tutorialTab.isSelected()) {
                 if (!(tutorialTab.getContent() instanceof MediaView)) {
-                    String videoUrl = Objects.requireNonNull(c.getResource("demo.mp4")).toExternalForm();
+                    String videoUrl = Objects.requireNonNull(c.getResource("final.mp4")).toExternalForm();
                     BorderPane videoPane = getVideoPane(videoUrl);
                     tutorialTab.setContent(videoPane);
                 }
