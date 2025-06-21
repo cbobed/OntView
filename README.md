@@ -7,7 +7,7 @@ Tool for the visualization and analysis of complex ontology structures.
 
 Following the licensing schema of OWLAPI, we have released OntView under both LGPL v3 and Apache license v2; developers are therefore free to choose which one to use. Note that some deployments will have to check the final permissions   depending on the DL reasoner used in the end: Currently, we bundle [Openllet](https://github.com/Galigator/openllet), which inherits from Pellet v2.0 a dual license, and [HermiT](http://www.hermit-reasoner.com), which is released under LPGL v3.0. 
 
-####[Video Tutorial](https://sid.cps.unizar.es/projects/OntView/final.mp4)
+#### [Video Tutorial](https://sid.cps.unizar.es/projects/OntView/final.mp4)
 ---
 
 ## Key Features
