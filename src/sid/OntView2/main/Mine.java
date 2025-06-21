@@ -369,6 +369,9 @@ public class Mine extends Application implements Embedable{
 					if(!path.endsWith(".xml"))
 						path += ".xml";
 					VisPositionConfig.saveState(path, graph);
+                    String finalPath = path;
+                    artPanel.showAlertDialog("Success", "View saved successfully.",
+                        "View has been saved to: " + finalPath, AlertType.INFORMATION);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -390,7 +393,7 @@ public class Mine extends Application implements Embedable{
         nTopPanel.getQualifiedNames().setSelected(false);
     }
 
-	public void restoreViewTask(ActionEvent arg0, String[] info) {
+	public void restoreViewTask(ActionEvent arg0, String[] info, String path) {
 		// load ontology and reasoner
 		nTopPanel.getOntologyCombo().setValue(info[0]);
 		nTopPanel.getReasonerCombo().setValue(info[1]);
@@ -417,6 +420,8 @@ public class Mine extends Application implements Embedable{
             artPanel.loadingStage.close();
             selectOptionsFromRestoreView(arg0, info);
 			Platform.runLater(artPanel.getRedrawRunnable());
+            artPanel.showAlertDialog("Success", "View restored successfully.",
+                "View has been restored from: " + path, AlertType.INFORMATION);
 		});
 		task.setOnFailed(e -> {
 			task.getException().printStackTrace();
@@ -454,7 +459,7 @@ public class Mine extends Application implements Embedable{
 			}
 
 			String[] info = VisPositionConfig.restoreOntologyReasoner(path);
-			restoreViewTask(arg0, info);
+			restoreViewTask(arg0, info, path);
 		}
 	}
 
@@ -476,7 +481,11 @@ public class Mine extends Application implements Embedable{
             }
         };
         Stage loadingStage = artPanel.showLoadingStage(task);
-        task.setOnSucceeded(e -> loadingStage.close());
+        task.setOnSucceeded(e -> {
+            loadingStage.close();
+            artPanel.showAlertDialog("Success", "Image created successfully.",
+                "The image have been created at: " + finalFl.getAbsolutePath(), AlertType.INFORMATION);
+        });
         task.setOnFailed(e -> {
             task.getException().printStackTrace();
             Path path = Paths.get("src/canvasImages/");
@@ -581,7 +590,11 @@ public class Mine extends Application implements Embedable{
 			}
 		};
 		Stage loadingStage = artPanel.showLoadingStage(task);
-		task.setOnSucceeded(e -> loadingStage.close());
+		task.setOnSucceeded(e -> {
+            loadingStage.close();
+            artPanel.showAlertDialog("Success", "Image created successfully.",
+                "The image have been created at: " + finalFl.getAbsolutePath(), AlertType.INFORMATION);
+        });
 		task.setOnFailed(e -> {
 			task.getException().printStackTrace();
 			loadingStage.close();

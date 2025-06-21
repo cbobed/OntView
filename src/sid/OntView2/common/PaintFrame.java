@@ -4,8 +4,13 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.CountDownLatch;
 
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
 import javafx.animation.PauseTransition;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.concurrent.Task;
 import javafx.geometry.*;
 import javafx.scene.Node;
@@ -681,6 +686,7 @@ public class PaintFrame extends Canvas {
 			}
 			showContextMenu((int) e.getScreenX(), (int) e.getScreenY());
 		}
+
 	}
 
     public void configurationTooltip(String content) {
@@ -1339,6 +1345,18 @@ public class PaintFrame extends Canvas {
 		Label loadingLabel = new Label("Please, wait...");
 		loadingLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #ffffff;");
 
+        Label timerLabel = new Label("00:00");
+        timerLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #ffffff;");
+
+        final IntegerProperty secondsElapsed = new SimpleIntegerProperty(0);
+        Timeline timeline = new Timeline(
+            new KeyFrame(Duration.seconds(1), e -> {
+                secondsElapsed.set(secondsElapsed.get() + 1);
+                timerLabel.setText(String.format("%02d:%02d", secondsElapsed.get() / 60, secondsElapsed.get() % 60));
+            })
+        );
+        timeline.setCycleCount(Animation.INDEFINITE);
+
 		ProgressIndicator progressIndicator = new ProgressIndicator();
 		progressIndicator.setProgress(ProgressIndicator.INDETERMINATE_PROGRESS);
 		progressIndicator.setStyle("-fx-accent: #3498db;");
@@ -1352,7 +1370,7 @@ public class PaintFrame extends Canvas {
             logger.info("Task cancellation requested");
         });
 
-		VBox loadingBox = new VBox(15.0, progressIndicator, loadingLabel, cancelButton);
+		VBox loadingBox = new VBox(15.0, progressIndicator, loadingLabel, timerLabel, cancelButton);
 		loadingBox.setAlignment(javafx.geometry.Pos.CENTER);
 		loadingBox.setStyle(
 				"-fx-background-color: rgba(0, 0, 0, 0.8); " +
@@ -1365,8 +1383,10 @@ public class PaintFrame extends Canvas {
 		Scene loadingScene = new Scene(loadingBox, 300, 200);
 		loadingScene.getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
 		loadingStage.setScene(loadingScene);
+        loadingStage.setOnShowing(e -> timeline.play());
+        loadingStage.setOnHidden(e -> timeline.stop());
 
-		loadingStage.show();
+        loadingStage.show();
 		return loadingStage;
 	}
 

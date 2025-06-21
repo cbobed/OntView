@@ -84,9 +84,14 @@ public class VisShapeContext extends ContextMenu {
 	private MenuItem getShowInstancesItem(){
 		if (showInstances == null) {
 			showInstances = new MenuItem("Show Instances");
-			showInstances.setOnAction(event -> showInstancesAction());
+            ArrayList<String> instanceArray = getInstances();
+            if (instanceArray.isEmpty()) {
+                showInstances.setDisable(true);
+                showInstances.setText("No Instances");
+            }
+			showInstances.setOnAction(event -> showInstancesAction(instanceArray));
 		}
-		return showInstances;
+        return showInstances;
 	}
 
     private MenuItem getSliderPercentage(){
@@ -113,16 +118,22 @@ public class VisShapeContext extends ContextMenu {
 		}
 		return hideProperties;
 	}
+
+    private ArrayList<String> getInstances(){
+        ArrayList<String> instanceArray = new ArrayList<>();
+        if ((shape instanceof VisClass)) {
+            NodeSet<OWLNamedIndividual> instanceSet = ((VisClass) shape).getInstances();
+            for (org.semanticweb.owlapi.reasoner.Node<OWLNamedIndividual> instanceNode : instanceSet.getNodes()) {
+                for (OWLNamedIndividual instance : instanceNode.getEntities()) {
+                    instanceArray.add(instance.getIRI().getFragment());
+                }
+            }
+        }
+        return instanceArray;
+    }
 	
-	private void showInstancesAction(){
-		ArrayList<String> instanceArray = new ArrayList<>();
+	private void showInstancesAction(ArrayList<String> instanceArray){
 		if ((shape instanceof VisClass)){
-			NodeSet<OWLNamedIndividual> instanceSet = ((VisClass) shape).getInstances();
-			for (org.semanticweb.owlapi.reasoner.Node<OWLNamedIndividual>  instanceNode : instanceSet.getNodes() ){
-				for (OWLNamedIndividual instance : instanceNode.getEntities()){
-					instanceArray.add(instance.getIRI().getFragment());
-				}
-			}
 			Stage stage = new Stage();
 			stage.setTitle("Instances of " + shape.asVisClass().label);
 
@@ -140,8 +151,14 @@ public class VisShapeContext extends ContextMenu {
 			VBox.setMargin(listView, new Insets(10, 0, 0, 0));
 			vbox.setPadding(new Insets(10));
 
-			Scene scene = new Scene(vbox, 300, 400);
+            // needed height = text + cell size + min padding
+            double totalHeight = textFlow.getBoundsInLocal().getHeight() + items.size() * 20 + 100;
+
+            Scene scene = new Scene(vbox);
 			stage.setScene(scene);
+            stage.setHeight(totalHeight);
+            stage.setMinHeight(150);
+            stage.setMinWidth(250);
 			stage.setX(posx);
 			stage.setY(posy);
 			stage.show();

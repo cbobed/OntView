@@ -1258,10 +1258,11 @@ public class VisGraph implements Runnable{
 	public void showAll() {
 		for (Entry<String,Shape> entry : shapeMap.entrySet()){
 			Shape s = entry.getValue();
-			if ((s.getState() == VisClass.CLOSED) || (s.getState() == VisClass.PARTIALLY_CLOSED)){
-				for (VisConnector connector : s.inConnectors) connector.show();
-                for (VisConnector connector : s.outConnectors) connector.show();
-			}
+			for (VisConnector connector : s.inConnectors) connector.show();
+            for (VisConnector connector : s.outConnectors) connector.show();
+
+            s.setLeftState(Shape.LEFTOPEN);
+            s.setState(Shape.OPEN);
 			s.resetHiddenChildrenCount();
 			s.setVisible(true);
 		}

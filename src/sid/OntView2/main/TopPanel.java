@@ -16,12 +16,12 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.MediaView;
 import javafx.scene.paint.Color;
 import javafx.scene.text.*;
-import javafx.stage.FileChooser;
-import javafx.stage.Modality;
-import javafx.stage.Popup;
-import javafx.stage.Stage;
+import javafx.stage.*;
 import javafx.util.Duration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -32,7 +32,6 @@ import sid.OntView2.utils.ErrorHandler;
 import java.io.*;
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 //VS4E -- DO NOT REMOVE THIS LINE!
 public class TopPanel extends Canvas implements ControlPanelInterface {
@@ -307,7 +306,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 	private ToggleButton getConnectorsSwitch() {
 		if (toggleSwitch == null) {
-			toggleSwitch = new ToggleButton("Show");
+			toggleSwitch = new ToggleButton("Hide");
 			toggleSwitch.getStyleClass().add("button");
 			toggleSwitch.setMinWidth(60);
 
@@ -752,38 +751,38 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
         return percentageSpinner;
     }
 
-	private VBox createHelpButton() {
-		if (helpPanel == null) {
-			helpPanel = new VBox();
-			helpPanel.setPadding(new Insets(5));
-			helpPanel.setSpacing(5);
+    private VBox createHelpButton() {
+        if (helpPanel == null) {
+            helpPanel = new VBox();
+            helpPanel.setPadding(new Insets(5));
+            helpPanel.setSpacing(5);
 
+            StackPane titlePane = createTitlePane("Help");
+            helpButton = new Button("?");
+            helpButton.getStyleClass().add("button");
+            helpButton.setStyle("-fx-shape:'M 0 50 a 50 50 0 1 1 100 0 a 50 50 0 1 1 -100 0'; -fx-background-radius: 50%;");
 
-			StackPane titlePane = createTitlePane("Help");
-			helpButton = new Button("?");
-			helpButton.getStyleClass().add("button");
-			helpButton.setStyle("-fx-shape:'M 0 50 a 50 50 0 1 1 100 0 a 50 50 0 1 1 -100 0'; -fx-background-radius: 50%;");
+            helpButton.setOnAction(e -> showHelpStage());
+            helpPanel = createContainer(titlePane, helpButton);
 
-			TabPane tabPane = createHelpTabPane();
+        }
+        return helpPanel;
+    }
 
-			helpPopup = new Popup();
-			helpPopup.getContent().add(tabPane);
-			helpPopup.setAutoHide(true);
+    private void showHelpStage() {
+        Stage helpStage = new Stage();
+        helpStage.setTitle("Help");
 
-			helpButton.setOnMouseClicked(event -> {
-				if (helpPopup.isShowing()) {
-					helpPopup.hide();
-				} else {
-					helpPopup.show(helpButton, event.getScreenX(), event.getScreenY() + 15);
-				}
-			});
+        TabPane tabPane = createHelpTabsPane(helpStage);
+        BorderPane root = new BorderPane(tabPane);
 
-			helpPanel = createContainer(titlePane, helpButton);
-		}
-		return helpPanel;
-	}
+        Scene scene = new Scene(root, 600, 300);
+        helpStage.setScene(scene);
 
-	private TabPane createHelpTabPane() {
+        helpStage.show();
+    }
+
+	private TabPane createHelpTabsPane(Stage helpStage) {
 		TabPane tabPane = new TabPane();
 
 		Tab helpTab = new Tab("Help");
@@ -796,12 +795,74 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		TextFlow elementsInfoContent = createElementsInfoContent();
 		elementsInfoTab.setContent(elementsInfoContent);
 
-		tabPane.getTabs().addAll(helpTab, elementsInfoTab);
+        Tab tutorialTab = new Tab("Video tutorial");
+        tutorialTab.setClosable(false);
+        TextFlow tutorialInfoContent = createTutorialContent();
+        tutorialTab.setContent(tutorialInfoContent);
+
+        ClassLoader c = Thread.currentThread().getContextClassLoader();
+
+        tabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
+            if (newTab == tutorialTab) {
+                helpStage.setWidth(1300);
+                helpStage.setHeight(900);
+                helpStage.centerOnScreen();
+            } else {
+                helpStage.setWidth(600);
+                helpStage.setHeight(300);
+                helpStage.centerOnScreen();
+            }
+        });
+
+
+        tutorialTab.setOnSelectionChanged(event -> {
+            if (tutorialTab.isSelected()) {
+                if (!(tutorialTab.getContent() instanceof MediaView)) {
+                    String videoUrl = Objects.requireNonNull(c.getResource("final.mp4")).toExternalForm();
+                    BorderPane videoPane = getVideoPane(videoUrl);
+                    tutorialTab.setContent(videoPane);
+                }
+            } else {
+                if (tutorialTab.getContent() instanceof BorderPane bp
+                    && bp.getCenter() instanceof MediaView mv) {
+                    MediaPlayer mp = mv.getMediaPlayer();
+                    if (mp != null) mp.pause();
+                }
+            }
+        });
+
+		tabPane.getTabs().addAll(helpTab, elementsInfoTab, tutorialTab);
 
 		return tabPane;
 	}
 
-	private TextFlow createHelpContent() {
+    private static BorderPane getVideoPane(String videoUrl) {
+        Media media = new Media(videoUrl);
+        MediaPlayer mediaPlayer = new MediaPlayer(media);
+        mediaPlayer.setAutoPlay(false);
+
+        MediaView mediaView = new MediaView(mediaPlayer);
+        mediaView.setPreserveRatio(true);
+
+        BorderPane videoPane = new BorderPane(mediaView);
+        videoPane.setStyle("-fx-padding: 0;");
+
+        mediaView.fitWidthProperty().bind(videoPane.widthProperty());
+        mediaView.fitHeightProperty().bind(videoPane.heightProperty());
+
+        mediaView.setOnMouseClicked(evt -> {
+            MediaPlayer.Status status = mediaPlayer.getStatus();
+            if (status == MediaPlayer.Status.PLAYING) {
+                mediaPlayer.pause();
+            } else {
+                mediaPlayer.play();
+            }
+        });
+
+        return videoPane;
+    }
+
+    private TextFlow createHelpContent() {
 		Text title = new Text("How to use the application:\n");
 		title.setFill(Color.BLUE);
 		title.setStyle("-fx-font-weight: bold;");
@@ -834,11 +895,29 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 		TextFlow elementsInfoContent = new TextFlow(elementsInfoTitle, elementsInfoText);
 		elementsInfoContent.setPadding(new Insets(10));
-
 		elementsInfoContent.setLineSpacing(5);
 
 		return elementsInfoContent;
 	}
+
+    private TextFlow createTutorialContent() {
+        Text tutorialTitle = new Text("Tutorial:\n");
+        tutorialTitle.setFill(Color.BLUE);
+        tutorialTitle.setStyle("-fx-font-weight: bold;");
+
+        Text tutorialInfoText = new Text(
+            """
+            This tutorial will help you to familiarise with the application.
+            """
+        );
+
+        TextFlow tutorialContent = new TextFlow(tutorialTitle, tutorialInfoText);
+        tutorialContent.setPadding(new Insets(10));
+        tutorialContent.setLineSpacing(5);
+
+        return tutorialContent;
+    }
+
 
 
 	private void loadRecent() {
@@ -949,9 +1028,10 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 	 void loadReasonerButtonActionActionPerformed(ActionEvent event) {
 		String x = getReasonerCombo().getValue();
-		//parent.artPanel.setShowConnectors(true);
 		if(toggleSwitch != null)
-			toggleSwitch.setSelected(false);
+            parent.artPanel.setShowConnectors(true);
+
+         //toggleSwitch.setSelected();
 
 		if ((x != null) && (!x.isEmpty())) {
 			try {
@@ -1150,9 +1230,9 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
     private void resetConnectorsSwitch() {
         if (toggleSwitch != null) {
-            toggleSwitch.setSelected(false);
-            toggleSwitch.setText("Show");
-            parent.artPanel.setShowConnectors(false);
+            toggleSwitch.setSelected(true);
+            toggleSwitch.setText("Hide");
+            parent.artPanel.setShowConnectors(true);
         }
     }
 

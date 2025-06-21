@@ -50,11 +50,13 @@ public class VisGeneralContext extends ContextMenu {
 
 	private void propertiesItemClicked() {
 	    Set<Entry<String, Shape>> classesInGraph = parent.getVisGraph().getClassesInGraph();
-	    if (existsVisiblePropertyBox()){
+        boolean visibleProperties = existsVisiblePropertyBox();
+	    if (visibleProperties){
 	        for (Entry<String, Shape> entry : classesInGraph) {
 		    	if ((entry.getValue() instanceof VisClass) && (entry.getValue().asVisClass().getPropertyBox()!=null)){
 		    		VisPropertyBox box = entry.getValue().asVisClass().getPropertyBox();
 		    		box.setVisible(false);
+                    parent.compactNodes(entry.getValue().asVisClass());
 		    	}
 		    }
 	    }
@@ -66,14 +68,14 @@ public class VisGeneralContext extends ContextMenu {
 		    	}
 		    }
 	    }
+
+        parent.nTopPanel.getPropertiesCheckBox().setSelected(!visibleProperties);
 		parent.setStateChanged(true);
 		Platform.runLater(parent.relaxerRunnable);
 		updateMenuItemTexts();
-
 	}
 
 	private boolean existsVisiblePropertyBox(){
-
 	    Set<Entry<String, Shape>> classesInGraph = parent.getVisGraph().getClassesInGraph();
 	    for (Entry<String, Shape> entry : classesInGraph) {
 	    	if ((entry.getValue() instanceof VisClass) && (entry.getValue().asVisClass().getPropertyBox()!=null)){
@@ -94,6 +96,7 @@ public class VisGeneralContext extends ContextMenu {
 
 	private void rangeItemClicked() {
 		parent.hideRange = !parent.hideRange;
+        Platform.runLater(parent.redrawRunnable);
 		updateMenuItemTexts();
 	}
 
@@ -111,9 +114,9 @@ public class VisGeneralContext extends ContextMenu {
 		}
 
 		if (!parent.hideRange) {
-			getMenuItem3().setText("Show Ranges");
-		} else {
 			getMenuItem3().setText("Hide Ranges");
+		} else {
+			getMenuItem3().setText("Show Ranges");
 		}
 	}
 }
