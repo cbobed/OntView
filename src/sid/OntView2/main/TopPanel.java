@@ -1128,7 +1128,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
         Set<String> labelSet = new HashSet<>();
 
 		for (Entry<String, Shape> s : parent.artPanel.getVisGraph().shapeMap.entrySet()) {
-            labelSet.add(s.getValue().getLabel());
+			if (s.getValue().isVisible())
+            	labelSet.add(s.getValue().getLabel());
 		}
 
         List<String> sortedLabels = new ArrayList<>(labelSet);
