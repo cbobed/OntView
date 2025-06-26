@@ -1244,6 +1244,7 @@ public class PaintFrame extends Canvas {
                 }
             }
         }
+		getParentFrame().loadSearchCombo();
         compactGraph();
         if (menuVisShapeContext != null) {
             menuVisShapeContext.updateSliderView();
