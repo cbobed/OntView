@@ -41,6 +41,8 @@ public class HelpUser {
         BorderPane root = new BorderPane(tabPane);
 
         Scene scene = new Scene(root, 600, 300);
+        ClassLoader c = Thread.currentThread().getContextClassLoader();
+        scene.getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
         helpStage.setScene(scene);
         helpStage.show();
     }
@@ -146,6 +148,7 @@ public class HelpUser {
     private static Slider createProgressSlider(MediaPlayer mediaPlayer) {
         Slider progress = new Slider(0, 100, 0);
         progress.setPrefWidth(400);
+        progress.getStyleClass().add("video-slider");
 
         mediaPlayer.currentTimeProperty().addListener((obs, oldTime, newTime) -> {
             Duration total = mediaPlayer.getTotalDuration();
