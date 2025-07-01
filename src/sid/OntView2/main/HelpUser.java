@@ -1,10 +1,8 @@
 package sid.OntView2.main;
 
-import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Tab;
@@ -18,7 +16,6 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
@@ -112,7 +109,6 @@ public class HelpUser {
         playIcon.setVisible(true);
 
         StackPane videoStack = new StackPane(mediaPane, playIcon);
-        videoStack.setAlignment(Pos.CENTER);
         videoStack.setStyle("-fx-background-color: black;");
         videoStack.setCursor(Cursor.HAND);
 
