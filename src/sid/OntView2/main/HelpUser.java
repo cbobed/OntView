@@ -4,18 +4,21 @@ import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
@@ -99,17 +102,22 @@ public class HelpUser {
         MediaView mediaView = new MediaView(mediaPlayer);
         mediaView.setPreserveRatio(true);
 
+        Pane mediaPane = new Pane(mediaView);
+        mediaView.fitWidthProperty().bind(mediaPane.widthProperty());
+        mediaView.fitHeightProperty().bind(mediaPane.heightProperty());
+        mediaView.setSmooth(true);
+
         Polygon playIcon = new Polygon(0, 0, 0, 60, 52, 30);
         playIcon.setFill(Color.rgb(70, 130, 180, 0.85));
         playIcon.setVisible(true);
 
-        StackPane centerStack = new StackPane(mediaView, playIcon);
-        centerStack.setStyle("-fx-background-color: black;");
-        centerStack.setCursor(Cursor.HAND);
+        StackPane videoStack = new StackPane(mediaPane, playIcon);
+        videoStack.setAlignment(Pos.CENTER);
+        videoStack.setStyle("-fx-background-color: black;");
+        videoStack.setCursor(Cursor.HAND);
 
-        centerStack.setOnMouseClicked(evt -> {
-            MediaPlayer.Status status = mediaPlayer.getStatus();
-            if (status == MediaPlayer.Status.PLAYING) {
+        videoStack.setOnMouseClicked(evt -> {
+            if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
                 mediaPlayer.pause();
             } else {
                 mediaPlayer.play();
@@ -132,15 +140,8 @@ public class HelpUser {
         controls.setStyle("-fx-background-color: rgba(0,0,0,0.6);");
 
         BorderPane videoPane = new BorderPane();
-        videoPane.setCenter(centerStack);
+        videoPane.setCenter(videoStack);
         videoPane.setBottom(controls);
-        BorderPane.setAlignment(controls, Pos.CENTER);
-        videoPane.setStyle("-fx-padding: 0;");
-
-        mediaView.fitWidthProperty().bind(videoPane.widthProperty());
-        mediaView.fitHeightProperty().bind(
-            Bindings.subtract(videoPane.heightProperty(), controls.heightProperty())
-        );
 
         return videoPane;
     }
