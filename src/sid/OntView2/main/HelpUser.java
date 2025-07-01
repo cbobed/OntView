@@ -97,11 +97,7 @@ public class HelpUser {
         MediaView mediaView = new MediaView(mediaPlayer);
         mediaView.setPreserveRatio(true);
 
-        Polygon playIcon = new Polygon(
-            0, 0,
-            0, 60,
-            52, 30
-        );
+        Polygon playIcon = new Polygon(0, 0, 0, 60, 52, 30);
         playIcon.setFill(Color.rgb(70, 130, 180, 0.85));
         playIcon.setVisible(true);
 
@@ -126,36 +122,7 @@ public class HelpUser {
             mediaPlayer.pause();
         });
 
-        Slider progress = new Slider();
-        progress.setMin(0);
-        progress.setMax(100);
-        progress.setValue(0);
-        progress.setPrefWidth(400);
-
-        mediaPlayer.currentTimeProperty().addListener((obs, oldTime, newTime) -> {
-            Duration total = mediaPlayer.getTotalDuration();
-            if (total != null && !progress.isValueChanging()) {
-                progress.setValue(newTime.toMillis() / total.toMillis() * 100.0);
-            }
-        });
-
-        // usuario arrastra el slider
-        progress.valueChangingProperty().addListener((obs, wasChanging, isChanging) -> {
-            if (!isChanging) {
-                if (mediaPlayer.getTotalDuration() != null) {
-                    double pct = progress.getValue() / 100.0;
-                    mediaPlayer.seek(mediaPlayer.getTotalDuration().multiply(pct));
-                }
-            }
-        });
-
-        progress.setOnMouseClicked(evt -> {
-            if (mediaPlayer.getTotalDuration() != null) {
-                double mouseX = evt.getX();
-                double pct = mouseX / progress.getWidth();
-                mediaPlayer.seek(mediaPlayer.getTotalDuration().multiply(pct));
-            }
-        });
+        Slider progress = createProgressSlider(mediaPlayer);
 
         HBox controls = new HBox(10, progress);
         controls.setPadding(new Insets(5));
@@ -174,6 +141,33 @@ public class HelpUser {
         );
 
         return videoPane;
+    }
+
+    private static Slider createProgressSlider(MediaPlayer mediaPlayer) {
+        Slider progress = new Slider(0, 100, 0);
+        progress.setPrefWidth(400);
+
+        mediaPlayer.currentTimeProperty().addListener((obs, oldTime, newTime) -> {
+            Duration total = mediaPlayer.getTotalDuration();
+            if (total != null && !progress.isValueChanging()) {
+                progress.setValue(newTime.toMillis() / total.toMillis() * 100.0);
+            }
+        });
+
+        progress.valueChangingProperty().addListener((obs, wasChanging, isChanging) -> {
+            if (!isChanging && mediaPlayer.getTotalDuration() != null) {
+                double pct = progress.getValue() / 100;
+                mediaPlayer.seek(mediaPlayer.getTotalDuration().multiply(pct));
+            }
+        });
+
+        progress.setOnMouseClicked(evt -> {
+            if (mediaPlayer.getTotalDuration() != null) {
+                double pct = evt.getX() / progress.getWidth();
+                mediaPlayer.seek(mediaPlayer.getTotalDuration().multiply(pct));
+            }
+        });
+        return progress;
     }
 
 
