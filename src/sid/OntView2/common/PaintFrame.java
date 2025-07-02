@@ -1380,10 +1380,13 @@ public class PaintFrame extends Canvas {
 		Scene loadingScene = new Scene(loadingBox, 300, 200);
 		loadingScene.getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
 		loadingStage.setScene(loadingScene);
-        loadingStage.setOnShowing(e -> timeline.play());
+        loadingStage.setOnShowing(e -> {
+            timeline.play();
+            loadingStage.requestFocus();
+        });
         loadingStage.setOnHidden(e -> timeline.stop());
 
-        loadingStage.requestFocus();
+        //loadingStage.requestFocus();
         loadingStage.show();
 		return loadingStage;
 	}
