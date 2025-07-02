@@ -64,7 +64,8 @@ public class Mine extends Application implements Embedable{
 	TopPanel     nTopPanel;
 	ScrollPane  scroll;
 	Mine         self= this;
-	boolean      check = true, cancelledOutOfVisGraph = false;
+	boolean      check = true;
+    public static boolean cancelledFlag = false;
     private static final double SCROLL_INCREMENT = 10000;
     private static final double SPEED = 100;
 
@@ -202,7 +203,7 @@ public class Mine extends Application implements Embedable{
 			}
             catch (CancellationException | InterruptedException e) {
                 artPanel.clearCanvas();
-                cancelledOutOfVisGraph = true;
+                cancelledFlag = true;
                 Platform.runLater(() -> artPanel.loadingStage.close());
                 artPanel.setCursor(Cursor.DEFAULT);
                 return;
@@ -413,8 +414,8 @@ public class Mine extends Application implements Embedable{
 
 		artPanel.loadingStage = artPanel.showLoadingStage(task);
         task.setOnCancelled(e -> {
-            if (!cancelledOutOfVisGraph) VisGraph.voluntaryCancel(true);
-            cancelledOutOfVisGraph = false;
+            if (!cancelledFlag) VisGraph.voluntaryCancel(true);
+            cancelledFlag = false;
         });
 		task.setOnSucceeded(e -> {
             artPanel.loadingStage.close();
@@ -494,6 +495,12 @@ public class Mine extends Application implements Embedable{
             artPanel.showAlertDialog("Error", "Unable to save the ontology view.",
                 ErrorHandler.getGraphSaveError(task.getException()), AlertType.ERROR);
         });
+        task.setOnCancelled(e -> {
+            loadingStage.close();
+            Path path = Paths.get("src/canvasImages/");
+            ImageMerger.deleteDirectory(path.toFile());
+            cancelledFlag = false;
+        });
         new Thread(task).start();
 	}
 
@@ -540,6 +547,7 @@ public class Mine extends Application implements Embedable{
 
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < columns; col++) {
+                checkInterrupted();
                 int x = col * CHUNK_SIZE;
                 int y = row * CHUNK_SIZE;
                 int width = Math.min(CHUNK_SIZE, artPanel.canvasWidth - x);
@@ -564,7 +572,7 @@ public class Mine extends Application implements Embedable{
                 try {
                     latch.await();
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    cancelledFlag = true;
                     return;
                 }
 
@@ -577,6 +585,7 @@ public class Mine extends Application implements Embedable{
             }
         }
         logger.debug("Done creating images in {}", tempDir.toAbsolutePath());
+        checkInterrupted();
         ImageMerger.mergeImages("src/canvasImages/", directory.toString());
     }
 
@@ -601,8 +610,21 @@ public class Mine extends Application implements Embedable{
 			artPanel.showAlertDialog("Error", "Unable to save the ontology view.",
                 ErrorHandler.getGraphSaveError(task.getException()), AlertType.ERROR);
 		});
+        task.setOnCancelled(e -> {
+            loadingStage.close();
+        });
 		new Thread(task).start();
 	}
+
+    /**
+     * Checks if the current thread is interrupted and throws a CancellationException if it is.
+     */
+    private void checkInterrupted() {
+        if (Thread.currentThread().isInterrupted()) {
+            cancelledFlag = true;
+            throw new CancellationException("Thread was interrupted");
+        }
+    }
 
     @Override
 	public void loadSearchCombo() {

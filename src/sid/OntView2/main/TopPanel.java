@@ -16,9 +16,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
-import javafx.scene.media.MediaView;
 import javafx.scene.paint.Color;
 import javafx.scene.text.*;
 import javafx.stage.*;
@@ -863,8 +860,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		parent.artPanel.loadingStage = parent.artPanel.showLoadingStage(task);
 
         task.setOnCancelled(e -> {
-            if (!parent.cancelledOutOfVisGraph) VisGraph.voluntaryCancel(true);
-            parent.cancelledOutOfVisGraph = false;
+            if (!parent.cancelledFlag) VisGraph.voluntaryCancel(true);
+            parent.cancelledFlag = false;
         });
 		task.setOnSucceeded(e -> parent.artPanel.loadingStage.close());
 		task.setOnFailed(e -> {

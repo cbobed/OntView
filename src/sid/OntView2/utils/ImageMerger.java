@@ -5,6 +5,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import sid.OntView2.main.Mine;
 
 import javax.imageio.ImageIO;
 import java.io.File;
@@ -111,7 +112,7 @@ public class ImageMerger {
     }
 
     public static void deleteDirectory(File dir) {
-        if (dir.isDirectory()) {
+        if (dir.isDirectory() && dir.exists()) {
             File[] files = dir.listFiles();
             if (files != null) {
                 for (File file : files) {
@@ -119,6 +120,8 @@ public class ImageMerger {
                 }
             }
         }
+        if (Mine.cancelledFlag) return;
+
         if (!dir.delete()) {
             logger.error("Could not delete directory: {}", dir.getAbsolutePath());
         }

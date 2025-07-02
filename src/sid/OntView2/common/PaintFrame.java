@@ -374,7 +374,7 @@ public class PaintFrame extends Canvas {
 
 
            } else {
-                logger.error("visGraph is null in draw method.");
+                logger.debug("visGraph is null in draw method.");
 			}
 		}
 	}
