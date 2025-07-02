@@ -8,9 +8,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 public class VisGeneralContext extends ContextMenu {
-	MenuItem item1;
-	MenuItem item2;
-	MenuItem item3;
+	MenuItem item1, item2, item3;
     PaintFrame parent;
 
     private MenuItem getMenuItem1(){
@@ -31,7 +29,7 @@ public class VisGeneralContext extends ContextMenu {
 		return item3;
 	}
 
-	public VisGeneralContext (PaintFrame pParent){
+	public VisGeneralContext(PaintFrame pParent){
 		super();
 		parent = pParent;
 		getItems().add(getMenuItem1());
