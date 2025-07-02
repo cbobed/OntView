@@ -82,6 +82,7 @@
     -fx-tick-mark-fill: blue;
     -fx-track-color: linear-gradient(to bottom, #99bad8, #5679a2);
     -fx-thumb-color: #005cbf;
+    -fx-cursor: hand;
 }
 
 .zoom-slider .thumb {
