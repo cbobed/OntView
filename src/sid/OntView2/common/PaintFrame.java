@@ -885,8 +885,7 @@ public class PaintFrame extends Canvas {
                                 shape.openRight();
                                 refreshDashedConnectors();
                                 VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
-                                setStateChanged(true);
-                                Platform.runLater(relaxerRunnable);
+                                compactGraph();
                                 if (menuVisShapeContext != null) {
                                     menuVisShapeContext.updateSliderView();
                                 }
@@ -901,8 +900,7 @@ public class PaintFrame extends Canvas {
                                 shape.closeRight();
                                 refreshDashedConnectors();
                                 VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
-                                setStateChanged(true);
-                                Platform.runLater(relaxerRunnable);
+                                compactGraph();
                                 if (menuVisShapeContext != null) {
                                     menuVisShapeContext.updateSliderView();
                                 }
@@ -917,8 +915,7 @@ public class PaintFrame extends Canvas {
                                 shape.openLeft();
                                 refreshDashedConnectors();
                                 VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
-                                setStateChanged(true);
-                                Platform.runLater(relaxerRunnable);
+                                compactGraph();
                             }
 						}
 					}
@@ -930,8 +927,7 @@ public class PaintFrame extends Canvas {
                                 shape.closeLeft();
                                 refreshDashedConnectors();
                                 VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
-                                setStateChanged(true);
-                                Platform.runLater(relaxerRunnable);
+                                compactGraph();
                             }
                         }
 

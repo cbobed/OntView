@@ -116,7 +116,6 @@
     -fx-font-weight: normal;
 }
 
-
 .tooltipDesign {
     -fx-background-color: lightblue;
     -fx-text-fill: black;
@@ -136,37 +135,6 @@
 
 .tooltipDesign .label {
     -fx-text-fill: black;
-}
-
-.tab-pane {
-    -fx-background-color: white;
-    -fx-border-color: blue;
-    -fx-border-width: 1px;
-    -fx-cursor: hand;
-}
-
-.tab-pane .tab {
-    -fx-background-color: rgba(224, 224, 249);
-    -fx-border-color: blue;
-    -fx-border-width: 1px;
-}
-
-.tab-pane .tab:selected {
-    -fx-background-color: white;
-}
-
-.tab-header-background {
-    -fx-background-color: rgba(0, 0, 255, 0.2);
-    -fx-border-color: transparent transparent blue transparent;
-    -fx-border-width: 0 0 1px 0;
-}
-
-.tab {
-    -fx-background-color: white;
-}
-
-.tab:selected {
-    -fx-background-color: white;
 }
 
 .dialog-pane {
@@ -326,4 +294,32 @@
 
 .language-radio .radio:hover {
     -fx-background-color: linear-gradient(to bottom, #d3e3f1, #b0c4de);
+}
+
+.video-slider {
+    -fx-control-inner-background: transparent;
+    -fx-tick-mark-visible: false;
+    -fx-cursor: hand;
+}
+
+.video-slider .track {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #5679a2;
+    -fx-border-width: 2px;
+    -fx-pref-height: 10px;
+    -fx-background-insets: 0, 0;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+}
+
+.video-slider .thumb {
+    -fx-shape: "M0,0 A8,8 0 1,1 16,0 A8,8 0 1,1 0,0";
+    -fx-pref-width: 16px;
+    -fx-pref-height: 16px;
+    -fx-background-color: blue;
+    -fx-border-color: white;
+    -fx-border-width: 2px;
+    -fx-background-insets: 0;
+    -fx-background-radius: 8px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 2, 0, 0, 1);
 }
