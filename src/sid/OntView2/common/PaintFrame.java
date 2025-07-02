@@ -1383,6 +1383,7 @@ public class PaintFrame extends Canvas {
         loadingStage.setOnShowing(e -> timeline.play());
         loadingStage.setOnHidden(e -> timeline.stop());
 
+        loadingStage.requestFocus();
         loadingStage.show();
 		return loadingStage;
 	}
@@ -1395,6 +1396,7 @@ public class PaintFrame extends Canvas {
         ClassLoader c = Thread.currentThread().getContextClassLoader();
         alert.getDialogPane().getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
         alert.getDialogPane().getStyleClass().add("custom-alert");
+        alert.getDialogPane().requestFocus();
         alert.showAndWait();
     }
 

@@ -1,2 +1,2 @@
-https://protege.stanford.edu/ontologies/pizza/pizza.owl
 https://protege.stanford.edu/ontologies/koala.owl
+https://protege.stanford.edu/ontologies/pizza/pizza.owl
