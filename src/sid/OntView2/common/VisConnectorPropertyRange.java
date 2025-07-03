@@ -65,20 +65,18 @@ public class VisConnectorPropertyRange extends VisConnectorIsA {
     private void drawArrowProperty(GraphicsContext g, double length, double width, double x, double y) {
         double tx = toPoint.getX() - controlX2;
         double ty = toPoint.getY() - fromPoint.getY();
-        double angleRad = Math.atan2(ty, tx);
-        double angleDeg = Math.toDegrees(angleRad);
+        double angleDeg = Math.toDegrees(Math.atan2(ty, tx));
         g.setFill(Color.DARKCYAN);
 
         double halfW = width / 2.0;
         g.save();
         g.translate(x, y);
         g.rotate(angleDeg);
-        g.beginPath();
-        g.moveTo(0, 0);
-        g.lineTo(-length,  halfW);
-        g.lineTo(-length, -halfW);
-        g.closePath();
-        g.fill();
+
+        double[] xPoints = {  0, -length, -length };
+        double[] yPoints = {  0,  halfW,  -halfW };
+
+        g.fillPolygon(xPoints, yPoints, 3);
         g.restore();
     }
 
