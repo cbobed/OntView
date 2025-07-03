@@ -836,12 +836,8 @@ public class VisGraph implements Runnable{
                     String auxLabel = replaceString(an.getValue().toString().replaceAll("\"", ""));
                     vis.explicitLabel.add(auxLabel);
                     auxQLabel = qualifyLabel(ce.asOWLClass(), auxLabel);
-                    if (!"null".equalsIgnoreCase(auxQLabel)) {
-                        vis.explicitQualifiedLabel.add(auxQLabel);
-                    }
-                    else {
-                        vis.explicitQualifiedLabel.add(auxLabel);
-                    }
+                    vis.explicitQualifiedLabel.add(!"null".equalsIgnoreCase(auxQLabel) ? auxQLabel : auxLabel);
+
                     if (auxLabel.contains("@")) {
                         paintframe.languagesLabels.add(auxLabel.split("@")[1]);
                     }
