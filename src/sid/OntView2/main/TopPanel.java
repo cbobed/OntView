@@ -949,7 +949,11 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	}
 
 	private void restoreViewButtonActionActionPerformed(ActionEvent event) {
-		parent.restoreViewButtonAction(event);
+        try {
+            parent.restoreViewButtonAction(event);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 	}
 
 	private void comboBox0ItemItemStateChanged(String selectedItem) {

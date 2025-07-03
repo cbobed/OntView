@@ -1,3 +1,3 @@
+file:/home/carlota/Desktop/OntView/onts/dbpedia_3.8.owl
 https://protege.stanford.edu/ontologies/koala.owl
 https://protege.stanford.edu/ontologies/pizza/pizza.owl
-file:/home/carlota/Desktop/OntView/onts/dbpedia_3.8.owl

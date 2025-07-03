@@ -441,7 +441,7 @@ public class Mine extends Application implements Embedable{
 		new Thread(task).start();
 	}
 
-	public void restoreViewButtonAction(ActionEvent arg0) {
+	public void restoreViewButtonAction(ActionEvent arg0) throws Exception {
 		// TODO Auto-generated method stub
 		FileChooser selector = new FileChooser();
 		selector.setInitialDirectory(new File(System.getProperty("user.dir")));
@@ -459,7 +459,14 @@ public class Mine extends Application implements Embedable{
 				e.printStackTrace();
 			}
 
-			String[] info = VisPositionConfig.restoreOntologyReasoner(path);
+			String[] info;
+            try {
+                info = VisPositionConfig.restoreOntologyReasoner(path);
+            } catch (Exception e) {
+                artPanel.showAlertDialog("Error", "Failed to load view.",
+                    ErrorHandler.getXMLeError(e), Alert.AlertType.ERROR);
+                return;
+            }
 			restoreViewTask(arg0, info, path);
 		}
 	}
