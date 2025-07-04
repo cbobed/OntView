@@ -102,27 +102,28 @@ public class HelpUser {
 
         return tabPane;
     }
-
     private static BorderPane getVideoPane(String videoUrl) {
         Media media = new Media(videoUrl);
         MediaPlayer mediaPlayer = new MediaPlayer(media);
         mediaPlayer.setAutoPlay(false);
+
         MediaView mediaView = new MediaView(mediaPlayer);
         mediaView.setPreserveRatio(true);
-
-        Pane mediaPane = new Pane(mediaView);
-        mediaView.fitWidthProperty().bind(mediaPane.widthProperty());
-        mediaView.fitHeightProperty().bind(mediaPane.heightProperty());
         mediaView.setSmooth(true);
 
-        Polygon playIcon = new Polygon(0, 0, 0, 60, 52, 30);
-        playIcon.setFill(Color.rgb(70, 130, 180, 0.85));
-        playIcon.setVisible(true);
+        StackPane mediaContainer = new StackPane(mediaView);
+        mediaContainer.setStyle("-fx-background-color: black;");
+        mediaView.fitWidthProperty().bind(mediaContainer.widthProperty());
+        mediaView.fitHeightProperty().bind(mediaContainer.heightProperty());
+        mediaContainer.setMinWidth(0);
+        mediaContainer.setMinHeight(0);
 
-        StackPane videoStack = new StackPane(mediaPane, playIcon);
-        videoStack.setStyle("-fx-background-color: black;");
+        Polygon playIcon = new Polygon(0,0, 0,60, 52,30);
+        playIcon.setFill(Color.rgb(70,130,180,0.85));
+        playIcon.visibleProperty().bind(mediaPlayer.statusProperty().isNotEqualTo(MediaPlayer.Status.PLAYING));
+
+        StackPane videoStack = new StackPane(mediaContainer, playIcon);
         videoStack.setCursor(Cursor.HAND);
-
         videoStack.setOnMouseClicked(evt -> {
             if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
                 mediaPlayer.pause();
@@ -130,18 +131,13 @@ public class HelpUser {
                 mediaPlayer.play();
             }
         });
-
-        mediaPlayer.setOnPlaying(() -> playIcon.setVisible(false));
-        mediaPlayer.setOnPaused(() -> playIcon.setVisible(true));
         mediaPlayer.setOnEndOfMedia(() -> {
-            playIcon.setVisible(true);
             mediaPlayer.seek(Duration.ZERO);
             mediaPlayer.pause();
         });
 
         Slider progress = createProgressSlider(mediaPlayer);
-
-        HBox controls = new HBox(10, progress);
+        HBox controls = new HBox(progress);
         controls.setPadding(new Insets(5));
         controls.setAlignment(Pos.CENTER);
         controls.setStyle("-fx-background-color: rgba(0,0,0,0.6);");
@@ -149,7 +145,7 @@ public class HelpUser {
         BorderPane videoPane = new BorderPane();
         videoPane.setCenter(videoStack);
         videoPane.setBottom(controls);
-
+        BorderPane.setAlignment(videoStack, Pos.CENTER);
         return videoPane;
     }
 
