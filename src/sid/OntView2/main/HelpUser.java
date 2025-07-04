@@ -78,7 +78,7 @@ public class HelpUser {
                 helpStage.centerOnScreen();
             } else if (newTab == elementsInfoTab) {
                 helpStage.setWidth(700);
-                helpStage.setHeight(550);
+                helpStage.setHeight(600);
                 helpStage.centerOnScreen();
 
             }else {
@@ -253,9 +253,12 @@ public class HelpUser {
 
     private List<Item> getGraphElementsItems() {
         return List.of(
-            new Item("· Named Classes : Gray","assets/named.png", 170),
-            new Item("· Defined Classes and Equivalent Classes: Light Green", "assets/definedEquivalent.png", 170),
-            new Item("· Anonymous Classes : White", "assets/anonymous.png", 170),
+            new Item("· Named Classes: Basic concepts forming the ontology's vocabulary (gray).",
+                "assets/named.png", 170),
+            new Item("· Defined and Equivalent Classes: Represent concepts specified with necessary and sufficient" +
+                " conditions for membership (light green).", "assets/definedEquivalent.png", 170),
+            new Item("· Anonymous Classes: Concepts without explicit names in the schema, used as part of complex" +
+                " expressions in the ontology (white).", "assets/anonymous.png", 170),
             new Item("· D : Indicates that the class is disjoint with other classes.",
                 "assets/disjoint.png", 130),
             new Item("· P : Indicates that this specific node has properties associated with it.",
