@@ -73,8 +73,6 @@ public class HelpUser {
         Tab tutorialTab = new Tab("Video tutorial");
         tutorialTab.setClosable(false);
 
-        ClassLoader c = Thread.currentThread().getContextClassLoader();
-
         tabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
             if (newTab == tutorialTab) {
                 helpStage.setWidth(1400);
@@ -186,8 +184,8 @@ public class HelpUser {
             containerLegend = new VBox(12);
             containerLegend.setPadding(new Insets(15));
 
-            Text title = new Text("How to use the application:");
-            title.setFill(Color.BLUE);
+            Label title = new Label("How to use the application:");
+            title.setTextFill(Color.BLUE);
             title.setFont(Font.font("DejaVu Sans", FontWeight.BOLD, FontPosture.ITALIC, 14));
             containerLegend.getChildren().add(title);
 
@@ -197,7 +195,8 @@ public class HelpUser {
                 VBox row = new VBox(8);
                 row.setAlignment(Pos.CENTER_LEFT);
 
-                Text txt = new Text(item.text);
+                Label txt = new Label(item.text);
+                txt.setWrapText(true);
                 row.getChildren().add(txt);
                 if (item.imagePath != null) {
                     row.getChildren().add(createIcon(item.imagePath, item.size));
@@ -215,8 +214,8 @@ public class HelpUser {
             containerElementsInfo = new VBox(12);
             containerElementsInfo.setPadding(new Insets(15));
 
-            Text title = new Text("Legend:");
-            title.setFill(Color.BLUE);
+            Label title = new Label("Legend:");
+            title.setTextFill(Color.BLUE);
             title.setFont(Font.font("DejaVu Sans", FontWeight.BOLD, FontPosture.ITALIC, 14));
             containerElementsInfo.getChildren().add(title);
 
@@ -226,7 +225,8 @@ public class HelpUser {
                 VBox row = new VBox(8);
                 row.setAlignment(Pos.CENTER_LEFT);
 
-                Text txt = new Text(item.text);
+                Label txt = new Label(item.text);
+                txt.setWrapText(true);
                 row.getChildren().add(txt);
                 if (item.imagePath != null) {
                     row.getChildren().add(createIcon(item.imagePath, item.size));
@@ -242,7 +242,8 @@ public class HelpUser {
     private List<Item> getLegendItems() {
         return List.of(
             new Item("1. Load an ontology and click the 'Load Ont' button.",null, 0),
-            new Item("2. Select a reasoner, then choose the 'KConceptExtractor', and finally click the 'Sync' button.",null, 0),
+            new Item("2. Select a reasoner, then choose the 'KConceptExtractor', and finally click the 'Sync' " +
+                "button.",null, 0),
             new Item("3. You are now ready to use the rest of the functionalities.",null, 0)
         );
     }
@@ -252,9 +253,18 @@ public class HelpUser {
             new Item("· Named Classes : Gray","assets/named.png", 170),
             new Item("· Defined Classes : Light Green", "assets/definedEquivalent.png", 170),
             new Item("· Anonymous Classes : White", "assets/anonymous.png", 170),
-            new Item("· P : Indicates that this specific node has properties associated with it.", "assets/properties.png", 170),
-            new Item("· D : Indicates that the class is disjoint with other classes.", "assets/dDisjoint.png", 130),
-            new Item("· (1) : Functional property",null, 0)
+            new Item("· D : Indicates that the class is disjoint with other classes.",
+                "assets/disjoint.png", 130),
+            new Item("· P : Indicates that this specific node has properties associated with it.",
+                "assets/properties.png", 170),
+            new Item("· (1) : Functional property",null, 0),
+            new Item("· IsA Connectors : Represent direct hierarchical relationships between concepts in the graph.",
+                "assets/isA.png", 450),
+            new Item("· Dashed Connectors : A special type of IsA connector. Represents an indirect hierarchical relationship.",
+                "assets/dashed.png", 400),
+            new Item("· Range Connectors : Are defined by a link to a particular node (light blue)\n" +
+                "· Property Hierarchy Connectors : Object Property hierarchies are also rendered " +
+                "in OntView via inheritance connectors showing their subProperty relationship", "assets/rangeInheritance.png", 400)
         );
     }
 
