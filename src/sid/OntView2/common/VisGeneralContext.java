@@ -8,10 +8,10 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 public class VisGeneralContext extends ContextMenu {
-	MenuItem item1;
-	MenuItem item2;
-	MenuItem item3;
-	private MenuItem getMenuItem1(){
+	MenuItem item1, item2, item3;
+    PaintFrame parent;
+
+    private MenuItem getMenuItem1(){
 		if (item1==null)
 			item1 = new MenuItem();
 		return item1;
@@ -28,9 +28,8 @@ public class VisGeneralContext extends ContextMenu {
 			item3 = new MenuItem();
 		return item3;
 	}
-	PaintFrame parent;
 
-	public VisGeneralContext (PaintFrame pParent){
+	public VisGeneralContext(PaintFrame pParent){
 		super();
 		parent = pParent;
 		getItems().add(getMenuItem1());
@@ -45,29 +44,21 @@ public class VisGeneralContext extends ContextMenu {
 		updateMenuItemTexts();
 	}
 
-
-
-
 	private void propertiesItemClicked() {
 	    Set<Entry<String, Shape>> classesInGraph = parent.getVisGraph().getClassesInGraph();
         boolean visibleProperties = existsVisiblePropertyBox();
-	    if (visibleProperties){
-	        for (Entry<String, Shape> entry : classesInGraph) {
-		    	if ((entry.getValue() instanceof VisClass) && (entry.getValue().asVisClass().getPropertyBox()!=null)){
-		    		VisPropertyBox box = entry.getValue().asVisClass().getPropertyBox();
-		    		box.setVisible(false);
-                    parent.compactNodes(entry.getValue().asVisClass());
-		    	}
-		    }
-	    }
-	    else {
-	    	for (Entry<String, Shape> entry : classesInGraph) {
-		    	if ((entry.getValue() instanceof VisClass) && (entry.getValue().asVisClass().getPropertyBox()!=null)){
-		    		VisPropertyBox box = entry.getValue().asVisClass().getPropertyBox();
-		    		box.setVisible(true);
-		    	}
-		    }
-	    }
+
+        for (Entry<String, Shape> entry : classesInGraph) {
+            Shape shape = entry.getValue();
+            if ((shape instanceof VisClass) && (shape.asVisClass().getPropertyBox() != null)) {
+                VisPropertyBox box = shape.asVisClass().getPropertyBox();
+                box.setVisible(!visibleProperties);
+                if (visibleProperties) {
+                    parent.compactNodes(shape);
+                }
+
+            }
+        }
 
         parent.nTopPanel.getPropertiesCheckBox().setSelected(!visibleProperties);
 		parent.setStateChanged(true);
@@ -87,7 +78,6 @@ public class VisGeneralContext extends ContextMenu {
 	}
 
 	private void disjointItemClicked() {
-		//parent.getVisGraph().disjoint = !parent.getVisGraph().disjoint;
         parent.hideDisjoint = !parent.selectedDisjoints.isEmpty();
 		parent.drawAllDisjointShapes();
 		updateMenuItemTexts();

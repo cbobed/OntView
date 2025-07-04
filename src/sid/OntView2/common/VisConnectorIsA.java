@@ -11,7 +11,7 @@ public class VisConnectorIsA extends VisConnector {
 
 	Color backgroundColor = Color.web("#f9f9f9");
 	
-	private static double PATH_OFFSET = 5.0;
+	private static final double PATH_OFFSET = 5.0;
 	
 	Path path;
 	

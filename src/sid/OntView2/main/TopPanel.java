@@ -16,9 +16,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
-import javafx.scene.media.MediaView;
 import javafx.scene.paint.Color;
 import javafx.scene.text.*;
 import javafx.stage.*;
@@ -235,15 +232,16 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
                 }
                 zoomSliderChangeStateChanged(newVal.doubleValue());
             });
-		}
+            tooltipInfo(zoomSlider, "Zoom in/out the graph");
+        }
 		return zoomSlider;
 	}
 
 	private void tooltipInfo(Node node, String text) {
 		Tooltip tooltip = new Tooltip(text);
-		Tooltip.install(node, tooltip);
 		tooltip.setFont(new Font("DejaVu Sans", 12));
-	}
+        Tooltip.install(node, tooltip);
+    }
 
 	private Button getfileSystemButton() {
 		if (fileSystemButton == null) {
@@ -323,7 +321,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 				}
 			});
-
+            tooltipInfo(toggleSwitch, "Change connectors visibility");
 		}
 		return toggleSwitch;
 	}
@@ -334,7 +332,9 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			cleanConnectorsButton.getStyleClass().add("button");
 			cleanConnectorsButton.setMinWidth(60);
 			cleanConnectorsButton.setOnAction(this::cleanConnectorActionPerformed);
-		}
+
+            tooltipInfo(cleanConnectorsButton, "Clear the selection of visible connectors in the graph");
+        }
 
 		return cleanConnectorsButton;
 	}
@@ -392,7 +392,9 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 				parent.artPanel.setKceOption(kceComboBox.getItems().get(0));
 			}
 			kceComboBox.setOnAction(this::kceItemItemStateChanged);
-		}
+
+            tooltipInfo(kceComboBox, "Select summarization technique");
+        }
 		return kceComboBox;
 	}
 
@@ -424,7 +426,9 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			loadReasonerButton.setFont(Font.font("DejaVu Sans", FontWeight.NORMAL, 10));
 			loadReasonerButton.getStyleClass().add("button");
 			loadReasonerButton.setOnAction(this::loadReasonerButtonActionTask);
-		}
+
+            tooltipInfo(loadReasonerButton, "Run reasoning over the ontology");
+        }
 		return loadReasonerButton;
 	}
 
@@ -575,7 +579,9 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			loadOntologyButton.getStyleClass().add("button");
 			loadOntologyButton.setMinWidth(100);
 			loadOntologyButton.setOnAction(this::OntologyButtonActionActionPerformed);
-		}
+
+            tooltipInfo(loadOntologyButton, "Load ontology from URL or file system");
+        }
 		return loadOntologyButton;
 	}
 
@@ -595,7 +601,9 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			loadReasonerCombo.setMaxWidth(Double.MAX_VALUE);
 			loadReasonerCombo.setPrefWidth(100);
 			loadReasonerCombo.setDisable(true);
-		}
+
+            tooltipInfo(loadReasonerCombo, "Select reasoner");
+        }
 		return loadReasonerCombo;
 	}
 
@@ -609,7 +617,9 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			loadOntologyCombo.setMaxWidth(Double.MAX_VALUE);
 			HBox.setHgrow(loadOntologyCombo, Priority.ALWAYS);
 			loadOntologyCombo.setDisable(false);
-		}
+
+            tooltipInfo(loadOntologyCombo, "Select a recently used ontology");
+        }
 		return loadOntologyCombo;
 	}
 
@@ -635,6 +645,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
                     new ClassExpression(parent);
                 }
             });
+
+            tooltipInfo(expressionButton, "View class expressions between the selected top and bottom classes");
         }
         return expressionButton;
     }
@@ -747,6 +759,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
             });
 
             percentageSpinner.setPrefWidth(60);
+
+            tooltipInfo(percentageSpinner, "Set visibility percentage for the expand/collapse functionality");
         }
         return percentageSpinner;
     }
@@ -863,8 +877,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		parent.artPanel.loadingStage = parent.artPanel.showLoadingStage(task);
 
         task.setOnCancelled(e -> {
-            if (!parent.cancelledOutOfVisGraph) VisGraph.voluntaryCancel(true);
-            parent.cancelledOutOfVisGraph = false;
+            if (!parent.cancelledFlag) VisGraph.voluntaryCancel(true);
+            parent.cancelledFlag = false;
         });
 		task.setOnSucceeded(e -> parent.artPanel.loadingStage.close());
 		task.setOnFailed(e -> {
@@ -935,7 +949,11 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	}
 
 	private void restoreViewButtonActionActionPerformed(ActionEvent event) {
-		parent.restoreViewButtonAction(event);
+        try {
+            parent.restoreViewButtonAction(event);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 	}
 
 	private void comboBox0ItemItemStateChanged(String selectedItem) {

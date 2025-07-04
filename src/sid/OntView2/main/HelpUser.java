@@ -3,28 +3,28 @@ package sid.OntView2.main;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Slider;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
+import javafx.scene.text.*;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.util.List;
 import java.util.Objects;
 
 public class HelpUser {
     Stage helpStage;
+    ClassLoader c = Thread.currentThread().getContextClassLoader();
+    VBox containerElementsInfo, containerLegend;
 
     public HelpUser() { }
 
@@ -40,10 +40,12 @@ public class HelpUser {
         TabPane tabPane = createHelpTabsPane(helpStage);
         BorderPane root = new BorderPane(tabPane);
 
-        Scene scene = new Scene(root, 600, 300);
+        Scene scene = new Scene(root, 700, 300);
         ClassLoader c = Thread.currentThread().getContextClassLoader();
         scene.getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
         helpStage.setScene(scene);
+        helpStage.setMinHeight(150);
+        helpStage.setMinWidth(350);
         helpStage.show();
     }
 
@@ -52,26 +54,35 @@ public class HelpUser {
 
         Tab helpTab = new Tab("Help");
         helpTab.setClosable(false);
-        TextFlow helpContent = createHelpContent();
-        helpTab.setContent(helpContent);
+        VBox helpContent = createHelpContent();
+        ScrollPane scrollHelp = new ScrollPane(helpContent);
+        scrollHelp.setFitToWidth(true);
+        scrollHelp.setPannable(true);
+        helpTab.setContent(scrollHelp);
 
         Tab elementsInfoTab = new Tab("Legend");
         elementsInfoTab.setClosable(false);
-        TextFlow elementsInfoContent = createElementsInfoContent();
-        elementsInfoTab.setContent(elementsInfoContent);
+        VBox elementsInfoContent = createElementsInfoContent();
+        ScrollPane scroll = new ScrollPane(elementsInfoContent);
+        scroll.setFitToWidth(true);
+        scroll.setPannable(true);
+        elementsInfoTab.setContent(scroll);
 
         Tab tutorialTab = new Tab("Video tutorial");
         tutorialTab.setClosable(false);
-
-        ClassLoader c = Thread.currentThread().getContextClassLoader();
 
         tabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
             if (newTab == tutorialTab) {
                 helpStage.setWidth(1400);
                 helpStage.setHeight(900);
                 helpStage.centerOnScreen();
-            } else {
-                helpStage.setWidth(600);
+            } else if (newTab == elementsInfoTab) {
+                helpStage.setWidth(700);
+                helpStage.setHeight(550);
+                helpStage.centerOnScreen();
+
+            }else {
+                helpStage.setWidth(700);
                 helpStage.setHeight(300);
                 helpStage.centerOnScreen();
             }
@@ -171,41 +182,115 @@ public class HelpUser {
     }
 
 
-    private TextFlow createHelpContent() {
-        Text title = new Text("How to use the application:\n");
-        title.setFill(Color.BLUE);
-        title.setStyle("-fx-font-weight: bold;");
+    private VBox createHelpContent() {
+        if (containerLegend == null) {
+            containerLegend = new VBox(12);
+            containerLegend.setPadding(new Insets(15));
 
-        Text step1 = new Text("1. Load an ontology and click the 'Load Ont' button.\n");
-        Text step2 = new Text("2. Select a reasoner, then choose the 'KConceptExtractor', and finally click the 'Sync' button.\n");
-        Text step3 = new Text("3. You are now ready to use the rest of the functionalities.");
+            Label title = new Label("How to use the application:");
+            title.setTextFill(Color.BLUE);
+            title.setFont(Font.font("DejaVu Sans", FontWeight.BOLD, FontPosture.ITALIC, 14));
+            containerLegend.getChildren().add(title);
 
-        TextFlow helpContent = new TextFlow(title, step1, step2, step3);
-        helpContent.setPadding(new Insets(10));
+            List<Item> items = getLegendItems();
 
-        helpContent.setLineSpacing(5);
-        return helpContent;
+            for (Item item : items) {
+                VBox row = new VBox(8);
+                row.setAlignment(Pos.CENTER_LEFT);
+
+                Label txt = new Label(item.text);
+                txt.setWrapText(true);
+                row.getChildren().add(txt);
+                if (item.imagePath != null) {
+                    row.getChildren().add(createIcon(item.imagePath, item.size));
+                }
+
+                containerLegend.getChildren().add(createContainerNoSize(row));
+            }
+
+        }
+        return containerLegend;
     }
-    private TextFlow createElementsInfoContent() {
-        Text elementsInfoTitle = new Text("Legend:\n");
-        elementsInfoTitle.setFill(Color.BLUE);
-        elementsInfoTitle.setStyle("-fx-font-weight: bold;");
 
-        Text elementsInfoText = new Text(
-            """
-            P: Indicates that this specific node has properties associated with it.
-            D: Indicates that the class is disjoint with other classes.
-            Named Classes: Gray
-            Defined Classes: Light Green
-            Anonymous Classes: White
-            (1): Functional property
-            """
+    private VBox createElementsInfoContent() {
+        if (containerElementsInfo == null) {
+            containerElementsInfo = new VBox(12);
+            containerElementsInfo.setPadding(new Insets(15));
+
+            Label title = new Label("Legend:");
+            title.setTextFill(Color.BLUE);
+            title.setFont(Font.font("DejaVu Sans", FontWeight.BOLD, FontPosture.ITALIC, 14));
+            containerElementsInfo.getChildren().add(title);
+
+            List<Item> items = getGraphElementsItems();
+
+            for (Item item : items) {
+                VBox row = new VBox(8);
+                row.setAlignment(Pos.CENTER_LEFT);
+
+                Label txt = new Label(item.text);
+                txt.setWrapText(true);
+                row.getChildren().add(txt);
+                if (item.imagePath != null) {
+                    row.getChildren().add(createIcon(item.imagePath, item.size));
+                }
+
+                containerElementsInfo.getChildren().add(createContainerNoSize(row));
+            }
+        }
+
+        return containerElementsInfo;
+    }
+
+    private List<Item> getLegendItems() {
+        return List.of(
+            new Item("1. Load an ontology and click the 'Load Ont' button.",null, 0),
+            new Item("2. Select a reasoner, then choose the 'KConceptExtractor', and finally click the 'Sync' " +
+                "button.",null, 0),
+            new Item("3. You are now ready to use the rest of the functionalities.",null, 0)
         );
-
-        TextFlow elementsInfoContent = new TextFlow(elementsInfoTitle, elementsInfoText);
-        elementsInfoContent.setPadding(new Insets(10));
-        elementsInfoContent.setLineSpacing(5);
-
-        return elementsInfoContent;
     }
+
+    private List<Item> getGraphElementsItems() {
+        return List.of(
+            new Item("· Named Classes : Gray","assets/named.png", 170),
+            new Item("· Defined Classes and Equivalent Classes: Light Green", "assets/definedEquivalent.png", 170),
+            new Item("· Anonymous Classes : White", "assets/anonymous.png", 170),
+            new Item("· D : Indicates that the class is disjoint with other classes.",
+                "assets/disjoint.png", 130),
+            new Item("· P : Indicates that this specific node has properties associated with it.",
+                "assets/properties.png", 170),
+            new Item("· (1) : Functional property",null, 0),
+            new Item("· Graph Levels : The graph is organized into horizontal levels corresponding to the maximum " +
+                "hierarchical distance of a concept from OwlThing (light gray vertical lines).",
+                "assets/3levels.png", 500),
+            new Item("· IsA Connectors : Represent direct hierarchical relationships between concepts in the graph.",
+                "assets/isA.png", 500),
+            new Item("· Dashed Connectors : A special type of IsA connector. Represents an indirect hierarchical relationship.",
+                "assets/dashed.png", 400),
+            new Item("· Range Connectors : Are defined by a link to a particular node (light blue).\n\n" +
+                "· Property Hierarchy Connectors : Object Property hierarchies are also rendered " +
+                "in OntView via inheritance connectors showing their subProperty relationship (black).",
+                "assets/rangeInheritance.png", 550)
+        );
+    }
+
+    private ImageView createIcon(String resourcePath, double width) {
+        Image img = new Image(Objects.requireNonNull(c.getResourceAsStream(resourcePath)));
+        ImageView iv = new ImageView(img);
+        iv.setFitWidth(width);
+        iv.setPreserveRatio(true);
+        return iv;
+    }
+
+    private VBox createContainerNoSize(Node... children) {
+        VBox container = new VBox(7);
+        container.getChildren().addAll(children);
+        container.setPadding(new Insets(10));
+        container.getStyleClass().add("tab-info-container");
+        container.setAlignment(Pos.CENTER_LEFT);
+        return container;
+    }
+
+    private record Item(String text, String imagePath, double size) { }
 }

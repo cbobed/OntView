@@ -466,14 +466,17 @@ public class VisClass extends Shape {
 
                 ArrayList<String> aux = new ArrayList<>();
                 for (OWLClassExpression eqDef : getEquivalentClasses()) {
-                    List<String> labels = explicitQualifiedDefinitionLabels.getOrDefault(eqDef, Collections.emptyList());
-                    List<String> matches = labels.stream().filter(s -> s.contains("@" + language)).toList();
+                    if (eqDef instanceof OWLClass) {
+                        List<String> labels = explicitQualifiedDefinitionLabels.getOrDefault(eqDef, Collections.emptyList());
+                        List<String> matches = labels.stream().filter(s -> s.contains("@" + language)).toList();
 
-                    if (!matches.isEmpty()) {
-                        aux.addAll(matches);
+                        if (!matches.isEmpty()) {
+                            aux.addAll(matches);
+                        } else {
+                            aux.add(qualifyLabel(eqDef.asOWLClass(), ExpressionManager.getReducedClassExpression(eqDef)));
+                        }
                     } else {
-                        String reduced = qualifyLabel(eqDef.asOWLClass(), ExpressionManager.getReducedClassExpression(eqDef));
-                        aux.add(reduced);
+                        aux.add(ExpressionManager.getReducedClassExpression(eqDef));
                     }
                 }
                 if (!aux.isEmpty()) visibleDefinitionLabels = aux;
@@ -488,9 +491,9 @@ public class VisClass extends Shape {
                     if (!matches.isEmpty()) {
                         aux.addAll(matches);
                     } else {
-                        String reduced = ExpressionManager.getReducedClassExpression(eqDef);
-                        aux.add(reduced);
+                        aux.add(ExpressionManager.getReducedClassExpression(eqDef));
                     }
+
                 }
                 if (!aux.isEmpty()) visibleDefinitionLabels = aux;
             }
@@ -514,8 +517,8 @@ public class VisClass extends Shape {
         this.isKorean = language.equals("ko");
 
         swapLabelEquivalentClasses(labelRendering, qualifiedRendering, language);
-		
-		if (!explicitLabel.isEmpty()) {
+
+        if (!explicitLabel.isEmpty()) {
 			if (labelRendering) {
 				if (qualifiedRendering) {
 					if (!explicitQualifiedLabel.isEmpty()) {
@@ -547,10 +550,10 @@ public class VisClass extends Shape {
 			}
 		}
 		else {
-			if (qualifiedRendering) {
+			if (qualifiedRendering) { // QUALIFIED
 				visibleLabel = qualifiedLabel;
 			}
-			else if (!labelRendering) {
+			else {
 				visibleLabel = label;
 			}
 		}

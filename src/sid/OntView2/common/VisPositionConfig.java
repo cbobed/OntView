@@ -2,8 +2,11 @@ package sid.OntView2.common;
 
 import javafx.application.Platform;
 import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.*;
 
 import java.io.BufferedWriter;
@@ -18,17 +21,11 @@ public class VisPositionConfig {
 	XPath xpath;
 	static VisPositionConfig config = new VisPositionConfig();
 	
-	public void setup(String path){
+	public void setup(String path) throws IOException, ParserConfigurationException, SAXException {
 		DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
 		domFactory.setNamespaceAware(true);
-		DocumentBuilder builder;
-		try {
-			builder = domFactory.newDocumentBuilder();
-			doc = builder.parse(path);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
+		DocumentBuilder builder  = domFactory.newDocumentBuilder();
+        doc = builder.parse(path);
 		xpath = XPathFactory.newInstance().newXPath();
 	}
 	
@@ -42,17 +39,13 @@ public class VisPositionConfig {
 		}
 	}
 
-	public static String[] restoreOntologyReasoner(String path){
-		config.setup(path);
-		try {
-			return config.recoverGraphInfo();
-		} catch (XPathExpressionException e) {
-			e.printStackTrace();
-		}
-		return new String[0];
+	public static String[] restoreOntologyReasoner(String path) throws IOException, ParserConfigurationException,
+                                                                            SAXException, XPathExpressionException {
+        config.setup(path);
+        return config.recoverGraphInfo();
 	}
 
-	public String[] recoverGraphInfo() throws XPathExpressionException{
+	public String[] recoverGraphInfo() throws XPathExpressionException {
 		String s="//ontologyName/text()";
 		XPathExpression expr = xpath.compile(s);
 		Object ontologyName = expr.evaluate(doc, XPathConstants.STRING);

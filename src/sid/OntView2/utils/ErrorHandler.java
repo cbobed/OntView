@@ -7,6 +7,7 @@ import org.semanticweb.HermiT.datatypes.UnsupportedDatatypeException;
 import org.semanticweb.owlapi.io.OWLOntologyCreationIOException;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.UnloadableImportException;
+import org.xml.sax.SAXParseException;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -122,6 +123,25 @@ public class ErrorHandler {
     }
 
     /**
+     * Returns a user-friendly message for errors occurring during graph state XML saving.
+     */
+    public static String getXMLeError(Throwable ex) {
+        Throwable cause = unwrapCause(ex);
+
+        if (cause instanceof SAXParseException sax) {
+            return String.format("Error: Malformed XML at line %d, column %d: %s",
+                sax.getLineNumber(), sax.getColumnNumber(), sax.getMessage());
+        }
+        if (cause instanceof IOException) {
+            return "Error: I/O issue while reading the XML for restore view.";
+        }
+        if (cause instanceof ParserConfigurationException) {
+            return "Error: XML parser configuration invalid.";
+        }
+        return truncateMessage(cause);
+    }
+
+    /**
      * Unwraps nested causes to find the root cause.
      */
     private static Throwable unwrapCause(Throwable ex) {
@@ -137,9 +157,10 @@ public class ErrorHandler {
      */
     private static String truncateMessage(Throwable cause) {
         String msg = cause.getMessage();
-        if (msg != null && msg.length() > 100) {
-            msg = msg.substring(0, 100) + " …";
+        if (msg != null && msg.length() > 120) {
+            msg = msg.substring(0, 120) + " …";
         }
+
         return "Error: " + (msg != null ? msg + "." : "unknown.");
     }
 }

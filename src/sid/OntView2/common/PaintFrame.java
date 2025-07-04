@@ -374,7 +374,7 @@ public class PaintFrame extends Canvas {
 
 
            } else {
-                logger.error("visGraph is null in draw method.");
+                logger.debug("visGraph is null in draw method.");
 			}
 		}
 	}
@@ -1380,9 +1380,11 @@ public class PaintFrame extends Canvas {
 		Scene loadingScene = new Scene(loadingBox, 300, 200);
 		loadingScene.getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
 		loadingStage.setScene(loadingScene);
-        loadingStage.setOnShowing(e -> timeline.play());
+        loadingStage.setOnShowing(e -> {
+            timeline.play();
+            loadingStage.requestFocus();
+        });
         loadingStage.setOnHidden(e -> timeline.stop());
-
         loadingStage.show();
 		return loadingStage;
 	}
@@ -1395,6 +1397,7 @@ public class PaintFrame extends Canvas {
         ClassLoader c = Thread.currentThread().getContextClassLoader();
         alert.getDialogPane().getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
         alert.getDialogPane().getStyleClass().add("custom-alert");
+        alert.setOnShowing(e -> alert.getDialogPane().requestFocus());
         alert.showAndWait();
     }
 

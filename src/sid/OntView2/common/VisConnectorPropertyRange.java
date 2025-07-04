@@ -10,8 +10,9 @@ public class VisConnectorPropertyRange extends VisConnectorIsA {
 
 	VisPropertyBox parentBox;
 	VisObjectProperty vprop;
-	
-	Path path;
+    double ARROW_SIZE = 7.0;
+
+    Path path;
 	
 	public VisConnectorPropertyRange(VisPropertyBox box, Shape par_from, Shape par_to, VisObjectProperty pvprop) {
 		super(par_from, par_to);
@@ -48,9 +49,12 @@ public class VisConnectorPropertyRange extends VisConnectorIsA {
 					g.setStroke(Color.DARKTURQUOISE);
 					g.setLineWidth(1.7);
 			  		drawCurve(g, VisConstants.NURB);
+
 					g.setFill(Color.DARKCYAN);
 					g.fillOval(fromPoint.getX()-2, fromPoint.getY()-2, 4, 4);
-					g.setStroke(prevColor);
+                    drawArrowProperty(g, ARROW_SIZE, ARROW_SIZE , toPoint.getX(), toPoint.getY());
+
+                    g.setStroke(prevColor);
 					g.setLineWidth(prevLineWidth);
 				  	g.setFill(prevColor);
 				} 	
@@ -58,16 +62,33 @@ public class VisConnectorPropertyRange extends VisConnectorIsA {
 		}	
 	}
 
-	protected void drawCurve(GraphicsContext g2d,int method){
+    private void drawArrowProperty(GraphicsContext g, double length, double width, double x, double y) {
+        double tx = toPoint.getX() - controlX2;
+        double ty = toPoint.getY() - fromPoint.getY();
+        double angleDeg = Math.toDegrees(Math.atan2(ty, tx));
+        g.setFill(Color.DARKCYAN);
+
+        double halfW = width / 2.0;
+        g.save();
+        g.translate(x, y);
+        g.rotate(angleDeg);
+
+        double[] xPoints = {  0, -length, -length };
+        double[] yPoints = {  0,  halfW,  -halfW };
+
+        g.fillPolygon(xPoints, yPoints, 3);
+        g.restore();
+    }
+
+
+    protected void drawCurve(GraphicsContext g2d,int method){
 		switch (method){
 			case VisConstants.BEZIER:
 				drawBezier(g2d);
 			    break;
 			case VisConstants.NURB:
 				drawNurbs(g2d, fromPoint, toPoint);
-		
 		}
-		
 	}
 	
 	protected void drawNurbs(GraphicsContext g2d, Point2D pfrom, Point2D pto){

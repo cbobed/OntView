@@ -82,6 +82,7 @@
     -fx-tick-mark-fill: blue;
     -fx-track-color: linear-gradient(to bottom, #99bad8, #5679a2);
     -fx-thumb-color: #005cbf;
+    -fx-cursor: hand;
 }
 
 .zoom-slider .thumb {
@@ -322,4 +323,12 @@
     -fx-background-insets: 0;
     -fx-background-radius: 8px;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 2, 0, 0, 1);
+}
+
+.tab-info-container {
+    -fx-border-color: #1f3a57;
+    -fx-border-width: 1;
+    -fx-background-color: #ffffff;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
 }
