@@ -324,3 +324,11 @@
     -fx-background-radius: 8px;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 2, 0, 0, 1);
 }
+
+.tab-info-container {
+    -fx-border-color: #1f3a57;
+    -fx-border-width: 1;
+    -fx-background-color: #ffffff;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+}
