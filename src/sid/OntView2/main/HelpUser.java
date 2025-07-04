@@ -57,7 +57,6 @@ public class HelpUser {
         VBox helpContent = createHelpContent();
         ScrollPane scrollHelp = new ScrollPane(helpContent);
         scrollHelp.setFitToWidth(true);
-        scrollHelp.setFitToHeight(true);
         scrollHelp.setPannable(true);
         helpTab.setContent(scrollHelp);
 
@@ -66,7 +65,6 @@ public class HelpUser {
         VBox elementsInfoContent = createElementsInfoContent();
         ScrollPane scroll = new ScrollPane(elementsInfoContent);
         scroll.setFitToWidth(true);
-        scroll.setFitToHeight(true);
         scroll.setPannable(true);
         elementsInfoTab.setContent(scroll);
 
@@ -78,7 +76,12 @@ public class HelpUser {
                 helpStage.setWidth(1400);
                 helpStage.setHeight(900);
                 helpStage.centerOnScreen();
-            } else {
+            } else if (newTab == elementsInfoTab) {
+                helpStage.setWidth(700);
+                helpStage.setHeight(550);
+                helpStage.centerOnScreen();
+
+            }else {
                 helpStage.setWidth(700);
                 helpStage.setHeight(300);
                 helpStage.centerOnScreen();
@@ -251,20 +254,24 @@ public class HelpUser {
     private List<Item> getGraphElementsItems() {
         return List.of(
             new Item("· Named Classes : Gray","assets/named.png", 170),
-            new Item("· Defined Classes : Light Green", "assets/definedEquivalent.png", 170),
+            new Item("· Defined Classes and Equivalent Classes: Light Green", "assets/definedEquivalent.png", 170),
             new Item("· Anonymous Classes : White", "assets/anonymous.png", 170),
             new Item("· D : Indicates that the class is disjoint with other classes.",
                 "assets/disjoint.png", 130),
             new Item("· P : Indicates that this specific node has properties associated with it.",
                 "assets/properties.png", 170),
             new Item("· (1) : Functional property",null, 0),
+            new Item("· Graph Levels : The graph is organized into horizontal levels corresponding to the maximum " +
+                "hierarchical distance of a concept from OwlThing (light gray vertical lines).",
+                "assets/3levels.png", 500),
             new Item("· IsA Connectors : Represent direct hierarchical relationships between concepts in the graph.",
-                "assets/isA.png", 450),
+                "assets/isA.png", 500),
             new Item("· Dashed Connectors : A special type of IsA connector. Represents an indirect hierarchical relationship.",
                 "assets/dashed.png", 400),
-            new Item("· Range Connectors : Are defined by a link to a particular node (light blue)\n" +
+            new Item("· Range Connectors : Are defined by a link to a particular node (light blue).\n\n" +
                 "· Property Hierarchy Connectors : Object Property hierarchies are also rendered " +
-                "in OntView via inheritance connectors showing their subProperty relationship", "assets/rangeInheritance.png", 400)
+                "in OntView via inheritance connectors showing their subProperty relationship (black).",
+                "assets/rangeInheritance.png", 550)
         );
     }
 
