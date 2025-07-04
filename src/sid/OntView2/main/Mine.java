@@ -157,7 +157,7 @@ public class Mine extends Application implements Embedable{
             event.consume();
         });
 
-        viewer.artPanel.prohibitedImage = new Image(Objects.requireNonNull(c.getResource("prohibited.jpg")).toExternalForm());
+        viewer.artPanel.prohibitedImage = new Image(Objects.requireNonNull(c.getResource("assets/prohibited.jpg")).toExternalForm());
 
 		VBox root = new VBox();
 		root.getChildren().addAll(viewer.nTopPanel.getMainPane(), viewer.scroll);

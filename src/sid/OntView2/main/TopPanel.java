@@ -124,7 +124,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			saveImagePartialButton.setMinWidth(40);
 
 			ClassLoader c = Thread.currentThread().getContextClassLoader();
-			Image image = new Image(Objects.requireNonNull(c.getResourceAsStream("saveImagePartial.JPG")));
+			Image image = new Image(Objects.requireNonNull(c.getResourceAsStream("assets/saveImagePartial.JPG")));
 			ImageView imageView = new ImageView(image);
 			imageView.setFitWidth(20);
 			imageView.setFitHeight(20);
@@ -250,7 +250,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			fileSystemButton.setCursor(Cursor.HAND);
 
 			ClassLoader c = Thread.currentThread().getContextClassLoader();
-			Image icon = new Image(Objects.requireNonNull(c.getResourceAsStream("folder.png")));
+			Image icon = new Image(Objects.requireNonNull(c.getResourceAsStream("assets/folder.png")));
 			ImageView imageView = new ImageView(icon);
 			imageView.setFitWidth(17);
 			imageView.setFitHeight(17);
@@ -409,7 +409,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		if (label0 == null) {
 			label0 = new Label();
 			ClassLoader c = Thread.currentThread().getContextClassLoader();
-			Image image = new Image(Objects.requireNonNull(c.getResourceAsStream("search.JPG")));
+			Image image = new Image(Objects.requireNonNull(c.getResourceAsStream("assets/search.JPG")));
 			ImageView imageView = new ImageView(image);
 			imageView.setFitWidth(18);
 			imageView.setFitHeight(18);
@@ -500,7 +500,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			saveImageButton.setMinWidth(40);
 
 			ClassLoader c = Thread.currentThread().getContextClassLoader();
-			Image image = new Image(Objects.requireNonNull(c.getResourceAsStream("saveImage.JPG")));
+			Image image = new Image(Objects.requireNonNull(c.getResourceAsStream("assets/saveImage.JPG")));
 			ImageView imageView = new ImageView(image);
 			imageView.setFitWidth(20);
 			imageView.setFitHeight(20);
