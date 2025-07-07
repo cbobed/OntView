@@ -44,24 +44,18 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import sid.OntView2.main.TopPanel;
 import sid.OntView2.kcExtractors.KConceptExtractor;
 import sid.OntView2.kcExtractors.KConceptExtractorFactory;
-import sid.OntView2.utils.ExpressionManager;
 
 public class PaintFrame extends Canvas {
     private static final Logger logger = LogManager.getLogger(GraphReorder.class);
     private static final long serialVersionUID = 1L;
     public Stage loadingStage = null;
 	public ScrollPane scroll;
-	static final int BORDER_PANEL = 60;
-	static final int MIN_SPACE = 30;
-	static final int MIN_INITIAL_SPACE = 40;
-	private static final int DOWN = 0;
-	private static final int UP = -1;
-	boolean stable = false;
-	boolean repulsion = true;
-	public boolean renderLabel = false;
+	static final int BORDER_PANEL = 60, MIN_SPACE = 30, MIN_INITIAL_SPACE = 40;
+	private static final int DOWN = 0, UP = -1;
+	boolean stable = false, repulsion = true;
+	public boolean renderLabel = false, qualifiedNames = false;
     public Set<String> languagesLabels = new HashSet<>();
 	// CBL: added the qualified names rendering
-	public boolean qualifiedNames = false;
 	private String kceOption = VisConstants.NONECOMBOOPTION;
 	Dimension2D prevSize;
 	PaintFrame paintFrame = this;
@@ -73,16 +67,23 @@ public class PaintFrame extends Canvas {
 	public VisShapeContext menuVisShapeContext = null;
 	private VisGeneralContext menuVisGeneralContext = null;
     private Stage sliderStage = null;
-	public int screenWidth;
-	public int screenHeight;
-	public int canvasWidth = 0;
-	public int canvasHeight = 0;
-    public int nTopPanelHeight = 0;
+	public int screenWidth, screenHeight, canvasWidth = 0, canvasHeight = 0, nTopPanelHeight = 0;
     public Set<Shape> orderedShapesByRDF = new HashSet<>();
     private int percentageShown = 0;
-    private String strategyOptionStep = VisConstants.STEPSTRATEGY_RDFRANK;
-    private String strategyOptionGlobal = VisConstants.GLOBALSTRATEGY_RDFRANK;
+    private String strategyOptionStep = VisConstants.STEPSTRATEGY_RDFRANK,
+        strategyOptionGlobal = VisConstants.GLOBALSTRATEGY_RDFRANK;
     public String selectedLanguage = "";
+    int mouseLastY = 0, mouseLastX = 0;
+    Shape pressedShape = null;
+    List<Shape> selectedShapes = new ArrayList<>(), selectedDisjoints = new ArrayList<>();
+    public boolean hideRange = false, showDiagramOverview = false;
+    private Embedable parentFrame;
+    private final Tooltip tooltip = new Tooltip();
+    private Point2D pinchPoint = null;
+    public Shape selectedShape = null, focusOnShape = null;
+    public Image prohibitedImage;
+    private boolean showConnectors = false, isDragging = false, stateChanged = true;
+
     public String getStrategyOptionStep() { return strategyOptionStep; }
     public void setStrategyOptionStep(String strategyOptionStep) { this.strategyOptionStep = strategyOptionStep; }
     public String getStrategyOptionGlobal() { return strategyOptionGlobal; }
@@ -93,50 +94,37 @@ public class PaintFrame extends Canvas {
     public void setPercentageShown(int percentageShown) {
         this.percentageShown = percentageShown;
     }
-
 	public boolean isStable() {
 		return stable;
 	}
-
 	public void setReasoner(OWLReasoner pReasoner) {
 		reasoner = pReasoner;
 	}
-
 	public OWLReasoner getReasoner() {
 		return reasoner;
 	}
-
 	public void setOntology(OWLOntology ac) {
 		activeOntology = ac;
 	}
-
 	public OWLOntology getOntology() {
 		return activeOntology;
 	}
-
 	public void setActiveOntologySource(String p) {
 		activeOntologySource = p;
 	}
-
 	public String getActiveOntologySource() {
 		return activeOntologySource;
 	}
-
 	public String getKceOption() {
 		return kceOption;
 	}
-
 	public void setKceOption(String itemAt) {
 		kceOption = itemAt;
 	}
-	private boolean showConnectors = false;
 	public void setShowConnectors(boolean b) { showConnectors = b; }
 	public boolean getShowConnectors() { return showConnectors; }
     public Stage getSliderStage() { return sliderStage; }
     public void setSliderStage(Stage stage) { sliderStage = stage; }
-    public Shape selectedShape = null;
-    public Shape focusOnShape = null;
-    public Image prohibitedImage;
 
 	public PaintFrame(double width, double height) {
 		super();
@@ -453,8 +441,6 @@ public class PaintFrame extends Canvas {
 		return pressedShape;
 	}
 
-	private boolean stateChanged = true;
-
 	public void setStateChanged(boolean value) {
 		stateChanged = value;
 	}
@@ -513,18 +499,6 @@ public class PaintFrame extends Canvas {
 	 * MOUSE-LISTENER METHODS
 	 *
 	 **/
-
-	// to keep track of the increment when moving the shapes
-
-	int mouseLastY = 0;
-	int mouseLastX = 0;
-	Shape pressedShape = null;
-	List<Shape> selectedShapes = new ArrayList<>();
-	List<Shape> selectedDisjoints = new ArrayList<>();
-	public boolean hideRange = false;
-	private Embedable parentFrame;
-	private final Tooltip tooltip = new Tooltip();
-    private Point2D pinchPoint = null;
 
     public void cleanConnectors() {
 		selectedShapes.clear();
@@ -589,9 +563,6 @@ public class PaintFrame extends Canvas {
 	/*
 	 * MOUSE MOTION LISTENER
 	 */
-
-	private boolean isDragging = false;
-
 	public void handleMouseDragged(MouseEvent e) {
 		if (visGraph == null) {
 			return;

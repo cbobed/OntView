@@ -8,26 +8,28 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 public class VisGeneralContext extends ContextMenu {
-	MenuItem item1, item2, item3;
+	MenuItem item1, item2, item3, item4;
     PaintFrame parent;
 
     private MenuItem getMenuItem1(){
-		if (item1==null)
-			item1 = new MenuItem();
+		if (item1 == null) item1 = new MenuItem();
 		return item1;
 	}
 
 	private MenuItem getMenuItem2(){
-		if (item2==null)
-			item2 = new MenuItem();
+		if (item2 == null) item2 = new MenuItem();
 		return item2;
 	}
 
 	private MenuItem getMenuItem3(){
-		if (item3==null)
-			item3 = new MenuItem();
+		if (item3 == null) item3 = new MenuItem();
 		return item3;
 	}
+
+    private MenuItem getMenuItem4(){
+        if (item4 == null) item4 = new MenuItem();
+        return item4;
+    }
 
 	public VisGeneralContext(PaintFrame pParent){
 		super();
@@ -40,6 +42,9 @@ public class VisGeneralContext extends ContextMenu {
 
 		getItems().add(getMenuItem3());
 		getMenuItem3().setOnAction(actionEvent -> rangeItemClicked());
+
+        getItems().add(getMenuItem4());
+        getMenuItem4().setOnAction(actionEvent -> overviewDiagramClicked());
 
 		updateMenuItemTexts();
 	}
@@ -108,5 +113,11 @@ public class VisGeneralContext extends ContextMenu {
 		} else {
 			getMenuItem3().setText("Show Ranges");
 		}
+
+        if (parent.showDiagramOverview) {
+            getMenuItem3().setText("Hide Diagram Overview");
+        } else {
+            getMenuItem3().setText("Show Diagram Overview");
+        }
 	}
 }
