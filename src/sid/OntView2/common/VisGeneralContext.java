@@ -95,6 +95,16 @@ public class VisGeneralContext extends ContextMenu {
 		updateMenuItemTexts();
 	}
 
+    private void overviewDiagramClicked() {
+        if (parent.showDiagramOverview) {
+            parent.diagramOverview.closeDiagramOverview();
+        } else {
+            parent.diagramOverview = new DiagramOverview(parent);
+            parent.showDiagramOverview = true;
+        }
+        updateMenuItemTexts();
+    }
+
 	private void updateMenuItemTexts() {
 		if (existsVisiblePropertyBox()) {
 			getMenuItem1().setText("Hide Properties");
@@ -115,9 +125,9 @@ public class VisGeneralContext extends ContextMenu {
 		}
 
         if (parent.showDiagramOverview) {
-            getMenuItem3().setText("Hide Diagram Overview");
+            getMenuItem4().setText("Hide Diagram Overview");
         } else {
-            getMenuItem3().setText("Show Diagram Overview");
+            getMenuItem4().setText("Show Diagram Overview");
         }
 	}
 }

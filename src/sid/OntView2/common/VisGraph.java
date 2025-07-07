@@ -1231,6 +1231,7 @@ public class VisGraph implements Runnable{
 			storeAncestors();
             getShapeOrderedByRDFRank();
             Platform.runLater(paintframe.redrawRunnable);
+            Platform.runLater(paintframe.canvasAdjusterRunnable);
         } catch (XPathExpressionException | ParserConfigurationException | SAXException | IOException e) {
             if (!Thread.currentThread().isInterrupted()) {
                 e.printStackTrace();

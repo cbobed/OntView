@@ -83,6 +83,7 @@ public class PaintFrame extends Canvas {
     public Shape selectedShape = null, focusOnShape = null;
     public Image prohibitedImage;
     private boolean showConnectors = false, isDragging = false, stateChanged = true;
+    DiagramOverview diagramOverview = null;
 
     public String getStrategyOptionStep() { return strategyOptionStep; }
     public void setStrategyOptionStep(String strategyOptionStep) { this.strategyOptionStep = strategyOptionStep; }
@@ -173,6 +174,8 @@ public class PaintFrame extends Canvas {
 			gc.translate(-offsetX, -offsetY);
 			draw(gc);
 			gc.restore();
+
+            if (diagramOverview != null) diagramOverview.drawOverview();
 		}
 	}
 
@@ -290,22 +293,18 @@ public class PaintFrame extends Canvas {
 			if (visGraph != null && shape != null) {
 				for (VisConnector c: shape.inConnectors) {
 					redrawConnector(gc,c);
-					//c.draw(gc);
 				}
 				for (VisConnector c: shape.outConnectors) {
 					redrawConnector(gc,c);
-					//c.draw(gc);
 				}
 				for (VisConnector c : shape.inDashedConnectors) {
 					if (c.from.isVisible()) {
 						redrawConnector(gc,c);
-						//c.draw(gc);
 					}
 				}
 				for (VisConnector c : shape.outDashedConnectors) {
 					if (c.to.isVisible()) {
 						redrawConnector(gc,c);
-						//c.draw(gc);
 					}
 				}
 			}
