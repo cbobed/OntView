@@ -812,33 +812,6 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
         }
     }
 
-	private void loadRecent2() {
-        File recentFile = new File("recent.txt");
-		try {
-			ClassLoader c = Thread.currentThread().getContextClassLoader();
-			BufferedReader in;
-			if (!recentFile.exists()) {
-				in = new BufferedReader(new FileReader("recent.txt"));
-			} else {
-				in = new BufferedReader(new InputStreamReader(Objects.requireNonNull(c.getResourceAsStream("recent.txt"))));
-			}
-			String line = "";
-			int no = 0;
-			ObservableList<Object> items = FXCollections.observableArrayList();
-			while ((line != null) && (no < 15)) {
-				line = in.readLine();
-				if ((line != null) && (!line.isEmpty())) {
-					items.add(line);
-					no++;
-				}
-			}
-			in.close();
-			loadOntologyCombo.setItems(items);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
 	void OntologyButtonActionActionPerformed(ActionEvent event) {
 		String x = (String) getOntologyCombo().getValue();
 		if ((x != null) && (!x.isEmpty())) {
