@@ -35,7 +35,7 @@ public class ClassExpression extends Stage {
     private VisClass selectedParent, selectedChild;
     private TextField parentSearchField, childSearchField;
     private ListView<CheckBox> parentCheckBoxList , childCheckBoxList;
-    private Button submitButtonCE, helpButtonCE;
+    private Button submitButtonCE;
 
     public ClassExpression(Mine parent) {
         this.parent = parent;
@@ -70,20 +70,6 @@ public class ClassExpression extends Stage {
         scene.getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
         setScene(scene);
         show();
-    }
-
-    private Button getHelpButtonCE(){
-        if (helpButtonCE == null) {
-            helpButtonCE = new Button("?");
-            helpButtonCE.getStyleClass().add("button");
-            helpButtonCE.setStyle(
-                "-fx-font-size: 14px; -fx-shape: 'M 0 50 a 50 50 0 1 1 100 0 a 50 50 0 1 1 -100 0'; " +
-                    "-fx-background-radius: 50%; -fx-min-width: 35px; -fx-min-height: 35px; " +
-                    "-fx-pref-width: 35px; -fx-pref-height: 35px;"
-            );
-            //helpButtonCE.setOnAction(this::helpButtonCEActionActionPerformed);
-        }
-        return helpButtonCE;
     }
 
     private Button submitCE(){
@@ -200,14 +186,14 @@ public class ClassExpression extends Stage {
         Set<Shape> result = new HashSet<>();
         if (selectedParent != null) {
             for (Shape s : selectedParent.getDescendants()) {
-                if (!s.asVisClass().isAnonymous()) {
+                if (!s.asVisClass().isAnonymous() && s.isVisible()) {
                     result.add(s);
                 }
             }
             result.add(getShapeByLabel("Nothing"));
         } else if (selectedChild != null) {
             for (Shape s : selectedChild.getAncestors()) {
-                if (!s.asVisClass().isAnonymous()) {
+                if (!s.asVisClass().isAnonymous() && s.isVisible()) {
                     result.add(s);
                 }
             }
@@ -247,11 +233,12 @@ public class ClassExpression extends Stage {
      * Retrieves all shapes
      */
     private Set<Shape> getAllShapeMap() {
+        System.out.println("Retrieving all shapes from the graph.");
         Set<Shape> allNodes = new HashSet<>();
         if (parent.artPanel.getVisGraph() != null) {
             Map<String, Shape> shapeMap = parent.artPanel.getVisGraph().shapeMap;
             for (Shape shape : shapeMap.values()) {
-                if (!shape.asVisClass().isAnonymous()) {
+                if (!shape.asVisClass().isAnonymous() && shape.isVisible()) {
                     allNodes.add(shape);
                 }
             }
