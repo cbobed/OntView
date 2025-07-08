@@ -785,11 +785,39 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
         return helpPanel;
     }
 
-	private void loadRecent() {
+    private void loadRecent(){
+        File recentFile = new File("recent.txt");
+        try {
+            if (!recentFile.exists()){
+                if (!recentFile.createNewFile()){
+                    logger.error("Could not create recent.txt file.");
+                }
+            }
+
+            try (BufferedReader in = new BufferedReader(new FileReader(recentFile))) {
+                String line;
+                int count = 0;
+                ObservableList<Object> items = FXCollections.observableArrayList();
+                while (count < 15 && (line = in.readLine()) != null) {
+                    if (!line.isBlank()) {
+                        items.add(line);
+                        count++;
+                    }
+                }
+                loadOntologyCombo.setItems(items);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+	private void loadRecent2() {
+        File recentFile = new File("recent.txt");
 		try {
 			ClassLoader c = Thread.currentThread().getContextClassLoader();
 			BufferedReader in;
-			if (new File("recent.txt").exists()) {
+			if (!recentFile.exists()) {
 				in = new BufferedReader(new FileReader("recent.txt"));
 			} else {
 				in = new BufferedReader(new InputStreamReader(Objects.requireNonNull(c.getResourceAsStream("recent.txt"))));
