@@ -1171,6 +1171,7 @@ public class PaintFrame extends Canvas {
 	/**
 	 * Action done when changing kce Combo
 	 */
+    CustomKCEModal modal;
 	public void doKceOptionAction() {
 		if (getVisGraph() == null) {
 			return;
@@ -1182,7 +1183,7 @@ public class PaintFrame extends Canvas {
 			getVisGraph().showAll();
 		}
 		else {
-            CustomKCEModal modal = new CustomKCEModal(getVisGraph().shapeMap, new ArrayList<>());
+            modal = new CustomKCEModal(getVisGraph().shapeMap, new ArrayList<>());
             KConceptExtractor extractor = KConceptExtractorFactory.getInstance(getKceOption(), modal.getSelectedConcepts());
 
             switch (getKceOption()) {
@@ -1203,7 +1204,6 @@ public class PaintFrame extends Canvas {
                     modal.showConceptSelectionPopup();
                     if (modal.getSelectedConcepts().isEmpty()) return;
                     extractor.hideNonKeyConcepts(activeOntology, this.getVisGraph(), modal.getSelectedConcepts().size());
-
                 }
             }
         }

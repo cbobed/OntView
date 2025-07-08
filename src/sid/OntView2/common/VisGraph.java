@@ -172,6 +172,30 @@ public class VisGraph implements Runnable{
         }
 
         layoutAndRenderGraph(activeOntology, reasoner);
+        logger.debug("Applying KCE Option if required ...");
+        if (paintframe.getKceOption().equals(VisConstants.CUSTOMCOMBOOPTION3)) { //TODO: fix this
+            Set<Shape> selectedConcepts = new HashSet<>(paintframe.modal.getSelectedConcepts());
+            paintframe.modal.getSelectedConcepts().clear();
+
+            for (Shape s : selectedConcepts){
+                paintframe.modal.setSelectedConcept(getVisualExtension(s.getLinkedClassExpression()));
+            }
+
+            KConceptExtractor extractor = KConceptExtractorFactory.getInstance(paintframe.getKceOption(), paintframe.modal.getSelectedConcepts());
+            showAll();
+            if (paintframe.modal.getSelectedConcepts().isEmpty()) return;
+            extractor.hideNonKeyConcepts(activeOntology, this, paintframe.modal.getSelectedConcepts().size());
+            paintframe.getParentFrame().loadSearchCombo();
+            paintframe.compactGraph();
+
+        } else {
+            paintframe.doKceOptionAction();
+        }
+
+        VisLevel.adjustWidthAndPos(getLevelSet());
+        paintframe.getParentFrame().loadSearchCombo();
+        paintframe.setStateChanged(true);
+
         logger.debug("<--buildReasonedGraphSelectedNodes");
         storeDescendants();
         storeAncestors();
@@ -207,6 +231,15 @@ public class VisGraph implements Runnable{
         }
 
         layoutAndRenderGraph(activeOntology, reasoner);
+        logger.debug("Applying KCE Option if required ...");
+        if (paintframe.getKceOption().equals(VisConstants.CUSTOMCOMBOOPTION3)) { //TODO: fix this
+            paintframe.setKceOption(VisConstants.NONECOMBOOPTION);
+            paintframe.nTopPanel.getKceComboBox().setPromptText(VisConstants.NONECOMBOOPTION);
+        }
+        paintframe.doKceOptionAction();
+        VisLevel.adjustWidthAndPos(getLevelSet());
+        paintframe.getParentFrame().loadSearchCombo();
+        paintframe.setStateChanged(true);
         logger.debug("<--buildReasonedGraph");
     }
 
@@ -244,15 +277,7 @@ public class VisGraph implements Runnable{
         adjustPanelSize((float) 1.0);
         clearDashedConnectorList();
         updatePosition();
-        logger.debug("Applying KCE Option if required ...");
-        if (paintframe.getKceOption().equals(VisConstants.CUSTOMCOMBOOPTION3)) { //TODO: fix this
-            paintframe.setKceOption(VisConstants.NONECOMBOOPTION);
-            paintframe.nTopPanel.getKceComboBox().setPromptText(VisConstants.NONECOMBOOPTION);
-        }
-        paintframe.doKceOptionAction();
-        VisLevel.adjustWidthAndPos(getLevelSet());
-        paintframe.getParentFrame().loadSearchCombo();
-        paintframe.setStateChanged(true);
+
     }
 
     public void checkOntologyPrefixes(OWLOntology activeOntology) {

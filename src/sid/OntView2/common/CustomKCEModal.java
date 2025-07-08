@@ -65,6 +65,12 @@ public class CustomKCEModal {
         return selectedConcepts;
     }
 
+    public void setSelectedConcept(Shape shape) {
+        if (shape != null) {
+            selectedConcepts.add(shape);
+        }
+    }
+
     private void setupDoubleClickActions(ListView<Shape> allConceptsView, ListView<Shape> selectedConceptsView,
                                          ObservableList<Shape> selectedConceptsList) {
         allConceptsView.setOnMouseClicked(event -> {
