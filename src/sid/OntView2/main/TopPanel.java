@@ -781,6 +781,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
             helpButton.setOnAction(e -> helpUser.showHelpStage());
             helpPanel = createContainer(titlePane, helpButton);
 
+            tooltipInfo(helpButton, "Open user guide and instructions");
+
         }
         return helpPanel;
     }
