@@ -10,31 +10,28 @@ import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
-public class DiagramOverview{
+public class DiagramOverview extends Canvas{
     PaintFrame paintframe;
-    Canvas overviewCanvas;
     public Stage overviewStage;
 
     public DiagramOverview(PaintFrame pPaintFrame) {
-        paintframe = pPaintFrame;
+        this.paintframe = pPaintFrame;
+        setOnMousePressed(this::handleOverviewDrag);
+        setOnMouseDragged(this::handleOverviewDrag);
+
         initDiagramOverview();
     }
 
     public void closeDiagramOverview() {
         overviewStage.close();
         overviewStage = null;
-        overviewCanvas = null;
         paintframe.showDiagramOverview = false;
         paintframe.diagramOverview = null;
     }
 
     public void initDiagramOverview() {
-        overviewCanvas = new Canvas();
-        overviewCanvas.setOnMousePressed(this::handleOverviewDrag);
-        overviewCanvas.setOnMouseDragged(this::handleOverviewDrag);
-
         overviewStage = new Stage();
-        BorderPane root = new BorderPane(overviewCanvas);
+        BorderPane root = new BorderPane(this);
 
         double viewportWorldW = paintframe.scroll.getViewportBounds().getWidth() / paintframe.factor;
         double viewportWorldH = paintframe.scroll.getViewportBounds().getHeight() / paintframe.factor;
@@ -46,11 +43,11 @@ public class DiagramOverview{
         double ow = aspect >= 1 ? maxSize : maxSize * aspect;
         double oh = aspect >= 1 ? maxSize / aspect : maxSize;
 
-        overviewCanvas.setWidth(ow);
-        overviewCanvas.setHeight(oh);
+        setWidth(ow);
+        setHeight(oh);
 
-        if (overviewCanvas.isFocusWithin()) {
-            overviewCanvas.requestFocus();
+        if (isFocusWithin()) {
+            requestFocus();
         }
 
         Scene scene = new Scene(root, ow, oh);
@@ -76,11 +73,11 @@ public class DiagramOverview{
     }
 
     public void drawOverview() {
-        if (overviewCanvas == null || paintframe.scroll == null) return;
+        if (paintframe.scroll == null) return;
 
-        GraphicsContext gc = overviewCanvas.getGraphicsContext2D();
-        double ow = overviewCanvas.getWidth();
-        double oh = overviewCanvas.getHeight();
+        GraphicsContext gc = getGraphicsContext2D();
+        double ow = getWidth();
+        double oh = getHeight();
         gc.clearRect(0,0,ow,oh);
         gc.setFill(Color.WHITE);
         gc.fillRect(0,0,ow,oh);
@@ -112,10 +109,10 @@ public class DiagramOverview{
     }
 
     private void handleOverviewDrag(MouseEvent e) {
-        if (overviewCanvas == null || paintframe.scroll == null) return;
+        if (paintframe.scroll == null) return;
 
-        double ow = overviewCanvas.getWidth();
-        double oh = overviewCanvas.getHeight();
+        double ow = getWidth();
+        double oh = getHeight();
 
         double viewportWorldW = paintframe.scroll.getViewportBounds().getWidth() / paintframe.factor;
         double viewportWorldH = paintframe.scroll.getViewportBounds().getHeight() / paintframe.factor;
