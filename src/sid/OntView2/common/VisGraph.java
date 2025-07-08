@@ -245,6 +245,10 @@ public class VisGraph implements Runnable{
         clearDashedConnectorList();
         updatePosition();
         logger.debug("Applying KCE Option if required ...");
+        if (paintframe.getKceOption().equals(VisConstants.CUSTOMCOMBOOPTION3)) { //TODO: fix this
+            paintframe.setKceOption(VisConstants.NONECOMBOOPTION);
+            paintframe.nTopPanel.getKceComboBox().setPromptText(VisConstants.NONECOMBOOPTION);
+        }
         paintframe.doKceOptionAction();
         VisLevel.adjustWidthAndPos(getLevelSet());
         paintframe.getParentFrame().loadSearchCombo();

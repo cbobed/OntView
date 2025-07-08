@@ -233,7 +233,6 @@ public class ClassExpression extends Stage {
      * Retrieves all shapes
      */
     private Set<Shape> getAllShapeMap() {
-        System.out.println("Retrieving all shapes from the graph.");
         Set<Shape> allNodes = new HashSet<>();
         if (parent.artPanel.getVisGraph() != null) {
             Map<String, Shape> shapeMap = parent.artPanel.getVisGraph().shapeMap;
