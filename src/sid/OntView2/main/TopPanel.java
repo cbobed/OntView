@@ -856,6 +856,9 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
         if(parent.artPanel.menuVisShapeContext != null && parent.artPanel.menuVisShapeContext.getSliderStage() != null) { // close slider
             parent.artPanel.menuVisShapeContext.getSliderStage().close();
         }
+        if(parent.artPanel.diagramOverview != null && parent.artPanel.diagramOverview.overviewStage.isShowing()) { // close diagram overview
+            parent.artPanel.diagramOverview.closeDiagramOverview();
+        }
         parent.artPanel.cleanConnectors();
         parent.artPanel.clearCanvas();
         parent.artPanel.languagesLabels.clear();

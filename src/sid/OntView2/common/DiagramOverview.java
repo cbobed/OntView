@@ -13,7 +13,7 @@ import javafx.stage.Stage;
 public class DiagramOverview{
     PaintFrame paintframe;
     Canvas overviewCanvas;
-    Stage overviewStage;
+    public Stage overviewStage;
 
     public DiagramOverview(PaintFrame pPaintFrame) {
         paintframe = pPaintFrame;
@@ -90,15 +90,13 @@ public class DiagramOverview{
         double contentWidth  = paintframe.scroll.getHmax() + viewportWorldW;
         double contentHeight = paintframe.scroll.getVmax() + viewportWorldH;
 
-        double scaleX = ow / contentWidth;
-        double scaleY = oh / contentHeight;
-        double scale = Math.min( ow  / contentWidth, oh  / contentHeight );
+        double scale = Math.min(ow/contentWidth, oh/contentHeight);
 
-        drawShapesDO(gc, scale, paintframe.getVisGraph());
+        drawShapes(gc, scale, paintframe.getVisGraph());
 
         // Calculate rectangle size in overview canvas
-        double viewportRectW = viewportWorldW * scaleX;
-        double viewportRectH = viewportWorldH * scaleY;
+        double viewportRectW = viewportWorldW * scale;
+        double viewportRectH = viewportWorldH * scale;
 
         double normH = paintframe.scroll.getHmax() > 0
             ? paintframe.scroll.getHvalue() / paintframe.scroll.getHmax() : 0;
@@ -143,7 +141,7 @@ public class DiagramOverview{
         drawOverview();
     }
 
-    private void drawShapesDO(GraphicsContext g, double scale, VisGraph visGraph) {
+    private void drawShapes(GraphicsContext g, double scale, VisGraph visGraph) {
         if (visGraph != null || g != null) {
             g.save();
             g.scale(scale, scale);

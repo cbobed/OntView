@@ -83,7 +83,7 @@ public class PaintFrame extends Canvas {
     public Shape selectedShape = null, focusOnShape = null;
     public Image prohibitedImage;
     private boolean showConnectors = false, isDragging = false, stateChanged = true;
-    DiagramOverview diagramOverview = null;
+    public DiagramOverview diagramOverview = null;
 
     public String getStrategyOptionStep() { return strategyOptionStep; }
     public void setStrategyOptionStep(String strategyOptionStep) { this.strategyOptionStep = strategyOptionStep; }
@@ -360,7 +360,9 @@ public class PaintFrame extends Canvas {
            } else {
                 logger.debug("visGraph is null in draw method.");
 			}
-		}
+		} else {
+            logger.debug("Scene is null or PaintFrame is disabled or not visible in draw method.");
+        }
 	}
 
 	private void drawConnectorsForSelectedShapes(GraphicsContext g) {

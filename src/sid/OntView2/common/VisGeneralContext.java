@@ -34,6 +34,9 @@ public class VisGeneralContext extends ContextMenu {
 	public VisGeneralContext(PaintFrame pParent){
 		super();
 		parent = pParent;
+        getItems().add(getMenuItem4());
+        getMenuItem4().setOnAction(actionEvent -> overviewDiagramClicked());
+
 		getItems().add(getMenuItem1());
 		getMenuItem1().setOnAction(e -> propertiesItemClicked());
 
@@ -42,9 +45,6 @@ public class VisGeneralContext extends ContextMenu {
 
 		getItems().add(getMenuItem3());
 		getMenuItem3().setOnAction(actionEvent -> rangeItemClicked());
-
-        getItems().add(getMenuItem4());
-        getMenuItem4().setOnAction(actionEvent -> overviewDiagramClicked());
 
 		updateMenuItemTexts();
 	}
@@ -61,7 +61,6 @@ public class VisGeneralContext extends ContextMenu {
                 if (visibleProperties) {
                     parent.compactNodes(shape);
                 }
-
             }
         }
 
