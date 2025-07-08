@@ -258,11 +258,9 @@ public class PaintFrame extends Canvas {
 
 
 	/*-*************************************************************/
-	public void drawDisjointShape() {
-		if (this.getScene() != null && !this.isDisabled() && this.isVisible() && this.getGraphicsContext2D() != null) {
-			GraphicsContext g = this.getGraphicsContext2D();
-
-			if (visGraph != null || g == null) {
+	public void drawDisjointShape(GraphicsContext g) {
+		if (this.getScene() != null && !this.isDisabled() && this.isVisible() && g != null) {
+			if (visGraph != null) {
 				for (Shape shape : selectedDisjoints) {
 					if (shape instanceof VisClass visClass) {
 						for (VisConnectorDisjoint disjoint : visClass.getDisjointConnectors()) {
@@ -287,9 +285,8 @@ public class PaintFrame extends Canvas {
 		Platform.runLater(redrawRunnable);
 	}
 
-	public void drawConnectorShape(Shape shape) {
-		if (this.getScene() != null && !this.isDisabled() && this.isVisible() && this.getGraphicsContext2D() != null) {
-			GraphicsContext gc = this.getGraphicsContext2D();
+	public void drawConnectorShape(GraphicsContext gc, Shape shape) {
+		if (this.getScene() != null && !this.isDisabled() && this.isVisible() && gc != null) {
 			if (visGraph != null && shape != null) {
 				for (VisConnector c: shape.inConnectors) {
 					redrawConnector(gc,c);
@@ -346,11 +343,11 @@ public class PaintFrame extends Canvas {
 				}
 
 				if (!selectedShapes.isEmpty()){
-					drawConnectorsForSelectedShapes();
+					drawConnectorsForSelectedShapes(g);
 				}
 
 				if (!selectedDisjoints.isEmpty()){
-					drawDisjointShape();
+					drawDisjointShape(g);
 				}
 
 				for (Entry<String, Shape> entry : visGraph.shapeMap.entrySet()) {
@@ -366,9 +363,9 @@ public class PaintFrame extends Canvas {
 		}
 	}
 
-	private void drawConnectorsForSelectedShapes() {
+	private void drawConnectorsForSelectedShapes(GraphicsContext g) {
 		for (Shape shape : selectedShapes) {
-			drawConnectorShape(shape);
+			drawConnectorShape(g, shape);
 		}
 	}
 

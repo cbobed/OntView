@@ -10,7 +10,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
-public class DiagramOverview {
+public class DiagramOverview{
     PaintFrame paintframe;
     Canvas overviewCanvas;
     Stage overviewStage;
@@ -144,9 +144,7 @@ public class DiagramOverview {
     }
 
     private void drawShapesDO(GraphicsContext g, double scale, VisGraph visGraph) {
-        if (visGraph != null) {
-
-            if (g == null) return;
+        if (visGraph != null || g != null) {
             g.save();
             g.scale(scale, scale);
 
