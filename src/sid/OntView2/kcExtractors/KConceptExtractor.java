@@ -22,9 +22,7 @@ public abstract class KConceptExtractor {
     public void hideNonKeyConcepts(OWLOntology activeOntology, VisGraph graph, int limitResultSize){
         Map<String, Shape> shapeMap = graph.getShapeMap();
         Set<String> conceptSet = retrieveKeyConcepts(activeOntology, shapeMap, limitResultSize);
-
-        for (String s: conceptSet) System.out.println("--------------- " + s);
-
+        
         conceptSet.add(VisConstants.THING_ENTITY);
         conceptSet.add(VisConstants.NOTHING_ENTITY);
 
