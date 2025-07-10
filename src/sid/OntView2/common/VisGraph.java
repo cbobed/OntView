@@ -175,9 +175,7 @@ public class VisGraph implements Runnable{
         layoutAndRenderGraph(activeOntology, reasoner);
         logger.debug("Applying KCE Option if required ...");
         if (paintframe.getKceOption().equals(VisConstants.CUSTOMCOMBOOPTION3)) { //TODO: fix this
-            if (paintframe.getCustomExtractor() instanceof CustomConceptExtraction customExtractor) {
-                customExtractor.isClassExpressionUsed = true;
-            }
+            paintframe.isClassExpressionUsed = true;
         }
 
         paintframe.doKceOptionAction();

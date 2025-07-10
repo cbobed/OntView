@@ -15,6 +15,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.*;
@@ -391,7 +392,26 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			if (parent.artPanel != null) {
 				parent.artPanel.setKceOption(kceComboBox.getItems().get(0));
 			}
-			kceComboBox.setOnAction(this::kceItemItemStateChanged);
+
+            // to be able to click twice the same option
+            kceComboBox.setCellFactory(listView -> {
+                ListCell<String> cell = new ListCell<>() {
+                    @Override
+                    protected void updateItem(String item, boolean empty) {
+                        super.updateItem(item, empty);
+                        setText(empty ? null : item);
+                    }
+                };
+                cell.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
+                    if (!cell.isEmpty()) {
+                        kceComboBox.getSelectionModel().select(cell.getItem());
+                        kceItemItemStateChanged(new ActionEvent(kceComboBox, event.getTarget()));
+                        event.consume();
+                    }
+                });
+                return cell;
+            });
+            kceComboBox.setButtonCell(kceComboBox.getCellFactory().call(null));
 
             tooltipInfo(kceComboBox, "Select summarization technique");
         }
@@ -401,6 +421,9 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	protected void kceItemItemStateChanged(ActionEvent event) {
 		if (parent.artPanel != null) {
 			parent.artPanel.setKceOption(kceComboBox.getSelectionModel().getSelectedItem());
+            if (parent.artPanel.getKceOption().equals(VisConstants.CUSTOMCOMBOOPTION3)) {
+                parent.artPanel.isClassExpressionUsed = false;
+            }
 			parent.artPanel.doKceOptionAction();
 		}
 	}
@@ -434,11 +457,10 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 	private VBox createLoadOntologyOptions() {
 		if (panelLoad == null) {
-			HBox row1 = createRow(getReasonerCombo(), getKceComboBox(), getLoadReasonerButton());
-
 			StackPane titlePane = createTitlePane("Reasoner & KConcept Extraction");
+            HBox row = createRow(getReasonerCombo(), getKceComboBox(), getLoadReasonerButton());
 
-			panelLoad = createContainer(titlePane, row1);
+			panelLoad = createContainer(titlePane, row);
 			panelLoad.setMinWidth(250);
 		}
 		return panelLoad;

@@ -47,13 +47,17 @@ public class CustomConceptExtraction extends KConceptExtractor {
     /**
      * Shows a popup for selecting concepts or find the selected nodes in the visual graph.
      */
+    CustomKCEModal modal;
     public void showConceptSelectionPopup() {
-        if(selectedConcepts.isEmpty()) {
-            CustomKCEModal modal = new CustomKCEModal(shapeMap, new HashSet<>(), this);
-            modal.showConceptSelectionPopup();
-        } else {
+        if (isClassExpressionUsed) {
             findSelectedNodesVisGraph(selectedConcepts);
+            return;
         }
+
+        if(selectedConcepts.isEmpty()) {
+            modal = new CustomKCEModal(shapeMap, new HashSet<>(), this);
+        }
+        modal.showConceptSelectionPopup();
     }
 
     public Set<Shape> getSelectedConcepts() { return selectedConcepts; }

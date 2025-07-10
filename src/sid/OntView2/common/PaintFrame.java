@@ -53,7 +53,8 @@ public class PaintFrame extends Canvas {
 	public ScrollPane scroll;
 	static final int BORDER_PANEL = 60, MIN_SPACE = 30, MIN_INITIAL_SPACE = 40;
 	private static final int DOWN = 0, UP = -1;
-	boolean stable = false, repulsion = true;
+    public boolean isClassExpressionUsed;
+    boolean stable = false, repulsion = true;
 	public boolean renderLabel = false, qualifiedNames = false;
     public Set<String> languagesLabels = new HashSet<>();
 	// CBL: added the qualified names rendering
@@ -221,8 +222,8 @@ public class PaintFrame extends Canvas {
 
 
     public void setOriginalSize(Dimension2D in) { oSize = in; }
-	
-	/*** 
+
+    /***
 	 * Runnable required to push the drawing to the javaFx application thread using Platform.runLater()
 	 */
 
@@ -1208,6 +1209,7 @@ public class PaintFrame extends Canvas {
                         customExtractor = KConceptExtractorFactory.getInstance(getKceOption(), new HashSet<>(), getVisGraph().shapeMap);
                     }
                     CustomConceptExtraction custom = (CustomConceptExtraction) customExtractor;
+                    custom.isClassExpressionUsed = isClassExpressionUsed;
                     getVisGraph().showAll();
                     custom.showConceptSelectionPopup();
                     customExtractor.hideNonKeyConcepts(activeOntology, this.getVisGraph(), custom.getSelectedConcepts().size());
