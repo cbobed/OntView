@@ -1,6 +1,5 @@
 package sid.OntView2.kcExtractors;
 
-import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLOntology;
 
 import sid.OntView2.common.Shape;
@@ -27,7 +26,6 @@ public abstract class KConceptExtractor {
         conceptSet.add(VisConstants.NOTHING_ENTITY);
 
         for (Shape value: shapeMap.values()) {
-
             if (isNonKeyConcept(Shape.getKey(value.getLinkedClassExpression()), conceptSet, shapeMap)) {
                 value.hide();
             } else {
@@ -78,7 +76,7 @@ public abstract class KConceptExtractor {
     protected boolean isKeyConceptEquivalent(Shape s, Set<String> keyConcepts) {
     	
     	Set<String> auxDefinitions = new HashSet<>();  
-    	s.asVisClass().getEquivalentClasses().forEach(x -> {auxDefinitions.add(Shape.getKey(x));}); 
+    	s.asVisClass().getEquivalentClasses().forEach(x -> auxDefinitions.add(Shape.getKey(x)));
     	// intersection of definitions of the shape and the keyConcepts themselves 
     	auxDefinitions.retainAll(keyConcepts); 
     	

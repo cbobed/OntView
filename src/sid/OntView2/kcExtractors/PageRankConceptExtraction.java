@@ -8,7 +8,6 @@ import org.jgrapht.graph.DefaultEdge;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLOntology;
 
-import sid.OntView2.common.GraphReorder;
 import sid.OntView2.common.Shape;
 import sid.OntView2.common.VisClass;
 import sid.OntView2.utils.PageRankScoreComparator;

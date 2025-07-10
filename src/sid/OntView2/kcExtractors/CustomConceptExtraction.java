@@ -8,7 +8,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class CustomConceptExtraction extends KConceptExtractor {
-    private Set<Shape> selectedConcepts;
+    private final Set<Shape> selectedConcepts;
     private final Map<String, Shape> shapeMap;
     public boolean isClassExpressionUsed = false;
 

@@ -8,7 +8,6 @@ import org.semanticweb.owlapi.model.OWLOntology;
 
 import sid.OntView2.common.Shape;
 import sid.OntView2.common.VisConstants;
-import sid.OntView2.main.Mine;
 import sid.OntView2.utils.OWLAPITaxonomyMakerExtended;
 
 import java.util.Map;
