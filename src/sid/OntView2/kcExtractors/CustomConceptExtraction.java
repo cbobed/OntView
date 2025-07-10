@@ -12,8 +12,8 @@ public class CustomConceptExtraction extends KConceptExtractor {
     private final Map<String, Shape> shapeMap;
     public boolean isClassExpressionUsed = false;
 
-    public CustomConceptExtraction(Set<Shape> selectedConcepts, Map<String, Shape> shapeMap) {
-        this.selectedConcepts = selectedConcepts;
+    public CustomConceptExtraction(Map<String, Shape> shapeMap) {
+        this.selectedConcepts = new HashSet<>();
         this.shapeMap = shapeMap;
     }
 
@@ -55,7 +55,7 @@ public class CustomConceptExtraction extends KConceptExtractor {
         }
 
         if(selectedConcepts.isEmpty()) {
-            modal = new CustomKCEModal(shapeMap, new HashSet<>(), this);
+            modal = new CustomKCEModal(shapeMap, this);
         }
         modal.showConceptSelectionPopup();
     }

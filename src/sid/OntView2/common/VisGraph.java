@@ -16,7 +16,6 @@ import org.xml.sax.SAXException;
 
 import sid.OntView2.expressionNaming.NonGatheredClassExpressionsException;
 import sid.OntView2.expressionNaming.SIDClassExpressionNamer;
-import sid.OntView2.kcExtractors.CustomConceptExtraction;
 import sid.OntView2.kcExtractors.KConceptExtractor;
 import sid.OntView2.kcExtractors.KConceptExtractorFactory;
 import sid.OntView2.kcExtractors.RDFRankConceptExtraction;
@@ -1218,7 +1217,7 @@ public class VisGraph implements Runnable{
      * Gets the shapes ordered by RDFRank.
      */
     public void getShapeOrderedByRDFRank() {
-        KConceptExtractor extractor = KConceptExtractorFactory.getInstance(VisConstants.RDFRANKCOMBOOPTION1, null, shapeMap);
+        KConceptExtractor extractor = KConceptExtractorFactory.getInstance(VisConstants.RDFRANKCOMBOOPTION1, shapeMap);
         if (extractor instanceof RDFRankConceptExtraction rdfExtractor) {
             paintframe.orderedShapesByRDF = rdfExtractor.getShapesOrderedByRDFRank(activeOntology, this, shapeMap.size());
             storeOrderedDescendantsByRDFRank();

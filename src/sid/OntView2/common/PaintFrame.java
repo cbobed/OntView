@@ -1193,20 +1193,20 @@ public class PaintFrame extends Canvas {
                 case VisConstants.KCECOMBOOPTION1,
                     VisConstants.PAGERANKCOMBOOPTION1,
                     VisConstants.RDFRANKCOMBOOPTION1 -> { // "KCE10"
-                    KConceptExtractor extractor = KConceptExtractorFactory.getInstance(getKceOption(), new HashSet<>(), getVisGraph().shapeMap);
+                    KConceptExtractor extractor = KConceptExtractorFactory.getInstance(getKceOption(), getVisGraph().shapeMap);
                     getVisGraph().showAll();
                     extractor.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 10);
                 }
                 case VisConstants.KCECOMBOOPTION2,
                     VisConstants.PAGERANKCOMBOOPTION2,
                     VisConstants.RDFRANKCOMBOOPTION2 -> { // "KCE20"
-                    KConceptExtractor extractor = KConceptExtractorFactory.getInstance(getKceOption(), new HashSet<>(), getVisGraph().shapeMap);
+                    KConceptExtractor extractor = KConceptExtractorFactory.getInstance(getKceOption(), getVisGraph().shapeMap);
                     getVisGraph().showAll();
                     extractor.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20);
                 }
                 case VisConstants.CUSTOMCOMBOOPTION3 -> { // "Custom"
                     if (customExtractor == null) {
-                        customExtractor = KConceptExtractorFactory.getInstance(getKceOption(), new HashSet<>(), getVisGraph().shapeMap);
+                        customExtractor = KConceptExtractorFactory.getInstance(getKceOption(), getVisGraph().shapeMap);
                     }
                     CustomConceptExtraction custom = (CustomConceptExtraction) customExtractor;
                     custom.isClassExpressionUsed = isClassExpressionUsed;

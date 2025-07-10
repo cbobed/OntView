@@ -16,12 +16,10 @@ import java.util.*;
 
 public class CustomKCEModal {
     private final Map<String, Shape> shapeMap;
-    private final Set<Shape> selectedConcepts;
     CustomConceptExtraction customConceptExtraction;
 
-    public CustomKCEModal(Map<String, Shape> shapeMap, Set<Shape> initialSelected, CustomConceptExtraction customCE) {
+    public CustomKCEModal(Map<String, Shape> shapeMap, CustomConceptExtraction customCE) {
         this.shapeMap = shapeMap;
-        this.selectedConcepts = initialSelected;
         this.customConceptExtraction = customCE;
     }
 
@@ -32,7 +30,7 @@ public class CustomKCEModal {
 
         List<Shape> unique = shapeMap.values().stream().distinct().toList();
         ObservableList<Shape> allConcepts = FXCollections.observableArrayList(unique);
-        ObservableList<Shape> selectedConceptsList = FXCollections.observableArrayList(selectedConcepts);
+        ObservableList<Shape> selectedConceptsList = FXCollections.observableArrayList(customConceptExtraction.getSelectedConcepts());
 
         ListView<Shape> allConceptsView = createConceptListView(allConcepts);
         ListView<Shape> selectedConceptsView = createConceptListView(selectedConceptsList);
@@ -62,16 +60,6 @@ public class CustomKCEModal {
         scene.getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
         popupStage.setScene(scene);
         popupStage.showAndWait();
-    }
-
-    public Set<Shape> getSelectedConcepts() {
-        return selectedConcepts;
-    }
-
-    public void setSelectedConcept(Shape shape) {
-        if (shape != null) {
-            selectedConcepts.add(shape);
-        }
     }
 
     private void setupDoubleClickActions(ListView<Shape> allConceptsView, ListView<Shape> selectedConceptsView,
