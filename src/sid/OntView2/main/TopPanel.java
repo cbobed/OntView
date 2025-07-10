@@ -863,7 +863,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
         parent.artPanel.clearCanvas();
         parent.artPanel.languagesLabels.clear();
         parent.artPanel.selectedShape = null;
-        parent.artPanel.setExtractor(null);
+        parent.artPanel.setCustomExtractor(null);
         getComboSearchBox().setValue("");
     }
 

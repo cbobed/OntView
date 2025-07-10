@@ -85,7 +85,7 @@ public class PaintFrame extends Canvas {
     public Image prohibitedImage;
     private boolean showConnectors = false, isDragging = false, stateChanged = true;
     public DiagramOverview diagramOverview = null;
-    private KConceptExtractor extractor = null;
+    private KConceptExtractor customExtractor = null;
 
 
     public String getStrategyOptionStep() { return strategyOptionStep; }
@@ -127,8 +127,8 @@ public class PaintFrame extends Canvas {
 	public boolean getShowConnectors() { return showConnectors; }
     public Stage getSliderStage() { return sliderStage; }
     public void setSliderStage(Stage stage) { sliderStage = stage; }
-    public void setExtractor(KConceptExtractor extractor) { this.extractor = extractor; }
-    public KConceptExtractor getExtractor() { return extractor; }
+    public void setCustomExtractor(KConceptExtractor customExtractor) { this.customExtractor = customExtractor; }
+    public KConceptExtractor getCustomExtractor() { return customExtractor; }
 
 	public PaintFrame(double width, double height) {
 		super();
@@ -1187,27 +1187,30 @@ public class PaintFrame extends Canvas {
 			getVisGraph().showAll();
 		}
 		else {
-            if(extractor == null)
-                extractor = KConceptExtractorFactory.getInstance(getKceOption(), new HashSet<>(), getVisGraph().shapeMap);
 
             switch (getKceOption()) {
                 case VisConstants.KCECOMBOOPTION1,
                     VisConstants.PAGERANKCOMBOOPTION1,
                     VisConstants.RDFRANKCOMBOOPTION1 -> { // "KCE10"
+                    KConceptExtractor extractor = KConceptExtractorFactory.getInstance(getKceOption(), new HashSet<>(), getVisGraph().shapeMap);
                     getVisGraph().showAll();
                     extractor.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 10);
                 }
                 case VisConstants.KCECOMBOOPTION2,
                     VisConstants.PAGERANKCOMBOOPTION2,
                     VisConstants.RDFRANKCOMBOOPTION2 -> { // "KCE20"
+                    KConceptExtractor extractor = KConceptExtractorFactory.getInstance(getKceOption(), new HashSet<>(), getVisGraph().shapeMap);
                     getVisGraph().showAll();
                     extractor.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20);
                 }
                 case VisConstants.CUSTOMCOMBOOPTION3 -> { // "Custom"
-                    CustomConceptExtraction custom = (CustomConceptExtraction) extractor;
+                    if (customExtractor == null) {
+                        customExtractor = KConceptExtractorFactory.getInstance(getKceOption(), new HashSet<>(), getVisGraph().shapeMap);
+                    }
+                    CustomConceptExtraction custom = (CustomConceptExtraction) customExtractor;
                     getVisGraph().showAll();
                     custom.showConceptSelectionPopup();
-                    extractor.hideNonKeyConcepts(activeOntology, this.getVisGraph(), custom.getSelectedConcepts().size());
+                    customExtractor.hideNonKeyConcepts(activeOntology, this.getVisGraph(), custom.getSelectedConcepts().size());
                 }
             }
         }
