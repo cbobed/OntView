@@ -117,6 +117,9 @@ public abstract class Shape {
     public int getBottomShapeCorner() {
         return posy + getHeight() / 2;
     }
+    public VisGraph getGraph() {
+        return graph;
+    }
 
 
     public int getBottomCorner() {

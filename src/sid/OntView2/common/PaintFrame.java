@@ -41,6 +41,7 @@ import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
+import sid.OntView2.kcExtractors.CustomConceptExtraction;
 import sid.OntView2.main.TopPanel;
 import sid.OntView2.kcExtractors.KConceptExtractor;
 import sid.OntView2.kcExtractors.KConceptExtractorFactory;
@@ -84,6 +85,8 @@ public class PaintFrame extends Canvas {
     public Image prohibitedImage;
     private boolean showConnectors = false, isDragging = false, stateChanged = true;
     public DiagramOverview diagramOverview = null;
+    private KConceptExtractor extractor = null;
+
 
     public String getStrategyOptionStep() { return strategyOptionStep; }
     public void setStrategyOptionStep(String strategyOptionStep) { this.strategyOptionStep = strategyOptionStep; }
@@ -119,13 +122,13 @@ public class PaintFrame extends Canvas {
 	public String getKceOption() {
 		return kceOption;
 	}
-	public void setKceOption(String itemAt) {
-		kceOption = itemAt;
-	}
+	public void setKceOption(String itemAt) { kceOption = itemAt; }
 	public void setShowConnectors(boolean b) { showConnectors = b; }
 	public boolean getShowConnectors() { return showConnectors; }
     public Stage getSliderStage() { return sliderStage; }
     public void setSliderStage(Stage stage) { sliderStage = stage; }
+    public void setExtractor(KConceptExtractor extractor) { this.extractor = extractor; }
+    public KConceptExtractor getExtractor() { return extractor; }
 
 	public PaintFrame(double width, double height) {
 		super();
@@ -1173,7 +1176,6 @@ public class PaintFrame extends Canvas {
 	/**
 	 * Action done when changing kce Combo
 	 */
-    CustomKCEModal modal;
 	public void doKceOptionAction() {
 		if (getVisGraph() == null) {
 			return;
@@ -1185,8 +1187,8 @@ public class PaintFrame extends Canvas {
 			getVisGraph().showAll();
 		}
 		else {
-            modal = new CustomKCEModal(getVisGraph().shapeMap, new ArrayList<>());
-            KConceptExtractor extractor = KConceptExtractorFactory.getInstance(getKceOption(), modal.getSelectedConcepts());
+            if(extractor == null)
+                extractor = KConceptExtractorFactory.getInstance(getKceOption(), new HashSet<>(), getVisGraph().shapeMap);
 
             switch (getKceOption()) {
                 case VisConstants.KCECOMBOOPTION1,
@@ -1202,10 +1204,10 @@ public class PaintFrame extends Canvas {
                     extractor.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20);
                 }
                 case VisConstants.CUSTOMCOMBOOPTION3 -> { // "Custom"
+                    CustomConceptExtraction custom = (CustomConceptExtraction) extractor;
                     getVisGraph().showAll();
-                    modal.showConceptSelectionPopup();
-                    if (modal.getSelectedConcepts().isEmpty()) return;
-                    extractor.hideNonKeyConcepts(activeOntology, this.getVisGraph(), modal.getSelectedConcepts().size());
+                    custom.showConceptSelectionPopup();
+                    extractor.hideNonKeyConcepts(activeOntology, this.getVisGraph(), custom.getSelectedConcepts().size());
                 }
             }
         }

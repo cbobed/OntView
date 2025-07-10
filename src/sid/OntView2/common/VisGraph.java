@@ -16,6 +16,7 @@ import org.xml.sax.SAXException;
 
 import sid.OntView2.expressionNaming.NonGatheredClassExpressionsException;
 import sid.OntView2.expressionNaming.SIDClassExpressionNamer;
+import sid.OntView2.kcExtractors.CustomConceptExtraction;
 import sid.OntView2.kcExtractors.KConceptExtractor;
 import sid.OntView2.kcExtractors.KConceptExtractorFactory;
 import sid.OntView2.kcExtractors.RDFRankConceptExtraction;
@@ -174,23 +175,12 @@ public class VisGraph implements Runnable{
         layoutAndRenderGraph(activeOntology, reasoner);
         logger.debug("Applying KCE Option if required ...");
         if (paintframe.getKceOption().equals(VisConstants.CUSTOMCOMBOOPTION3)) { //TODO: fix this
-            Set<Shape> selectedConcepts = new HashSet<>(paintframe.modal.getSelectedConcepts());
-            paintframe.modal.getSelectedConcepts().clear();
-
-            for (Shape s : selectedConcepts){
-                paintframe.modal.setSelectedConcept(getVisualExtension(s.getLinkedClassExpression()));
+            if (paintframe.getExtractor() instanceof CustomConceptExtraction customExtractor) {
+                customExtractor.isClassExpressionUsed = true;
             }
-
-            KConceptExtractor extractor = KConceptExtractorFactory.getInstance(paintframe.getKceOption(), paintframe.modal.getSelectedConcepts());
-            showAll();
-            if (paintframe.modal.getSelectedConcepts().isEmpty()) return;
-            extractor.hideNonKeyConcepts(activeOntology, this, paintframe.modal.getSelectedConcepts().size());
-            paintframe.getParentFrame().loadSearchCombo();
-            paintframe.compactGraph();
-
-        } else {
-            paintframe.doKceOptionAction();
         }
+
+        paintframe.doKceOptionAction();
 
         VisLevel.adjustWidthAndPos(getLevelSet());
         paintframe.getParentFrame().loadSearchCombo();
@@ -1230,7 +1220,7 @@ public class VisGraph implements Runnable{
      * Gets the shapes ordered by RDFRank.
      */
     public void getShapeOrderedByRDFRank() {
-        KConceptExtractor extractor = KConceptExtractorFactory.getInstance(VisConstants.RDFRANKCOMBOOPTION1, null);
+        KConceptExtractor extractor = KConceptExtractorFactory.getInstance(VisConstants.RDFRANKCOMBOOPTION1, null, shapeMap);
         if (extractor instanceof RDFRankConceptExtraction rdfExtractor) {
             paintframe.orderedShapesByRDF = rdfExtractor.getShapesOrderedByRDFRank(activeOntology, this, shapeMap.size());
             storeOrderedDescendantsByRDFRank();

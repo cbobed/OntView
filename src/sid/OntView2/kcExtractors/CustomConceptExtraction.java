@@ -1,16 +1,20 @@
 package sid.OntView2.kcExtractors;
 
 import org.semanticweb.owlapi.model.OWLOntology;
+import sid.OntView2.common.CustomKCEModal;
 import sid.OntView2.common.Shape;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class CustomConceptExtraction extends KConceptExtractor {
-    private final Set<Shape> selectedConcepts;
+    private Set<Shape> selectedConcepts;
+    private final Map<String, Shape> shapeMap;
+    public boolean isClassExpressionUsed = false;
 
-    public CustomConceptExtraction(Set<Shape> selectedConcepts) {
+    public CustomConceptExtraction(Set<Shape> selectedConcepts, Map<String, Shape> shapeMap) {
         this.selectedConcepts = selectedConcepts;
+        this.shapeMap = shapeMap;
     }
 
     /**
@@ -37,6 +41,36 @@ public class CustomConceptExtraction extends KConceptExtractor {
         }
         
         return keyConcepts;
+
+    }
+
+    /**
+     * Shows a popup for selecting concepts or find the selected nodes in the visual graph.
+     */
+    public void showConceptSelectionPopup() {
+        if(selectedConcepts.isEmpty()) {
+            CustomKCEModal modal = new CustomKCEModal(shapeMap, new HashSet<>(), this);
+            modal.showConceptSelectionPopup();
+        } else {
+            findSelectedNodesVisGraph(selectedConcepts);
+        }
+    }
+
+    public Set<Shape> getSelectedConcepts() { return selectedConcepts; }
+
+    /**
+     * Finds the selected nodes in the visual graph and adds them to the selectedConcepts set.
+     */
+    public void findSelectedNodesVisGraph(Set<Shape> selectedConcepts) {
+        if (!selectedConcepts.isEmpty()) {
+            Set<Shape> conceptsToFind = new HashSet<>(selectedConcepts);
+            this.selectedConcepts.clear();
+
+            for (Shape s : conceptsToFind) {
+                if (s != null)
+                    this.selectedConcepts.add(s.getGraph().getVisualExtension(s.getLinkedClassExpression()));
+            }
+        }
 
     }
 }

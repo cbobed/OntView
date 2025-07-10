@@ -73,7 +73,9 @@ public class DiagramOverview extends Canvas{
     }
 
     public void drawOverview() {
-        if (paintframe.scroll == null) return;
+        if (overviewStage == null || !overviewStage.isShowing() || paintframe.scroll == null) {
+            return;
+        }
 
         GraphicsContext gc = getGraphicsContext2D();
         double ow = getWidth();
@@ -142,9 +144,7 @@ public class DiagramOverview extends Canvas{
         if (visGraph != null || g != null) {
             g.save();
             g.scale(scale, scale);
-
             paintframe.draw(g);
-
             g.restore();
         }
     }

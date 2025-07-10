@@ -10,16 +10,19 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import sid.OntView2.kcExtractors.CustomConceptExtraction;
 
 import java.util.*;
 
 public class CustomKCEModal {
     private final Map<String, Shape> shapeMap;
     private final Set<Shape> selectedConcepts;
+    CustomConceptExtraction customConceptExtraction;
 
-    public CustomKCEModal(Map<String, Shape> shapeMap, List<Shape> initialSelected) {
+    public CustomKCEModal(Map<String, Shape> shapeMap, Set<Shape> initialSelected, CustomConceptExtraction customCE) {
         this.shapeMap = shapeMap;
-        this.selectedConcepts = new HashSet<>(initialSelected);
+        this.selectedConcepts = initialSelected;
+        this.customConceptExtraction = customCE;
     }
 
     public void showConceptSelectionPopup() {
@@ -141,8 +144,8 @@ public class CustomKCEModal {
     private Button createSaveButton(ObservableList<Shape> selectedConceptsList, Stage popupStage) {
         Button saveButton = new Button("Save");
         saveButton.setOnAction(e -> {
-            selectedConcepts.clear();
-            selectedConcepts.addAll(selectedConceptsList);
+            customConceptExtraction.getSelectedConcepts().clear();
+            customConceptExtraction.getSelectedConcepts().addAll(selectedConceptsList);
             popupStage.close();
         });
         return saveButton;
