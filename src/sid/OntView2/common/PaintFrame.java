@@ -1204,7 +1204,7 @@ public class PaintFrame extends Canvas {
                     getVisGraph().showAll();
                     extractor.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20);
                 }
-                case VisConstants.CUSTOMCOMBOOPTION3 -> { // "Custom"
+                case VisConstants.CUSTOMCOMBOOPTION -> { // "Custom"
                     if (customExtractor == null) {
                         customExtractor = KConceptExtractorFactory.getInstance(getKceOption(), getVisGraph().shapeMap);
                     }
@@ -1213,6 +1213,13 @@ public class PaintFrame extends Canvas {
                     getVisGraph().showAll();
                     custom.showConceptSelectionPopup();
                     customExtractor.hideNonKeyConcepts(activeOntology, this.getVisGraph(), custom.getSelectedConcepts().size());
+                }
+                case VisConstants.KCECOMBOOPTION3,
+                    VisConstants.PAGERANKCOMBOOPTION3,
+                    VisConstants.RDFRANKCOMBOOPTION3 -> { // "KCE n"
+                    KConceptExtractor extractor = KConceptExtractorFactory.getInstance(getKceOption(), getVisGraph().shapeMap);
+                    getVisGraph().showAll();
+                    extractor.hideNonKeyConcepts(activeOntology, this.getVisGraph(), getLimitNumberKCE());
                 }
             }
         }
@@ -1375,6 +1382,31 @@ public class PaintFrame extends Canvas {
         alert.getDialogPane().getStyleClass().add("custom-alert");
         alert.setOnShowing(e -> alert.getDialogPane().requestFocus());
         alert.showAndWait();
+    }
+
+    private int getLimitNumberKCE() {
+        Dialog<Integer> dialog = new Dialog<>();
+        dialog.setTitle("Configure");
+        dialog.setHeaderText("Introduce the number of concepts to show");
+        dialog.setContentText("Number of concepts to be shown:");
+
+        ButtonType okBtn = new ButtonType("Submit", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(okBtn, ButtonType.CANCEL);
+
+        Spinner<Integer> spinner = new Spinner<>(1, visGraph.shapeMap.size(), 1);
+        spinner.setEditable(true);
+
+        dialog.getDialogPane().setContent(spinner);
+
+        dialog.setResultConverter(btn -> {
+            if (btn == okBtn) {
+                return spinner.getValue();
+            }
+            return null;
+        });
+
+        Optional<Integer> res = dialog.showAndWait();
+        return res.orElse(0);
     }
 
 }

@@ -370,14 +370,17 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			kceComboBox.getStyleClass().add("custom-combo-box");
 
 			ObservableList<String> items = FXCollections.observableArrayList(
-					VisConstants.NONECOMBOOPTION,
-					VisConstants.KCECOMBOOPTION1,
-					VisConstants.KCECOMBOOPTION2,
-					VisConstants.PAGERANKCOMBOOPTION1,
-					VisConstants.PAGERANKCOMBOOPTION2,
-					VisConstants.RDFRANKCOMBOOPTION1,
-					VisConstants.RDFRANKCOMBOOPTION2,
-					VisConstants.CUSTOMCOMBOOPTION3);
+                VisConstants.CUSTOMCOMBOOPTION,
+                VisConstants.NONECOMBOOPTION,
+                VisConstants.KCECOMBOOPTION1,
+                VisConstants.KCECOMBOOPTION2,
+                VisConstants.KCECOMBOOPTION3,
+                VisConstants.PAGERANKCOMBOOPTION1,
+                VisConstants.PAGERANKCOMBOOPTION2,
+                VisConstants.PAGERANKCOMBOOPTION3,
+                VisConstants.RDFRANKCOMBOOPTION1,
+                VisConstants.RDFRANKCOMBOOPTION2,
+                VisConstants.RDFRANKCOMBOOPTION3);
 			kceComboBox.setItems(items);
 
 			HBox.setHgrow(kceComboBox, Priority.ALWAYS);
@@ -421,7 +424,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	protected void kceItemItemStateChanged(ActionEvent event) {
 		if (parent.artPanel != null) {
 			parent.artPanel.setKceOption(kceComboBox.getSelectionModel().getSelectedItem());
-            if (parent.artPanel.getKceOption().equals(VisConstants.CUSTOMCOMBOOPTION3)) {
+            if (parent.artPanel.getKceOption().equals(VisConstants.CUSTOMCOMBOOPTION)) {
                 parent.artPanel.isClassExpressionUsed = false;
             }
 			parent.artPanel.doKceOptionAction();
@@ -893,7 +896,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	void loadReasonerButtonActionTask(ActionEvent event) {
 		// Only use Custom mode once the graph is loaded
         resetParameters();
-		if (Objects.equals(getKceComboBox().getValue(), VisConstants.CUSTOMCOMBOOPTION3)){
+		if (Objects.equals(getKceComboBox().getValue(), VisConstants.CUSTOMCOMBOOPTION)){
 			getKceComboBox().setValue(VisConstants.NONECOMBOOPTION);
 		}
         Task<Void> task = new Task<>() {

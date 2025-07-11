@@ -173,7 +173,7 @@ public class VisGraph implements Runnable{
 
         layoutAndRenderGraph(activeOntology, reasoner);
         logger.debug("Applying KCE Option if required ...");
-        if (paintframe.getKceOption().equals(VisConstants.CUSTOMCOMBOOPTION3)) { //TODO: fix this
+        if (paintframe.getKceOption().equals(VisConstants.CUSTOMCOMBOOPTION)) { //TODO: fix this
             paintframe.isClassExpressionUsed = true;
         }
 
@@ -219,7 +219,7 @@ public class VisGraph implements Runnable{
 
         layoutAndRenderGraph(activeOntology, reasoner);
         logger.debug("Applying KCE Option if required ...");
-        if (paintframe.getKceOption().equals(VisConstants.CUSTOMCOMBOOPTION3)) {
+        if (paintframe.getKceOption().equals(VisConstants.CUSTOMCOMBOOPTION)) {
             paintframe.setKceOption(VisConstants.NONECOMBOOPTION);
             paintframe.nTopPanel.getKceComboBox().setPromptText(VisConstants.NONECOMBOOPTION);
         }

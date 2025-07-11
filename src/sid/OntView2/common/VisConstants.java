@@ -5,11 +5,14 @@ public class VisConstants {
 	public static final String NONECOMBOOPTION = "None";
 	public static final String KCECOMBOOPTION1 = "KCE 10";
 	public static final String KCECOMBOOPTION2 = "KCE 20";
+    public static final String KCECOMBOOPTION3 = "KCE n";
 	public static final String PAGERANKCOMBOOPTION1 = "PageRank 10";
 	public static final String PAGERANKCOMBOOPTION2 = "PageRank 20";
+    public static final String PAGERANKCOMBOOPTION3 = "PageRank n";
 	public static final String RDFRANKCOMBOOPTION1 = "RDFRank 10";
 	public static final String RDFRANKCOMBOOPTION2 = "RDFRank 20";
-	public static final String CUSTOMCOMBOOPTION3 = "Custom";
+    public static final String RDFRANKCOMBOOPTION3 = "RDFRank n";
+	public static final String CUSTOMCOMBOOPTION = "Custom";
     public static final String STEPSTRATEGY_RDFRANK = "RDFRank";
     public static final String STEPSTRATEGY_RDF_LEVEL_LR = "RDFRank + Level: left to right";
     public static final String STEPSTRATEGY_RDF_LEVEL_RL = "RDFRank + Level: right to left";
