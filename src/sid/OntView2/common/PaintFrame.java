@@ -1178,7 +1178,7 @@ public class PaintFrame extends Canvas {
 	 * Action done when changing kce Combo
 	 */
 	public void doKceOptionAction() {
-		if (getVisGraph() == null) {
+		if (getVisGraph() == null || getVisGraph().shapeMap.isEmpty()) {
 			return;
 		}
         cleanConnectors();
