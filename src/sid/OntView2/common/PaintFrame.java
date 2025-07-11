@@ -1388,15 +1388,40 @@ public class PaintFrame extends Canvas {
         Dialog<Integer> dialog = new Dialog<>();
         dialog.setTitle("Configure");
         dialog.setHeaderText("Introduce the number of concepts to show");
-        dialog.setContentText("Number of concepts to be shown:");
 
         ButtonType okBtn = new ButtonType("Submit", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(okBtn, ButtonType.CANCEL);
 
         Spinner<Integer> spinner = new Spinner<>(1, visGraph.shapeMap.size(), 1);
+        spinner.getStyleClass().add("spinner-kce-limit");
         spinner.setEditable(true);
 
-        dialog.getDialogPane().setContent(spinner);
+        int numShapes = (new HashSet<>(visGraph.shapeMap.values()).size() - 2); // 2 = Thing, Nothing
+        TextField editor = spinner.getEditor();
+        editor.textProperty().addListener((obs, oldValue, newValue) -> {
+            if (newValue.isEmpty()) {
+                return;
+            }
+            if (!newValue.matches("\\d*")) {
+                editor.setText(oldValue);
+            } else {
+                try {
+                    int value = Integer.parseInt(newValue);
+
+                    if (value < 0 || value > numShapes) {
+                        editor.setText(oldValue);
+                    }
+                } catch (NumberFormatException e) {
+                    editor.setText(oldValue);
+                }
+            }
+        });
+        editor.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {
+            if (!isNowFocused && editor.getText().isEmpty()) {
+                editor.setText("0");
+                spinner.getValueFactory().setValue(0);
+            }
+        });
 
         dialog.setResultConverter(btn -> {
             if (btn == okBtn) {
@@ -1405,6 +1430,10 @@ public class PaintFrame extends Canvas {
             return null;
         });
 
+        ClassLoader c = Thread.currentThread().getContextClassLoader();
+        dialog.getDialogPane().getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
+
+        dialog.getDialogPane().setContent(spinner);
         Optional<Integer> res = dialog.showAndWait();
         return res.orElse(0);
     }

@@ -370,17 +370,10 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			kceComboBox.getStyleClass().add("custom-combo-box");
 
 			ObservableList<String> items = FXCollections.observableArrayList(
-                VisConstants.CUSTOMCOMBOOPTION,
-                VisConstants.NONECOMBOOPTION,
-                VisConstants.KCECOMBOOPTION1,
-                VisConstants.KCECOMBOOPTION2,
-                VisConstants.KCECOMBOOPTION3,
-                VisConstants.PAGERANKCOMBOOPTION1,
-                VisConstants.PAGERANKCOMBOOPTION2,
-                VisConstants.PAGERANKCOMBOOPTION3,
-                VisConstants.RDFRANKCOMBOOPTION1,
-                VisConstants.RDFRANKCOMBOOPTION2,
-                VisConstants.RDFRANKCOMBOOPTION3);
+                VisConstants.NONECOMBOOPTION, VisConstants.CUSTOMCOMBOOPTION,
+                VisConstants.KCECOMBOOPTION1, VisConstants.KCECOMBOOPTION2, VisConstants.KCECOMBOOPTION3,
+                VisConstants.PAGERANKCOMBOOPTION1, VisConstants.PAGERANKCOMBOOPTION2, VisConstants.PAGERANKCOMBOOPTION3,
+                VisConstants.RDFRANKCOMBOOPTION1, VisConstants.RDFRANKCOMBOOPTION2, VisConstants.RDFRANKCOMBOOPTION3);
 			kceComboBox.setItems(items);
 
 			HBox.setHgrow(kceComboBox, Priority.ALWAYS);
@@ -752,7 +745,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 100, 0, 1);
             percentageSpinner = new Spinner<>(values);
             percentageSpinner.setEditable(true);
-            percentageSpinner.getStyleClass().add("spinner");
+            percentageSpinner.getStyleClass().add("spinner-visibility");
             percentageSpinner.valueProperty().addListener((obs, oldValue, newValue) -> {
                 savePercentageValue(newValue);
             });
