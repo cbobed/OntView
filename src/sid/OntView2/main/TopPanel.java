@@ -886,6 +886,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
         parent.artPanel.languagesLabels.clear();
         parent.artPanel.selectedShape = null;
         parent.artPanel.setCustomExtractor(null);
+        GraphViewSettings.getInstance().setLastMode(ViewMode.ALL);
         getComboSearchBox().setValue("");
     }
 

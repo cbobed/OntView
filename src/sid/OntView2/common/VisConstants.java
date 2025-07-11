@@ -35,4 +35,5 @@ public class VisConstants {
 	 */
 	final static int BEZIER = 1;
 	final static int NURB   = 2;
+
 }

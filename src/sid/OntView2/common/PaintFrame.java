@@ -1192,14 +1192,14 @@ public class PaintFrame extends Canvas {
             switch (getKceOption()) {
                 case VisConstants.KCECOMBOOPTION1,
                     VisConstants.PAGERANKCOMBOOPTION1,
-                    VisConstants.RDFRANKCOMBOOPTION1 -> { // "KCE10"
+                    VisConstants.RDFRANKCOMBOOPTION1 -> { // "KCE 10"
                     KConceptExtractor extractor = KConceptExtractorFactory.getInstance(getKceOption(), getVisGraph().shapeMap);
                     getVisGraph().showAll();
                     extractor.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 10);
                 }
                 case VisConstants.KCECOMBOOPTION2,
                     VisConstants.PAGERANKCOMBOOPTION2,
-                    VisConstants.RDFRANKCOMBOOPTION2 -> { // "KCE20"
+                    VisConstants.RDFRANKCOMBOOPTION2 -> { // "KCE 20"
                     KConceptExtractor extractor = KConceptExtractorFactory.getInstance(getKceOption(), getVisGraph().shapeMap);
                     getVisGraph().showAll();
                     extractor.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20);

@@ -17,6 +17,7 @@ import java.util.*;
 public class CustomKCEModal {
     private final Map<String, Shape> shapeMap;
     CustomConceptExtraction customConceptExtraction;
+    private GraphViewSettings settings;
 
     public CustomKCEModal(Map<String, Shape> shapeMap, CustomConceptExtraction customCE) {
         this.shapeMap = shapeMap;
@@ -27,6 +28,9 @@ public class CustomKCEModal {
         Stage popupStage = new Stage();
         popupStage.initModality(Modality.APPLICATION_MODAL);
         popupStage.setTitle("Select Key Concepts");
+
+        settings = GraphViewSettings.getInstance();
+        checkSettingMode(settings);
 
         List<Shape> unique = shapeMap.values().stream().distinct().toList();
         ObservableList<Shape> allConcepts = FXCollections.observableArrayList(unique);
@@ -59,7 +63,23 @@ public class CustomKCEModal {
         ClassLoader c = Thread.currentThread().getContextClassLoader();
         scene.getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
         popupStage.setScene(scene);
+
+        popupStage.setOnCloseRequest(e -> {
+            if (settings.getLastMode() == ViewMode.CUSTOM) {
+                customConceptExtraction.getSelectedConcepts().clear();
+                customConceptExtraction.getSelectedConcepts().addAll(selectedConceptsList);
+            } else {
+                customConceptExtraction.getSelectedConcepts().clear();
+                customConceptExtraction.getSelectedConcepts().addAll(allConcepts);
+            }
+        });
         popupStage.showAndWait();
+    }
+
+    private void checkSettingMode(GraphViewSettings settings) {
+        if (settings.getLastMode() == ViewMode.ALL) {
+            customConceptExtraction.getSelectedConcepts().clear();
+        }
     }
 
     private void setupDoubleClickActions(ListView<Shape> allConceptsView, ListView<Shape> selectedConceptsView,
@@ -134,6 +154,7 @@ public class CustomKCEModal {
         saveButton.setOnAction(e -> {
             customConceptExtraction.getSelectedConcepts().clear();
             customConceptExtraction.getSelectedConcepts().addAll(selectedConceptsList);
+            settings.setLastMode(ViewMode.CUSTOM);
             popupStage.close();
         });
         return saveButton;
