@@ -173,10 +173,6 @@ public class VisGraph implements Runnable{
 
         layoutAndRenderGraph(activeOntology, reasoner);
         logger.debug("Applying KCE Option if required ...");
-        if (paintframe.getKceOption().equals(VisConstants.CUSTOMCOMBOOPTION)) { //TODO: fix this
-            paintframe.isClassExpressionUsed = true;
-        }
-
         paintframe.doKceOptionAction();
 
         VisLevel.adjustWidthAndPos(getLevelSet());

@@ -418,9 +418,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	protected void kceItemItemStateChanged(ActionEvent event) {
 		if (parent.artPanel != null) {
 			parent.artPanel.setKceOption(kceComboBox.getSelectionModel().getSelectedItem());
-            if (parent.artPanel.getKceOption().equals(VisConstants.CUSTOMCOMBOOPTION)) {
-                parent.artPanel.isClassExpressionUsed = false;
-            }
+            parent.artPanel.isClassExpressionUsed = false;
 			parent.artPanel.doKceOptionAction();
 		}
 	}

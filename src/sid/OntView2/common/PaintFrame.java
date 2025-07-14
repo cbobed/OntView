@@ -55,7 +55,7 @@ public class PaintFrame extends Canvas {
 	public ScrollPane scroll;
 	static final int BORDER_PANEL = 60, MIN_SPACE = 30, MIN_INITIAL_SPACE = 40;
 	private static final int DOWN = 0, UP = -1;
-    public boolean isClassExpressionUsed;
+    public boolean isClassExpressionUsed = false;
     boolean stable = false, repulsion = true;
 	public boolean renderLabel = false, qualifiedNames = false;
     public Set<String> languagesLabels = new HashSet<>();
@@ -1179,6 +1179,7 @@ public class PaintFrame extends Canvas {
 	/**
 	 * Action done when changing kce Combo
 	 */
+    int limit;
 	public void doKceOptionAction() {
 		if (getVisGraph() == null || getVisGraph().shapeMap.isEmpty()) {
 			return;
@@ -1218,9 +1219,10 @@ public class PaintFrame extends Canvas {
                 case VisConstants.KCECOMBOOPTION3,
                     VisConstants.PAGERANKCOMBOOPTION3,
                     VisConstants.RDFRANKCOMBOOPTION3 -> { // "KCE n"
-                    int limit = getLimitNumberKCE();
-                    if (limit == -1) return;
-
+                    if(!isClassExpressionUsed) {
+                        limit = getLimitNumberKCE();
+                        if (limit == -1) return;
+                    }
                     KConceptExtractor extractor = KConceptExtractorFactory.getInstance(getKceOption(), getVisGraph().shapeMap);
                     getVisGraph().showAll();
                     extractor.hideNonKeyConcepts(activeOntology, this.getVisGraph(), limit);
