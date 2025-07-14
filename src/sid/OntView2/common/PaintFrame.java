@@ -1183,7 +1183,6 @@ public class PaintFrame extends Canvas {
 		if (getVisGraph() == null || getVisGraph().shapeMap.isEmpty()) {
 			return;
 		}
-        cleanConnectors();
 
 		if (Objects.equals(getKceOption(), VisConstants.NONECOMBOOPTION)) {
 			getVisGraph().clearDashedConnectorList();
@@ -1219,12 +1218,16 @@ public class PaintFrame extends Canvas {
                 case VisConstants.KCECOMBOOPTION3,
                     VisConstants.PAGERANKCOMBOOPTION3,
                     VisConstants.RDFRANKCOMBOOPTION3 -> { // "KCE n"
+                    int limit = getLimitNumberKCE();
+                    if (limit == -1) return;
+
                     KConceptExtractor extractor = KConceptExtractorFactory.getInstance(getKceOption(), getVisGraph().shapeMap);
                     getVisGraph().showAll();
-                    extractor.hideNonKeyConcepts(activeOntology, this.getVisGraph(), getLimitNumberKCE());
+                    extractor.hideNonKeyConcepts(activeOntology, this.getVisGraph(), limit);
                 }
             }
         }
+        cleanConnectors();
 		getParentFrame().loadSearchCombo();
         compactGraph();
         if (menuVisShapeContext != null) {
@@ -1413,6 +1416,6 @@ public class PaintFrame extends Canvas {
 
         dialog.getDialogPane().setContent(spinner);
         Optional<Integer> res = dialog.showAndWait();
-        return res.orElse(0);
+        return res.orElse(-1);
     }
 }
