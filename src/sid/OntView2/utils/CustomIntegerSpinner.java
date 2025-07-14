@@ -78,5 +78,11 @@ public class CustomIntegerSpinner extends Spinner<Integer> {
                 }
             }
         });
+        editor.focusedProperty().addListener((fObs, wasFocused, isNow) -> {
+            if (!isNow && editor.getText().trim().isEmpty()) {
+                valueFactory.setValue(0);
+                editor.setText("0");
+            }
+        });
     }
 }
