@@ -25,6 +25,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.semanticweb.owlapi.model.IRI;
 import sid.OntView2.common.*;
+import sid.OntView2.utils.CustomIntegerSpinner;
 import sid.OntView2.utils.ErrorHandler;
 
 import java.io.*;
@@ -741,39 +742,10 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
     private Spinner<Integer> getVisibilitySpinner() {
         if (percentageSpinner == null) {
-            SpinnerValueFactory<Integer> values =
-                new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 100, 0, 1);
-            percentageSpinner = new Spinner<>(values);
-            percentageSpinner.setEditable(true);
+            percentageSpinner = new CustomIntegerSpinner(0, 100, 0);
             percentageSpinner.getStyleClass().add("spinner-visibility");
             percentageSpinner.valueProperty().addListener((obs, oldValue, newValue) -> {
                 savePercentageValue(newValue);
-            });
-
-            // Only numbers allow [0-100]
-            TextField editor = percentageSpinner.getEditor();
-            editor.textProperty().addListener((obs, oldValue, newValue) -> {
-                if (newValue.isEmpty()) {
-                    return;
-                }
-                if (!newValue.matches("\\d*")) {
-                    editor.setText(oldValue);
-                } else {
-                    try {
-                        int value = Integer.parseInt(newValue);
-                        if (value < 0 || value > 100) {
-                            editor.setText(oldValue);
-                        }
-                    } catch (NumberFormatException e) {
-                        editor.setText(oldValue);
-                    }
-                }
-            });
-            editor.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {
-                if (!isNowFocused && editor.getText().isEmpty()) {
-                    editor.setText("0");
-                    percentageSpinner.getValueFactory().setValue(0);
-                }
             });
 
             percentageSpinner.setPrefWidth(60);
@@ -876,6 +848,11 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
         }
         if(parent.artPanel.diagramOverview != null && parent.artPanel.diagramOverview.overviewStage.isShowing()) { // close diagram overview
             parent.artPanel.diagramOverview.closeDiagramOverview();
+        }
+        Set<String> cantUseOptions = Set.of(VisConstants.KCECOMBOOPTION3, VisConstants.PAGERANKCOMBOOPTION3, VisConstants.RDFRANKCOMBOOPTION3);
+        if (cantUseOptions.contains(parent.artPanel.getKceOption())){
+            parent.artPanel.setKceOption(VisConstants.NONECOMBOOPTION);
+            getKceComboBox().setValue(VisConstants.NONECOMBOOPTION);
         }
         parent.artPanel.cleanConnectors();
         parent.artPanel.clearCanvas();

@@ -204,14 +204,14 @@
     -fx-background-color: blue;
 }
 
-.spinner-visibility .text-field {
+.spinner .text-field {
     -fx-border-color: #8186d0;
     -fx-border-width: 1px 0 1px 1px;
     -fx-border-radius: 3px 0 0 3px;
 }
 
-.spinner-visibility .increment-arrow-button,
-.spinner-visibility .decrement-arrow-button {
+.spinner .increment-arrow-button,
+.spinner .decrement-arrow-button{
     -fx-background-color: linear-gradient(to bottom, #f0f8ff, #d3e3f1);
     -fx-border-color: #8186d0;
     -fx-border-width: 1px;
@@ -222,14 +222,14 @@
     -fx-mark-color: blue;
 }
 
-.spinner-visibility .increment-arrow-button:hover,
-.spinner-visibility .decrement-arrow-button:hover,
+.spinner .increment-arrow-button:hover,
+.spinner .decrement-arrow-button:hover,
 .combo-box .arrow-button:hover {
     -fx-background-color: linear-gradient(to bottom, #d3e3f1, #b0c4de);
 }
 
-.spinner-visibility .increment-arrow-button:pressed,
-.spinner-visibility .decrement-arrow-button:pressed,
+.spinner .increment-arrow-button:pressed,
+.spinner .decrement-arrow-button:pressed,
 .combo-box .arrow-button:pressed {
     -fx-background-color: linear-gradient(to bottom, #b0c4de, #a2b9cc);
 }
@@ -331,4 +331,17 @@
     -fx-background-color: #ffffff;
     -fx-border-radius: 5;
     -fx-background-radius: 5;
+}
+
+.spinner-kce-limit {
+    -fx-max-height: 50px;
+    -fx-min-height: 50px;
+
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-border-radius: 0px;
+}
+
+.spinner-kce-limit:hover {
+    -fx-border-color: transparent;
 }

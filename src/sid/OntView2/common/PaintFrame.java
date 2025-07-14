@@ -33,6 +33,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
+import javafx.util.StringConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.semanticweb.owlapi.apibinding.OWLManager;
@@ -45,6 +46,7 @@ import sid.OntView2.kcExtractors.CustomConceptExtraction;
 import sid.OntView2.main.TopPanel;
 import sid.OntView2.kcExtractors.KConceptExtractor;
 import sid.OntView2.kcExtractors.KConceptExtractorFactory;
+import sid.OntView2.utils.CustomIntegerSpinner;
 
 public class PaintFrame extends Canvas {
     private static final Logger logger = LogManager.getLogger(GraphReorder.class);
@@ -1384,44 +1386,20 @@ public class PaintFrame extends Canvas {
         alert.showAndWait();
     }
 
+
     private int getLimitNumberKCE() {
         Dialog<Integer> dialog = new Dialog<>();
         dialog.setTitle("Configure");
-        dialog.setHeaderText("Introduce the number of concepts to show");
+        dialog.setHeaderText("Enter number of concepts to display");
 
         ButtonType okBtn = new ButtonType("Submit", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(okBtn, ButtonType.CANCEL);
 
-        Spinner<Integer> spinner = new Spinner<>(1, visGraph.shapeMap.size(), 1);
+        int numShapes = (new HashSet<>(visGraph.shapeMap.values()).size() - 2);
+
+        CustomIntegerSpinner spinner = new CustomIntegerSpinner(0, numShapes, 1);
         spinner.getStyleClass().add("spinner-kce-limit");
         spinner.setEditable(true);
-
-        int numShapes = (new HashSet<>(visGraph.shapeMap.values()).size() - 2); // 2 = Thing, Nothing
-        TextField editor = spinner.getEditor();
-        editor.textProperty().addListener((obs, oldValue, newValue) -> {
-            if (newValue.isEmpty()) {
-                return;
-            }
-            if (!newValue.matches("\\d*")) {
-                editor.setText(oldValue);
-            } else {
-                try {
-                    int value = Integer.parseInt(newValue);
-
-                    if (value < 0 || value > numShapes) {
-                        editor.setText(oldValue);
-                    }
-                } catch (NumberFormatException e) {
-                    editor.setText(oldValue);
-                }
-            }
-        });
-        editor.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {
-            if (!isNowFocused && editor.getText().isEmpty()) {
-                editor.setText("0");
-                spinner.getValueFactory().setValue(0);
-            }
-        });
 
         dialog.setResultConverter(btn -> {
             if (btn == okBtn) {
@@ -1437,5 +1415,4 @@ public class PaintFrame extends Canvas {
         Optional<Integer> res = dialog.showAndWait();
         return res.orElse(0);
     }
-
 }
