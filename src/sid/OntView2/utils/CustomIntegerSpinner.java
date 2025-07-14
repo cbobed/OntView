@@ -5,9 +5,7 @@ import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextField;
 import javafx.util.StringConverter;
 
-
 public class CustomIntegerSpinner extends Spinner<Integer> {
-
     private final int min;
     private final int max;
 
@@ -58,7 +56,6 @@ public class CustomIntegerSpinner extends Spinner<Integer> {
 
         setValueFactory(valueFactory);
         setEditable(true);
-        getStyleClass().add("spinner-custom");
 
         TextField editor = getEditor();
         editor.textProperty().addListener((obs, oldValue, newValue) -> {
