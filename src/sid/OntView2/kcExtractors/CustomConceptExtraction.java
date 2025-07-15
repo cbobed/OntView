@@ -56,7 +56,14 @@ public class CustomConceptExtraction extends KConceptExtractor {
 
         if(selectedConcepts.isEmpty()) {
             modal = new CustomKCEModal(shapeMap, this);
+        } else {
+            Set<Shape> nonHiddenShapes = selectedConcepts.stream()
+                .filter(Shape::isVisible)
+                .collect(Collectors.toSet());
+            selectedConcepts.clear();
+            selectedConcepts.addAll(nonHiddenShapes);
         }
+
         modal.showConceptSelectionPopup();
     }
 
@@ -71,10 +78,13 @@ public class CustomConceptExtraction extends KConceptExtractor {
             this.selectedConcepts.clear();
 
             for (Shape s : conceptsToFind) {
-                if (s != null)
-                    this.selectedConcepts.add(s.getGraph().getVisualExtension(s.getLinkedClassExpression()));
+                if (s != null) {
+                    Shape foundShape = s.getGraph().getVisualExtension(s.getLinkedClassExpression());
+                    if (foundShape == null) continue;
+
+                    this.selectedConcepts.add(foundShape);
+                }
             }
         }
-
     }
 }

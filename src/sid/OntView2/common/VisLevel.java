@@ -155,9 +155,11 @@ public class VisLevel {
 			}
 			else {
                 for (Shape shape : lvl.levelShapes){
-                    int shapeWidth = Math.max(shape.getWidth(), (int) shape.getIndicatorSize());
-                    if (shapeWidth > maxShapeWidthInLevel) {
-                        maxShapeWidthInLevel = shapeWidth;
+                    if (shape.isVisible()) {
+                        int shapeWidth = Math.max(shape.getWidth(), (int) shape.getIndicatorSize());
+                        if (shapeWidth > maxShapeWidthInLevel) {
+                            maxShapeWidthInLevel = shapeWidth;
+                        }
                     }
                 }
                 maxShapeWidthInLevel += SPACE_BETWEEN_LEVELS;

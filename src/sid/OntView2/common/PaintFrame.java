@@ -834,7 +834,8 @@ public class PaintFrame extends Canvas {
 					shape.hide();
 					shape.updateParents();
 					refreshDashedConnectors();
-					setStateChanged(true);
+                    VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
+                    setStateChanged(true);
 					Platform.runLater(relaxerRunnable);
 					return true;
 				}
@@ -1212,8 +1213,8 @@ public class PaintFrame extends Canvas {
                     }
                     CustomConceptExtraction custom = (CustomConceptExtraction) customExtractor;
                     custom.isClassExpressionUsed = isClassExpressionUsed;
-                    getVisGraph().showAll();
                     custom.showConceptSelectionPopup();
+                    getVisGraph().showAll();
                     customExtractor.hideNonKeyConcepts(activeOntology, this.getVisGraph(), custom.getSelectedConcepts().size());
                 }
                 case VisConstants.KCECOMBOOPTION3,
