@@ -462,6 +462,9 @@ public abstract class Shape {
         Set<Shape> visited = new HashSet<>();
         for (Shape s: visibleDescendants){
             s.removeHiddenDescendantsFromAncestors(visibleDescendants, visited);
+            for (VisConnector c : s.outConnectors) { // update direct children
+                c.to.checkAndUpdateParentVisibilityStates();
+            }
         }
         hiddenDescendantsSet.removeAll(visibleDescendants);
         checkAndUpdateChildrenVisibilityStates();
