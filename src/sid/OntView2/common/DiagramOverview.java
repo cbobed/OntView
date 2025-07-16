@@ -43,14 +43,19 @@ public class DiagramOverview extends Canvas{
         double ow = aspect >= 1 ? maxSize : maxSize * aspect;
         double oh = aspect >= 1 ? maxSize / aspect : maxSize;
 
+        double scaleY = oh / contentHeight;
+        double extraScaled = VisConstants.NEEDED_HEIGHT * scaleY;
+
+        double finalHeight = oh + extraScaled;
+
         setWidth(ow);
-        setHeight(oh);
+        setHeight(finalHeight);
 
         if (isFocusWithin()) {
             requestFocus();
         }
 
-        Scene scene = new Scene(root, ow, oh);
+        Scene scene = new Scene(root, ow, finalHeight);
         overviewStage.setScene(scene);
         overviewStage.setTitle("Diagram Overview");
         overviewStage.setAlwaysOnTop(true);
@@ -59,7 +64,7 @@ public class DiagramOverview extends Canvas{
         double margin = 80;
         overviewStage.setX(screen.getMaxX() - ow - margin);
         overviewStage.setY(screen.getMinY() + margin);
-        overviewStage.setResizable(false);
+        //overviewStage.setResizable(false);
 
         overviewStage.show();
 
@@ -76,6 +81,8 @@ public class DiagramOverview extends Canvas{
         if (overviewStage == null || !overviewStage.isShowing() || paintframe.scroll == null) {
             return;
         }
+
+        //updateOverviewSize();
 
         GraphicsContext gc = getGraphicsContext2D();
         double ow = getWidth();
@@ -148,4 +155,31 @@ public class DiagramOverview extends Canvas{
             g.restore();
         }
     }
+
+    public void updateOverviewSize() {
+        if (overviewStage == null || !overviewStage.isShowing()) return;
+
+        double viewportWorldW = paintframe.scroll.getViewportBounds().getWidth() / paintframe.factor;
+        double viewportWorldH = paintframe.scroll.getViewportBounds().getHeight() / paintframe.factor;
+        double contentWidth = paintframe.scroll.getHmax() + viewportWorldW;
+        double contentHeight = paintframe.scroll.getVmax() + viewportWorldH;
+
+        double maxSize = 400;
+        double aspect = contentWidth / contentHeight;
+        double ow = aspect >= 1 ? maxSize : maxSize * aspect;
+        double oh = aspect >= 1 ? maxSize / aspect : maxSize;
+
+        double scaleY = oh / contentHeight;
+        double extraScaled = 245 * scaleY;
+
+        double finalHeight = oh + extraScaled;
+
+        setWidth(ow);
+        setHeight(finalHeight);
+
+        overviewStage.setWidth(ow);
+        overviewStage.setHeight(finalHeight);
+
+    }
+
 }
