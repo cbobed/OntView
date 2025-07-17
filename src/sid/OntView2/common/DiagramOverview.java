@@ -75,9 +75,10 @@ public class DiagramOverview extends Canvas{
             return;
         }
 
+        updateOverviewSize();
+
         GraphicsContext gc = getGraphicsContext2D();
-        double ow = getWidth();
-        double oh = getHeight();
+        double ow = getWidth(), oh = getHeight();
         gc.clearRect(0,0,ow,oh);
         gc.setFill(Color.WHITE);
         gc.fillRect(0,0,ow,oh);
@@ -106,8 +107,6 @@ public class DiagramOverview extends Canvas{
         gc.setStroke(Color.DARKRED);
         gc.setLineWidth(1.5);
         gc.strokeRect(rectX, rectY, viewportRectW, viewportRectH);
-
-        Platform.runLater(this::updateOverviewSize);
     }
 
     private void handleOverviewDrag(MouseEvent e) {
@@ -161,11 +160,6 @@ public class DiagramOverview extends Canvas{
 
         overviewStage.setWidth(ow);
         overviewStage.setHeight(oh + VisConstants.WINDOW_TITLE_BAR);
-
-        Rectangle2D screen = Screen.getPrimary().getVisualBounds();
-        double margin = 80;
-        overviewStage.setX(screen.getMaxX() - ow - margin);
-        overviewStage.setY(screen.getMinY() + margin);
     }
 
     private Dimension2D computeOverviewDimensions() {

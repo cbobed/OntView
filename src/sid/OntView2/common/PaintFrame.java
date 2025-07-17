@@ -131,9 +131,8 @@ public class PaintFrame extends Canvas {
     public Stage getSliderStage() { return sliderStage; }
     public void setSliderStage(Stage stage) { sliderStage = stage; }
     public void setCustomExtractor(KConceptExtractor customExtractor) { this.customExtractor = customExtractor; }
-    public KConceptExtractor getCustomExtractor() { return customExtractor; }
 
-	public PaintFrame(double width, double height) {
+    public PaintFrame(double width, double height) {
 		super();
 		try {
 			this.setWidth(width);
@@ -773,6 +772,9 @@ public class PaintFrame extends Canvas {
 
         scroll.setVmax(Math.max(0, maxY - viewportHeight));
         scroll.setHmax(Math.max(0, maxX - viewportWidth));
+
+        if (diagramOverview != null) Platform.runLater(() -> diagramOverview.drawOverview());
+
     }
 
     /**
@@ -1233,17 +1235,16 @@ public class PaintFrame extends Canvas {
         cleanConnectors();
 		getParentFrame().loadSearchCombo();
         compactGraph();
-        if (menuVisShapeContext != null) {
-            menuVisShapeContext.updateSliderView();
-        }
+
+        if (menuVisShapeContext != null) menuVisShapeContext.updateSliderView();
 	}
 	
 
 	public void compactGraph() {
-		int currentY = BORDER_PANEL;
+		int currentY;
 		int minY = -1; 
-		int maxY = -1; 
-		int span = -1; 
+		int maxY;
+		int span;
 		int levelHeight = MIN_INITIAL_SPACE;
 		Map<Integer, ArrayList<Shape>> visibleShapesPerLevel = new HashMap<>(); 
 		Map<Integer, Integer> ySpanPerLevel = new HashMap<>(); 
@@ -1401,7 +1402,7 @@ public class PaintFrame extends Canvas {
         ButtonType okBtn = new ButtonType("Submit", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(okBtn, ButtonType.CANCEL);
 
-        int numShapes = (new HashSet<>(visGraph.shapeMap.values()).size() - 2);
+        int numShapes = (new HashSet<>(visGraph.shapeMap.values()).size() - 2); // 2 = Thing, Nothing
 
         CustomIntegerSpinner spinner = new CustomIntegerSpinner(0, numShapes, 1);
         spinner.getStyleClass().add("spinner-kce-limit");
