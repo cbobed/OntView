@@ -227,6 +227,28 @@ public class VisGraph implements Runnable{
         VisLevel.adjustWidthAndPos(getLevelSet());
         paintframe.getParentFrame().loadSearchCombo();
         paintframe.setStateChanged(true);
+        
+        
+        for (Entry<String, Shape> e: this.shapeMap.entrySet()) {
+        	logger.debug("---------"); 
+        	logger.debug(e.getKey());
+        	logger.debug("\tChildren");  
+        		for (Shape s: e.getValue().asVisClass().getChildren()) {
+        			logger.debug("\t\t"+s.asVisClass().getLinkedClassExpression()); 
+        		}
+    		logger.debug("\tParents");  
+    		for (Shape s: e.getValue().asVisClass().getParents()) {
+    			logger.debug("\t\t"+s.asVisClass().getLinkedClassExpression()); 
+    		}
+        }
+        logger.debug("------------ CONNECTORS --------------"); 
+        for (VisConnector vc: connectorList) {
+        	if (vc instanceof VisConnectorIsA) {
+        		logger.debug(vc.from.getLinkedClassExpression()+" --> " +vc.to.getLinkedClassExpression()); 
+        	}
+        }
+        
+        
         logger.debug("<--buildReasonedGraph");
     }
 
@@ -346,6 +368,16 @@ public class VisGraph implements Runnable{
         shape.asVisClass().qualifiedLabel = !"null".equalsIgnoreCase(auxQLabel) ? auxQLabel : shape.asVisClass().label;
     }
 
+    private boolean checkAtomicEquivalence (OWLReasoner reasoner, OWLClassExpression ce) {
+		Node<OWLClass> equivalentClasses = reasoner.getEquivalentClasses(ce); 
+		for (OWLClass c: equivalentClasses) {
+			if (getShapeFromOWLClassExpression(c) != null) {
+				return true; 
+			}
+		}
+		return false; 
+    }
+    
 	private void insertClassExpressions (OWLOntology activeOntology, OWLReasoner reasoner,
 											OWLClassExpression startingPoint, 
 											OWLClassExpression endPoint) {
@@ -364,9 +396,15 @@ public class VisGraph implements Runnable{
 		int i = 0; 
 		
 		for (OWLClassExpression ce: renamer.getClassesToAdd()) {
+			logger.debug("inserting " +ce); 
 			if (getShapeFromOWLClassExpression(ce) == null) {
-				if ( (startingPoint.isOWLThing() || subsumes(startingPoint, ce, reasoner, dFactory)) &&
-						(endPoint.isOWLNothing() || subsumes(ce, endPoint, reasoner, dFactory )) ){
+
+				// we also check if they are equivalent to any atomic class, so we don't skip 
+				// any possible definition 
+				if ( checkAtomicEquivalence(reasoner,  ce) || 
+					( (startingPoint.isOWLThing() || subsumes(startingPoint, ce, reasoner, dFactory)) &&
+						(endPoint.isOWLNothing() || subsumes(ce, endPoint, reasoner, dFactory )) )
+					) {
 					addGatheredClassExpression(ce, activeOntology.getOWLOntologyManager().getOWLDataFactory().getOWLThing(), reasoner, activeOntology, dFactory);
 					i++; 
 					if (i%5==0)
@@ -411,7 +449,7 @@ public class VisGraph implements Runnable{
 			OWLReasoner reasoner, 
 			OWLOntology activeOntology,
 			OWLDataFactory dataFactory) {
-
+		logger.debug("adding "+e); 
         HashSet<Shape> directParents = new HashSet<>(exploreParent(e, entryPointParent, reasoner, dataFactory));
 		
 		// We check for the equivalences 
@@ -776,9 +814,15 @@ public class VisGraph implements Runnable{
 		parent.addSon(vis);
         vis.addParent(parent);
         //skip if previously added
+		logger.debug("Checking "+parent.getLinkedClassExpression()+" --> "+vis.getLinkedClassExpression()); 
+
         for (VisConnector c :pConnectorList) {
-           if ((c.from == parent) && (c.to == vis)){
-        	  return;}
+        	if (c.from.getLinkedClassExpression().equals(parent.getLinkedClassExpression())  
+        			&& c.to.getLinkedClassExpression().equals(vis.getLinkedClassExpression()))
+        	{
+        		logger.debug("Skipped "+parent.getLinkedClassExpression()+" --> "+vis.getLinkedClassExpression()); 
+        	  return; 
+        	}
         }
         con = new VisConnectorIsA(parent, vis);
         
