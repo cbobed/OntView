@@ -2,10 +2,7 @@ package sid.OntView2.kcExtractors;
 
 import org.semanticweb.owlapi.model.OWLOntology;
 
-import sid.OntView2.common.Shape;
-import sid.OntView2.common.VisClass;
-import sid.OntView2.common.VisConstants;
-import sid.OntView2.common.VisGraph;
+import sid.OntView2.common.*;
 
 import java.util.HashSet;
 import java.util.Map;

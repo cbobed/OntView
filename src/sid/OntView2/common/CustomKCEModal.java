@@ -13,6 +13,7 @@ import javafx.stage.Stage;
 import sid.OntView2.kcExtractors.CustomConceptExtraction;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class CustomKCEModal {
     private final Map<String, Shape> shapeMap;
@@ -72,8 +73,16 @@ public class CustomKCEModal {
 
         popupStage.setOnCloseRequest(e -> {
             if (settings.getLastMode() == ViewMode.CUSTOM) {
+                settings.setLastMode(ViewMode.CANCELLED_CUSTOM);
+                Set<Shape> nonHiddenShapes = selectedConceptsList.stream()
+                    .filter(Shape::isVisible)
+                    .collect(Collectors.toSet());
+
+                customConceptExtraction.getTempSelectedConcepts().clear();
+                customConceptExtraction.getTempSelectedConcepts().addAll(selectedConceptsList);
+
                 customConceptExtraction.getSelectedConcepts().clear();
-                customConceptExtraction.getSelectedConcepts().addAll(selectedConceptsList);
+                customConceptExtraction.getSelectedConcepts().addAll(nonHiddenShapes);
             } else {
                 customConceptExtraction.getSelectedConcepts().clear();
                 customConceptExtraction.getSelectedConcepts().addAll(allConcepts);

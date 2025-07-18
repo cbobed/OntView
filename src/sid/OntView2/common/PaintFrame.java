@@ -1218,6 +1218,7 @@ public class PaintFrame extends Canvas {
                     custom.showConceptSelectionPopup();
                     getVisGraph().showAll();
                     customExtractor.hideNonKeyConcepts(activeOntology, this.getVisGraph(), custom.getSelectedConcepts().size());
+                    custom.checkCancelStatus();
                 }
                 case VisConstants.KCECOMBOOPTION3,
                     VisConstants.PAGERANKCOMBOOPTION3,
