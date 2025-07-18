@@ -23,7 +23,7 @@ public class VisConstants {
     public static final String COMPACT_GRAPH = "Compact graph";
 	public static final int CONTAINER_SIZE = 65;
 
-    public static final int WINDOW_TITLE_BAR = 37;
+    public static int WINDOW_TITLE_BAR = 0;
 
     final static int WIDTH_MARGIN = 30;
     final static int HEIGHT_MARGIN = 30;
