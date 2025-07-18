@@ -228,27 +228,6 @@ public class VisGraph implements Runnable{
         paintframe.getParentFrame().loadSearchCombo();
         paintframe.setStateChanged(true);
         
-        
-        for (Entry<String, Shape> e: this.shapeMap.entrySet()) {
-        	logger.debug("---------"); 
-        	logger.debug(e.getKey());
-        	logger.debug("\tChildren");  
-        		for (Shape s: e.getValue().asVisClass().getChildren()) {
-        			logger.debug("\t\t"+s.asVisClass().getLinkedClassExpression()); 
-        		}
-    		logger.debug("\tParents");  
-    		for (Shape s: e.getValue().asVisClass().getParents()) {
-    			logger.debug("\t\t"+s.asVisClass().getLinkedClassExpression()); 
-    		}
-        }
-        logger.debug("------------ CONNECTORS --------------"); 
-        for (VisConnector vc: connectorList) {
-        	if (vc instanceof VisConnectorIsA) {
-        		logger.debug(vc.from.getLinkedClassExpression()+" --> " +vc.to.getLinkedClassExpression()); 
-        	}
-        }
-        
-        
         logger.debug("<--buildReasonedGraph");
     }
 
@@ -396,7 +375,7 @@ public class VisGraph implements Runnable{
 		int i = 0; 
 		
 		for (OWLClassExpression ce: renamer.getClassesToAdd()) {
-			logger.debug("inserting " +ce); 
+
 			if (getShapeFromOWLClassExpression(ce) == null) {
 
 				// we also check if they are equivalent to any atomic class, so we don't skip 
@@ -449,7 +428,6 @@ public class VisGraph implements Runnable{
 			OWLReasoner reasoner, 
 			OWLOntology activeOntology,
 			OWLDataFactory dataFactory) {
-		logger.debug("adding "+e); 
         HashSet<Shape> directParents = new HashSet<>(exploreParent(e, entryPointParent, reasoner, dataFactory));
 		
 		// We check for the equivalences 
@@ -813,14 +791,11 @@ public class VisGraph implements Runnable{
 		VisConnector con; 
 		parent.addSon(vis);
         vis.addParent(parent);
-        //skip if previously added
-		logger.debug("Checking "+parent.getLinkedClassExpression()+" --> "+vis.getLinkedClassExpression()); 
-
+       
         for (VisConnector c :pConnectorList) {
         	if (c.from.getLinkedClassExpression().equals(parent.getLinkedClassExpression())  
         			&& c.to.getLinkedClassExpression().equals(vis.getLinkedClassExpression()))
         	{
-        		logger.debug("Skipped "+parent.getLinkedClassExpression()+" --> "+vis.getLinkedClassExpression()); 
         	  return; 
         	}
         }
