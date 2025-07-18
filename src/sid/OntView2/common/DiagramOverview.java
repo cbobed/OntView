@@ -53,15 +53,15 @@ public class DiagramOverview extends Canvas{
         overviewStage.setTitle("Diagram Overview");
         overviewStage.setAlwaysOnTop(true);
 
-        Rectangle2D screen = Screen.getPrimary().getVisualBounds();
-        double margin = 80;
-        overviewStage.setX(screen.getMaxX() - ow - margin);
-        overviewStage.setY(screen.getMaxY() - oh - margin);
+        relocateStage();
         overviewStage.setResizable(false);
-
         overviewStage.show();
 
         drawOverview();
+
+        overviewStage.widthProperty().addListener((obs, oldW, newW) -> relocateStage());
+        overviewStage.heightProperty().addListener((obs, oldH, newH) -> relocateStage());
+
         if (paintframe.scroll != null) {
             paintframe.scroll.hvalueProperty().addListener((o, a, b) -> drawOverview());
             paintframe.scroll.vvalueProperty().addListener((o, a, b) -> drawOverview());
@@ -177,6 +177,17 @@ public class DiagramOverview extends Canvas{
         double scaleY = overviewHeight / contentHeight;
         double finalH = overviewHeight + VisConstants.NEEDED_HEIGHT * scaleY;
         return new Dimension2D(overviewWidth, finalH);
+    }
+
+    public void relocateStage(){
+        Dimension2D dims = computeOverviewDimensions();
+        double ow = dims.getWidth();
+        double oh = dims.getHeight();
+
+        Rectangle2D screen = Screen.getPrimary().getVisualBounds();
+        double margin = 80;
+        overviewStage.setX(screen.getMaxX() - ow - margin);
+        overviewStage.setY(screen.getMaxY() - oh - margin);
     }
 
 }
