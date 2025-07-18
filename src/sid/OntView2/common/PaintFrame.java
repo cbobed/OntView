@@ -33,6 +33,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
+import javafx.util.StringConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.semanticweb.owlapi.apibinding.OWLManager;
@@ -45,6 +46,7 @@ import sid.OntView2.kcExtractors.CustomConceptExtraction;
 import sid.OntView2.main.TopPanel;
 import sid.OntView2.kcExtractors.KConceptExtractor;
 import sid.OntView2.kcExtractors.KConceptExtractorFactory;
+import sid.OntView2.utils.CustomIntegerSpinner;
 
 public class PaintFrame extends Canvas {
     private static final Logger logger = LogManager.getLogger(GraphReorder.class);
@@ -53,7 +55,7 @@ public class PaintFrame extends Canvas {
 	public ScrollPane scroll;
 	static final int BORDER_PANEL = 60, MIN_SPACE = 30, MIN_INITIAL_SPACE = 40;
 	private static final int DOWN = 0, UP = -1;
-    public boolean isClassExpressionUsed;
+    public boolean isClassExpressionUsed = false;
     boolean stable = false, repulsion = true;
 	public boolean renderLabel = false, qualifiedNames = false;
     public Set<String> languagesLabels = new HashSet<>();
@@ -129,9 +131,8 @@ public class PaintFrame extends Canvas {
     public Stage getSliderStage() { return sliderStage; }
     public void setSliderStage(Stage stage) { sliderStage = stage; }
     public void setCustomExtractor(KConceptExtractor customExtractor) { this.customExtractor = customExtractor; }
-    public KConceptExtractor getCustomExtractor() { return customExtractor; }
 
-	public PaintFrame(double width, double height) {
+    public PaintFrame(double width, double height) {
 		super();
 		try {
 			this.setWidth(width);
@@ -771,6 +772,9 @@ public class PaintFrame extends Canvas {
 
         scroll.setVmax(Math.max(0, maxY - viewportHeight));
         scroll.setHmax(Math.max(0, maxX - viewportWidth));
+
+        if (diagramOverview != null) Platform.runLater(() -> diagramOverview.drawOverview());
+
     }
 
     /**
@@ -832,7 +836,8 @@ public class PaintFrame extends Canvas {
 					shape.hide();
 					shape.updateParents();
 					refreshDashedConnectors();
-					setStateChanged(true);
+                    VisLevel.adjustWidthAndPos(visGraph.getLevelSet());
+                    setStateChanged(true);
 					Platform.runLater(relaxerRunnable);
 					return true;
 				}
@@ -1177,11 +1182,11 @@ public class PaintFrame extends Canvas {
 	/**
 	 * Action done when changing kce Combo
 	 */
+    int limit;
 	public void doKceOptionAction() {
-		if (getVisGraph() == null) {
+		if (getVisGraph() == null || getVisGraph().shapeMap.isEmpty()) {
 			return;
 		}
-        cleanConnectors();
 
 		if (Objects.equals(getKceOption(), VisConstants.NONECOMBOOPTION)) {
 			getVisGraph().clearDashedConnectorList();
@@ -1204,31 +1209,43 @@ public class PaintFrame extends Canvas {
                     getVisGraph().showAll();
                     extractor.hideNonKeyConcepts(activeOntology, this.getVisGraph(), 20);
                 }
-                case VisConstants.CUSTOMCOMBOOPTION3 -> { // "Custom"
+                case VisConstants.CUSTOMCOMBOOPTION -> { // "Custom"
                     if (customExtractor == null) {
                         customExtractor = KConceptExtractorFactory.getInstance(getKceOption(), getVisGraph().shapeMap);
                     }
                     CustomConceptExtraction custom = (CustomConceptExtraction) customExtractor;
                     custom.isClassExpressionUsed = isClassExpressionUsed;
-                    getVisGraph().showAll();
                     custom.showConceptSelectionPopup();
+                    getVisGraph().showAll();
                     customExtractor.hideNonKeyConcepts(activeOntology, this.getVisGraph(), custom.getSelectedConcepts().size());
+                    custom.checkCancelStatus();
+                }
+                case VisConstants.KCECOMBOOPTION3,
+                    VisConstants.PAGERANKCOMBOOPTION3,
+                    VisConstants.RDFRANKCOMBOOPTION3 -> { // "KCE n"
+                    if(!isClassExpressionUsed) {
+                        limit = getLimitNumberKCE();
+                        if (limit == -1) return;
+                    }
+                    KConceptExtractor extractor = KConceptExtractorFactory.getInstance(getKceOption(), getVisGraph().shapeMap);
+                    getVisGraph().showAll();
+                    extractor.hideNonKeyConcepts(activeOntology, this.getVisGraph(), limit);
                 }
             }
         }
+        cleanConnectors();
 		getParentFrame().loadSearchCombo();
         compactGraph();
-        if (menuVisShapeContext != null) {
-            menuVisShapeContext.updateSliderView();
-        }
+
+        if (menuVisShapeContext != null) menuVisShapeContext.updateSliderView();
 	}
 	
 
 	public void compactGraph() {
-		int currentY = BORDER_PANEL;
+		int currentY;
 		int minY = -1; 
-		int maxY = -1; 
-		int span = -1; 
+		int maxY;
+		int span;
 		int levelHeight = MIN_INITIAL_SPACE;
 		Map<Integer, ArrayList<Shape>> visibleShapesPerLevel = new HashMap<>(); 
 		Map<Integer, Integer> ySpanPerLevel = new HashMap<>(); 
@@ -1377,4 +1394,33 @@ public class PaintFrame extends Canvas {
         alert.showAndWait();
     }
 
+
+    private int getLimitNumberKCE() {
+        Dialog<Integer> dialog = new Dialog<>();
+        dialog.setTitle("Configure");
+        dialog.setHeaderText("Enter number of concepts to display");
+
+        ButtonType okBtn = new ButtonType("Submit", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(okBtn, ButtonType.CANCEL);
+
+        int numShapes = (new HashSet<>(visGraph.shapeMap.values()).size() - 2); // 2 = Thing, Nothing
+
+        CustomIntegerSpinner spinner = new CustomIntegerSpinner(0, numShapes, 1);
+        spinner.getStyleClass().add("spinner-kce-limit");
+        spinner.setEditable(true);
+
+        dialog.setResultConverter(btn -> {
+            if (btn == okBtn) {
+                return spinner.getValue();
+            }
+            return null;
+        });
+
+        ClassLoader c = Thread.currentThread().getContextClassLoader();
+        dialog.getDialogPane().getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
+
+        dialog.getDialogPane().setContent(spinner);
+        Optional<Integer> res = dialog.showAndWait();
+        return res.orElse(-1);
+    }
 }

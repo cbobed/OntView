@@ -15,6 +15,7 @@ import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
+import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
@@ -171,7 +172,19 @@ public class Mine extends Application implements Embedable{
 		viewer.primaryStage.setMaximized(true);
 		viewer.primaryStage.show();
 
+        viewer.calculateStageTopBar(viewer.primaryStage, root);
 	}
+
+    private void calculateStageTopBar(Stage primaryStage, VBox root) {
+        Platform.runLater(() -> {
+            double stageScreenY = primaryStage.getY();
+
+            Point2D rootScreenPos = root.localToScreen(0, 0);
+            double rootScreenY = rootScreenPos.getY();
+
+            VisConstants.WINDOW_TITLE_BAR = (int) Math.round(rootScreenY - stageScreenY);
+        });
+    }
 
     private double getNewZoom(ScrollEvent event) {
         double sensitivity = 0.001;

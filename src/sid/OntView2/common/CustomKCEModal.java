@@ -13,11 +13,13 @@ import javafx.stage.Stage;
 import sid.OntView2.kcExtractors.CustomConceptExtraction;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class CustomKCEModal {
     private final Map<String, Shape> shapeMap;
     CustomConceptExtraction customConceptExtraction;
     private GraphViewSettings settings;
+    private ObservableList<Shape> tempSelectedConceptsList = FXCollections.observableArrayList();
 
     public CustomKCEModal(Map<String, Shape> shapeMap, CustomConceptExtraction customCE) {
         this.shapeMap = shapeMap;
@@ -47,15 +49,20 @@ public class CustomKCEModal {
         Button addButton = createAddButton(allConceptsView, selectedConceptsList);
         Button removeButton = createRemoveButton(selectedConceptsView, selectedConceptsList);
         Button saveButton = createSaveButton(selectedConceptsList, popupStage);
+        Button resetButton = createResetButton(selectedConceptsList);
 
-        HBox buttonBox = new HBox(5, addButton, removeButton);
+        CheckBox selectAllNodes = selectAllNodesCheckbox(unique, selectedConceptsList);
+
+        HBox arrowBox = new HBox(5, addButton, removeButton);
+        arrowBox.setAlignment(Pos.CENTER);
+        VBox buttonBox = new VBox(15, arrowBox, resetButton);
         buttonBox.setAlignment(Pos.CENTER);
 
         VBox allConceptsBox = new VBox(5, searchAllField, allConceptsView);
         VBox selectedConceptsBox = new VBox(5, searchSelectedField, selectedConceptsView);
 
         HBox mainLayout = new HBox(10, allConceptsBox, buttonBox, selectedConceptsBox);
-        VBox root = new VBox(10, mainLayout, saveButton);
+        VBox root = new VBox(10, selectAllNodes, mainLayout, saveButton);
         root.setAlignment(Pos.CENTER);
         root.setPadding(new Insets(20));
 
@@ -66,8 +73,16 @@ public class CustomKCEModal {
 
         popupStage.setOnCloseRequest(e -> {
             if (settings.getLastMode() == ViewMode.CUSTOM) {
+                settings.setLastMode(ViewMode.CANCELLED_CUSTOM);
+                Set<Shape> nonHiddenShapes = selectedConceptsList.stream()
+                    .filter(Shape::isVisible)
+                    .collect(Collectors.toSet());
+
+                customConceptExtraction.getTempSelectedConcepts().clear();
+                customConceptExtraction.getTempSelectedConcepts().addAll(selectedConceptsList);
+
                 customConceptExtraction.getSelectedConcepts().clear();
-                customConceptExtraction.getSelectedConcepts().addAll(selectedConceptsList);
+                customConceptExtraction.getSelectedConcepts().addAll(nonHiddenShapes);
             } else {
                 customConceptExtraction.getSelectedConcepts().clear();
                 customConceptExtraction.getSelectedConcepts().addAll(allConcepts);
@@ -127,6 +142,21 @@ public class CustomKCEModal {
         return searchField;
     }
 
+    private CheckBox selectAllNodesCheckbox(List<Shape> allConcepts, ObservableList<Shape> selectedConceptsList) {
+        CheckBox selectAllNodes = new CheckBox("Select all nodes");
+        selectAllNodes.setOnAction(e -> {
+            if (selectAllNodes.isSelected()) {
+                tempSelectedConceptsList = FXCollections.observableArrayList(selectedConceptsList);
+                selectedConceptsList.clear();
+                selectedConceptsList.addAll(allConcepts);
+            } else {
+                selectedConceptsList.clear();
+                selectedConceptsList.addAll(tempSelectedConceptsList);
+            }
+        });
+        return selectAllNodes;
+    }
+
     private Button createAddButton(ListView<Shape> allConceptsView, ObservableList<Shape> selectedConceptsList) {
         Button addButton = new Button(OntViewConstants.RIGHT_ARROW);
         addButton.setOnAction(e -> {
@@ -149,11 +179,19 @@ public class CustomKCEModal {
         return removeButton;
     }
 
+    private Button createResetButton(ObservableList<Shape> selectedConceptsList) {
+        Button resetButton = new Button("Reset");
+        resetButton.setOnAction(e -> selectedConceptsList.clear());
+        return resetButton;
+    }
+
+
     private Button createSaveButton(ObservableList<Shape> selectedConceptsList, Stage popupStage) {
         Button saveButton = new Button("Save");
         saveButton.setOnAction(e -> {
             customConceptExtraction.getSelectedConcepts().clear();
             customConceptExtraction.getSelectedConcepts().addAll(selectedConceptsList);
+            tempSelectedConceptsList.clear();
             settings.setLastMode(ViewMode.CUSTOM);
             popupStage.close();
         });

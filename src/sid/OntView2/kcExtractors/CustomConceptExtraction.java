@@ -2,13 +2,16 @@ package sid.OntView2.kcExtractors;
 
 import org.semanticweb.owlapi.model.OWLOntology;
 import sid.OntView2.common.CustomKCEModal;
+import sid.OntView2.common.GraphViewSettings;
 import sid.OntView2.common.Shape;
+import sid.OntView2.common.ViewMode;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class CustomConceptExtraction extends KConceptExtractor {
     private final Set<Shape> selectedConcepts;
+    private final Set<Shape> tempSelectedConcepts = new HashSet<>();
     private final Map<String, Shape> shapeMap;
     public boolean isClassExpressionUsed = false;
 
@@ -61,6 +64,7 @@ public class CustomConceptExtraction extends KConceptExtractor {
     }
 
     public Set<Shape> getSelectedConcepts() { return selectedConcepts; }
+    public Set<Shape> getTempSelectedConcepts() { return tempSelectedConcepts; }
 
     /**
      * Finds the selected nodes in the visual graph and adds them to the selectedConcepts set.
@@ -71,10 +75,25 @@ public class CustomConceptExtraction extends KConceptExtractor {
             this.selectedConcepts.clear();
 
             for (Shape s : conceptsToFind) {
-                if (s != null)
-                    this.selectedConcepts.add(s.getGraph().getVisualExtension(s.getLinkedClassExpression()));
+                if (s != null) {
+                    Shape foundShape = s.getGraph().getVisualExtension(s.getLinkedClassExpression());
+                    if (foundShape == null) continue;
+
+                    this.selectedConcepts.add(foundShape);
+                }
             }
         }
+    }
 
+    /**
+     * Checks cancel status. If the last mode was cancelled custom, it restores the selected concepts
+     */
+    public void checkCancelStatus() {
+        if (GraphViewSettings.getInstance().getLastMode() == ViewMode.CANCELLED_CUSTOM){
+            selectedConcepts.clear();
+            selectedConcepts.addAll(tempSelectedConcepts);
+            tempSelectedConcepts.clear();
+            GraphViewSettings.getInstance().setLastMode(ViewMode.CUSTOM);
+        }
     }
 }

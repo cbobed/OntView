@@ -287,6 +287,7 @@ public class ClassExpression extends Stage {
         }
         if (selectedChild != null && selectedParent != null) {
             parent.artPanel.cleanConnectors();
+            parent.artPanel.isClassExpressionUsed = true;
             parent.artPanel.getVisGraph().rebuildGraphSelectedNodes(selectedParent.getLinkedClassExpression(), selectedChild.getLinkedClassExpression());
             close();
         }

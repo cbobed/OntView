@@ -1,5 +1,5 @@
 package sid.OntView2.common;
 
 public enum ViewMode {
-    ALL, CUSTOM
+    ALL, CUSTOM, CANCELLED_CUSTOM
 }

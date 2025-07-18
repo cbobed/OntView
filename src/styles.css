@@ -211,7 +211,7 @@
 }
 
 .spinner .increment-arrow-button,
-.spinner .decrement-arrow-button {
+.spinner .decrement-arrow-button{
     -fx-background-color: linear-gradient(to bottom, #f0f8ff, #d3e3f1);
     -fx-border-color: #8186d0;
     -fx-border-width: 1px;
@@ -331,4 +331,17 @@
     -fx-background-color: #ffffff;
     -fx-border-radius: 5;
     -fx-background-radius: 5;
+}
+
+.spinner-kce-limit {
+    -fx-max-height: 50px;
+    -fx-min-height: 50px;
+
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-border-radius: 0px;
+}
+
+.spinner-kce-limit:hover {
+    -fx-border-color: transparent;
 }
