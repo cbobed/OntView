@@ -56,7 +56,7 @@ public class DiagramOverview extends Canvas{
         Rectangle2D screen = Screen.getPrimary().getVisualBounds();
         double margin = 80;
         overviewStage.setX(screen.getMaxX() - ow - margin);
-        overviewStage.setY(screen.getMinY() + margin);
+        overviewStage.setY(screen.getMaxY() - oh - margin);
         overviewStage.setResizable(false);
 
         overviewStage.show();
