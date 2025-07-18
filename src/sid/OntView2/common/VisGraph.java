@@ -146,52 +146,22 @@ public class VisGraph implements Runnable{
      *
      */
     public void rebuildGraphSelectedNodes(OWLClassExpression topNode, OWLClassExpression bottomNode){
-        buildReasonedGraphSelectedNodes(getActiveOntology(), getReasoner(), set, topNode, bottomNode);
+        try {
+            buildReasonedGraph(getActiveOntology(), getReasoner(), set, topNode, bottomNode);
+        } catch (XPathExpressionException | ParserConfigurationException | SAXException | IOException e) {
+            logger.error("Error while rebuilding graph with selected nodes", e);
+        }
     }
 
-    private void buildReasonedGraphSelectedNodes(OWLOntology activeOntology,OWLReasoner reasoner,
-                                                 Set<OWLClassExpression> rootCpts, OWLClassExpression topNode,
-                                                 OWLClassExpression bottomNode) {
-
-        logger.debug("-->buildReasonedGraphSelectedNodes");
-        //It's important to set config constants before creating
-        //will have to move this elsewhere
-        clearAll();
-        OWLClass topClass = activeOntology.getOWLOntologyManager().getOWLDataFactory().getOWLThing();
-        OWLClass bottomClass = activeOntology.getOWLOntologyManager().getOWLDataFactory().getOWLNothing();
-        // we start from a fresh graph, so it is safe to create OWLThing and OWLNothing directly
-        addVisClass(Shape.getKey(topClass), topClass, activeOntology, reasoner);
-        addVisClass(Shape.getKey(bottomClass), bottomClass, activeOntology, reasoner);
-        this.reasonedTraversal(activeOntology,reasoner, null, rootCpts);
-
-        if (!VisConfig.APPLY_RENAMING_DEBUG_PURPOSES) {
-            insertClassExpressions(activeOntology, reasoner, topNode, bottomNode);
-        }
-        else {
-            linkDefinitionsToDefinedClasses(activeOntology);
-        }
-
-        layoutAndRenderGraph(activeOntology, reasoner);
-        logger.debug("Applying KCE Option if required ...");
-        paintframe.doKceOptionAction();
-
-        VisLevel.adjustWidthAndPos(getLevelSet());
-        paintframe.getParentFrame().loadSearchCombo();
-        paintframe.setStateChanged(true);
-
-        logger.debug("<--buildReasonedGraphSelectedNodes");
-        storeDescendants();
-        storeAncestors();
-        getShapeOrderedByRDFRank();
-        Platform.runLater(paintframe.redrawRunnable);
-    }
-
-	/**
+    /**
 	 *  builds the complete graph
 	 *  relies on weather it's expanded or not, and rearranging visual info
 	 */
-    public void buildReasonedGraph(OWLOntology activeOntology,OWLReasoner reasoner, Set<OWLClassExpression> rootCpts) throws XPathExpressionException, ParserConfigurationException, SAXException, IOException {
+    public void buildReasonedGraph(OWLOntology activeOntology,OWLReasoner reasoner, Set<OWLClassExpression> rootCpts,
+                                    OWLClassExpression topNode, OWLClassExpression bottomNode)
+                    throws XPathExpressionException, ParserConfigurationException, SAXException, IOException {
 
+        logger.debug("-->buildReasonedGraph");
         //It's important to set config constants before creating
         //will have to move this elsewhere
         clearAll();
@@ -205,8 +175,9 @@ public class VisGraph implements Runnable{
 
         if (!VisConfig.APPLY_RENAMING_DEBUG_PURPOSES) {
             OWLDataFactory dFactory = activeOntology.getOWLOntologyManager().getOWLDataFactory();
-            OWLClass topDetailedCpt = dFactory.getOWLThing();
-            OWLClass bottomDetailedCpt = dFactory.getOWLNothing();
+            OWLClassExpression topDetailedCpt = (topNode != null ? topNode : dFactory.getOWLThing());
+            OWLClassExpression bottomDetailedCpt = (bottomNode != null ? bottomNode : dFactory.getOWLNothing());
+
             insertClassExpressions(activeOntology, reasoner, topDetailedCpt, bottomDetailedCpt);
         }
         else {
@@ -214,8 +185,9 @@ public class VisGraph implements Runnable{
         }
 
         layoutAndRenderGraph(activeOntology, reasoner);
+
         logger.debug("Applying KCE Option if required ...");
-        if (paintframe.getKceOption().equals(VisConstants.CUSTOMCOMBOOPTION)) {
+        if (topNode == null && paintframe.getKceOption().equals(VisConstants.CUSTOMCOMBOOPTION)) {
             paintframe.setKceOption(VisConstants.NONECOMBOOPTION);
             paintframe.nTopPanel.getKceComboBox().setPromptText(VisConstants.NONECOMBOOPTION);
         }
@@ -223,7 +195,17 @@ public class VisGraph implements Runnable{
         VisLevel.adjustWidthAndPos(getLevelSet());
         paintframe.getParentFrame().loadSearchCombo();
         paintframe.setStateChanged(true);
+
+        logger.debug("-->storeDescendants");
+        storeDescendants();
+        storeAncestors();
+        getShapeOrderedByRDFRank();
+        logger.debug("<--storeDescendants");
         logger.debug("<--buildReasonedGraph");
+
+        Platform.runLater(paintframe.redrawRunnable);
+        Platform.runLater(paintframe.canvasAdjusterRunnable);
+
     }
 
     private void layoutAndRenderGraph(OWLOntology activeOntology, OWLReasoner reasoner) {
@@ -1234,16 +1216,9 @@ public class VisGraph implements Runnable{
             topSet.add(getActiveOntology().getOWLOntologyManager().getOWLDataFactory().getOWLThing());
 
             if (Thread.currentThread().isInterrupted()) { return; }
-            logger.debug("-->buildReasonedGraph");
-			this.buildReasonedGraph(getActiveOntology(), getReasoner(), topSet);
 
-            if (Thread.currentThread().isInterrupted()) { return; }
-            logger.debug("-->storeDescendants");
-			storeDescendants();
-			storeAncestors();
-            getShapeOrderedByRDFRank();
-            Platform.runLater(paintframe.redrawRunnable);
-            Platform.runLater(paintframe.canvasAdjusterRunnable);
+			this.buildReasonedGraph(getActiveOntology(), getReasoner(), topSet, null, null);
+
         } catch (XPathExpressionException | ParserConfigurationException | SAXException | IOException e) {
             if (!Thread.currentThread().isInterrupted()) {
                 e.printStackTrace();
