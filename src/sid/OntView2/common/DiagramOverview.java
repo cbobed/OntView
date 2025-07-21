@@ -61,20 +61,12 @@ public class DiagramOverview extends Canvas{
 
         overviewStage.widthProperty().addListener((obs, oldW, newW) -> relocateStage());
         overviewStage.heightProperty().addListener((obs, oldH, newH) -> relocateStage());
-
-        if (paintframe.scroll != null) {
-            paintframe.scroll.hvalueProperty().addListener((o, a, b) -> drawOverview());
-            paintframe.scroll.vvalueProperty().addListener((o, a, b) -> drawOverview());
-        }
-
         overviewStage.setOnCloseRequest(e -> closeDiagramOverview());
     }
 
     public void drawOverview() {
-        if (overviewStage == null || !overviewStage.isShowing() || paintframe.scroll == null) {
-            return;
-        }
-
+        if (overviewStage == null || !overviewStage.isShowing() || paintframe.scroll == null) return;
+        
         updateOverviewSize();
 
         GraphicsContext gc = getGraphicsContext2D();
@@ -175,7 +167,10 @@ public class DiagramOverview extends Canvas{
         double overviewHeight = aspect >= 1 ? MAX_OVERVIEW_SIZE / aspect : MAX_OVERVIEW_SIZE;
 
         double scaleY = overviewHeight / contentHeight;
-        double finalH = overviewHeight + VisConstants.NEEDED_HEIGHT * scaleY;
+
+        double finalH = overviewHeight;
+        if (paintframe.scroll.getVmax() > 0) finalH += VisConstants.NEEDED_HEIGHT * scaleY;
+
         return new Dimension2D(overviewWidth, finalH);
     }
 

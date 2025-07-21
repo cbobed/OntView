@@ -33,7 +33,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
-import javafx.util.StringConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.semanticweb.owlapi.apibinding.OWLManager;
@@ -509,23 +508,18 @@ public class PaintFrame extends Canvas {
 	}
 
 	public void handleMouseEntered(MouseEvent e) {
-		if (visGraph == null) {
-			return;
-		}
+		if (visGraph == null) return;
 		setCursor(Cursor.DEFAULT);
 	}
 
 	public void handleMouseExited(MouseEvent e) {
-		if (visGraph == null) {
-			return;
-		}
+		if (visGraph == null) return;
 		setCursor(Cursor.DEFAULT);
 	}
 
 	private void handleMousePressed(MouseEvent e) {
-		if (visGraph == null) {
-			return;
-		}
+		if (visGraph == null) return;
+
 		Point2D p = translatePoint(new Point2D(e.getX(), e.getY()));
 		if (isInsidePropertyBox((int) p.getX(), (int) p.getY())) {
 			pressedShape = null;
@@ -547,9 +541,7 @@ public class PaintFrame extends Canvas {
 	}
 
 	public void handleMouseReleased(MouseEvent e) {
-		if (visGraph == null) {
-			return;
-		}
+		if (visGraph == null) return;
 
         selectedShapes.remove(pressedShape);
         pinchPoint = null;
@@ -559,17 +551,16 @@ public class PaintFrame extends Canvas {
 		mouseLastX = 0;
 		setCursor(Cursor.DEFAULT);
 
-        Platform.runLater(canvasAdjusterRunnable);
         Platform.runLater(relaxerRunnable);
+        Platform.runLater(canvasAdjusterRunnable);
 	}
 
 	/*
 	 * MOUSE MOTION LISTENER
 	 */
 	public void handleMouseDragged(MouseEvent e) {
-		if (visGraph == null) {
-			return;
-		}
+		if (visGraph == null) return;
+
 		isDragging = true;
 
 		int draggedY;
@@ -605,9 +596,8 @@ public class PaintFrame extends Canvas {
 	}
 
 	public void handleMouseMoved(MouseEvent e) {
-		if (visGraph == null) {
-			return;
-		}
+		if (visGraph == null) return;
+
 		Point2D p = translatePoint(new Point2D(e.getX(), e.getY()));
 		int x = (int) p.getX();
 		int y = (int) p.getY();
@@ -635,9 +625,8 @@ public class PaintFrame extends Canvas {
 	}
 
 	public void handleMouseClicked(MouseEvent e) {
-		if (visGraph == null) {
-			return;
-		}
+		if (visGraph == null) return;
+
 		if (isDragging) {
 			e.consume();
 			isDragging = false;
@@ -725,7 +714,7 @@ public class PaintFrame extends Canvas {
 	 * Method to check if it needs to expand the canvas size
 	 */
     public void checkAndResizeCanvas() {
-        if (visGraph == null) { return; }
+        if (visGraph == null) return;
 
         double maxY = Double.MIN_VALUE;
         double minY = Double.MAX_VALUE;
@@ -798,9 +787,8 @@ public class PaintFrame extends Canvas {
 	}
 
 	private boolean isInsidePropertyBox(int x, int y) {
-		if (visGraph == null) {
-			return false;
-		}
+		if (visGraph == null) return false;
+
 		for (Entry<String, Shape> entry : visGraph.shapeMap.entrySet()) {
 			Shape shape = entry.getValue();
 			if ((shape instanceof VisClass) && (shape.asVisClass().propertyBox != null)) {
@@ -818,9 +806,8 @@ public class PaintFrame extends Canvas {
 	}
 
 	private boolean clickedOnShape(int x, int y, MouseEvent e, Shape shape) {
-		if (visGraph == null) {
-			return false;
-		}
+		if (visGraph == null) return false;
+
 		if (shape != null) {
 			if (e.getClickCount() == 2 && !e.isConsumed() && e.getButton() == MouseButton.PRIMARY) {
 				// double click
@@ -939,9 +926,7 @@ public class PaintFrame extends Canvas {
 	}
 
 	private boolean clickedOnClosePropertyBox(int x, int y, Shape shape) {
-		if (visGraph == null || shape == null) {
-			return false;
-		}
+		if (visGraph == null || shape == null) return false;
 
 		if(shape.asVisClass().propertyBox != null){
 			if (shape.asVisClass().onCloseBox(x, y)) {
@@ -985,9 +970,8 @@ public class PaintFrame extends Canvas {
 	}
 
 	private boolean clickedOnCloseDisjointBox(int x, int y) {
-		if (visGraph == null) {
-			return false;
-		}
+		if (visGraph == null) return false;
+
 		for (Entry<String, Shape> entry : visGraph.shapeMap.entrySet()) {
 			Shape shape = entry.getValue();
 			if (shape instanceof VisClass visClass) {
@@ -1184,9 +1168,7 @@ public class PaintFrame extends Canvas {
 	 */
     int limit;
 	public void doKceOptionAction() {
-		if (getVisGraph() == null || getVisGraph().shapeMap.isEmpty()) {
-			return;
-		}
+		if (getVisGraph() == null || getVisGraph().shapeMap.isEmpty()) return;
 
 		if (Objects.equals(getKceOption(), VisConstants.NONECOMBOOPTION)) {
 			getVisGraph().clearDashedConnectorList();

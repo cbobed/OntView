@@ -20,6 +20,7 @@ public class CustomKCEModal {
     CustomConceptExtraction customConceptExtraction;
     private GraphViewSettings settings;
     private ObservableList<Shape> tempSelectedConceptsList = FXCollections.observableArrayList();
+    private ObservableList<Shape> deletedConcepts = FXCollections.observableArrayList();
 
     public CustomKCEModal(Map<String, Shape> shapeMap, CustomConceptExtraction customCE) {
         this.shapeMap = shapeMap;
@@ -37,6 +38,8 @@ public class CustomKCEModal {
         List<Shape> unique = shapeMap.values().stream().distinct().toList();
         ObservableList<Shape> allConcepts = FXCollections.observableArrayList(unique);
         ObservableList<Shape> selectedConceptsList = FXCollections.observableArrayList(customConceptExtraction.getSelectedConcepts());
+
+        deletedConcepts = FXCollections.observableArrayList();
 
         ListView<Shape> allConceptsView = createConceptListView(allConcepts);
         ListView<Shape> selectedConceptsView = createConceptListView(selectedConceptsList);
@@ -74,6 +77,9 @@ public class CustomKCEModal {
         popupStage.setOnCloseRequest(e -> {
             if (settings.getLastMode() == ViewMode.CUSTOM) {
                 settings.setLastMode(ViewMode.CANCELLED_CUSTOM);
+
+                selectedConceptsList.addAll(deletedConcepts);
+
                 Set<Shape> nonHiddenShapes = selectedConceptsList.stream()
                     .filter(Shape::isVisible)
                     .collect(Collectors.toSet());
@@ -113,6 +119,7 @@ public class CustomKCEModal {
                 Shape selected = selectedConceptsView.getSelectionModel().getSelectedItem();
                 if (selected != null) {
                     selectedConceptsList.remove(selected);
+                    deletedConcepts.add(selected);
                 }
             }
         });
@@ -174,6 +181,7 @@ public class CustomKCEModal {
             Shape selected = selectedConceptsView.getSelectionModel().getSelectedItem();
             if (selected != null) {
                 selectedConceptsList.remove(selected);
+                deletedConcepts.add(selected);
             }
         });
         return removeButton;
@@ -181,7 +189,10 @@ public class CustomKCEModal {
 
     private Button createResetButton(ObservableList<Shape> selectedConceptsList) {
         Button resetButton = new Button("Reset");
-        resetButton.setOnAction(e -> selectedConceptsList.clear());
+        resetButton.setOnAction(e -> {
+            deletedConcepts.addAll(selectedConceptsList);
+            selectedConceptsList.clear();
+        });
         return resetButton;
     }
 
