@@ -29,8 +29,13 @@ import sid.OntView2.utils.CustomIntegerSpinner;
 import sid.OntView2.utils.ErrorHandler;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 //VS4E -- DO NOT REMOVE THIS LINE!
 public class TopPanel extends Canvas implements ControlPanelInterface {
@@ -897,8 +902,6 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 		if(toggleSwitch != null)
             parent.artPanel.setShowConnectors(true);
 
-         //toggleSwitch.setSelected();
-
 		if ((x != null) && (!x.isEmpty())) {
 			try {
 				boolean loaded = parent.loadReasoner(x);
@@ -906,32 +909,16 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
                     logger.error("Reasoner could not be loaded.");
 					return;
 				}
-				createButtonActionActionPerformed(event);
-                ArrayList<String> recent = new ArrayList<>();
-				String selected = (String) getOntologyCombo().getValue();
-				recent.add(selected);
+                createButtonActionActionPerformed(event);
 
-				for (Object item : getOntologyCombo().getItems()) {
-					recent.add(item.toString());
-				}
+                // Needed to solve concurrency issue
+                PauseTransition pause = new PauseTransition(Duration.millis(100));
+                pause.setOnFinished(e -> Platform.runLater(() -> applyCheckBoxFunctions(event)));
+                pause.play();
 
-				FileOutputStream fOut = new FileOutputStream("recent.txt");
-				PrintStream pStream = new PrintStream(fOut);
-				pStream.println(selected);
-				for (String str : recent) {
-					if (!str.equals(selected)) {
-						pStream.println(str);
-					}
-				}
-				pStream.flush();
-				pStream.close();
+                addToRecentFile((String) getOntologyCombo().getValue());
 
-				// Needed to solve concurrency issue
-				PauseTransition pause = new PauseTransition(Duration.millis(100));
-				pause.setOnFinished(e -> Platform.runLater(() -> applyCheckBoxFunctions(event)));
-				pause.play();
-
-			} catch (Exception e) {
+            } catch (Exception e) {
 				e.printStackTrace();
 				parent.artPanel.showAlertDialog("Error", "Reasoner could not be loaded.",
                     ErrorHandler.getLoadAndReasonError(e), Alert.AlertType.ERROR);
@@ -939,6 +926,22 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 			}
 		}
 	}
+
+    private void addToRecentFile(String selected) throws IOException {
+        Path path = Paths.get("recent.txt");
+
+        List<String> existing = Files.exists(path) ? Files.readAllLines(path) : Collections.emptyList();
+
+        List<String> history = existing.stream()
+            .filter(line -> !line.isBlank() && !line.equals(selected))
+            .collect(Collectors.toList());
+
+        history.add(0, selected);
+
+        Files.write(path, history, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+
+        loadRecent();
+    }
 
 	private void cleanConnectorActionPerformed(ActionEvent event) {
 		parent.artPanel.cleanConnectors();
