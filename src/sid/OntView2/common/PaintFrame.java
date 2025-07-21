@@ -547,9 +547,7 @@ public class PaintFrame extends Canvas {
 	}
 
 	public void handleMouseReleased(MouseEvent e) {
-		if (visGraph == null) {
-			return;
-		}
+		if (visGraph == null) return;
 
         selectedShapes.remove(pressedShape);
         pinchPoint = null;
@@ -559,17 +557,16 @@ public class PaintFrame extends Canvas {
 		mouseLastX = 0;
 		setCursor(Cursor.DEFAULT);
 
-        Platform.runLater(canvasAdjusterRunnable);
         Platform.runLater(relaxerRunnable);
+        Platform.runLater(canvasAdjusterRunnable);
 	}
 
 	/*
 	 * MOUSE MOTION LISTENER
 	 */
 	public void handleMouseDragged(MouseEvent e) {
-		if (visGraph == null) {
-			return;
-		}
+		if (visGraph == null) return;
+
 		isDragging = true;
 
 		int draggedY;
