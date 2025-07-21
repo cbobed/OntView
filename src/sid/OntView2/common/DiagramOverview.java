@@ -61,20 +61,12 @@ public class DiagramOverview extends Canvas{
 
         overviewStage.widthProperty().addListener((obs, oldW, newW) -> relocateStage());
         overviewStage.heightProperty().addListener((obs, oldH, newH) -> relocateStage());
-
-        if (paintframe.scroll != null) {
-            paintframe.scroll.hvalueProperty().addListener((o, a, b) -> drawOverview());
-            paintframe.scroll.vvalueProperty().addListener((o, a, b) -> drawOverview());
-        }
-
         overviewStage.setOnCloseRequest(e -> closeDiagramOverview());
     }
 
     public void drawOverview() {
-        if (overviewStage == null || !overviewStage.isShowing() || paintframe.scroll == null) {
-            return;
-        }
-
+        if (overviewStage == null || !overviewStage.isShowing() || paintframe.scroll == null) return;
+        
         updateOverviewSize();
 
         GraphicsContext gc = getGraphicsContext2D();
