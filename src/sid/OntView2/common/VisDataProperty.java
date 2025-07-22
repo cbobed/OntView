@@ -52,11 +52,6 @@ public class VisDataProperty extends VisProperty {
         }
         if (explicitLabel.isEmpty()) explicitLabel.add(label);
 
-        System.out.println(pBox.vClass.getLabel() + " ::::: " + label);
-        for (String explicit : explicitLabel) {
-            System.out.println("  +++ " + explicit);
-        }
-
 		if (qualifiedLabel == null || "null".equalsIgnoreCase(qualifiedLabel)) {
 			qualifiedLabel = label; 
 		}
