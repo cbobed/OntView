@@ -501,7 +501,7 @@ public class VisGraph implements Runnable{
 		}
 		for (Entry<String, VisDataProperty> dProp: dPropertyMap.entrySet()) {
 			VisDataProperty v = dProp.getValue();
-			v.swapLabel(qualifiedRendering);
+			v.swapLabel(labelRendering, qualifiedRendering, language);
 		}
 
     	VisLevel.adjustWidthAndPos(levelSet);

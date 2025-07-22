@@ -12,8 +12,9 @@ import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.search.EntitySearcher;
 import sid.OntView2.utils.ExpressionManager;
 
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.*;
+
+import static sid.OntView2.utils.ExpressionManager.replaceString;
 
 public class VisDataProperty extends VisProperty {
 
@@ -23,7 +24,8 @@ public class VisDataProperty extends VisProperty {
 	OWLDataPropertyExpression dPropExp;
 	String label;
 	String qualifiedLabel;
-	String visibleLabel;
+    Set<String> explicitLabel = new HashSet<>();
+    String visibleLabel;
 	String range;
 	VisConnectorPropProp parent;
 	ArrayList<Point2D> connectionPoints;
@@ -40,7 +42,21 @@ public class VisDataProperty extends VisProperty {
 		pBox = ppbox;
 		label = ExpressionManager.getReducedDataPropertyExpression(dExp);
 		qualifiedLabel = ExpressionManager.getReducedQualifiedDataPropertyExpression(dExp);
-		
+
+        OWLDataProperty namedProp = dExp.asOWLDataProperty();
+        List<OWLAnnotation> annotations = EntitySearcher.getAnnotations(namedProp, ontology).toList();
+        for (OWLAnnotation ann : annotations) {
+            if (ann.getProperty().isLabel()) {
+                explicitLabel.add(replaceString(ann.getValue().toString()));
+            }
+        }
+        if (explicitLabel.isEmpty()) explicitLabel.add(label);
+
+        System.out.println(pBox.vClass.getLabel() + " ::::: " + label);
+        for (String explicit : explicitLabel) {
+            System.out.println("  +++ " + explicit);
+        }
+
 		if (qualifiedLabel == null || "null".equalsIgnoreCase(qualifiedLabel)) {
 			qualifiedLabel = label; 
 		}
@@ -109,7 +125,7 @@ public class VisDataProperty extends VisProperty {
 				g.fillText(label, getPosX(), getPosY());
 			}	
 			else {
-				g.fillText(label+ " : " + range, getPosX(), getPosY());
+				g.fillText(visibleLabel+ " : " + range, getPosX(), getPosY());
 			}
 			Point2D circlePos = new Point2D(getPosX()-16, getPosY()-10);
 			if (isFunctional){
@@ -157,17 +173,24 @@ public class VisDataProperty extends VisProperty {
 		return description.toString();
 	}
 	
-	public void swapLabel(Boolean qualifiedRendering){
+	public void swapLabel(Boolean labelRendering, Boolean qualifiedRendering, String language){
 		// this is needed for the getTooltipInfo method of the different 
 		// elements: as this info is refreshed at a different pace from the 
 		// global view refreshment, these methods have to be aware of the type of 
 		// rendering that is being used (labelled, qualified). 
 		this.qualifiedRendering = qualifiedRendering;
-		
-		if (qualifiedRendering) 
-			visibleLabel = qualifiedLabel; 
-		else 
-			visibleLabel = label;
+
+        if (qualifiedRendering) {
+            visibleLabel = qualifiedLabel;
+        } else if (labelRendering) {
+            Optional<String> candidate = explicitLabel.stream()
+                .filter(s -> s.contains("@" + language))
+                .findFirst();
+            candidate.ifPresent(s -> visibleLabel = s);
+        }
+        else {
+            visibleLabel = label;
+        }
 	}
 	
 	// <CBL 25/9/13> 
