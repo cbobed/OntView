@@ -14,8 +14,10 @@ import sid.OntView2.utils.ExpressionManager;
 import javafx.scene.text.Font;
 import javafx.scene.paint.Color;
 
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static sid.OntView2.utils.ExpressionManager.replaceString;
 
 public class VisObjectProperty extends VisProperty {
 
@@ -25,6 +27,7 @@ public class VisObjectProperty extends VisProperty {
 	OWLObjectPropertyExpression oPropExp;
 	String label;
 	String qualifiedLabel;
+    Set<String> explicitLabel = new HashSet<>();
 	String visibleLabel;
 	Shape range;
 	boolean visible = true;
@@ -123,6 +126,21 @@ public class VisObjectProperty extends VisProperty {
 		parents  = new ArrayList<>();
 		label    = ExpressionManager.getReducedObjectPropertyExpression (po);
 		visibleLabel = label;
+
+        OWLObjectProperty namedProp = po.getNamedProperty();
+        List<OWLAnnotation> annotations = EntitySearcher.getAnnotations(namedProp, ontology).toList();
+
+        for (OWLAnnotation ann : annotations) {
+            if (ann.getProperty().isLabel()) {
+                explicitLabel.add(replaceString(ann.getValue().toString()));
+            }
+        }
+        if (explicitLabel.isEmpty()) explicitLabel.add(label);
+
+        System.out.println(pBox.vClass.getLabel() + " ::::: " + label);
+        for (String explicit : explicitLabel) {
+            System.out.println("  --- " + explicit);
+        }
 
 		qualifiedLabel = ExpressionManager.getReducedQualifiedObjectPropertyExpression(po);
 		if (qualifiedLabel == null || "null".equalsIgnoreCase(qualifiedLabel)) {
@@ -347,17 +365,23 @@ public class VisObjectProperty extends VisProperty {
 		return false;
 	}
 	
-	public void swapLabel(Boolean qualifiedRendering){
+	public void swapLabel(Boolean labelRendering, Boolean qualifiedRendering, String language) {
 		// this is needed for the getTooltipInfo method of the different 
 		// elements: as this info is refreshed at a different pace from the 
 		// global view refreshment, these methods have to be aware of the type of 
 		// rendering that is being used (labelled, qualified). 
 		this.qualifiedRendering = qualifiedRendering;
-		if (qualifiedRendering) 
-			visibleLabel = qualifiedLabel; 
-		else 
-			visibleLabel = label; 
-		
+		if (qualifiedRendering) {
+            visibleLabel = qualifiedLabel;
+        } else if (labelRendering) {
+            Optional<String> candidate = explicitLabel.stream()
+                .filter(s -> s.contains("@" + language))
+                .findFirst();
+            candidate.ifPresent(s -> visibleLabel = s);
+        }
+		else {
+            visibleLabel = label;
+        }
 	}
 }
 	

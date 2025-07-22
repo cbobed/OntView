@@ -304,7 +304,7 @@ public class VisGraph implements Runnable{
         String auxQLabel;
         if (ce instanceof OWLClass){
             for (OWLAnnotation  an : EntitySearcher.getAnnotations(ce.asOWLClass(), activeOntology).toList() ){
-                if (an.getProperty().toString().equals("rdfs:label")){
+                if (an.getProperty().isLabel()){
                     String auxLabel = replaceString(an.getValue().toString().replaceAll("\"", ""));
                     shape.asVisClass().explicitLabel.add(auxLabel);
                     auxQLabel = qualifyLabel(ce.asOWLClass(), auxLabel);
@@ -497,7 +497,7 @@ public class VisGraph implements Runnable{
 		// we also change the visible label for both object and datatype properties
 		for (Entry<String, VisObjectProperty> oProp: propertyMap.entrySet()) {
 			VisObjectProperty p = oProp.getValue();
-			p.swapLabel(qualifiedRendering);
+			p.swapLabel(labelRendering, qualifiedRendering, language);
 		}
 		for (Entry<String, VisDataProperty> dProp: dPropertyMap.entrySet()) {
 			VisDataProperty v = dProp.getValue();
