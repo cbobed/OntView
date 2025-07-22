@@ -928,6 +928,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	}
 
     private void addToRecentFile(String selected) throws IOException {
+        int MAX_HISTORY = 15;
         Path path = Paths.get("recent.txt");
 
         List<String> existing = Files.exists(path) ? Files.readAllLines(path) : Collections.emptyList();
@@ -937,6 +938,8 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
             .collect(Collectors.toList());
 
         history.add(0, selected);
+
+        if (history.size() > MAX_HISTORY) history = history.subList(0, MAX_HISTORY);
 
         Files.write(path, history, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 
