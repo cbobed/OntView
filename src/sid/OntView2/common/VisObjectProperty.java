@@ -128,15 +128,13 @@ public class VisObjectProperty extends VisProperty {
 		label    = ExpressionManager.getReducedObjectPropertyExpression (po);
 		visibleLabel = label;
 
-        String auxQLabel;
-
         OWLObjectProperty namedProp = po.getNamedProperty();
         List<OWLAnnotation> annotations = EntitySearcher.getAnnotations(namedProp, ontology).toList();
         for (OWLAnnotation ann : annotations) {
             if (ann.getProperty().isLabel()) {
                 String auxLabel = replaceString(ann.getValue().toString());
                 explicitLabel.add(auxLabel);
-                auxQLabel = qualifyLabel(namedProp, auxLabel);
+                String auxQLabel = qualifyLabel(namedProp, auxLabel);
                 explicitQualifiedLabel.add(!"null".equalsIgnoreCase(auxQLabel) ? auxQLabel : auxLabel);
             }
         }

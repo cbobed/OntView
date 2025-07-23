@@ -14,6 +14,7 @@ import sid.OntView2.utils.ExpressionManager;
 
 import java.util.*;
 
+import static sid.OntView2.utils.ExpressionManager.qualifyLabel;
 import static sid.OntView2.utils.ExpressionManager.replaceString;
 
 public class VisDataProperty extends VisProperty {
@@ -25,6 +26,7 @@ public class VisDataProperty extends VisProperty {
 	String label;
 	String qualifiedLabel;
     Set<String> explicitLabel = new HashSet<>();
+    Set<String> explicitQualifiedLabel = new HashSet<>();
     String visibleLabel;
 	String range;
 	VisConnectorPropProp parent;
@@ -34,7 +36,7 @@ public class VisDataProperty extends VisProperty {
 	Font textFont;
 	Font circleFont;
 	boolean isFunctional  =  false;
-	boolean qualifiedRendering = false;
+	boolean qualifiedRendering = false, labelRendering = false, isKorean = false;
 	public int getPosX(){return getDomain().getLeftCorner() + 2;}
 	public int getPosY(){return 15 + getDomain().getBottomShapeCorner() + getLabelHeight() * vOffset;}
 
@@ -47,7 +49,10 @@ public class VisDataProperty extends VisProperty {
         List<OWLAnnotation> annotations = EntitySearcher.getAnnotations(namedProp, ontology).toList();
         for (OWLAnnotation ann : annotations) {
             if (ann.getProperty().isLabel()) {
-                explicitLabel.add(replaceString(ann.getValue().toString()));
+                String auxLabel = replaceString(ann.getValue().toString());
+                explicitLabel.add(auxLabel);
+                String auxQLabel = qualifyLabel(namedProp, auxLabel);
+                explicitQualifiedLabel.add(!"null".equalsIgnoreCase(auxQLabel) ? auxQLabel : auxLabel);
             }
         }
         if (explicitLabel.isEmpty()) explicitLabel.add(label);
@@ -167,26 +172,38 @@ public class VisDataProperty extends VisProperty {
 		}
 		return description.toString();
 	}
-	
-	public void swapLabel(Boolean labelRendering, Boolean qualifiedRendering, String language){
-		// this is needed for the getTooltipInfo method of the different 
-		// elements: as this info is refreshed at a different pace from the 
-		// global view refreshment, these methods have to be aware of the type of 
-		// rendering that is being used (labelled, qualified). 
-		this.qualifiedRendering = qualifiedRendering;
 
-        if (qualifiedRendering) {
-            visibleLabel = qualifiedLabel;
-        } else if (labelRendering) {
-            Optional<String> candidate = explicitLabel.stream()
-                .filter(s -> s.contains("@" + language))
-                .findFirst();
-            candidate.ifPresent(s -> visibleLabel = s);
+    public void swapLabel(Boolean labelRendering, Boolean qualifiedRendering, String language) {
+        // this is needed for the getTooltipInfo method of the different
+        // elements: as this info is refreshed at a different pace from the
+        // global view refreshment, these methods have to be aware of the type of
+        // rendering that is being used (labelled, qualified).
+        this.qualifiedRendering = qualifiedRendering;
+        this.labelRendering = labelRendering;
+        this.isKorean = language.equals("ko");
+
+        if (labelRendering){
+            if (qualifiedRendering) {
+                Optional<String> candidate = explicitQualifiedLabel.stream()
+                    .filter(s -> s.contains("@" + language))
+                    .findFirst();
+                candidate.ifPresent(s -> visibleLabel = s);
+            }
+            else {
+                Optional<String> candidate = explicitLabel.stream()
+                    .filter(s -> s.contains("@" + language))
+                    .findFirst();
+                candidate.ifPresent(s -> visibleLabel = s);
+            }
         }
         else {
-            visibleLabel = label;
+            if (qualifiedRendering) {
+                visibleLabel = qualifiedLabel;
+            } else {
+                visibleLabel = label;
+            }
         }
-	}
+    }
 	
 	// <CBL 25/9/13> 
 	// method added to handle the dataProperties in the same way as ObjectProperties
