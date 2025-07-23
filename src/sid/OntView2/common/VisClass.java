@@ -62,9 +62,9 @@ public class VisClass extends Shape {
     // we have the four variants: normal, qualified, labels and qualified labels
     ArrayList<String> visibleDefinitionLabels;
     ArrayList<String> definitionLabels;
-    Map<OWLClassExpression, List<String>> explicitDefinitionLabels;
+    Map<OWLClassExpression, Set<String>> explicitDefinitionLabels;
     ArrayList<String> qualifiedDefinitionLabels;
-    Map<OWLClassExpression, List<String>> explicitQualifiedDefinitionLabels;
+    Map<OWLClassExpression, Set<String>> explicitQualifiedDefinitionLabels;
 	// </CBL>
     
     String visibleLabel;
@@ -73,7 +73,7 @@ public class VisClass extends Shape {
 	boolean labelRendering = false;
 	public int topToBarDistance = 0;
 	int tabSize = 15;
-    private int lineSpacing = 6;
+    private final int lineSpacing = 6;
 
     Color mini = Color.rgb(224, 224, 224);
     Color lightgray = Color.rgb(234, 234, 234);
@@ -467,7 +467,7 @@ public class VisClass extends Shape {
                 ArrayList<String> aux = new ArrayList<>();
                 for (OWLClassExpression eqDef : getEquivalentClasses()) {
                     if (eqDef instanceof OWLClass) {
-                        List<String> labels = explicitQualifiedDefinitionLabels.getOrDefault(eqDef, Collections.emptyList());
+                        Set<String> labels = explicitQualifiedDefinitionLabels.getOrDefault(eqDef, new HashSet<>());
                         List<String> matches = labels.stream().filter(s -> s.contains("@" + language)).toList();
 
                         if (!matches.isEmpty()) {
@@ -485,7 +485,7 @@ public class VisClass extends Shape {
 
                 ArrayList<String> aux = new ArrayList<>();
                 for (OWLClassExpression eqDef : getEquivalentClasses()) {
-                    List<String> labels = explicitDefinitionLabels.getOrDefault(eqDef, Collections.emptyList());
+                    Set<String> labels = explicitDefinitionLabels.getOrDefault(eqDef, new HashSet<>());
                     List<String> matches = labels.stream().filter(s -> s.contains("@" + language)).toList();
 
                     if (!matches.isEmpty()) {
@@ -634,22 +634,11 @@ public class VisClass extends Shape {
     }
 
     private void saveLabelsQualifiedNamesEquivalentClasses(OWLClassExpression def) {
-        List<String> labelsForDef = new ArrayList<>();
-        List<String> qualifiedLabelsForDef = new ArrayList<>();
-        if (def instanceof OWLClass) {
-            for (OWLAnnotation  an : EntitySearcher.getAnnotations(def.asOWLClass(), graph.getActiveOntology()).toList() ){
-                if (an.getProperty().toString().equals("rdfs:label")){
-                    String auxLabel = replaceString(an.getValue().toString().replaceAll("\"", ""));
-                    labelsForDef.add(auxLabel);
-                    String auxQLabel = qualifyLabel(def.asOWLClass().getIRI().toString(), auxLabel);
-                    qualifiedLabelsForDef.add(auxQLabel != null ? auxQLabel : auxLabel);
+        Set<String> labelsForDef = new HashSet<>();
+        Set<String> qualifiedLabelsForDef = new HashSet<>();
 
-                    if (auxLabel.contains("@")) {
-                        graph.paintframe.languagesLabels.add(auxLabel.split("@")[1]);
-                    }
-                }
-            }
-        }
+        graph.collectLabelsQualifiedNames(def, labelsForDef, qualifiedLabelsForDef);
+
         explicitDefinitionLabels.put(def, labelsForDef);
         explicitQualifiedDefinitionLabels.put(def, qualifiedLabelsForDef);
 
@@ -657,11 +646,7 @@ public class VisClass extends Shape {
         String label = ExpressionManager.getReducedClassExpression(def);
         definitionLabels.add(label);
         String auxQLabel = ExpressionManager.getReducedQualifiedClassExpression(def);
-        if (!"null".equalsIgnoreCase(auxQLabel))
-            qualifiedDefinitionLabels.add(auxQLabel);
-        else
-            qualifiedDefinitionLabels.add(label);
-
+        qualifiedDefinitionLabels.add(!"null".equalsIgnoreCase(auxQLabel) ? auxQLabel : label);
         visibleDefinitionLabels = definitionLabels;
     }
 

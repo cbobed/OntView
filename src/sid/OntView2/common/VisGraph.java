@@ -301,14 +301,23 @@ public class VisGraph implements Runnable{
         vis.explicitLabel.clear();
         vis.explicitQualifiedLabel.clear();
 
+        collectLabelsQualifiedNames(ce, vis.explicitLabel, vis.explicitQualifiedLabel);
+
+        vis.label = ExpressionManager.getReducedClassExpression(ce);
+        vis.visibleLabel = vis.label;
+        String auxQLabel = ExpressionManager.getReducedQualifiedClassExpression(ce);
+        vis.qualifiedLabel = !"null".equalsIgnoreCase(auxQLabel) ? auxQLabel : vis.label;
+    }
+
+    public void collectLabelsQualifiedNames(OWLClassExpression ce, Set<String> outLabels, Set<String> outQualifiedLabels){
         String auxQLabel;
         if (ce instanceof OWLClass){
             for (OWLAnnotation  an : EntitySearcher.getAnnotations(ce.asOWLClass(), activeOntology).toList() ){
                 if (an.getProperty().isLabel()){
                     String auxLabel = replaceString(an.getValue().toString().replaceAll("\"", ""));
-                    vis.explicitLabel.add(auxLabel);
+                    outLabels.add(auxLabel);
                     auxQLabel = qualifyLabel(ce.asOWLClass().getIRI().toString(), auxLabel);
-                    vis.explicitQualifiedLabel.add(!"null".equalsIgnoreCase(auxQLabel) ? auxQLabel : auxLabel);
+                    outQualifiedLabels.add(!"null".equalsIgnoreCase(auxQLabel) ? auxQLabel : auxLabel);
                     OWLLiteral lit = (OWLLiteral) an.getValue();
                     if (!lit.getLang().isEmpty()) {
                         paintframe.languagesLabels.add(lit.getLang());
@@ -316,11 +325,6 @@ public class VisGraph implements Runnable{
                 }
             }
         }
-
-        vis.label = ExpressionManager.getReducedClassExpression(ce);
-        vis.visibleLabel = vis.label;
-        auxQLabel = ExpressionManager.getReducedQualifiedClassExpression(ce);
-        vis.qualifiedLabel = !"null".equalsIgnoreCase(auxQLabel) ? auxQLabel : vis.label;
     }
 
 	private void insertClassExpressions (OWLOntology activeOntology, OWLReasoner reasoner,
