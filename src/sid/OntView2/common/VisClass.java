@@ -473,7 +473,7 @@ public class VisClass extends Shape {
                         if (!matches.isEmpty()) {
                             aux.addAll(matches);
                         } else {
-                            aux.add(qualifyLabel(eqDef.asOWLClass(), ExpressionManager.getReducedClassExpression(eqDef)));
+                            aux.add(qualifyLabel(eqDef.asOWLClass().getIRI().toString(), ExpressionManager.getReducedClassExpression(eqDef)));
                         }
                     } else {
                         aux.add(ExpressionManager.getReducedClassExpression(eqDef));
@@ -641,7 +641,7 @@ public class VisClass extends Shape {
                 if (an.getProperty().toString().equals("rdfs:label")){
                     String auxLabel = replaceString(an.getValue().toString().replaceAll("\"", ""));
                     labelsForDef.add(auxLabel);
-                    String auxQLabel = qualifyLabel(def.asOWLClass(), auxLabel);
+                    String auxQLabel = qualifyLabel(def.asOWLClass().getIRI().toString(), auxLabel);
                     qualifiedLabelsForDef.add(auxQLabel != null ? auxQLabel : auxLabel);
 
                     if (auxLabel.contains("@")) {

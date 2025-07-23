@@ -307,7 +307,7 @@ public class VisGraph implements Runnable{
                 if (an.getProperty().isLabel()){
                     String auxLabel = replaceString(an.getValue().toString().replaceAll("\"", ""));
                     shape.asVisClass().explicitLabel.add(auxLabel);
-                    auxQLabel = qualifyLabel(ce.asOWLClass(), auxLabel);
+                    auxQLabel = qualifyLabel(ce.asOWLClass().getIRI().toString(), auxLabel);
                     if (!"null".equalsIgnoreCase(auxQLabel)) {
                         shape.asVisClass().explicitQualifiedLabel.add(auxQLabel);
                     }
@@ -829,7 +829,7 @@ public class VisGraph implements Runnable{
                 if (an.getProperty().isLabel()){
                     String auxLabel = replaceString(an.getValue().toString().replaceAll("\"", ""));
                     vis.explicitLabel.add(auxLabel);
-                    auxQLabel = qualifyLabel(ce.asOWLClass(), auxLabel);
+                    auxQLabel = qualifyLabel(ce.asOWLClass().getIRI().toString(), auxLabel);
                     vis.explicitQualifiedLabel.add(!"null".equalsIgnoreCase(auxQLabel) ? auxQLabel : auxLabel);
 
                     if (auxLabel.contains("@")) {

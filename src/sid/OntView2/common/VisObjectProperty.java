@@ -134,7 +134,7 @@ public class VisObjectProperty extends VisProperty {
             if (ann.getProperty().isLabel()) {
                 String auxLabel = replaceString(ann.getValue().toString());
                 explicitLabel.add(auxLabel);
-                String auxQLabel = qualifyLabel(namedProp, auxLabel);
+                String auxQLabel = qualifyLabel(namedProp.getNamedProperty().getIRI().toString(), auxLabel);
                 explicitQualifiedLabel.add(!"null".equalsIgnoreCase(auxQLabel) ? auxQLabel : auxLabel);
             }
         }
