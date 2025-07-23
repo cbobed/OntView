@@ -784,12 +784,14 @@ public class VisClass extends Shape {
             if (!isAnonymous) {
                 if (!label.startsWith(SIDClassExpressionNamer.className) ) {
                     textNode.setText(visibleLabel);
-                    max = (int) textNode.getLayoutBounds().getWidth() + 25 ;
+                    max = (int) textNode.getLayoutBounds().getWidth() + 25;
                 }
                 //<CBL> for the defined, max might not be the desired value
                 if (isDefined || !asVisClass().getEquivalentClasses().isEmpty()) {
                     // we have to do the same as for the anonymous ones
                     // for each of the definitions
+                    if (!getDisjointConnectors().isEmpty()) max += 10;
+
                     for (String auxLabel: getVisibleDefinitionLabels()) {
                         sTokenizer = new StringTokenizer(auxLabel, "\n");
                         while (sTokenizer.hasMoreElements()) {
