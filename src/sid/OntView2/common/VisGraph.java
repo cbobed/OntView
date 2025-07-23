@@ -268,7 +268,7 @@ public class VisGraph implements Runnable{
 
                 if (primary != ce) {
                     shape.asVisClass().setLinkedClassExpression(primary);
-                    changeLabels(primary, shape);
+                    labelsAndQualifiedNames(primary, shape.asVisClass());
                     shape.asVisClass().addEquivalentExpression(ce);
                     shape.asVisClass().removeEquivalentExpression(primary);
                 }
@@ -297,31 +297,30 @@ public class VisGraph implements Runnable{
         }
     }
 
-    public void changeLabels(OWLClassExpression ce, Shape shape) {
-        shape.asVisClass().explicitLabel.clear();
-        shape.asVisClass().explicitQualifiedLabel.clear();
+    public void labelsAndQualifiedNames(OWLClassExpression ce, VisClass vis) {
+        vis.explicitLabel.clear();
+        vis.explicitQualifiedLabel.clear();
 
         String auxQLabel;
         if (ce instanceof OWLClass){
             for (OWLAnnotation  an : EntitySearcher.getAnnotations(ce.asOWLClass(), activeOntology).toList() ){
                 if (an.getProperty().isLabel()){
                     String auxLabel = replaceString(an.getValue().toString().replaceAll("\"", ""));
-                    shape.asVisClass().explicitLabel.add(auxLabel);
+                    vis.explicitLabel.add(auxLabel);
                     auxQLabel = qualifyLabel(ce.asOWLClass().getIRI().toString(), auxLabel);
-                    if (!"null".equalsIgnoreCase(auxQLabel)) {
-                        shape.asVisClass().explicitQualifiedLabel.add(auxQLabel);
-                    }
-                    else {
-                        shape.asVisClass().explicitQualifiedLabel.add(auxLabel);
+                    vis.explicitQualifiedLabel.add(!"null".equalsIgnoreCase(auxQLabel) ? auxQLabel : auxLabel);
+                    OWLLiteral lit = (OWLLiteral) an.getValue();
+                    if (!lit.getLang().isEmpty()) {
+                        paintframe.languagesLabels.add(lit.getLang());
                     }
                 }
             }
         }
 
-        shape.asVisClass().label = ExpressionManager.getReducedClassExpression(ce);
-        shape.asVisClass().visibleLabel = shape.asVisClass().label;
+        vis.label = ExpressionManager.getReducedClassExpression(ce);
+        vis.visibleLabel = vis.label;
         auxQLabel = ExpressionManager.getReducedQualifiedClassExpression(ce);
-        shape.asVisClass().qualifiedLabel = !"null".equalsIgnoreCase(auxQLabel) ? auxQLabel : shape.asVisClass().label;
+        vis.qualifiedLabel = !"null".equalsIgnoreCase(auxQLabel) ? auxQLabel : vis.label;
     }
 
 	private void insertClassExpressions (OWLOntology activeOntology, OWLReasoner reasoner,
@@ -824,25 +823,7 @@ public class VisGraph implements Runnable{
         vis = new VisClass(0, ce, label, this);
         shapeMap.put(label, vis);
 
-        if (ce instanceof OWLClass){
-            for (OWLAnnotation  an : EntitySearcher.getAnnotations(ce.asOWLClass(), activeOntology).toList() ){
-                if (an.getProperty().isLabel()){
-                    String auxLabel = replaceString(an.getValue().toString().replaceAll("\"", ""));
-                    vis.explicitLabel.add(auxLabel);
-                    auxQLabel = qualifyLabel(ce.asOWLClass().getIRI().toString(), auxLabel);
-                    vis.explicitQualifiedLabel.add(!"null".equalsIgnoreCase(auxQLabel) ? auxQLabel : auxLabel);
-
-                    if (auxLabel.contains("@")) {
-                        paintframe.languagesLabels.add(auxLabel.split("@")[1]);
-                    }
-                }
-            }
-        }
-
-        vis.label = ExpressionManager.getReducedClassExpression(ce);
-        vis.visibleLabel = vis.label;
-        auxQLabel = ExpressionManager.getReducedQualifiedClassExpression(ce);
-        vis.qualifiedLabel = !"null".equalsIgnoreCase(auxQLabel) ? auxQLabel : vis.label;
+        labelsAndQualifiedNames(ce, vis);
         vis.isBottom = ce.isOWLNothing();
         vis.isAnonymous = ce.isAnonymous();
         if ((ce instanceof OWLClass) && (EntitySearcher.isDefined(ce.asOWLClass(), activeOntology) )) {
