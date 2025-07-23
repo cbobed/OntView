@@ -826,7 +826,7 @@ public class VisGraph implements Runnable{
 
         if (ce instanceof OWLClass){
             for (OWLAnnotation  an : EntitySearcher.getAnnotations(ce.asOWLClass(), activeOntology).toList() ){
-                if (an.getProperty().toString().equals("rdfs:label")){
+                if (an.getProperty().isLabel()){
                     String auxLabel = replaceString(an.getValue().toString().replaceAll("\"", ""));
                     vis.explicitLabel.add(auxLabel);
                     auxQLabel = qualifyLabel(ce.asOWLClass(), auxLabel);

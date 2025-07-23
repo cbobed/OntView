@@ -17,6 +17,7 @@ import javafx.scene.paint.Color;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static sid.OntView2.utils.ExpressionManager.qualifyLabel;
 import static sid.OntView2.utils.ExpressionManager.replaceString;
 
 public class VisObjectProperty extends VisProperty {
@@ -28,6 +29,7 @@ public class VisObjectProperty extends VisProperty {
 	String label;
 	String qualifiedLabel;
     Set<String> explicitLabel = new HashSet<>();
+    Set<String> explicitQualifiedLabel = new HashSet<>();
 	String visibleLabel;
 	Shape range;
 	boolean visible = true;
@@ -36,9 +38,8 @@ public class VisObjectProperty extends VisProperty {
 	ArrayList<VisObjectProperty> parents;
 	VisConnectorPropProp onlyParentConnector;
 	ArrayList<Point2D> connectionPoints;
-	Font textFont;
-	Font circleFont;
-	boolean qualifiedRendering = false;
+	Font textFont, circleFont, koreanFont;
+	boolean qualifiedRendering = false, labelRendering = false, isKorean = false;
 	org.semanticweb.owlapi.reasoner.Node<OWLObjectPropertyExpression> inverseOf;
 	boolean isTransitive  =  false;
 	boolean isSymmetric   =  false;
@@ -127,11 +128,16 @@ public class VisObjectProperty extends VisProperty {
 		label    = ExpressionManager.getReducedObjectPropertyExpression (po);
 		visibleLabel = label;
 
+        String auxQLabel;
+
         OWLObjectProperty namedProp = po.getNamedProperty();
         List<OWLAnnotation> annotations = EntitySearcher.getAnnotations(namedProp, ontology).toList();
         for (OWLAnnotation ann : annotations) {
             if (ann.getProperty().isLabel()) {
-                explicitLabel.add(replaceString(ann.getValue().toString()));
+                String auxLabel = replaceString(ann.getValue().toString());
+                explicitLabel.add(auxLabel);
+                auxQLabel = qualifyLabel(namedProp, auxLabel);
+                explicitQualifiedLabel.add(!"null".equalsIgnoreCase(auxQLabel) ? auxQLabel : auxLabel);
             }
         }
         if (explicitLabel.isEmpty()) explicitLabel.add(label);
@@ -147,6 +153,7 @@ public class VisObjectProperty extends VisProperty {
 
 		textFont    = Font.font("DejaVu Sans", FontWeight.NORMAL, FontPosture.REGULAR, 11);
 		circleFont  = Font.font("DejaVu Sans", FontWeight.BOLD, 10);
+        koreanFont = Font.font("Noto Sans CJK KR", FontWeight.NORMAL, FontPosture.REGULAR, 11);
 
 		connectionPoints = new ArrayList<>();
 		if (getDomain() != range) {
@@ -217,7 +224,7 @@ public class VisObjectProperty extends VisProperty {
 			return;
 		}
 		if ((pBox.visible)&&(visible)&&(getDomain().visible)){
-			g.setFont(textFont);
+            g.setFont(this.isKorean ? koreanFont : textFont);
 			g.setFill(Color.BLACK);
 
 			if ((parents!=null)&&(!parents.isEmpty())) {
@@ -262,7 +269,7 @@ public class VisObjectProperty extends VisProperty {
 			    }
 				onlyParentConnector.draw(g);
 			}
-		   g.setFont(textFont); 	
+            g.setFont(this.isKorean ? koreanFont : textFont);
 		}
 	}
 
@@ -365,16 +372,29 @@ public class VisObjectProperty extends VisProperty {
 		// global view refreshment, these methods have to be aware of the type of 
 		// rendering that is being used (labelled, qualified). 
 		this.qualifiedRendering = qualifiedRendering;
-		if (qualifiedRendering) {
-            visibleLabel = qualifiedLabel;
-        } else if (labelRendering) {
-            Optional<String> candidate = explicitLabel.stream()
-                .filter(s -> s.contains("@" + language))
-                .findFirst();
-            candidate.ifPresent(s -> visibleLabel = s);
+        this.labelRendering = labelRendering;
+        this.isKorean = language.equals("ko");
+
+        if (labelRendering){
+            if (qualifiedRendering) {
+                Optional<String> candidate = explicitQualifiedLabel.stream()
+                    .filter(s -> s.contains("@" + language))
+                    .findFirst();
+                candidate.ifPresent(s -> visibleLabel = s);
+            }
+            else {
+                Optional<String> candidate = explicitLabel.stream()
+                    .filter(s -> s.contains("@" + language))
+                    .findFirst();
+                candidate.ifPresent(s -> visibleLabel = s);
+            }
         }
-		else {
-            visibleLabel = label;
+        else {
+            if (qualifiedRendering) {
+                visibleLabel = qualifiedLabel;
+            } else {
+                visibleLabel = label;
+            }
         }
 	}
 }

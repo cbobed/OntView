@@ -619,4 +619,17 @@ public class ExpressionManager {
         result = replaceString(result);
 		return result;
 	}
+
+    public static String qualifyLabel(OWLObjectPropertyExpression pe, String label) {
+        String result = label;
+        String aux = manager.getQName(pe.getNamedProperty().getIRI().toString());
+        if (aux != null) {
+            if (aux.contains(":")) {
+                String prefix = aux.substring(0, aux.indexOf(':'));
+                result = prefix + ":" + label;
+            }
+        }
+        result = replaceString(result);
+        return result;
+    }
 }
