@@ -11,7 +11,6 @@ import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
-import org.semanticweb.owlapi.search.EntitySearcher;
 import sid.OntView2.expressionNaming.SIDClassExpressionNamer;
 import sid.OntView2.utils.ExpressionManager;
 
@@ -19,7 +18,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static sid.OntView2.utils.ExpressionManager.qualifyLabel;
-import static sid.OntView2.utils.ExpressionManager.replaceString;
 
 public class VisClass extends Shape {
 	
@@ -46,7 +44,7 @@ public class VisClass extends Shape {
 	Set<String>  explicitLabel = new HashSet<>();
 
 	boolean isAnonymous;
-    boolean isDefined   = false, isKorean = false;
+    boolean isDefined   = false, isKorean = false, wasKorean = false;
     public boolean isBottom    = false;
     int     currentHeight;
 
@@ -178,6 +176,12 @@ public class VisClass extends Shape {
         if (koreanFont==null)
             koreanFont= Font.font("Noto Sans CJK KR", FontWeight.BOLD, 10);
         return koreanFont;
+    }
+
+    public void onLanguageChange(){
+        GraphicsContext g = graph.paintframe.getGraphicsContext2D();
+        g.setFont(this.isKorean ? getKoreanFont() : getBoldFont());
+        currentHeight = (!isAnonymous && !isDefined && asVisClass().getEquivalentClasses().isEmpty()) ? getHeight() : calculateHeight();
     }
 
 	public void drawShape(GraphicsContext g) {
@@ -515,6 +519,7 @@ public class VisClass extends Shape {
 		this.qualifiedRendering = qualifiedRendering; 
 		this.labelRendering = labelRendering;
         this.isKorean = language.equals("ko");
+        if (isKorean) onLanguageChange();
 
         swapLabelEquivalentClasses(labelRendering, qualifiedRendering, language);
 
@@ -819,12 +824,9 @@ public class VisClass extends Shape {
                     }
                 }
             }
-            if (!getDisjointConnectors().isEmpty()) {
-                max += 10;
-            }
-            if (propertyBox != null) {
-                max += 20;
-            }
+            if (!getDisjointConnectors().isEmpty()) max += 10;
+            if (propertyBox != null) max += 20;
+
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -898,7 +900,8 @@ public class VisClass extends Shape {
 
 		for (String line : lines) {
 			Text textNode = new Text(line);
-			textNode.setFont(Font.font("DejaVu Sans", FontWeight.BOLD, 10));
+            Font font = this.isKorean ? getKoreanFont() : getBoldFont();
+			textNode.setFont(font);
 			totalHeight += (int) textNode.getLayoutBounds().getHeight() + lineSpacing;
 		}
 
@@ -945,17 +948,6 @@ public class VisClass extends Shape {
 	public String removeFormatInformation(String str) {
 		return str.replace("\n", "").replace("\t", "");
 	}
-
-    private double textHeight(String text) {
-        Font font = Font.font("DejaVu Sans", FontWeight.NORMAL, 9);
-        int lines = countLines(text) + 1;
-
-        Text helper = new Text("ONTVIEW");
-        helper.setFont(font);
-        double lineHeight = helper.getLayoutBounds().getHeight();
-
-        return lines * lineHeight;
-    }
 
     private double textHeight(GraphicsContext g, String text) {
         int numLines = countLines(text);

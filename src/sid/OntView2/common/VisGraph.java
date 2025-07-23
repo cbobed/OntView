@@ -488,10 +488,14 @@ public class VisGraph implements Runnable{
 	}
 
 	public void changeRenderMethod(Boolean labelRendering, Boolean qualifiedRendering, String language){
+        Set<Shape> shapes = (new HashSet<>(shapeMap.values()));
 
-		for (Entry<String,Shape> entry : shapeMap.entrySet()){
-			Shape shape = entry.getValue();
+        for (Shape shape : shapes){
 			if (shape instanceof VisClass) {
+                if (shape.asVisClass().isKorean) { // reset height - different font
+                    shape.asVisClass().isKorean = language.equals("ko");
+                    shape.asVisClass().onLanguageChange();
+                }
 				shape.asVisClass().swapLabel(labelRendering, qualifiedRendering, language);
 			}
 		}
