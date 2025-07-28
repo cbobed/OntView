@@ -37,7 +37,7 @@ public class DiagramOverview extends Canvas{
         overviewStage = new Stage();
         BorderPane root = new BorderPane(this);
 
-        Dimension2D dims = computeInitialOverviewDimensions();
+        Dimension2D dims = computeOverviewDimensions();
         double ow = dims.getWidth();
         double oh = dims.getHeight();
 
@@ -54,28 +54,23 @@ public class DiagramOverview extends Canvas{
         overviewStage.setAlwaysOnTop(true);
 
         relocateStage();
+        overviewStage.setResizable(false);
         overviewStage.show();
 
         drawOverview();
 
-        overviewStage.widthProperty().addListener((obs, oldW, newW) -> {
-            updateCanvasSize();
-            drawOverview();
-        });
-        overviewStage.heightProperty().addListener((obs, oldH, newH) -> {
-            updateCanvasSize();
-            drawOverview();
-        });
-
+        overviewStage.widthProperty().addListener((obs, oldW, newW) -> relocateStage());
+        overviewStage.heightProperty().addListener((obs, oldH, newH) -> relocateStage());
         overviewStage.setOnCloseRequest(e -> closeDiagramOverview());
     }
 
     public void drawOverview() {
         if (overviewStage == null || !overviewStage.isShowing() || paintframe.scroll == null) return;
 
+        updateOverviewSize();
+
         GraphicsContext gc = getGraphicsContext2D();
         double ow = getWidth(), oh = getHeight();
-
         gc.clearRect(0,0,ow,oh);
         gc.setFill(Color.WHITE);
         gc.fillRect(0,0,ow,oh);
@@ -145,37 +140,47 @@ public class DiagramOverview extends Canvas{
         }
     }
 
-    private Dimension2D computeInitialOverviewDimensions() {
-        Bounds vp = paintframe.scroll.getViewportBounds();
-        double worldW = vp.getWidth() / paintframe.factor;
-        double worldH = vp.getHeight() / paintframe.factor;
-        double contentW = paintframe.scroll.getHmax() + worldW;
-        double contentH = paintframe.scroll.getVmax() + worldH;
-        double aspect = contentW / contentH;
+    public void updateOverviewSize() {
+        if (overviewStage == null || !overviewStage.isShowing()) return;
 
-        double baseW = aspect >= 1 ? MAX_OVERVIEW_SIZE : MAX_OVERVIEW_SIZE * aspect;
-        double baseH = aspect >= 1 ? MAX_OVERVIEW_SIZE / aspect : MAX_OVERVIEW_SIZE;
+        Dimension2D dims = computeOverviewDimensions();
+        double ow = dims.getWidth();
+        double oh = dims.getHeight();
 
-        if (paintframe.scroll.getVmax() > 0) {
-            double scaleY = baseH / contentH;
-            baseH += VisConstants.NEEDED_HEIGHT * scaleY;
-        }
-        return new Dimension2D(baseW, baseH);
+        this.setWidth(ow);
+        this.setHeight(oh);
+
+        overviewStage.setWidth(ow);
+        overviewStage.setHeight(oh + VisConstants.WINDOW_TITLE_BAR);
     }
 
-    private void updateCanvasSize() {
-        double newW = overviewStage.getWidth();
-        double newH = overviewStage.getHeight() - VisConstants.WINDOW_TITLE_BAR;
-        setWidth(newW);
-        setHeight(newH);
+    private Dimension2D computeOverviewDimensions() {
+        Bounds vp = paintframe.scroll.getViewportBounds();
+        double viewportWorldW = vp.getWidth() / paintframe.factor;
+        double viewportWorldH = vp.getHeight() / paintframe.factor;
+
+        double contentWidth = paintframe.scroll.getHmax() + viewportWorldW;
+        double contentHeight = paintframe.scroll.getVmax() + viewportWorldH;
+
+        double aspect = contentWidth / contentHeight;
+        double overviewWidth = aspect >= 1 ? MAX_OVERVIEW_SIZE : MAX_OVERVIEW_SIZE * aspect;
+        double overviewHeight = aspect >= 1 ? MAX_OVERVIEW_SIZE / aspect : MAX_OVERVIEW_SIZE;
+        
+        double finalH = overviewHeight;
+        if (paintframe.scroll.getVmax() > 0) finalH += VisConstants.NEEDED_HEIGHT * overviewHeight / contentHeight;
+
+        return new Dimension2D(overviewWidth, finalH);
     }
 
     public void relocateStage(){
-        double ow = getWidth(), oh = getHeight();
+        Dimension2D dims = computeOverviewDimensions();
+        double ow = dims.getWidth();
+        double oh = dims.getHeight();
 
         Rectangle2D screen = Screen.getPrimary().getVisualBounds();
         double margin = 80;
         overviewStage.setX(screen.getMaxX() - ow - margin);
         overviewStage.setY(screen.getMaxY() - oh - margin);
     }
+
 }
