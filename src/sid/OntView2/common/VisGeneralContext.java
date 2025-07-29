@@ -98,7 +98,7 @@ public class VisGeneralContext extends ContextMenu {
         if (parent.showDiagramOverview) {
             parent.diagramOverview.closeDiagramOverview();
         } else {
-            parent.diagramOverview = new DiagramOverview(parent);
+            parent.diagramOverview = new DiagramOverview(parent, parent.nTopPanel.parent.getPrimaryStage());
             parent.showDiagramOverview = true;
         }
         updateMenuItemTexts();

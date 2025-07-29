@@ -762,7 +762,7 @@ public class PaintFrame extends Canvas {
         scroll.setVmax(Math.max(0, maxY - viewportHeight));
         scroll.setHmax(Math.max(0, maxX - viewportWidth));
 
-        if (diagramOverview != null) Platform.runLater(() -> diagramOverview.drawOverview());
+        if (diagramOverview != null) Platform.runLater(() -> diagramOverview.updateOverviewSize());
 
     }
 

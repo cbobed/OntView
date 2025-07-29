@@ -54,8 +54,7 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 	private CheckBox Properties, reduceCheckBox;
 	private Slider zoomSlider;
     private Spinner<Integer> percentageSpinner;
-	private Popup helpPopup;
-    private final Mine parent;
+    public final Mine parent;
 
 
 	public TopPanel(Mine pParent) {
