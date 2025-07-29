@@ -91,7 +91,7 @@ public class HelpUser {
         tutorialTab.setOnSelectionChanged(event -> {
             if (tutorialTab.isSelected()) {
                 if (!(tutorialTab.getContent() instanceof MediaView)) {
-                    String videoUrl = Objects.requireNonNull(c.getResource("tutorial.mp4")).toExternalForm();
+                    String videoUrl = Objects.requireNonNull(c.getResource("video.mp4")).toExternalForm();
                     BorderPane videoPane = getVideoPane(videoUrl);
                     tutorialTab.setContent(videoPane);
                 }

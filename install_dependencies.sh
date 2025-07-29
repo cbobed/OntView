@@ -25,8 +25,8 @@ fi
 echo "Initializing Git LFS..."
 git lfs install
 
-echo "Fetching LFS files (tutorial video)..."
-git lfs pull
+# echo "Fetching LFS files (tutorial video)..."
+# git lfs pull
 
 echo "Dependency installation completed."
 

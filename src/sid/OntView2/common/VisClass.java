@@ -11,7 +11,6 @@ import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
-import org.semanticweb.owlapi.search.EntitySearcher;
 import sid.OntView2.expressionNaming.SIDClassExpressionNamer;
 import sid.OntView2.utils.ExpressionManager;
 
@@ -19,7 +18,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static sid.OntView2.utils.ExpressionManager.qualifyLabel;
-import static sid.OntView2.utils.ExpressionManager.replaceString;
 
 public class VisClass extends Shape {
 	
@@ -46,7 +44,7 @@ public class VisClass extends Shape {
 	Set<String>  explicitLabel = new HashSet<>();
 
 	boolean isAnonymous;
-    boolean isDefined   = false, isKorean = false;
+    boolean isDefined   = false, isKorean = false, wasKorean = false;
     public boolean isBottom    = false;
     int     currentHeight;
 
@@ -62,9 +60,9 @@ public class VisClass extends Shape {
     // we have the four variants: normal, qualified, labels and qualified labels
     ArrayList<String> visibleDefinitionLabels;
     ArrayList<String> definitionLabels;
-    Map<OWLClassExpression, List<String>> explicitDefinitionLabels;
+    Map<OWLClassExpression, Set<String>> explicitDefinitionLabels;
     ArrayList<String> qualifiedDefinitionLabels;
-    Map<OWLClassExpression, List<String>> explicitQualifiedDefinitionLabels;
+    Map<OWLClassExpression, Set<String>> explicitQualifiedDefinitionLabels;
 	// </CBL>
     
     String visibleLabel;
@@ -73,7 +71,7 @@ public class VisClass extends Shape {
 	boolean labelRendering = false;
 	public int topToBarDistance = 0;
 	int tabSize = 15;
-    private int lineSpacing = 6;
+    private final int lineSpacing = 6;
 
     Color mini = Color.rgb(224, 224, 224);
     Color lightgray = Color.rgb(234, 234, 234);
@@ -178,6 +176,12 @@ public class VisClass extends Shape {
         if (koreanFont==null)
             koreanFont= Font.font("Noto Sans CJK KR", FontWeight.BOLD, 10);
         return koreanFont;
+    }
+
+    public void onLanguageChange(){
+        GraphicsContext g = graph.paintframe.getGraphicsContext2D();
+        g.setFont(this.isKorean ? getKoreanFont() : getBoldFont());
+        currentHeight = (!isAnonymous && !isDefined && asVisClass().getEquivalentClasses().isEmpty()) ? getHeight() : calculateHeight();
     }
 
 	public void drawShape(GraphicsContext g) {
@@ -467,13 +471,13 @@ public class VisClass extends Shape {
                 ArrayList<String> aux = new ArrayList<>();
                 for (OWLClassExpression eqDef : getEquivalentClasses()) {
                     if (eqDef instanceof OWLClass) {
-                        List<String> labels = explicitQualifiedDefinitionLabels.getOrDefault(eqDef, Collections.emptyList());
+                        Set<String> labels = explicitQualifiedDefinitionLabels.getOrDefault(eqDef, new HashSet<>());
                         List<String> matches = labels.stream().filter(s -> s.contains("@" + language)).toList();
 
                         if (!matches.isEmpty()) {
                             aux.addAll(matches);
                         } else {
-                            aux.add(qualifyLabel(eqDef.asOWLClass(), ExpressionManager.getReducedClassExpression(eqDef)));
+                            aux.add(qualifyLabel(eqDef.asOWLClass().getIRI().toString(), ExpressionManager.getReducedClassExpression(eqDef)));
                         }
                     } else {
                         aux.add(ExpressionManager.getReducedClassExpression(eqDef));
@@ -485,7 +489,7 @@ public class VisClass extends Shape {
 
                 ArrayList<String> aux = new ArrayList<>();
                 for (OWLClassExpression eqDef : getEquivalentClasses()) {
-                    List<String> labels = explicitDefinitionLabels.getOrDefault(eqDef, Collections.emptyList());
+                    Set<String> labels = explicitDefinitionLabels.getOrDefault(eqDef, new HashSet<>());
                     List<String> matches = labels.stream().filter(s -> s.contains("@" + language)).toList();
 
                     if (!matches.isEmpty()) {
@@ -515,6 +519,7 @@ public class VisClass extends Shape {
 		this.qualifiedRendering = qualifiedRendering; 
 		this.labelRendering = labelRendering;
         this.isKorean = language.equals("ko");
+        if (isKorean) onLanguageChange();
 
         swapLabelEquivalentClasses(labelRendering, qualifiedRendering, language);
 
@@ -634,22 +639,11 @@ public class VisClass extends Shape {
     }
 
     private void saveLabelsQualifiedNamesEquivalentClasses(OWLClassExpression def) {
-        List<String> labelsForDef = new ArrayList<>();
-        List<String> qualifiedLabelsForDef = new ArrayList<>();
-        if (def instanceof OWLClass) {
-            for (OWLAnnotation  an : EntitySearcher.getAnnotations(def.asOWLClass(), graph.getActiveOntology()).toList() ){
-                if (an.getProperty().toString().equals("rdfs:label")){
-                    String auxLabel = replaceString(an.getValue().toString().replaceAll("\"", ""));
-                    labelsForDef.add(auxLabel);
-                    String auxQLabel = qualifyLabel(def.asOWLClass(), auxLabel);
-                    qualifiedLabelsForDef.add(auxQLabel != null ? auxQLabel : auxLabel);
+        Set<String> labelsForDef = new HashSet<>();
+        Set<String> qualifiedLabelsForDef = new HashSet<>();
 
-                    if (auxLabel.contains("@")) {
-                        graph.paintframe.languagesLabels.add(auxLabel.split("@")[1]);
-                    }
-                }
-            }
-        }
+        graph.collectLabelsQualifiedNames(def, labelsForDef, qualifiedLabelsForDef);
+
         explicitDefinitionLabels.put(def, labelsForDef);
         explicitQualifiedDefinitionLabels.put(def, qualifiedLabelsForDef);
 
@@ -657,11 +651,7 @@ public class VisClass extends Shape {
         String label = ExpressionManager.getReducedClassExpression(def);
         definitionLabels.add(label);
         String auxQLabel = ExpressionManager.getReducedQualifiedClassExpression(def);
-        if (!"null".equalsIgnoreCase(auxQLabel))
-            qualifiedDefinitionLabels.add(auxQLabel);
-        else
-            qualifiedDefinitionLabels.add(label);
-
+        qualifiedDefinitionLabels.add(!"null".equalsIgnoreCase(auxQLabel) ? auxQLabel : label);
         visibleDefinitionLabels = definitionLabels;
     }
 
@@ -799,12 +789,14 @@ public class VisClass extends Shape {
             if (!isAnonymous) {
                 if (!label.startsWith(SIDClassExpressionNamer.className) ) {
                     textNode.setText(visibleLabel);
-                    max = (int) textNode.getLayoutBounds().getWidth() + 25 ;
+                    max = (int) textNode.getLayoutBounds().getWidth() + 25;
                 }
                 //<CBL> for the defined, max might not be the desired value
                 if (isDefined || !asVisClass().getEquivalentClasses().isEmpty()) {
                     // we have to do the same as for the anonymous ones
                     // for each of the definitions
+                    if (!getDisjointConnectors().isEmpty()) max += 10;
+
                     for (String auxLabel: getVisibleDefinitionLabels()) {
                         sTokenizer = new StringTokenizer(auxLabel, "\n");
                         while (sTokenizer.hasMoreElements()) {
@@ -832,12 +824,9 @@ public class VisClass extends Shape {
                     }
                 }
             }
-            if (!getDisjointConnectors().isEmpty()) {
-                max += 10;
-            }
-            if (propertyBox != null) {
-                max += 20;
-            }
+            if (!getDisjointConnectors().isEmpty()) max += 10;
+            if (propertyBox != null) max += 20;
+
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -911,7 +900,8 @@ public class VisClass extends Shape {
 
 		for (String line : lines) {
 			Text textNode = new Text(line);
-			textNode.setFont(Font.font("DejaVu Sans", FontWeight.BOLD, 10));
+            Font font = this.isKorean ? getKoreanFont() : getBoldFont();
+			textNode.setFont(font);
 			totalHeight += (int) textNode.getLayoutBounds().getHeight() + lineSpacing;
 		}
 
@@ -958,17 +948,6 @@ public class VisClass extends Shape {
 	public String removeFormatInformation(String str) {
 		return str.replace("\n", "").replace("\t", "");
 	}
-
-    private double textHeight(String text) {
-        Font font = Font.font("DejaVu Sans", FontWeight.NORMAL, 9);
-        int lines = countLines(text) + 1;
-
-        Text helper = new Text("ONTVIEW");
-        helper.setFont(font);
-        double lineHeight = helper.getLayoutBounds().getHeight();
-
-        return lines * lineHeight;
-    }
 
     private double textHeight(GraphicsContext g, String text) {
         int numLines = countLines(text);

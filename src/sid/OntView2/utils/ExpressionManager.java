@@ -606,9 +606,9 @@ public class ExpressionManager {
         return manager.getQName(iri.toString());
 	}
 
-    public static String qualifyLabel(OWLClass c, String label) {
+    public static String qualifyLabel(String iriString, String label) {
 		String result = label;
-		String aux = manager.getQName(c.getIRI().toString());
+		String aux = manager.getQName(iriString);
 
 		if (aux!= null) {
 			if (aux.contains(":")) {
@@ -619,4 +619,5 @@ public class ExpressionManager {
         result = replaceString(result);
 		return result;
 	}
+
 }

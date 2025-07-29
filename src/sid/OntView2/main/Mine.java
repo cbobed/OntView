@@ -649,6 +649,6 @@ public class Mine extends Application implements Embedable{
     @Override
 	public void loadSearchCombo() {
 		// TODO Auto-generated method stub
-		nTopPanel.loadSearchCombo();
+		Platform.runLater(() -> nTopPanel.loadSearchCombo());
 	}
 }
