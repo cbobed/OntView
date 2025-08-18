@@ -17,11 +17,16 @@ import javafx.scene.shape.Polygon;
 import javafx.scene.text.*;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
+import java.io.File;
 import java.util.List;
 import java.util.Objects;
 
 public class HelpUser {
+    private static final Logger logger = LogManager.getLogger(HelpUser.class);
+
     Stage helpStage;
     ClassLoader c = Thread.currentThread().getContextClassLoader();
     VBox containerElementsInfo, containerLegend;
@@ -91,7 +96,7 @@ public class HelpUser {
         tutorialTab.setOnSelectionChanged(event -> {
             if (tutorialTab.isSelected()) {
                 if (!(tutorialTab.getContent() instanceof MediaView)) {
-                    String videoUrl = Objects.requireNonNull(c.getResource("video.mp4")).toExternalForm();
+                    String videoUrl = Objects.requireNonNull(c.getResource("assets/video.mp4")).toExternalForm();
                     BorderPane videoPane = getVideoPane(videoUrl);
                     tutorialTab.setContent(videoPane);
                 }
@@ -103,6 +108,8 @@ public class HelpUser {
         return tabPane;
     }
     private static BorderPane getVideoPane(String videoUrl) {
+        System.out.println("Loading video from: " + videoUrl);
+
         Media media = new Media(videoUrl);
         MediaPlayer mediaPlayer = new MediaPlayer(media);
         mediaPlayer.setAutoPlay(false);
