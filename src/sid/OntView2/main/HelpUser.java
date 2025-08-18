@@ -1,5 +1,6 @@
 package sid.OntView2.main;
 
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -52,6 +53,14 @@ public class HelpUser {
         helpStage.setMinHeight(150);
         helpStage.setMinWidth(350);
         helpStage.show();
+
+        helpStage.show();
+        Platform.runLater(() -> {
+            helpStage.setWidth(700);
+            helpStage.setHeight(300);
+            helpStage.centerOnScreen();
+        });
+
     }
 
     private TabPane createHelpTabsPane(Stage helpStage) {
