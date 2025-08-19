@@ -117,18 +117,14 @@ public class HelpUser {
         return tabPane;
     }
     private static BorderPane getVideoPane(String videoUrl) {
+        Media media;
         try {
-            File videoFile = new File(videoUrl);
-            if (!videoFile.exists()) {
-                logger.error("Video file not found: " + videoUrl);
-                return createErrorPane("Video file not found.");
-            }
+            media = new Media(videoUrl);
         } catch (Exception e) {
-            logger.error("Error loading video file: " + videoUrl, e);
-            return createErrorPane("Error loading video file.");
+            logger.error("Invalid media URL: " + videoUrl, e);
+            return createErrorPane("Unable to load video.");
         }
 
-        Media media = new Media(videoUrl);
         MediaPlayer mediaPlayer = new MediaPlayer(media);
         mediaPlayer.setAutoPlay(false);
 
