@@ -22,11 +22,5 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-echo "Initializing Git LFS..."
-git lfs install
-
-# echo "Fetching LFS files (tutorial video)..."
-# git lfs pull
-
 echo "Dependency installation completed."
 
