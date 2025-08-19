@@ -1,5 +1,6 @@
 package sid.OntView2.main;
 
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -17,11 +18,16 @@ import javafx.scene.shape.Polygon;
 import javafx.scene.text.*;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
+import java.io.File;
 import java.util.List;
 import java.util.Objects;
 
 public class HelpUser {
+    private static final Logger logger = LogManager.getLogger(HelpUser.class);
+
     Stage helpStage;
     ClassLoader c = Thread.currentThread().getContextClassLoader();
     VBox containerElementsInfo, containerLegend;
@@ -47,6 +53,14 @@ public class HelpUser {
         helpStage.setMinHeight(150);
         helpStage.setMinWidth(350);
         helpStage.show();
+
+        helpStage.show();
+        Platform.runLater(() -> {
+            helpStage.setWidth(700);
+            helpStage.setHeight(300);
+            helpStage.centerOnScreen();
+        });
+
     }
 
     private TabPane createHelpTabsPane(Stage helpStage) {
@@ -91,7 +105,7 @@ public class HelpUser {
         tutorialTab.setOnSelectionChanged(event -> {
             if (tutorialTab.isSelected()) {
                 if (!(tutorialTab.getContent() instanceof MediaView)) {
-                    String videoUrl = Objects.requireNonNull(c.getResource("video.mp4")).toExternalForm();
+                    String videoUrl = Objects.requireNonNull(c.getResource("assets/video.mp4")).toExternalForm();
                     BorderPane videoPane = getVideoPane(videoUrl);
                     tutorialTab.setContent(videoPane);
                 }
@@ -103,7 +117,14 @@ public class HelpUser {
         return tabPane;
     }
     private static BorderPane getVideoPane(String videoUrl) {
-        Media media = new Media(videoUrl);
+        Media media;
+        try {
+            media = new Media(videoUrl);
+        } catch (Exception e) {
+            logger.error("Invalid media URL: " + videoUrl, e);
+            return createErrorPane("Unable to load video.");
+        }
+
         MediaPlayer mediaPlayer = new MediaPlayer(media);
         mediaPlayer.setAutoPlay(false);
 
@@ -289,6 +310,27 @@ public class HelpUser {
         container.getStyleClass().add("tab-info-container");
         container.setAlignment(Pos.CENTER_LEFT);
         return container;
+    }
+
+    private static BorderPane createErrorPane(String message) {
+        BorderPane errorPane = new BorderPane();
+        errorPane.setPadding(new Insets(20));
+
+        Label icon = new Label("⚠");
+        icon.setTextFill(Color.ORANGERED);
+        icon.setFont(Font.font("DejaVu Sans", 40));
+
+        Label label = new Label(message);
+        label.setTextFill(Color.DIMGRAY);
+        label.setFont(Font.font("DejaVu Sans", FontWeight.NORMAL, FontPosture.ITALIC, 16));
+        label.setWrapText(true);
+        label.setTextAlignment(TextAlignment.CENTER);
+
+        VBox content = new VBox(10, icon, label);
+        content.setAlignment(Pos.CENTER);
+
+        errorPane.setCenter(content);
+        return errorPane;
     }
 
     private record Item(String text, String imagePath, double size) { }
