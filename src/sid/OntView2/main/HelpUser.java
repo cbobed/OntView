@@ -117,7 +117,16 @@ public class HelpUser {
         return tabPane;
     }
     private static BorderPane getVideoPane(String videoUrl) {
-        System.out.println("Loading video from: " + videoUrl);
+        try {
+            File videoFile = new File(videoUrl);
+            if (!videoFile.exists()) {
+                logger.error("Video file not found: " + videoUrl);
+                return createErrorPane("Video file not found.");
+            }
+        } catch (Exception e) {
+            logger.error("Error loading video file: " + videoUrl, e);
+            return createErrorPane("Error loading video file.");
+        }
 
         Media media = new Media(videoUrl);
         MediaPlayer mediaPlayer = new MediaPlayer(media);
@@ -305,6 +314,27 @@ public class HelpUser {
         container.getStyleClass().add("tab-info-container");
         container.setAlignment(Pos.CENTER_LEFT);
         return container;
+    }
+
+    private static BorderPane createErrorPane(String message) {
+        BorderPane errorPane = new BorderPane();
+        errorPane.setPadding(new Insets(20));
+
+        Label icon = new Label("⚠");
+        icon.setTextFill(Color.ORANGERED);
+        icon.setFont(Font.font("DejaVu Sans", 40));
+
+        Label label = new Label(message);
+        label.setTextFill(Color.DIMGRAY);
+        label.setFont(Font.font("DejaVu Sans", FontWeight.NORMAL, FontPosture.ITALIC, 16));
+        label.setWrapText(true);
+        label.setTextAlignment(TextAlignment.CENTER);
+
+        VBox content = new VBox(10, icon, label);
+        content.setAlignment(Pos.CENTER);
+
+        errorPane.setCenter(content);
+        return errorPane;
     }
 
     private record Item(String text, String imagePath, double size) { }
