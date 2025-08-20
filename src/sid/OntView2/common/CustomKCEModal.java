@@ -1,5 +1,6 @@
 package sid.OntView2.common;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -7,6 +8,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -63,8 +65,14 @@ public class CustomKCEModal {
 
         VBox allConceptsBox = new VBox(5, searchAllField, allConceptsView);
         VBox selectedConceptsBox = new VBox(5, searchSelectedField, selectedConceptsView);
+        HBox.setHgrow(allConceptsBox, Priority.ALWAYS);
+        HBox.setHgrow(selectedConceptsBox, Priority.ALWAYS);
+        VBox.setVgrow(allConceptsView, Priority.ALWAYS);
+        VBox.setVgrow(selectedConceptsView, Priority.ALWAYS);
 
         HBox mainLayout = new HBox(10, allConceptsBox, buttonBox, selectedConceptsBox);
+        VBox.setVgrow(mainLayout, Priority.ALWAYS);
+
         VBox root = new VBox(10, selectAllNodes, mainLayout, saveButton);
         root.setAlignment(Pos.CENTER);
         root.setPadding(new Insets(20));
@@ -73,6 +81,9 @@ public class CustomKCEModal {
         ClassLoader c = Thread.currentThread().getContextClassLoader();
         scene.getStylesheets().add(Objects.requireNonNull(c.getResource("styles.css")).toExternalForm());
         popupStage.setScene(scene);
+        popupStage.setMinHeight(400);
+        popupStage.setMinWidth(600);
+        popupStage.centerOnScreen();
 
         popupStage.setOnCloseRequest(e -> {
             if (settings.getLastMode() == ViewMode.CUSTOM) {
@@ -94,6 +105,7 @@ public class CustomKCEModal {
                 customConceptExtraction.getSelectedConcepts().addAll(allConcepts);
             }
         });
+
         popupStage.showAndWait();
     }
 
