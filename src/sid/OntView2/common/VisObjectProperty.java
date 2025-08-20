@@ -363,8 +363,13 @@ public class VisObjectProperty extends VisProperty {
 		}
 		return false;
 	}
-	
-	public void swapLabel(Boolean labelRendering, Boolean qualifiedRendering, String language) {
+
+    @Override
+    public void setVisibleLabel(String visibleLabel) {
+        this.visibleLabel = visibleLabel;
+    }
+
+    public void swapLabel(Boolean labelRendering, Boolean qualifiedRendering, String language) {
 		// this is needed for the getTooltipInfo method of the different 
 		// elements: as this info is refreshed at a different pace from the 
 		// global view refreshment, these methods have to be aware of the type of 
@@ -373,28 +378,10 @@ public class VisObjectProperty extends VisProperty {
         this.labelRendering = labelRendering;
         this.isKorean = language.equals("ko");
 
-        if (labelRendering){
-            if (qualifiedRendering) {
-                Optional<String> candidate = explicitQualifiedLabel.stream()
-                    .filter(s -> s.contains("@" + language))
-                    .findFirst();
-                candidate.ifPresent(s -> visibleLabel = s);
-            }
-            else {
-                Optional<String> candidate = explicitLabel.stream()
-                    .filter(s -> s.contains("@" + language))
-                    .findFirst();
-                candidate.ifPresent(s -> visibleLabel = s);
-            }
-        }
-        else {
-            if (qualifiedRendering) {
-                visibleLabel = qualifiedLabel;
-            } else {
-                visibleLabel = label;
-            }
-        }
-	}
+        super.swapLabel(labelRendering, qualifiedRendering, language, label, qualifiedLabel, explicitLabel,
+            explicitQualifiedLabel);
+
+    }
 }
 	
 
