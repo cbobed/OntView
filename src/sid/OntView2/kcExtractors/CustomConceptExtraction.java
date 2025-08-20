@@ -27,24 +27,14 @@ public class CustomConceptExtraction extends KConceptExtractor {
     public Set<String> retrieveKeyConcepts(OWLOntology activeOntology, Map<String, Shape> shapeMap, int limitResultSize) {
         Set<String> keyConcepts = new HashSet<>();
 
-        Map<Shape, List<String>> shapeToKeyMap = shapeMap.entrySet().stream()
-            .collect(Collectors.groupingBy(
-                Map.Entry::getValue,
-                Collectors.mapping(
-                    Map.Entry::getKey,
-                    Collectors.toList()
-                )
-            ));
-
         for (Shape shape : selectedConcepts) {
-            List<String> key = shapeToKeyMap.get(shape);
+            String key = Shape.getKey(shape.getLinkedClassExpression());
             if (key != null) {
-                keyConcepts.addAll(key);
+                keyConcepts.add(key);
             }
         }
-        
-        return keyConcepts;
 
+        return keyConcepts;
     }
 
     /**
