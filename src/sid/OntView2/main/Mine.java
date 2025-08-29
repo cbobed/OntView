@@ -282,7 +282,6 @@ public class Mine extends Application implements Embedable{
 
     protected void loadActiveOntology(IRI source) {
         source = cleanIri(source);
-        System.out.println("Loading ontology from: " + source);
 		manager = OWLManager.createOWLOntologyManager();
 		artPanel.setCursor(Cursor.WAIT);
 		try {
