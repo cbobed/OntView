@@ -270,8 +270,19 @@ public class Mine extends Application implements Embedable{
 		new Thread(task).start();
 	}
 
+    private IRI cleanIri(IRI source){
+        String s = source.toString();
+        if (s.contains(" ")) {
+            s = s.replaceAll(" ", "");
+            nTopPanel.getOntologyCombo().setValue(s);
+            return IRI.create(s);
+        }
+        return source;
+    }
 
     protected void loadActiveOntology(IRI source) {
+        source = cleanIri(source);
+        System.out.println("Loading ontology from: " + source);
 		manager = OWLManager.createOWLOntologyManager();
 		artPanel.setCursor(Cursor.WAIT);
 		try {

@@ -6,6 +6,7 @@ import org.semanticweb.HermiT.datatypes.MalformedLiteralException;
 import org.semanticweb.HermiT.datatypes.UnsupportedDatatypeException;
 import org.semanticweb.owlapi.io.OWLOntologyCreationIOException;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyFactoryNotFoundException;
 import org.semanticweb.owlapi.model.UnloadableImportException;
 import org.xml.sax.SAXParseException;
 
@@ -43,6 +44,9 @@ public class ErrorHandler {
         }
         if (cause instanceof OWLOntologyCreationException) {
             return "Error: The ontology is corrupted or invalid.";
+        }
+        if (cause instanceof OWLOntologyFactoryNotFoundException) {
+            return "Error: Unsupported or unrecognized ontology format.";
         }
 
         return truncateMessage(cause);
