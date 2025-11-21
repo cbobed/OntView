@@ -26,6 +26,7 @@ public class SIDClassExpressionNamer {
 	Set<OWLEquivalentClassesAxiom> axiomsToAdd;
 
 	OWLOntology ontology;
+	OWLDataFactory dataFactory; 
 	OWLReasoner reasoner;
 
 	private int classID = 1;
@@ -33,6 +34,7 @@ public class SIDClassExpressionNamer {
 
 	public SIDClassExpressionNamer (OWLOntology ont, OWLReasoner reasoner) {
 		this.ontology = ont;
+		this.dataFactory = ont.getOWLOntologyManager().getOWLDataFactory(); 
 		this.reasoner = reasoner;
 		this.classesToAdd = null;
 		this.classesFiltered = new ArrayList<>();
@@ -99,7 +101,7 @@ public class SIDClassExpressionNamer {
 		for (OWLAxiom axiom: ontology.getTBoxAxioms(Imports.INCLUDED)) {
 			axiom.accept(axiomVisitor);
 		}
-		classesToAdd = axiomVisitor.getHarvestedClasses();		
+		classesToAdd = axiomVisitor.getHarvestedClasses(this.dataFactory);		
 	}
 	
 	private void applySyntacticSieve() throws NonGatheredClassExpressionsException {
