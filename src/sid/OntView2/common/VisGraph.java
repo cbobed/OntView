@@ -67,6 +67,10 @@ public class VisGraph implements Runnable{
 	private CountDownLatch latch;
 	public void setLatch(CountDownLatch latch) { this.latch = latch; }
 	
+	// we now need all the information about the gathered expressions 
+	// available 
+	SIDClassExpressionNamer renamer; 
+	
 	/**
 	 * Progress bar criteria. From 0-70 % it will depend on the number of shapes added to the map
 	 */
@@ -360,7 +364,7 @@ public class VisGraph implements Runnable{
 	private void insertClassExpressions (OWLOntology activeOntology, OWLReasoner reasoner,
 											OWLClassExpression startingPoint, 
 											OWLClassExpression endPoint) {
-		SIDClassExpressionNamer renamer = new SIDClassExpressionNamer(activeOntology, reasoner);
+		renamer = new SIDClassExpressionNamer(activeOntology, reasoner);
 		try {
 			renamer.gatherAllExpressionsFiltering();
 		}
@@ -623,7 +627,7 @@ public class VisGraph implements Runnable{
 			// CBL: 
 			// changed the way the range shape is added and handled
 			if (propertyRangeNodeSet.getNodes().size()>1) {
-				range = VisObjectProperty.addRange(this, propertyRangeNodeSet);
+				range = VisObjectProperty.addRange(this, property, propertyRangeNodeSet);
 			}
 			else {
 				// there is only one node in the range definition
@@ -634,7 +638,7 @@ public class VisGraph implements Runnable{
 			}
 			
 			if (propertyDomainNodeSet.getNodes().size()>1){
-				VisObjectProperty.addDomain(this,propertyDomainNodeSet,property, activeOntology,range);
+				VisObjectProperty.addDomain(this,property, propertyDomainNodeSet,activeOntology,range);
 			}
 			else { //common case 
 				for (Node<OWLClass> o : propertyDomainNodeSet ){

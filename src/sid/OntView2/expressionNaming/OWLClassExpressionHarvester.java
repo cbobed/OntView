@@ -15,8 +15,8 @@ import java.util.Set;
 public class OWLClassExpressionHarvester implements OWLAxiomVisitor {
 
 	ArrayList<OWLClassExpression> harvestedClasses;
-	ArrayList<OWLClassExpression> domainClasses;
-	ArrayList<OWLClassExpression> rangeClasses;
+	Hashtable<OWLPropertyExpression, OWLClassExpression> domainClasses;
+	Hashtable<OWLPropertyExpression, OWLClassExpression> rangeClasses;
 	
 	Hashtable<OWLDataProperty, Set<OWLClassExpression>> domainIntersectionsDataProp;
 	Hashtable<OWLObjectProperty, Set<OWLClassExpression>> domainIntersectionsObjProp;
@@ -25,47 +25,61 @@ public class OWLClassExpressionHarvester implements OWLAxiomVisitor {
 	
 	public OWLClassExpressionHarvester () {
 		this.harvestedClasses = new ArrayList<>();
-		this.domainClasses = new ArrayList<>(); 
-		this.rangeClasses = new ArrayList<>(); 
+		this.domainClasses = new Hashtable<>(); 
+		this.rangeClasses = new Hashtable<>(); 
 		
 		this.domainIntersectionsDataProp = new Hashtable<>(); 
 		this.domainIntersectionsObjProp = new Hashtable<>(); 
 		this.rangeIntersectionsObjProp = new Hashtable<>();
-		
+	}
+	
+	public Hashtable<OWLPropertyExpression, OWLClassExpression> getDomainClasses() {
+		return domainClasses; 
+	}
+	
+	public Hashtable<OWLPropertyExpression, OWLClassExpression> getRangeClasses() {
+		return rangeClasses; 
 	}
 	
 	public ArrayList<OWLClassExpression> getHarvestedClasses(OWLDataFactory dataFactory) {
 		System.out.println("--> Harvested without consolidating: "+harvestedClasses.size()); 
+		int consolidated = 0; 
 		if (domainClasses.isEmpty() || rangeClasses.isEmpty()) {
 			// we consolidate the domains and the ranges and 
 			// add them to the harvestedClasses list 
 			for (Entry<OWLDataProperty, Set<OWLClassExpression>> ent: domainIntersectionsDataProp.entrySet()) {
 				if (ent.getValue().size()>1) {
-					harvestedClasses.add(dataFactory.getOWLObjectIntersectionOf(ent.getValue())); 
+					domainClasses.put(ent.getKey(), dataFactory.getOWLObjectIntersectionOf(ent.getValue())); 
+					consolidated++; 
 				}
 				else if (ent.getValue().size() == 1) {
-					harvestedClasses.add(ent.getValue().iterator().next()); 
+					domainClasses.put(ent.getKey(), ent.getValue().iterator().next()); 
 				}
 			}
 			
 			for (Entry<OWLObjectProperty, Set<OWLClassExpression>> ent: domainIntersectionsObjProp.entrySet()) {
 				if (ent.getValue().size()>1) {
-					harvestedClasses.add(dataFactory.getOWLObjectIntersectionOf(ent.getValue())); 
+					domainClasses.put(ent.getKey(), dataFactory.getOWLObjectIntersectionOf(ent.getValue())); 
+					consolidated++; 
 				}
 				else if (ent.getValue().size() == 1) {
-					harvestedClasses.add(ent.getValue().iterator().next()); 
+					domainClasses.put(ent.getKey(), ent.getValue().iterator().next()); 
 				}
 			}
 			for (Entry<OWLObjectProperty, Set<OWLClassExpression>> ent: rangeIntersectionsObjProp.entrySet()) {
 				if (ent.getValue().size()>1) {
-					harvestedClasses.add(dataFactory.getOWLObjectIntersectionOf(ent.getValue())); 
+					rangeClasses.put(ent.getKey(), dataFactory.getOWLObjectIntersectionOf(ent.getValue())); 
+					consolidated++; 
 				}
 				else if (ent.getValue().size() == 1) {
-					harvestedClasses.add(ent.getValue().iterator().next()); 
+					rangeClasses.put(ent.getKey(), ent.getValue().iterator().next()); 
 				}
 			}
+			
+			harvestedClasses.addAll(domainClasses.values()); 
+			harvestedClasses.addAll(rangeClasses.values()); 
 		}
-		System.out.println("--> Harvested after consolidating: "+harvestedClasses.size()); 
+		System.out.println("--> Harvested after consolidating: "+harvestedClasses.size() + " of which: "+consolidated+" are AND-built"); 
 		return harvestedClasses;
 	}
 
