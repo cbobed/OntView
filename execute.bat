@@ -6,4 +6,4 @@ echo "Installing KCE-0.0.1-SNAPSHOT.jar..."
 
 call mvn install:install-file -Dfile=lib/kce/KCE-0.0.1-SNAPSHOT.jar -DgroupId=org.sid.ontview -DartifactId=kce -Dversion=0.0.1-SNAPSHOT -Dpackaging=jar
 
-mvn clean compile exec:java -Dexec.args="-Dprism.targetvram=2G -Xmx4G -Dprism.order=es2 -Dprism.forceGPU --add-opens javafx.graphics/com.sun.javafx.sg.prism=ALL-UNNAMED"
+mvn clean compile exec:java -Dexec.args="-Dprism.targetvram=2G -Xmx8G -Dprism.order=es2 -Dprism.forceGPU --add-opens javafx.graphics/com.sun.javafx.sg.prism=ALL-UNNAMED"
