@@ -1,0 +1,1255 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="http://ontovibe.visualdataweb.org#"
+     xml:base="http://ontovibe.visualdataweb.org"
+     xmlns:dc="http://purl.org/dc/elements/1.1/"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:ontovibe="http://ontovibe.visualdataweb.org#">
+    <owl:Ontology rdf:about="http://ontovibe.visualdataweb.org">
+        <dc:contributor>Stefan Negru</dc:contributor>
+        <dc:creator>Florian Haag</dc:creator>
+        <dc:creator>Steffen Lohmann</dc:creator>
+        <dc:date>2015-08-27</dc:date>
+        <dc:description>OntoViBe is a benchmark for testing ontology visualizations. It incorporates a comprehensive set of OWL 2 language constructs and systematic combinations thereof.</dc:description>
+        <dc:rights rdf:resource="http://creativecommons.org/licenses/by/4.0/"/>
+        <dc:title>Ontology Visualization Benchmark (OntoViBe)</dc:title>
+        <rdfs:comment>OntoViBe is a benchmark for testing ontology visualizations. It incorporates a comprehensive set of OWL 2 language constructs and systematic combinations thereof.</rdfs:comment>
+        <rdfs:label>Ontology Visualization Benchmark (OntoViBe)</rdfs:label>
+        <owl:backwardCompatibleWith rdf:resource="http://ontovibe.visualdataweb.org/1.0/imported"/>
+        <owl:backwardCompatibleWith rdf:resource="http://ontovibe.visualdataweb.org/2.1"/>
+        <owl:incompatibleWith rdf:resource="http://ontovibe.visualdataweb.org/minimal"/>
+        <owl:priorVersion rdf:resource="http://ontovibe.visualdataweb.org/1.0/imported"/>
+        <owl:priorVersion rdf:resource="http://ontovibe.visualdataweb.org/2.1"/>
+        <owl:versionInfo>2.0</owl:versionInfo>
+        <owl:versionInfo>2.2</owl:versionInfo>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Annotation properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://purl.org/dc/elements/1.1/contributor -->
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/contributor"/>
+    
+
+
+    <!-- http://purl.org/dc/elements/1.1/creator -->
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/creator"/>
+    
+
+
+    <!-- http://purl.org/dc/elements/1.1/date -->
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/date"/>
+    
+
+
+    <!-- http://purl.org/dc/elements/1.1/description -->
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/description"/>
+    
+
+
+    <!-- http://purl.org/dc/elements/1.1/rights -->
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/rights"/>
+    
+
+
+    <!-- http://purl.org/dc/elements/1.1/title -->
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/title"/>
+    
+
+
+    <!-- http://www.w3.org/2002/07/owl#hasSelf -->
+
+    <owl:AnnotationProperty rdf:about="http://www.w3.org/2002/07/owl#hasSelf"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Datatypes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#ComplementDatatype -->
+
+    <rdfs:Datatype rdf:about="http://ontovibe.visualdataweb.org#ComplementDatatype">
+        <owl:equivalentClass>
+            <rdfs:Datatype>
+                <owl:datatypeComplementOf rdf:resource="http://ontovibe.visualdataweb.org#DivisibleByTwoEnumeration"/>
+            </rdfs:Datatype>
+        </owl:equivalentClass>
+    </rdfs:Datatype>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#DivisibleByFiveEnumeration -->
+
+    <rdfs:Datatype rdf:about="http://ontovibe.visualdataweb.org#DivisibleByFiveEnumeration">
+        <owl:equivalentClass>
+            <rdfs:Datatype>
+                <owl:oneOf>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                        <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">10</rdf:first>
+                        <rdf:rest>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">15</rdf:first>
+                                <rdf:rest>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                        <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">20</rdf:first>
+                                        <rdf:rest>
+                                            <rdf:Description>
+                                                <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                                <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">5</rdf:first>
+                                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                            </rdf:Description>
+                                        </rdf:rest>
+                                    </rdf:Description>
+                                </rdf:rest>
+                            </rdf:Description>
+                        </rdf:rest>
+                    </rdf:Description>
+                </owl:oneOf>
+            </rdfs:Datatype>
+        </owl:equivalentClass>
+    </rdfs:Datatype>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#DivisibleByTwoEnumeration -->
+
+    <rdfs:Datatype rdf:about="http://ontovibe.visualdataweb.org#DivisibleByTwoEnumeration">
+        <owl:equivalentClass>
+            <rdfs:Datatype>
+                <owl:oneOf>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                        <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">10</rdf:first>
+                        <rdf:rest>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">12</rdf:first>
+                                <rdf:rest>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                        <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">14</rdf:first>
+                                        <rdf:rest>
+                                            <rdf:Description>
+                                                <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                                <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">16</rdf:first>
+                                                <rdf:rest>
+                                                    <rdf:Description>
+                                                        <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                                        <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">18</rdf:first>
+                                                        <rdf:rest>
+                                                            <rdf:Description>
+                                                                <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                                                <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">2</rdf:first>
+                                                                <rdf:rest>
+                                                                    <rdf:Description>
+                                                                        <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                                                        <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">20</rdf:first>
+                                                                        <rdf:rest>
+                                                                            <rdf:Description>
+                                                                                <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                                                                <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">4</rdf:first>
+                                                                                <rdf:rest>
+                                                                                    <rdf:Description>
+                                                                                        <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                                                                        <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">6</rdf:first>
+                                                                                        <rdf:rest>
+                                                                                            <rdf:Description>
+                                                                                                <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                                                                                <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">8</rdf:first>
+                                                                                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                                                                            </rdf:Description>
+                                                                                        </rdf:rest>
+                                                                                    </rdf:Description>
+                                                                                </rdf:rest>
+                                                                            </rdf:Description>
+                                                                        </rdf:rest>
+                                                                    </rdf:Description>
+                                                                </rdf:rest>
+                                                            </rdf:Description>
+                                                        </rdf:rest>
+                                                    </rdf:Description>
+                                                </rdf:rest>
+                                            </rdf:Description>
+                                        </rdf:rest>
+                                    </rdf:Description>
+                                </rdf:rest>
+                            </rdf:Description>
+                        </rdf:rest>
+                    </rdf:Description>
+                </owl:oneOf>
+            </rdfs:Datatype>
+        </owl:equivalentClass>
+    </rdfs:Datatype>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#IntersectionDatatype -->
+
+    <rdfs:Datatype rdf:about="http://ontovibe.visualdataweb.org#IntersectionDatatype">
+        <owl:equivalentClass>
+            <rdfs:Datatype>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://ontovibe.visualdataweb.org#DivisibleByFiveEnumeration"/>
+                    <rdf:Description rdf:about="http://ontovibe.visualdataweb.org#DivisibleByTwoEnumeration"/>
+                </owl:intersectionOf>
+            </rdfs:Datatype>
+        </owl:equivalentClass>
+    </rdfs:Datatype>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#UnionDatatype -->
+
+    <rdfs:Datatype rdf:about="http://ontovibe.visualdataweb.org#UnionDatatype">
+        <owl:equivalentClass>
+            <rdfs:Datatype>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://ontovibe.visualdataweb.org#DivisibleByFiveEnumeration"/>
+                    <rdf:Description rdf:about="http://ontovibe.visualdataweb.org#DivisibleByTwoEnumeration"/>
+                </owl:unionOf>
+            </rdfs:Datatype>
+        </owl:equivalentClass>
+    </rdfs:Datatype>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org/imported#DivisibleByThreeEnumeration -->
+
+    <rdfs:Datatype rdf:about="http://ontovibe.visualdataweb.org/imported#DivisibleByThreeEnumeration">
+        <owl:equivalentClass>
+            <rdfs:Datatype>
+                <owl:oneOf>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                        <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">12</rdf:first>
+                        <rdf:rest>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">15</rdf:first>
+                                <rdf:rest>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                        <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">18</rdf:first>
+                                        <rdf:rest>
+                                            <rdf:Description>
+                                                <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                                <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">3</rdf:first>
+                                                <rdf:rest>
+                                                    <rdf:Description>
+                                                        <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                                        <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">6</rdf:first>
+                                                        <rdf:rest>
+                                                            <rdf:Description>
+                                                                <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                                                <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">9</rdf:first>
+                                                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                                            </rdf:Description>
+                                                        </rdf:rest>
+                                                    </rdf:Description>
+                                                </rdf:rest>
+                                            </rdf:Description>
+                                        </rdf:rest>
+                                    </rdf:Description>
+                                </rdf:rest>
+                            </rdf:Description>
+                        </rdf:rest>
+                    </rdf:Description>
+                </owl:oneOf>
+            </rdfs:Datatype>
+        </owl:equivalentClass>
+    </rdfs:Datatype>
+    
+
+
+    <!-- http://www.w3.org/2001/XMLSchema#date -->
+
+    <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#date"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#anonymousComplementClassProperty -->
+
+    <owl:ObjectProperty rdf:about="http://ontovibe.visualdataweb.org#anonymousComplementClassProperty">
+        <rdfs:domain rdf:resource="http://ontovibe.visualdataweb.org#AnonymousClassAnchor"/>
+        <rdfs:range>
+            <owl:Class>
+                <owl:complementOf rdf:resource="http://ontovibe.visualdataweb.org#DeprecatedClass"/>
+            </owl:Class>
+        </rdfs:range>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#anonymousEnumerationClassProperty -->
+
+    <owl:ObjectProperty rdf:about="http://ontovibe.visualdataweb.org#anonymousEnumerationClassProperty">
+        <rdfs:domain rdf:resource="http://ontovibe.visualdataweb.org#AnonymousClassAnchor"/>
+        <rdfs:range>
+            <owl:Class>
+                <owl:oneOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://ontovibe.visualdataweb.org#AnotherIndividual"/>
+                    <rdf:Description rdf:about="http://ontovibe.visualdataweb.org#MultiSubclassIndividual3"/>
+                </owl:oneOf>
+            </owl:Class>
+        </rdfs:range>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#anonymousIntersectionClassProperty -->
+
+    <owl:ObjectProperty rdf:about="http://ontovibe.visualdataweb.org#anonymousIntersectionClassProperty">
+        <rdfs:domain rdf:resource="http://ontovibe.visualdataweb.org#AnonymousClassAnchor"/>
+        <rdfs:range>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://ontovibe.visualdataweb.org#Class1"/>
+                    <rdf:Description rdf:about="http://ontovibe.visualdataweb.org#DeprecatedClass"/>
+                </owl:intersectionOf>
+            </owl:Class>
+        </rdfs:range>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#anonymousUnionClassProperty -->
+
+    <owl:ObjectProperty rdf:about="http://ontovibe.visualdataweb.org#anonymousUnionClassProperty">
+        <rdfs:domain rdf:resource="http://ontovibe.visualdataweb.org#AnonymousClassAnchor"/>
+        <rdfs:range>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://ontovibe.visualdataweb.org#Class1"/>
+                    <rdf:Description rdf:about="http://ontovibe.visualdataweb.org#DeprecatedClass"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:range>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#classToClassProperty -->
+
+    <owl:ObjectProperty rdf:about="http://ontovibe.visualdataweb.org#classToClassProperty">
+        <rdfs:domain rdf:resource="http://ontovibe.visualdataweb.org#PropertyOwner"/>
+        <rdfs:range rdf:resource="http://ontovibe.visualdataweb.org#Class1"/>
+        <dc:description xml:lang="es">Esto es una descripción en español de una propiedad con descripciones en varias lenguas.</dc:description>
+        <dc:description xml:lang="en">This is an English description of a property with descriptions in several languages.</dc:description>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#classToClassProperty1 -->
+
+    <owl:ObjectProperty rdf:about="http://ontovibe.visualdataweb.org#classToClassProperty1">
+        <rdfs:domain rdf:resource="http://ontovibe.visualdataweb.org#PropertyOwner"/>
+        <rdfs:range rdf:resource="http://ontovibe.visualdataweb.org#MultiPropertyOwner"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#classToClassProperty2 -->
+
+    <owl:ObjectProperty rdf:about="http://ontovibe.visualdataweb.org#classToClassProperty2">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
+        <rdfs:domain rdf:resource="http://ontovibe.visualdataweb.org#PropertyOwner"/>
+        <rdfs:range rdf:resource="http://ontovibe.visualdataweb.org#MultiPropertyOwner"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#classToUntypedClassProperty -->
+
+    <owl:ObjectProperty rdf:about="http://ontovibe.visualdataweb.org#classToUntypedClassProperty">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#SymmetricProperty"/>
+        <rdfs:domain rdf:resource="http://ontovibe.visualdataweb.org#PropertyOwner"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#cyclicProperty -->
+
+    <owl:ObjectProperty rdf:about="http://ontovibe.visualdataweb.org#cyclicProperty">
+        <rdfs:domain rdf:resource="http://ontovibe.visualdataweb.org#PropertyOwner"/>
+        <rdfs:range rdf:resource="http://ontovibe.visualdataweb.org#PropertyOwner"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#cyclicProperty1 -->
+
+    <owl:ObjectProperty rdf:about="http://ontovibe.visualdataweb.org#cyclicProperty1">
+        <rdfs:domain rdf:resource="http://ontovibe.visualdataweb.org#MultiPropertyOwner"/>
+        <rdfs:range rdf:resource="http://ontovibe.visualdataweb.org#MultiPropertyOwner"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#cyclicProperty2 -->
+
+    <owl:ObjectProperty rdf:about="http://ontovibe.visualdataweb.org#cyclicProperty2">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ReflexiveProperty"/>
+        <rdfs:domain rdf:resource="http://ontovibe.visualdataweb.org#MultiPropertyOwner"/>
+        <rdfs:range rdf:resource="http://ontovibe.visualdataweb.org#MultiPropertyOwner"/>
+        <dc:description xml:lang="de">Dies ist eine deutsche Beschreibung einer Eigenschaft, die auch einen nicht in Deutsch verfassten Kommentar enthält.</dc:description>
+        <rdfs:comment xml:lang="en">This is an English comment on a property that also has a non-English description.</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#cyclicProperty3 -->
+
+    <owl:ObjectProperty rdf:about="http://ontovibe.visualdataweb.org#cyclicProperty3">
+        <rdfs:domain rdf:resource="http://ontovibe.visualdataweb.org#MultiPropertyOwner"/>
+        <rdfs:range rdf:resource="http://ontovibe.visualdataweb.org#MultiPropertyOwner"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#deprecatedObjectProperty -->
+
+    <owl:ObjectProperty rdf:about="http://ontovibe.visualdataweb.org#deprecatedObjectProperty">
+        <rdfs:domain rdf:resource="http://ontovibe.visualdataweb.org#PropertyOwner"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+        <owl:deprecated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</owl:deprecated>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#disjointProperty -->
+
+    <owl:ObjectProperty rdf:about="http://ontovibe.visualdataweb.org#disjointProperty">
+        <rdfs:domain rdf:resource="http://ontovibe.visualdataweb.org#PropertyOwner"/>
+        <rdfs:range rdf:resource="http://ontovibe.visualdataweb.org#FunctionalAnchor"/>
+        <owl:propertyDisjointWith rdf:resource="http://ontovibe.visualdataweb.org#functionalProperty"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#dummyProperty -->
+
+    <owl:ObjectProperty rdf:about="http://ontovibe.visualdataweb.org#dummyProperty">
+        <owl:equivalentProperty rdf:resource="http://ontovibe.visualdataweb.org#equivalentObjectProperty"/>
+        <rdfs:domain rdf:resource="http://ontovibe.visualdataweb.org#PropertyOwner"/>
+        <rdfs:range rdf:resource="http://ontovibe.visualdataweb.org#DisjointClass"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#equivalentObjectProperty -->
+
+    <owl:ObjectProperty rdf:about="http://ontovibe.visualdataweb.org#equivalentObjectProperty"/>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#functionalProperty -->
+
+    <owl:ObjectProperty rdf:about="http://ontovibe.visualdataweb.org#functionalProperty">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:domain rdf:resource="http://ontovibe.visualdataweb.org#PropertyOwner"/>
+        <rdfs:range rdf:resource="http://ontovibe.visualdataweb.org#FunctionalAnchor"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#functionalPropertyAsInverse -->
+
+    <owl:ObjectProperty rdf:about="http://ontovibe.visualdataweb.org#functionalPropertyAsInverse">
+        <owl:inverseOf rdf:resource="http://ontovibe.visualdataweb.org#inverseFunctionalProperty"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:domain rdf:resource="http://ontovibe.visualdataweb.org#PropertyOwner"/>
+        <rdfs:range rdf:resource="http://ontovibe.visualdataweb.org#FunctionalAnchor"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#inverseFunctionalProperty -->
+
+    <owl:ObjectProperty rdf:about="http://ontovibe.visualdataweb.org#inverseFunctionalProperty">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#InverseFunctionalProperty"/>
+        <rdfs:domain rdf:resource="http://ontovibe.visualdataweb.org#FunctionalAnchor"/>
+        <rdfs:range rdf:resource="http://ontovibe.visualdataweb.org#PropertyOwner"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#oppositeDummyProperty -->
+
+    <owl:ObjectProperty rdf:about="http://ontovibe.visualdataweb.org#oppositeDummyProperty">
+        <rdfs:domain rdf:resource="http://ontovibe.visualdataweb.org#DisjointClass"/>
+        <rdfs:range rdf:resource="http://ontovibe.visualdataweb.org#PropertyOwner"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#subproperty -->
+
+    <owl:ObjectProperty rdf:about="http://ontovibe.visualdataweb.org#subproperty">
+        <rdfs:subPropertyOf rdf:resource="http://ontovibe.visualdataweb.org#deprecatedObjectProperty"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#untypedClassToClassProperty -->
+
+    <owl:ObjectProperty rdf:about="http://ontovibe.visualdataweb.org#untypedClassToClassProperty">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
+        <rdfs:range rdf:resource="http://ontovibe.visualdataweb.org#PropertyOwner"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org/imported#deprecatedImportedObjectProperty -->
+
+    <owl:ObjectProperty rdf:about="http://ontovibe.visualdataweb.org/imported#deprecatedImportedObjectProperty">
+        <rdfs:range rdf:resource="http://ontovibe.visualdataweb.org/imported#ImportedClass"/>
+        <owl:deprecated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</owl:deprecated>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org/imported#importedObjectPropertyWithDomain -->
+
+    <owl:ObjectProperty rdf:about="http://ontovibe.visualdataweb.org/imported#importedObjectPropertyWithDomain">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#TransitiveProperty"/>
+        <rdfs:domain rdf:resource="http://ontovibe.visualdataweb.org/imported#ImportedClass"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org/imported#importedObjectPropertyWithRange -->
+
+    <owl:ObjectProperty rdf:about="http://ontovibe.visualdataweb.org/imported#importedObjectPropertyWithRange">
+        <rdfs:range rdf:resource="http://ontovibe.visualdataweb.org/imported#ImportedClass"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Data properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#anotherEquivalentDataProperty -->
+
+    <owl:DatatypeProperty rdf:about="http://ontovibe.visualdataweb.org#anotherEquivalentDataProperty">
+        <owl:equivalentProperty rdf:resource="http://ontovibe.visualdataweb.org#equivalentDataProperty"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#complementTypeDatatypeProperty -->
+
+    <owl:DatatypeProperty rdf:about="http://ontovibe.visualdataweb.org#complementTypeDatatypeProperty">
+        <rdfs:domain rdf:resource="http://ontovibe.visualdataweb.org#PropertyOwner"/>
+        <rdfs:range rdf:resource="http://ontovibe.visualdataweb.org#ComplementDatatype"/>
+        <rdfs:label>complement-type datatype property</rdfs:label>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#customTypeDatatypeProperty -->
+
+    <owl:DatatypeProperty rdf:about="http://ontovibe.visualdataweb.org#customTypeDatatypeProperty">
+        <rdfs:domain rdf:resource="http://ontovibe.visualdataweb.org#PropertyOwner"/>
+        <rdfs:range rdf:resource="http://ontovibe.visualdataweb.org#DivisibleByFiveEnumeration"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#deprecatedDatatypeProperty -->
+
+    <owl:DatatypeProperty rdf:about="http://ontovibe.visualdataweb.org#deprecatedDatatypeProperty">
+        <rdfs:domain rdf:resource="http://ontovibe.visualdataweb.org#PropertyOwner"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#date"/>
+        <owl:deprecated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</owl:deprecated>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#equivalentDataProperty -->
+
+    <owl:DatatypeProperty rdf:about="http://ontovibe.visualdataweb.org#equivalentDataProperty">
+        <owl:equivalentProperty rdf:resource="http://ontovibe.visualdataweb.org#realProperty"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#functionalDatatypeProperty -->
+
+    <owl:DatatypeProperty rdf:about="http://ontovibe.visualdataweb.org#functionalDatatypeProperty">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:domain rdf:resource="http://ontovibe.visualdataweb.org#FunctionalAnchor"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#hexBinary"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#importedTypeDatatypeProperty -->
+
+    <owl:DatatypeProperty rdf:about="http://ontovibe.visualdataweb.org#importedTypeDatatypeProperty">
+        <rdfs:domain rdf:resource="http://ontovibe.visualdataweb.org#PropertyOwner"/>
+        <rdfs:range rdf:resource="http://ontovibe.visualdataweb.org/imported#DivisibleByThreeEnumeration"/>
+        <rdfs:label xml:lang="en">imported type datatype property</rdfs:label>
+        <rdfs:label xml:lang="fr">propriété d&apos;un type de données importé</rdfs:label>
+        <rdfs:label xml:lang="zh-hans">一种导入类型的数据类型性质</rdfs:label>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#intersectionTypeDatatypeProperty -->
+
+    <owl:DatatypeProperty rdf:about="http://ontovibe.visualdataweb.org#intersectionTypeDatatypeProperty">
+        <rdfs:domain rdf:resource="http://ontovibe.visualdataweb.org#PropertyOwner"/>
+        <rdfs:range rdf:resource="http://ontovibe.visualdataweb.org#IntersectionDatatype"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#rationalProperty -->
+
+    <owl:DatatypeProperty rdf:about="http://ontovibe.visualdataweb.org#rationalProperty">
+        <rdfs:domain rdf:resource="http://ontovibe.visualdataweb.org#PropertyOwner"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2002/07/owl#rational"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#realProperty -->
+
+    <owl:DatatypeProperty rdf:about="http://ontovibe.visualdataweb.org#realProperty">
+        <rdfs:domain rdf:resource="http://ontovibe.visualdataweb.org#PropertyOwner"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2002/07/owl#real"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#standardTypeDatatypeProperty -->
+
+    <owl:DatatypeProperty rdf:about="http://ontovibe.visualdataweb.org#standardTypeDatatypeProperty">
+        <rdfs:domain rdf:resource="http://ontovibe.visualdataweb.org#PropertyOwner"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#unionTypeDatatypeProperty -->
+
+    <owl:DatatypeProperty rdf:about="http://ontovibe.visualdataweb.org#unionTypeDatatypeProperty">
+        <rdfs:domain rdf:resource="http://ontovibe.visualdataweb.org#PropertyOwner"/>
+        <rdfs:range rdf:resource="http://ontovibe.visualdataweb.org#UnionDatatype"/>
+        <rdfs:comment xml:lang="en">This is an English comment on a property.</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#untypedDatatypeProperty -->
+
+    <owl:DatatypeProperty rdf:about="http://ontovibe.visualdataweb.org#untypedDatatypeProperty">
+        <rdfs:domain rdf:resource="http://ontovibe.visualdataweb.org#PropertyOwner"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org/imported#deprecatedImportedDatatypeProperty -->
+
+    <owl:DatatypeProperty rdf:about="http://ontovibe.visualdataweb.org/imported#deprecatedImportedDatatypeProperty">
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#date"/>
+        <owl:deprecated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</owl:deprecated>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org/imported#importedDatatypeProperty -->
+
+    <owl:DatatypeProperty rdf:about="http://ontovibe.visualdataweb.org/imported#importedDatatypeProperty">
+        <rdfs:domain rdf:resource="http://ontovibe.visualdataweb.org/imported#ImportedClass"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#AllValuesFromClass -->
+
+    <owl:Class rdf:about="http://ontovibe.visualdataweb.org#AllValuesFromClass">
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://ontovibe.visualdataweb.org#classToClassProperty"/>
+                <owl:allValuesFrom rdf:resource="http://ontovibe.visualdataweb.org#DeprecatedClass"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#AlsoEquivalentToSubclass -->
+
+    <owl:Class rdf:about="http://ontovibe.visualdataweb.org#AlsoEquivalentToSubclass">
+        <owl:equivalentClass rdf:resource="http://ontovibe.visualdataweb.org#Subclass"/>
+    </owl:Class>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#AnonymousClassAnchor -->
+
+    <owl:Class rdf:about="http://ontovibe.visualdataweb.org#AnonymousClassAnchor"/>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#Class1 -->
+
+    <owl:Class rdf:about="http://ontovibe.visualdataweb.org#Class1"/>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#ComplementClass -->
+
+    <owl:Class rdf:about="http://ontovibe.visualdataweb.org#ComplementClass">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:complementOf rdf:resource="http://ontovibe.visualdataweb.org#Class1"/>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#DeprecatedClass -->
+
+    <owl:Class rdf:about="http://ontovibe.visualdataweb.org#DeprecatedClass">
+        <owl:deprecated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</owl:deprecated>
+    </owl:Class>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#DisjointClass -->
+
+    <owl:Class rdf:about="http://ontovibe.visualdataweb.org#DisjointClass">
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://ontovibe.visualdataweb.org#oppositeDummyProperty"/>
+                <owl:minCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">5</owl:minCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://ontovibe.visualdataweb.org#oppositeDummyProperty"/>
+                <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">15</owl:maxCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <owl:disjointWith rdf:resource="http://ontovibe.visualdataweb.org#LargeUnionClass"/>
+        <rdfs:label xml:lang="en">disjoint class</rdfs:label>
+        <rdfs:label xml:lang="de">disjunkte Klasse</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#DisjointUnionClass -->
+
+    <owl:Class rdf:about="http://ontovibe.visualdataweb.org#DisjointUnionClass">
+        <owl:disjointUnionOf rdf:parseType="Collection">
+            <rdf:Description rdf:about="http://ontovibe.visualdataweb.org#Class1"/>
+            <rdf:Description rdf:about="http://ontovibe.visualdataweb.org#UnionClass"/>
+        </owl:disjointUnionOf>
+    </owl:Class>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#EnumerationClass -->
+
+    <owl:Class rdf:about="http://ontovibe.visualdataweb.org#EnumerationClass">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:oneOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://ontovibe.visualdataweb.org#MultiSubclassIndividual2"/>
+                    <rdf:Description rdf:about="http://ontovibe.visualdataweb.org#MultiSubclassIndividual3"/>
+                </owl:oneOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#EquivalentClassInLargeGroup -->
+
+    <owl:Class rdf:about="http://ontovibe.visualdataweb.org#EquivalentClassInLargeGroup">
+        <owl:equivalentClass rdf:resource="http://ontovibe.visualdataweb.org#EquivalentDeprecatedClassInLargeGroup"/>
+        <owl:equivalentClass rdf:resource="http://ontovibe.visualdataweb.org/imported#EquivalentImportedClassInLargeGroup"/>
+    </owl:Class>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#EquivalentDeprecatedClass -->
+
+    <owl:Class rdf:about="http://ontovibe.visualdataweb.org#EquivalentDeprecatedClass">
+        <owl:equivalentClass rdf:resource="http://ontovibe.visualdataweb.org#EquivalentToDeprecatedClass"/>
+        <dc:description xml:lang="en">This is an English description in a class that is part of an equivalent class group.</dc:description>
+        <owl:deprecated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</owl:deprecated>
+    </owl:Class>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#EquivalentDeprecatedClassInLargeGroup -->
+
+    <owl:Class rdf:about="http://ontovibe.visualdataweb.org#EquivalentDeprecatedClassInLargeGroup">
+        <owl:deprecated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</owl:deprecated>
+    </owl:Class>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#EquivalentToDeprecatedClass -->
+
+    <owl:Class rdf:about="http://ontovibe.visualdataweb.org#EquivalentToDeprecatedClass"/>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#EquivalentToPropertyOwner -->
+
+    <owl:Class rdf:about="http://ontovibe.visualdataweb.org#EquivalentToPropertyOwner">
+        <owl:equivalentClass rdf:resource="http://ontovibe.visualdataweb.org#PropertyOwner"/>
+    </owl:Class>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#EquivalentToSubclass -->
+
+    <owl:Class rdf:about="http://ontovibe.visualdataweb.org#EquivalentToSubclass">
+        <owl:equivalentClass rdf:resource="http://ontovibe.visualdataweb.org#Subclass"/>
+    </owl:Class>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#FunctionalAnchor -->
+
+    <owl:Class rdf:about="http://ontovibe.visualdataweb.org#FunctionalAnchor"/>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#HasSelfClass -->
+
+    <owl:Class rdf:about="http://ontovibe.visualdataweb.org#HasSelfClass">
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://ontovibe.visualdataweb.org#classToClassProperty"/>
+                <owl:hasSelf rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</owl:hasSelf>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#HasValueClass -->
+
+    <owl:Class rdf:about="http://ontovibe.visualdataweb.org#HasValueClass">
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://ontovibe.visualdataweb.org#classToClassProperty"/>
+                <owl:hasValue rdf:resource="http://ontovibe.visualdataweb.org#Class1Individual"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#IntersectionClass -->
+
+    <owl:Class rdf:about="http://ontovibe.visualdataweb.org#IntersectionClass">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://ontovibe.visualdataweb.org#Class1"/>
+                    <rdf:Description rdf:about="http://ontovibe.visualdataweb.org#DeprecatedClass"/>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#LargeDisjointUnionClass -->
+
+    <owl:Class rdf:about="http://ontovibe.visualdataweb.org#LargeDisjointUnionClass">
+        <owl:disjointUnionOf rdf:parseType="Collection">
+            <rdf:Description rdf:about="http://ontovibe.visualdataweb.org#ComplementClass"/>
+            <rdf:Description rdf:about="http://ontovibe.visualdataweb.org#IntersectionClass"/>
+            <rdf:Description rdf:about="http://ontovibe.visualdataweb.org/imported#DeprecatedImportedClass"/>
+        </owl:disjointUnionOf>
+    </owl:Class>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#LargeEnumerationClass -->
+
+    <owl:Class rdf:about="http://ontovibe.visualdataweb.org#LargeEnumerationClass">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:oneOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://ontovibe.visualdataweb.org#AnotherIndividual"/>
+                    <rdf:Description rdf:about="http://ontovibe.visualdataweb.org#MultiSubclassIndividual2"/>
+                    <rdf:Description rdf:about="http://ontovibe.visualdataweb.org#MultiSubclassIndividual3"/>
+                </owl:oneOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#LargeIntersectionClass -->
+
+    <owl:Class rdf:about="http://ontovibe.visualdataweb.org#LargeIntersectionClass">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://ontovibe.visualdataweb.org#PropertyOwner"/>
+                    <rdf:Description rdf:about="http://ontovibe.visualdataweb.org#UnionClass"/>
+                    <rdf:Description rdf:about="http://ontovibe.visualdataweb.org/imported#ImportedClass"/>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#LargeUnionClass -->
+
+    <owl:Class rdf:about="http://ontovibe.visualdataweb.org#LargeUnionClass">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://ontovibe.visualdataweb.org#PropertyOwner"/>
+                    <rdf:Description rdf:about="http://ontovibe.visualdataweb.org#UnionClass"/>
+                    <rdf:Description rdf:about="http://ontovibe.visualdataweb.org/imported#ImportedClass"/>
+                </owl:unionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#MultiPropertyOwner -->
+
+    <owl:Class rdf:about="http://ontovibe.visualdataweb.org#MultiPropertyOwner"/>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#MultiSubclass -->
+
+    <owl:Class rdf:about="http://ontovibe.visualdataweb.org#MultiSubclass">
+        <rdfs:subClassOf rdf:resource="http://ontovibe.visualdataweb.org#DisjointClass"/>
+        <rdfs:subClassOf rdf:resource="http://ontovibe.visualdataweb.org/imported#DeprecatedImportedClass"/>
+        <dc:description xml:lang="en">This is an English description on a class that also has a comment.</dc:description>
+        <rdfs:comment xml:lang="en">This is an English comment on a class that also has a description.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#PlainClass -->
+
+    <owl:Class rdf:about="http://ontovibe.visualdataweb.org#PlainClass"/>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#PropertyOwner -->
+
+    <owl:Class rdf:about="http://ontovibe.visualdataweb.org#PropertyOwner">
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://ontovibe.visualdataweb.org#dummyProperty"/>
+                <owl:minQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">3</owl:minQualifiedCardinality>
+                <owl:onClass rdf:resource="http://ontovibe.visualdataweb.org#Subclass"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://ontovibe.visualdataweb.org#classToClassProperty"/>
+                <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">3</owl:cardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://ontovibe.visualdataweb.org#customTypeDatatypeProperty"/>
+                <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">2</owl:cardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#PropertyOwnerType -->
+
+    <owl:Class rdf:about="http://ontovibe.visualdataweb.org#PropertyOwnerType"/>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#SomeValuesFromClass -->
+
+    <owl:Class rdf:about="http://ontovibe.visualdataweb.org#SomeValuesFromClass">
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://ontovibe.visualdataweb.org#classToClassProperty"/>
+                <owl:someValuesFrom rdf:resource="http://ontovibe.visualdataweb.org#DeprecatedClass"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#Subclass -->
+
+    <owl:Class rdf:about="http://ontovibe.visualdataweb.org#Subclass">
+        <rdfs:subClassOf rdf:resource="http://ontovibe.visualdataweb.org#DisjointClass"/>
+    </owl:Class>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#UnionClass -->
+
+    <owl:Class rdf:about="http://ontovibe.visualdataweb.org#UnionClass">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://ontovibe.visualdataweb.org#Class1"/>
+                    <rdf:Description rdf:about="http://ontovibe.visualdataweb.org#DeprecatedClass"/>
+                </owl:unionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+        <rdfs:comment xml:lang="en">This is an English comment on a class expression.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org/imported#DeprecatedImportedClass -->
+
+    <owl:Class rdf:about="http://ontovibe.visualdataweb.org/imported#DeprecatedImportedClass">
+        <owl:deprecated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</owl:deprecated>
+    </owl:Class>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org/imported#EquivalentImportedClassInLargeGroup -->
+
+    <owl:Class rdf:about="http://ontovibe.visualdataweb.org/imported#EquivalentImportedClassInLargeGroup"/>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org/imported#ImportedClass -->
+
+    <owl:Class rdf:about="http://ontovibe.visualdataweb.org/imported#ImportedClass"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#AnotherIndividual -->
+
+    <owl:NamedIndividual rdf:about="http://ontovibe.visualdataweb.org#AnotherIndividual">
+        <rdf:type rdf:resource="http://ontovibe.visualdataweb.org#DeprecatedClass"/>
+        <dc:description xml:lang="en">This is an English description on an individual that also has a comment.</dc:description>
+        <rdfs:comment xml:lang="en">This is an English comment on an individual that also has a description.</rdfs:comment>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#Class1Individual -->
+
+    <owl:NamedIndividual rdf:about="http://ontovibe.visualdataweb.org#Class1Individual">
+        <rdf:type rdf:resource="http://ontovibe.visualdataweb.org#Class1"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#MultiPropertyOwner -->
+
+    <owl:NamedIndividual rdf:about="http://ontovibe.visualdataweb.org#MultiPropertyOwner">
+        <rdf:type rdf:resource="http://ontovibe.visualdataweb.org#PropertyOwnerType"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#MultiSubclassIndividual1 -->
+
+    <owl:NamedIndividual rdf:about="http://ontovibe.visualdataweb.org#MultiSubclassIndividual1">
+        <rdf:type rdf:resource="http://ontovibe.visualdataweb.org#MultiSubclass"/>
+        <rdfs:comment xml:lang="en">This ia an English comment on an individual.</rdfs:comment>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#MultiSubclassIndividual2 -->
+
+    <owl:NamedIndividual rdf:about="http://ontovibe.visualdataweb.org#MultiSubclassIndividual2">
+        <rdf:type rdf:resource="http://ontovibe.visualdataweb.org#MultiSubclass"/>
+        <owl:sameAs rdf:resource="http://ontovibe.visualdataweb.org#SameAsMultiSubclassIndividual2"/>
+    </owl:NamedIndividual>
+    <rdf:Description>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NegativePropertyAssertion"/>
+        <owl:sourceIndividual rdf:resource="http://ontovibe.visualdataweb.org#MultiSubclassIndividual2"/>
+        <owl:assertionProperty rdf:resource="http://ontovibe.visualdataweb.org#dummyProperty"/>
+        <owl:targetIndividual rdf:resource="http://ontovibe.visualdataweb.org#AnotherIndividual"/>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NegativePropertyAssertion"/>
+        <owl:sourceIndividual rdf:resource="http://ontovibe.visualdataweb.org#MultiSubclassIndividual2"/>
+        <owl:assertionProperty rdf:resource="http://ontovibe.visualdataweb.org#complementTypeDatatypeProperty"/>
+        <owl:targetValue rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">18</owl:targetValue>
+    </rdf:Description>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#MultiSubclassIndividual3 -->
+
+    <owl:NamedIndividual rdf:about="http://ontovibe.visualdataweb.org#MultiSubclassIndividual3">
+        <rdf:type rdf:resource="http://ontovibe.visualdataweb.org#MultiSubclass"/>
+        <dummyProperty rdf:resource="http://ontovibe.visualdataweb.org#MultiSubclassIndividual1"/>
+        <complementTypeDatatypeProperty rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">19</complementTypeDatatypeProperty>
+        <dc:description>This is a description without a language on an individual.</dc:description>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#PropertyOwner -->
+
+    <owl:NamedIndividual rdf:about="http://ontovibe.visualdataweb.org#PropertyOwner">
+        <rdf:type rdf:resource="http://ontovibe.visualdataweb.org#PropertyOwnerType"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://ontovibe.visualdataweb.org#SameAsMultiSubclassIndividual2 -->
+
+    <owl:NamedIndividual rdf:about="http://ontovibe.visualdataweb.org#SameAsMultiSubclassIndividual2">
+        <rdf:type rdf:resource="http://ontovibe.visualdataweb.org#MultiSubclass"/>
+    </owl:NamedIndividual>
+    <rdf:Description>
+        <owl:hasSelf rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</owl:hasSelf>
+    </rdf:Description>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Annotations
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    <rdf:Description rdf:about="http://ontovibe.visualdataweb.org#MultiPropertyOwner">
+        <rdfs:comment>This is a comment without a language-tag on a class that also has a label.</rdfs:comment>
+        <rdfs:label>multi-property owner</rdfs:label>
+    </rdf:Description>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // General axioms
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    <rdf:Description>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDisjointClasses"/>
+        <owl:members rdf:parseType="Collection">
+            <rdf:Description rdf:about="http://ontovibe.visualdataweb.org#Class1"/>
+            <rdf:Description rdf:about="http://ontovibe.visualdataweb.org#LargeUnionClass"/>
+            <rdf:Description rdf:about="http://ontovibe.visualdataweb.org#MultiPropertyOwner"/>
+        </owl:members>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDifferent"/>
+        <owl:distinctMembers rdf:parseType="Collection">
+            <rdf:Description rdf:about="http://ontovibe.visualdataweb.org#AnotherIndividual"/>
+            <rdf:Description rdf:about="http://ontovibe.visualdataweb.org#MultiSubclassIndividual1"/>
+            <rdf:Description rdf:about="http://ontovibe.visualdataweb.org#MultiSubclassIndividual2"/>
+        </owl:distinctMembers>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDifferent"/>
+        <owl:distinctMembers rdf:parseType="Collection">
+            <rdf:Description rdf:about="http://ontovibe.visualdataweb.org#MultiSubclassIndividual2"/>
+            <rdf:Description rdf:about="http://ontovibe.visualdataweb.org#MultiSubclassIndividual3"/>
+        </owl:distinctMembers>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDisjointProperties"/>
+        <owl:members rdf:parseType="Collection">
+            <rdf:Description rdf:about="http://ontovibe.visualdataweb.org#deprecatedDatatypeProperty"/>
+            <rdf:Description rdf:about="http://ontovibe.visualdataweb.org#rationalProperty"/>
+            <rdf:Description rdf:about="http://ontovibe.visualdataweb.org#realProperty"/>
+        </owl:members>
+    </rdf:Description>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi -->
+
