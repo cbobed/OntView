@@ -1,0 +1,1064 @@
+<?xml version="1.0"?>
+<Ontology xmlns="http://www.w3.org/2002/07/owl#"
+     xml:base="http://horus.cps.unizar.es:18080/ontology/extendedCamera.owl"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     ontologyIRI="http://horus.cps.unizar.es:18080/ontology/extendedCamera.owl">
+    <Prefix name="" IRI="http://horus.cps.unizar.es:18080/ontology/extendedCamera.owl"/>
+    <Prefix name="owl" IRI="http://www.w3.org/2002/07/owl#"/>
+    <Prefix name="rdf" IRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+    <Prefix name="xml" IRI="http://www.w3.org/XML/1998/namespace"/>
+    <Prefix name="xsd" IRI="http://www.w3.org/2001/XMLSchema#"/>
+    <Prefix name="rdfs" IRI="http://www.w3.org/2000/01/rdf-schema#"/>
+    <Prefix name="owl11" IRI="http://www.w3.org/2006/12/owl11#"/>
+    <Prefix name="camera" IRI="http://www.xfront.com/owl/ontologies/camera/#"/>
+    <Prefix name="owl11xml" IRI="http://www.w3.org/2006/12/owl11-xml#"/>
+    <Annotation>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <Literal>Camera OWL Ontology
+
+Author: Roger L. Costello
+Acknowlegements: Many thanks to the following people for
+their invaluable input:
+Richard McCullough, Yuzhong Qu,
+Leo Sauermann, Brian McBride and
+Jim Farrugia.</Literal>
+    </Annotation>
+    <Declaration>
+        <Class IRI="#APS"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#APS-Camera"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#APS-Compact"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#APS-SLR"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Analog"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Body"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#BodyWithNonAdjustableShutterSpeed"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Camera"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#CellPhoneCamera"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#CellPhoneWithCamera"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#CellPhones"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Compact"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Digital"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Digital-SLR"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Digital-Video"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#DigitalZoom"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Dimension"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Film"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#ImageCapturingDeviceType"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#ImageSensors"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Large-Format"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Lens"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#LensFilter"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Manufacturer"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Money"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#NonAPS"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#OldFilm"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#OpticalZoom"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#PointAndShoot"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#PointAndShootWithZoom"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#ProductCode"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#PurchaseableItem"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Range"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#SLR"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Standard"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Standard-35mm"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#ViewerWindow"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Weight"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#WideAngle"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Zoom"/>
+    </Declaration>
+    <Declaration>
+        <Class abbreviatedIRI="camera:ImageCapturingDeviceType"/>
+    </Declaration>
+    <Declaration>
+        <Class abbreviatedIRI="camera:ViewerWindow"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#cost"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasBody"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasDimension"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasFilmSpeed"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasImageCapturingDevice"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasImageCapturingDeviceType"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasImageSize"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasLens"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasManufacturer"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasPart"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasProductCode"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasViewFinder"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#isCompatibleWith"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#isProductCodeFor"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#manufactures"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#shutter-speed"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#superProp"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#weight"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#aperture"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#breadth"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#colour"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#currency"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#dxCoding"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#f-stop"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#focal-length"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#height"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#length"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#max"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#min"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#noOfExposures"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#size"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#speed"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#steps"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#units"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#value"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#APSFILM"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#AtTheBack"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#CCD-array"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#CMOSdevice"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#Old110mm"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#OnTheside"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#RealImageZoom"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#ReverseGalelian"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#SingleLensReflector"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#Standard35mmFilm"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#TestLnes"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#ThroughTheLens"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#WindowOnTopOfCamera"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#test"/>
+    </Declaration>
+    <EquivalentClasses>
+        <Class IRI="#APS"/>
+        <ObjectIntersectionOf>
+            <Class IRI="#Film"/>
+            <ObjectHasValue>
+                <ObjectProperty IRI="#hasImageCapturingDeviceType"/>
+                <NamedIndividual IRI="#APSFILM"/>
+            </ObjectHasValue>
+        </ObjectIntersectionOf>
+    </EquivalentClasses>
+    <EquivalentClasses>
+        <Class IRI="#APS-Camera"/>
+        <ObjectIntersectionOf>
+            <Class IRI="#Analog"/>
+            <ObjectAllValuesFrom>
+                <ObjectProperty IRI="#hasImageCapturingDevice"/>
+                <Class IRI="#APS"/>
+            </ObjectAllValuesFrom>
+        </ObjectIntersectionOf>
+    </EquivalentClasses>
+    <EquivalentClasses>
+        <Class IRI="#APS-Compact"/>
+        <ObjectUnionOf>
+            <ObjectHasValue>
+                <ObjectProperty IRI="#hasViewFinder"/>
+                <NamedIndividual IRI="#RealImageZoom"/>
+            </ObjectHasValue>
+            <ObjectHasValue>
+                <ObjectProperty IRI="#hasViewFinder"/>
+                <NamedIndividual IRI="#ReverseGalelian"/>
+            </ObjectHasValue>
+        </ObjectUnionOf>
+    </EquivalentClasses>
+    <EquivalentClasses>
+        <Class IRI="#APS-SLR"/>
+        <ObjectHasValue>
+            <ObjectProperty IRI="#hasViewFinder"/>
+            <NamedIndividual IRI="#SingleLensReflector"/>
+        </ObjectHasValue>
+    </EquivalentClasses>
+    <EquivalentClasses>
+        <Class IRI="#Analog"/>
+        <ObjectIntersectionOf>
+            <Class IRI="#Camera"/>
+            <ObjectAllValuesFrom>
+                <ObjectProperty IRI="#hasImageCapturingDevice"/>
+                <Class IRI="#Film"/>
+            </ObjectAllValuesFrom>
+        </ObjectIntersectionOf>
+    </EquivalentClasses>
+    <EquivalentClasses>
+        <Class IRI="#BodyWithNonAdjustableShutterSpeed"/>
+        <ObjectIntersectionOf>
+            <Class IRI="#Body"/>
+            <ObjectExactCardinality cardinality="0">
+                <ObjectProperty IRI="#shutter-speed"/>
+            </ObjectExactCardinality>
+        </ObjectIntersectionOf>
+    </EquivalentClasses>
+    <EquivalentClasses>
+        <Class IRI="#CellPhoneWithCamera"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#hasPart"/>
+            <Class IRI="#CellPhoneCamera"/>
+        </ObjectSomeValuesFrom>
+    </EquivalentClasses>
+    <EquivalentClasses>
+        <Class IRI="#Compact"/>
+        <ObjectIntersectionOf>
+            <Class IRI="#Standard"/>
+            <ObjectUnionOf>
+                <ObjectHasValue>
+                    <ObjectProperty IRI="#hasViewFinder"/>
+                    <NamedIndividual IRI="#RealImageZoom"/>
+                </ObjectHasValue>
+                <ObjectHasValue>
+                    <ObjectProperty IRI="#hasViewFinder"/>
+                    <NamedIndividual IRI="#ReverseGalelian"/>
+                </ObjectHasValue>
+            </ObjectUnionOf>
+        </ObjectIntersectionOf>
+    </EquivalentClasses>
+    <EquivalentClasses>
+        <Class IRI="#Digital"/>
+        <ObjectIntersectionOf>
+            <Class IRI="#Camera"/>
+            <ObjectAllValuesFrom>
+                <ObjectProperty IRI="#hasImageCapturingDevice"/>
+                <Class IRI="#ImageSensors"/>
+            </ObjectAllValuesFrom>
+        </ObjectIntersectionOf>
+    </EquivalentClasses>
+    <EquivalentClasses>
+        <Class IRI="#Digital-SLR"/>
+        <ObjectIntersectionOf>
+            <Class IRI="#Digital"/>
+            <ObjectHasValue>
+                <ObjectProperty IRI="#hasViewFinder"/>
+                <NamedIndividual IRI="#ThroughTheLens"/>
+            </ObjectHasValue>
+        </ObjectIntersectionOf>
+    </EquivalentClasses>
+    <EquivalentClasses>
+        <Class IRI="#OldFilm"/>
+        <ObjectIntersectionOf>
+            <Class IRI="#Film"/>
+            <ObjectHasValue>
+                <ObjectProperty IRI="#hasImageCapturingDeviceType"/>
+                <NamedIndividual IRI="#Old110mm"/>
+            </ObjectHasValue>
+        </ObjectIntersectionOf>
+    </EquivalentClasses>
+    <EquivalentClasses>
+        <Class IRI="#PointAndShootWithZoom"/>
+        <ObjectAllValuesFrom>
+            <ObjectProperty IRI="#hasLens"/>
+            <Class IRI="#Zoom"/>
+        </ObjectAllValuesFrom>
+    </EquivalentClasses>
+    <EquivalentClasses>
+        <Class IRI="#SLR"/>
+        <ObjectHasValue>
+            <ObjectProperty IRI="#hasViewFinder"/>
+            <NamedIndividual IRI="#ThroughTheLens"/>
+        </ObjectHasValue>
+    </EquivalentClasses>
+    <EquivalentClasses>
+        <Class IRI="#Standard"/>
+        <ObjectIntersectionOf>
+            <Class IRI="#NonAPS"/>
+            <ObjectAllValuesFrom>
+                <ObjectProperty IRI="#hasImageCapturingDevice"/>
+                <Class IRI="#Standard-35mm"/>
+            </ObjectAllValuesFrom>
+        </ObjectIntersectionOf>
+    </EquivalentClasses>
+    <EquivalentClasses>
+        <Class IRI="#Standard-35mm"/>
+        <ObjectIntersectionOf>
+            <Class IRI="#Film"/>
+            <ObjectHasValue>
+                <ObjectProperty IRI="#hasImageCapturingDeviceType"/>
+                <NamedIndividual IRI="#Standard35mmFilm"/>
+            </ObjectHasValue>
+        </ObjectIntersectionOf>
+    </EquivalentClasses>
+    <EquivalentClasses>
+        <Class IRI="#ViewerWindow"/>
+        <ObjectOneOf>
+            <NamedIndividual IRI="#AtTheBack"/>
+            <NamedIndividual IRI="#OnTheside"/>
+            <NamedIndividual IRI="#RealImageZoom"/>
+            <NamedIndividual IRI="#ReverseGalelian"/>
+            <NamedIndividual IRI="#SingleLensReflector"/>
+            <NamedIndividual IRI="#ThroughTheLens"/>
+            <NamedIndividual IRI="#WindowOnTopOfCamera"/>
+        </ObjectOneOf>
+    </EquivalentClasses>
+    <SubClassOf>
+        <Class IRI="#APS-Compact"/>
+        <Class IRI="#APS-Camera"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#APS-SLR"/>
+        <Class IRI="#APS-Camera"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Body"/>
+        <Class IRI="#PurchaseableItem"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Camera"/>
+        <Class IRI="#PurchaseableItem"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#CellPhoneCamera"/>
+        <Class IRI="#Digital"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#CellPhoneCamera"/>
+        <ObjectMinCardinality cardinality="0">
+            <ObjectProperty IRI="#hasBody"/>
+        </ObjectMinCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#CellPhoneWithCamera"/>
+        <Class IRI="#CellPhones"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#CellPhones"/>
+        <Class IRI="#PurchaseableItem"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Digital-Video"/>
+        <Class IRI="#Digital"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#DigitalZoom"/>
+        <Class IRI="#Zoom"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Film"/>
+        <Class IRI="#PurchaseableItem"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Film"/>
+        <ObjectUnionOf>
+            <ObjectHasValue>
+                <ObjectProperty IRI="#hasImageCapturingDeviceType"/>
+                <NamedIndividual IRI="#APSFILM"/>
+            </ObjectHasValue>
+            <ObjectHasValue>
+                <ObjectProperty IRI="#hasImageCapturingDeviceType"/>
+                <NamedIndividual IRI="#Old110mm"/>
+            </ObjectHasValue>
+            <ObjectHasValue>
+                <ObjectProperty IRI="#hasImageCapturingDeviceType"/>
+                <NamedIndividual IRI="#Standard35mmFilm"/>
+            </ObjectHasValue>
+        </ObjectUnionOf>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#ImageSensors"/>
+        <Class IRI="#PurchaseableItem"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#ImageSensors"/>
+        <ObjectUnionOf>
+            <ObjectHasValue>
+                <ObjectProperty IRI="#hasImageCapturingDeviceType"/>
+                <NamedIndividual IRI="#CCD-array"/>
+            </ObjectHasValue>
+            <ObjectHasValue>
+                <ObjectProperty IRI="#hasImageCapturingDeviceType"/>
+                <NamedIndividual IRI="#CMOSdevice"/>
+            </ObjectHasValue>
+        </ObjectUnionOf>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Large-Format"/>
+        <Class IRI="#Standard"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Large-Format"/>
+        <ObjectAllValuesFrom>
+            <ObjectProperty IRI="#hasBody"/>
+            <Class IRI="#BodyWithNonAdjustableShutterSpeed"/>
+        </ObjectAllValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Lens"/>
+        <Class IRI="#PurchaseableItem"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#LensFilter"/>
+        <Class IRI="#PurchaseableItem"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#NonAPS"/>
+        <Class IRI="#Analog"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#OpticalZoom"/>
+        <Class IRI="#Zoom"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#PointAndShoot"/>
+        <Class IRI="#Digital"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#PointAndShootWithZoom"/>
+        <Class IRI="#PointAndShoot"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#SLR"/>
+        <Class IRI="#Standard"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#WideAngle"/>
+        <Class IRI="#Lens"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Zoom"/>
+        <Class IRI="#Lens"/>
+    </SubClassOf>
+    <DisjointClasses>
+        <Class IRI="#APS"/>
+        <Class IRI="#Standard-35mm"/>
+    </DisjointClasses>
+    <DisjointClasses>
+        <Class IRI="#Film"/>
+        <Class IRI="#ImageSensors"/>
+    </DisjointClasses>
+    <ClassAssertion>
+        <Class abbreviatedIRI="camera:ImageCapturingDeviceType"/>
+        <NamedIndividual IRI="#APSFILM"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class abbreviatedIRI="camera:ViewerWindow"/>
+        <NamedIndividual IRI="#AtTheBack"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class abbreviatedIRI="camera:ImageCapturingDeviceType"/>
+        <NamedIndividual IRI="#CCD-array"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class abbreviatedIRI="camera:ImageCapturingDeviceType"/>
+        <NamedIndividual IRI="#CMOSdevice"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class abbreviatedIRI="camera:ImageCapturingDeviceType"/>
+        <NamedIndividual IRI="#Old110mm"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class abbreviatedIRI="camera:ViewerWindow"/>
+        <NamedIndividual IRI="#OnTheside"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class abbreviatedIRI="camera:ViewerWindow"/>
+        <NamedIndividual IRI="#RealImageZoom"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class abbreviatedIRI="camera:ViewerWindow"/>
+        <NamedIndividual IRI="#ReverseGalelian"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class abbreviatedIRI="camera:ViewerWindow"/>
+        <NamedIndividual IRI="#SingleLensReflector"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class abbreviatedIRI="camera:ImageCapturingDeviceType"/>
+        <NamedIndividual IRI="#Standard35mmFilm"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#Lens"/>
+        <NamedIndividual IRI="#TestLnes"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class abbreviatedIRI="camera:ViewerWindow"/>
+        <NamedIndividual IRI="#ThroughTheLens"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class abbreviatedIRI="camera:ViewerWindow"/>
+        <NamedIndividual IRI="#WindowOnTopOfCamera"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#Body"/>
+        <NamedIndividual IRI="#test"/>
+    </ClassAssertion>
+    <SameIndividual>
+        <NamedIndividual IRI="#SingleLensReflector"/>
+        <NamedIndividual IRI="#ThroughTheLens"/>
+    </SameIndividual>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#CCD-array"/>
+        <NamedIndividual IRI="#CMOSdevice"/>
+    </DifferentIndividuals>
+    <ObjectPropertyAssertion>
+        <ObjectProperty IRI="#isCompatibleWith"/>
+        <NamedIndividual IRI="#TestLnes"/>
+        <NamedIndividual IRI="#test"/>
+    </ObjectPropertyAssertion>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#hasBody"/>
+        <ObjectProperty IRI="#hasPart"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#hasLens"/>
+        <ObjectProperty IRI="#hasPart"/>
+    </SubObjectPropertyOf>
+    <InverseObjectProperties>
+        <ObjectProperty IRI="#hasManufacturer"/>
+        <ObjectProperty IRI="#manufactures"/>
+    </InverseObjectProperties>
+    <FunctionalObjectProperty>
+        <ObjectProperty IRI="#hasBody"/>
+    </FunctionalObjectProperty>
+    <FunctionalObjectProperty>
+        <ObjectProperty IRI="#hasDimension"/>
+    </FunctionalObjectProperty>
+    <FunctionalObjectProperty>
+        <ObjectProperty IRI="#hasFilmSpeed"/>
+    </FunctionalObjectProperty>
+    <FunctionalObjectProperty>
+        <ObjectProperty IRI="#hasManufacturer"/>
+    </FunctionalObjectProperty>
+    <FunctionalObjectProperty>
+        <ObjectProperty IRI="#hasProductCode"/>
+    </FunctionalObjectProperty>
+    <FunctionalObjectProperty>
+        <ObjectProperty IRI="#hasViewFinder"/>
+    </FunctionalObjectProperty>
+    <FunctionalObjectProperty>
+        <ObjectProperty IRI="#isProductCodeFor"/>
+    </FunctionalObjectProperty>
+    <InverseFunctionalObjectProperty>
+        <ObjectProperty IRI="#hasProductCode"/>
+    </InverseFunctionalObjectProperty>
+    <InverseFunctionalObjectProperty>
+        <ObjectProperty IRI="#isProductCodeFor"/>
+    </InverseFunctionalObjectProperty>
+    <SymmetricObjectProperty>
+        <ObjectProperty IRI="#isCompatibleWith"/>
+    </SymmetricObjectProperty>
+    <TransitiveObjectProperty>
+        <ObjectProperty IRI="#hasPart"/>
+    </TransitiveObjectProperty>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#cost"/>
+        <Class IRI="#PurchaseableItem"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#hasBody"/>
+        <Class IRI="#Camera"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#hasDimension"/>
+        <Class IRI="#Camera"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#hasFilmSpeed"/>
+        <ObjectUnionOf>
+            <Class IRI="#Analog"/>
+            <Class IRI="#Film"/>
+        </ObjectUnionOf>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#hasImageCapturingDevice"/>
+        <Class IRI="#Camera"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#hasImageCapturingDeviceType"/>
+        <ObjectUnionOf>
+            <Class IRI="#Film"/>
+            <Class IRI="#ImageSensors"/>
+        </ObjectUnionOf>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#hasImageSize"/>
+        <Class IRI="#Digital"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#hasLens"/>
+        <Class IRI="#Camera"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#hasManufacturer"/>
+        <Class IRI="#PurchaseableItem"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#hasPart"/>
+        <Class IRI="#PurchaseableItem"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#hasProductCode"/>
+        <Class IRI="#PurchaseableItem"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#hasViewFinder"/>
+        <Class IRI="#Camera"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#isCompatibleWith"/>
+        <ObjectUnionOf>
+            <Class IRI="#Body"/>
+            <Class IRI="#Lens"/>
+        </ObjectUnionOf>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#isProductCodeFor"/>
+        <Class IRI="#ProductCode"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#manufactures"/>
+        <Class IRI="#Manufacturer"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#shutter-speed"/>
+        <Class IRI="#Body"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#superProp"/>
+        <ObjectMinCardinality cardinality="1">
+            <ObjectProperty IRI="#cost"/>
+        </ObjectMinCardinality>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#weight"/>
+        <ObjectUnionOf>
+            <Class IRI="#Camera"/>
+            <Class IRI="#Lens"/>
+        </ObjectUnionOf>
+    </ObjectPropertyDomain>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#cost"/>
+        <Class IRI="#Money"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#hasBody"/>
+        <Class IRI="#Body"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#hasDimension"/>
+        <Class IRI="#Dimension"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#hasFilmSpeed"/>
+        <Class IRI="#Range"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#hasImageCapturingDevice"/>
+        <ObjectUnionOf>
+            <Class IRI="#Film"/>
+            <Class IRI="#ImageSensors"/>
+        </ObjectUnionOf>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#hasImageCapturingDeviceType"/>
+        <Class IRI="#ImageCapturingDeviceType"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#hasImageSize"/>
+        <Class IRI="#Dimension"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#hasLens"/>
+        <Class IRI="#Lens"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#hasManufacturer"/>
+        <Class IRI="#Manufacturer"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#hasPart"/>
+        <Class IRI="#PurchaseableItem"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#hasProductCode"/>
+        <Class IRI="#ProductCode"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#hasViewFinder"/>
+        <Class IRI="#ViewerWindow"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#isCompatibleWith"/>
+        <ObjectUnionOf>
+            <Class IRI="#Body"/>
+            <Class IRI="#Lens"/>
+        </ObjectUnionOf>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#isProductCodeFor"/>
+        <Class IRI="#PurchaseableItem"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#manufactures"/>
+        <Class IRI="#PurchaseableItem"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#shutter-speed"/>
+        <Class IRI="#Range"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#weight"/>
+        <Class IRI="#Weight"/>
+    </ObjectPropertyRange>
+    <EquivalentDataProperties>
+        <DataProperty IRI="#aperture"/>
+        <DataProperty IRI="#f-stop"/>
+    </EquivalentDataProperties>
+    <EquivalentDataProperties>
+        <DataProperty IRI="#focal-length"/>
+        <DataProperty IRI="#size"/>
+    </EquivalentDataProperties>
+    <FunctionalDataProperty>
+        <DataProperty IRI="#breadth"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="#colour"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="#currency"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="#dxCoding"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="#height"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="#length"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="#max"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="#min"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="#noOfExposures"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="#size"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="#speed"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="#units"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="#value"/>
+    </FunctionalDataProperty>
+    <DataPropertyDomain>
+        <DataProperty IRI="#aperture"/>
+        <Class IRI="#Lens"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#breadth"/>
+        <Class IRI="#Dimension"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#colour"/>
+        <Class IRI="#Film"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#currency"/>
+        <Class IRI="#Money"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#dxCoding"/>
+        <Class IRI="#Film"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#f-stop"/>
+        <Class IRI="#Lens"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#focal-length"/>
+        <Class IRI="#Lens"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#height"/>
+        <Class IRI="#Dimension"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#length"/>
+        <Class IRI="#Dimension"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#max"/>
+        <Class IRI="#Range"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#min"/>
+        <Class IRI="#Range"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#noOfExposures"/>
+        <Class IRI="#Film"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#size"/>
+        <Class IRI="#Lens"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#speed"/>
+        <Class IRI="#Film"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#steps"/>
+        <Class IRI="#Range"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#units"/>
+        <ObjectUnionOf>
+            <Class IRI="#Dimension"/>
+            <Class IRI="#Range"/>
+            <Class IRI="#Weight"/>
+        </ObjectUnionOf>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#value"/>
+        <ObjectUnionOf>
+            <Class IRI="#Money"/>
+            <Class IRI="#Weight"/>
+        </ObjectUnionOf>
+    </DataPropertyDomain>
+    <DataPropertyRange>
+        <DataProperty IRI="#aperture"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#breadth"/>
+        <Datatype abbreviatedIRI="xsd:float"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#colour"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#currency"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#dxCoding"/>
+        <Datatype abbreviatedIRI="xsd:boolean"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#f-stop"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#focal-length"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#height"/>
+        <Datatype abbreviatedIRI="xsd:float"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#length"/>
+        <Datatype abbreviatedIRI="xsd:float"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#max"/>
+        <Datatype abbreviatedIRI="xsd:float"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#min"/>
+        <Datatype abbreviatedIRI="xsd:float"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#noOfExposures"/>
+        <Datatype abbreviatedIRI="xsd:int"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#size"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#speed"/>
+        <Datatype abbreviatedIRI="xsd:int"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#steps"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#units"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#value"/>
+        <Datatype abbreviatedIRI="xsd:float"/>
+    </DataPropertyRange>
+</Ontology>
+
+
+
+<!-- Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi -->
+

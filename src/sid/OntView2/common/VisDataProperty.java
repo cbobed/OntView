@@ -196,36 +196,49 @@ public class VisDataProperty extends VisProperty {
 	public static void addDomain(VisGraph v, NodeSet<OWLClass> propertyDomainNodeSet,
                                  OWLDataProperty property, OWLOntology ontology,
                                  String range){
-		// Since property domain returned more than one class, this will have
-		// to create  a new class as the intersection of all of them
-		OWLDataFactory dFactory = OWLManager.getOWLDataFactory();
-		HashSet<OWLClassExpression> terms = new HashSet<>();
 
-		for ( org.semanticweb.owlapi.reasoner.Node<OWLClass> node : propertyDomainNodeSet.getNodes()){
-            terms.addAll(node.getEntities());
+		Hashtable<OWLPropertyExpression, OWLClassExpression> domainsInfo = v.renamer.getExpressionHarvester().getDomainClasses();
+		OWLClassExpression result = null;
+		VisClass resultShape = null;
+		if (!domainsInfo.containsKey(property)) {
+			// Since property domain returned more than one class, this will have
+			// to create  a new class as the intersection of all of them
+			OWLDataFactory dFactory = OWLManager.getOWLDataFactory();
+			HashSet<OWLClassExpression> terms = new HashSet<>();
+
+			for ( org.semanticweb.owlapi.reasoner.Node<OWLClass> node : propertyDomainNodeSet.getNodes()){
+	            terms.addAll(node.getEntities());
+			}
+			result = dFactory.getOWLObjectIntersectionOf(terms);
+
+			VisLevel l = VisLevel.getLevelFromID(v.levelSet,1);
+			VisClass intersection = new VisClass(1, result, ExpressionManager.getReducedClassExpression(result), v);
+
+			l.addShape(intersection);
+			v.shapeMap.put(Shape.getKey(result), intersection);
+			intersection.isAnonymous = true;
+			intersection.setHeight(intersection.calculateHeight());
+			intersection.setWidth(intersection.calculateWidth());
+			intersection.setVisLevel(l);
+			for (OWLClassExpression term : terms){
+				Shape sup = v.lookUpOrCreate(term);
+				VisConnectorIsA con = new VisConnectorIsA(sup,intersection);
+				v.connectorList.add(con);
+				intersection.inConnectors.add(con);
+				sup.outConnectors.add(con);
+			}
+			resultShape = intersection;
+
 		}
-		OWLObjectIntersectionOf result = dFactory.getOWLObjectIntersectionOf(terms);
-		VisLevel l = VisLevel.getLevelFromID(v.levelSet,1);
-		VisClass intersection = new VisClass(1, result, ExpressionManager.getReducedClassExpression(result), v);
-
-		l.addShape(intersection);
-		v.shapeMap.put(Shape.getKey(result), intersection);
-		intersection.isAnonymous = true;
-		intersection.setHeight(intersection.calculateHeight());
-		intersection.setWidth(intersection.calculateWidth());
-		intersection.setVisLevel(l);
-		for (OWLClassExpression term : terms){
-			Shape sup = v.lookUpOrCreate(term);
-			VisConnectorIsA con = new VisConnectorIsA(sup,intersection);
-			v.connectorList.add(con);
-			intersection.inConnectors.add(con);
-			sup.outConnectors.add(con);
+		else {
+			result = domainsInfo.get(property);
+			resultShape = v.getShapeFromOWLClassExpression(result).asVisClass();
 		}
 
-		intersection.properties.add(property.getIRI().getFragment());
-		if (intersection.getPropertyBox() == null) {
-			intersection.createPropertyBox();
+		resultShape.properties.add(property.getIRI().getFragment());
+		if (resultShape.getPropertyBox() == null) {
+			resultShape.createPropertyBox();
 		}	
-		intersection.getPropertyBox().add(property,range,ontology);
+		resultShape.getPropertyBox().add(property,range,ontology);
 	}
 }

@@ -82,6 +82,7 @@ public class VisClass extends Shape {
 
 	public boolean isAnonymous(){return isAnonymous;}
 	public ArrayList<Shape> getChildren() {return children;}
+	public ArrayList<Shape> getParents() {return parents; }
 
 	public Set<Shape> getDescendants() { return descendants; }
 	public Set<Shape> getAncestors() { return ancestors; }

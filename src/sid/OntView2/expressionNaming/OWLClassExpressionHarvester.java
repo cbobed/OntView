@@ -3,24 +3,83 @@ package sid.OntView2.expressionNaming;
 import org.semanticweb.owlapi.model.*;
 
 import javax.annotation.Nonnull;
+
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 
 public class OWLClassExpressionHarvester implements OWLAxiomVisitor {
 
 	ArrayList<OWLClassExpression> harvestedClasses;
-	ArrayList<OWLClassExpression> domainClasses;
-	ArrayList<OWLClassExpression> rangeClasses;
+	Hashtable<OWLPropertyExpression, OWLClassExpression> domainClasses;
+	Hashtable<OWLPropertyExpression, OWLClassExpression> rangeClasses;
+	
+	Hashtable<OWLDataProperty, Set<OWLClassExpression>> domainIntersectionsDataProp;
+	Hashtable<OWLObjectProperty, Set<OWLClassExpression>> domainIntersectionsObjProp;
+	Hashtable<OWLObjectProperty, Set<OWLClassExpression>> rangeIntersectionsObjProp;
+	
 	
 	public OWLClassExpressionHarvester () {
 		this.harvestedClasses = new ArrayList<>();
-		this.domainClasses = new ArrayList<>(); 
-		this.rangeClasses = new ArrayList<>(); 
+		this.domainClasses = new Hashtable<>(); 
+		this.rangeClasses = new Hashtable<>(); 
+		
+		this.domainIntersectionsDataProp = new Hashtable<>(); 
+		this.domainIntersectionsObjProp = new Hashtable<>(); 
+		this.rangeIntersectionsObjProp = new Hashtable<>();
 	}
 	
-	public ArrayList<OWLClassExpression> getHarvestedClasses() {
+	public Hashtable<OWLPropertyExpression, OWLClassExpression> getDomainClasses() {
+		return domainClasses; 
+	}
+	
+	public Hashtable<OWLPropertyExpression, OWLClassExpression> getRangeClasses() {
+		return rangeClasses; 
+	}
+	
+	public ArrayList<OWLClassExpression> getHarvestedClasses(OWLDataFactory dataFactory) {
+		System.out.println("--> Harvested without consolidating: "+harvestedClasses.size()); 
+		int consolidated = 0; 
+		if (domainClasses.isEmpty() || rangeClasses.isEmpty()) {
+			// we consolidate the domains and the ranges and 
+			// add them to the harvestedClasses list 
+			for (Entry<OWLDataProperty, Set<OWLClassExpression>> ent: domainIntersectionsDataProp.entrySet()) {
+				if (ent.getValue().size()>1) {
+					domainClasses.put(ent.getKey(), dataFactory.getOWLObjectIntersectionOf(ent.getValue())); 
+					consolidated++; 
+				}
+				else if (ent.getValue().size() == 1) {
+					domainClasses.put(ent.getKey(), ent.getValue().iterator().next()); 
+				}
+			}
+			
+			for (Entry<OWLObjectProperty, Set<OWLClassExpression>> ent: domainIntersectionsObjProp.entrySet()) {
+				if (ent.getValue().size()>1) {
+					domainClasses.put(ent.getKey(), dataFactory.getOWLObjectIntersectionOf(ent.getValue())); 
+					consolidated++; 
+				}
+				else if (ent.getValue().size() == 1) {
+					domainClasses.put(ent.getKey(), ent.getValue().iterator().next()); 
+				}
+			}
+			for (Entry<OWLObjectProperty, Set<OWLClassExpression>> ent: rangeIntersectionsObjProp.entrySet()) {
+				if (ent.getValue().size()>1) {
+					rangeClasses.put(ent.getKey(), dataFactory.getOWLObjectIntersectionOf(ent.getValue())); 
+					consolidated++; 
+				}
+				else if (ent.getValue().size() == 1) {
+					rangeClasses.put(ent.getKey(), ent.getValue().iterator().next()); 
+				}
+			}
+			
+			harvestedClasses.addAll(domainClasses.values()); 
+			harvestedClasses.addAll(rangeClasses.values()); 
+		}
+		System.out.println("--> Harvested after consolidating: "+harvestedClasses.size() + " of which: "+consolidated+" are AND-built"); 
 		return harvestedClasses;
 	}
 
@@ -87,7 +146,7 @@ public class OWLClassExpressionHarvester implements OWLAxiomVisitor {
 	@Override
 	public void visit(OWLDisjointClassesAxiom axiom) {
 		
-		List<OWLClassExpression> operands = axiom.getClassExpressionsAsList();
+		List<OWLClassExpression> operands = axiom.getClassExpressionsAsList(); 
 		
 		for (OWLClassExpression ce: operands) {
 			if (ce.isAnonymous()) {
@@ -125,22 +184,34 @@ public class OWLClassExpressionHarvester implements OWLAxiomVisitor {
 
 	@Override
 	public void visit(OWLDataPropertyDomainAxiom axiom) {
-		OWLClassExpression domain = axiom.getDomain();
-		if (domain.isAnonymous()) {
-			harvestedClasses.add(domain); 
-			domainClasses.add(domain); 
-		}
+		OWLClassExpression domain = axiom.getDomain();		
+		if (!domainIntersectionsDataProp.containsKey(axiom.getProperty())) {
+			domainIntersectionsDataProp.put(axiom.getProperty().asOWLDataProperty(), new HashSet<>()); 
+		}	
+		domainIntersectionsDataProp.get(axiom.getProperty()).add(domain); 
 	}
 
 	@Override
 	public void visit(OWLObjectPropertyDomainAxiom axiom) {
 	
 		OWLClassExpression domain = axiom.getDomain();
+		OWLObjectProperty objProp = null; 
 		
-		if (domain.isAnonymous()) {
-			harvestedClasses.add(domain);
-			domainClasses.add(domain); 
+		if (axiom.getProperty() instanceof OWLObjectInverseOf) {
+			objProp = ((OWLObjectInverseOf)axiom.getProperty()).getNamedProperty(); 
+			if (!rangeIntersectionsObjProp.containsKey(objProp)) {
+				rangeIntersectionsObjProp.put(objProp, new HashSet<>()); 
+			}	
+			rangeIntersectionsObjProp.get(objProp).add(domain);
 		}
+		else {
+			if (!domainIntersectionsObjProp.containsKey(axiom.getProperty())) {
+				domainIntersectionsObjProp.put(axiom.getProperty().asOWLObjectProperty(), new HashSet<>()); 
+			}	
+			domainIntersectionsObjProp.get(axiom.getProperty()).add(domain);
+		}
+		
+		 
 	}
 
 	@Override
@@ -166,12 +237,24 @@ public class OWLClassExpressionHarvester implements OWLAxiomVisitor {
 
 	@Override
 	public void visit(OWLObjectPropertyRangeAxiom axiom) {
-        OWLClassExpression range = axiom.getRange();
+		OWLClassExpression range = axiom.getRange();
+		OWLObjectProperty objProp = null; 
 		
-		if (range.isAnonymous()) {
-			harvestedClasses.add(range);
-			rangeClasses.add(range); 
+		if (axiom.getProperty() instanceof OWLObjectInverseOf) {
+			objProp = ((OWLObjectInverseOf)axiom.getProperty()).getNamedProperty(); 
+			if (!domainIntersectionsObjProp.containsKey(objProp)) {
+				domainIntersectionsObjProp.put(objProp, new HashSet<>()); 
+			}	
+			domainIntersectionsObjProp.get(objProp).add(range);
 		}
+		else {
+			if (!rangeIntersectionsObjProp.containsKey(axiom.getProperty())) {
+				rangeIntersectionsObjProp.put(axiom.getProperty().asOWLObjectProperty(), new HashSet<>()); 
+			}	
+			rangeIntersectionsObjProp.get(axiom.getProperty()).add(range);
+		}
+		
+		
 	}
 
 	@Override

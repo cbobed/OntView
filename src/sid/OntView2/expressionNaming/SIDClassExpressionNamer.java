@@ -10,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
@@ -26,17 +27,22 @@ public class SIDClassExpressionNamer {
 	Set<OWLEquivalentClassesAxiom> axiomsToAdd;
 
 	OWLOntology ontology;
+	OWLDataFactory dataFactory; 
 	OWLReasoner reasoner;
+	
+	OWLClassExpressionHarvester expressionHarvester; 
 
 	private int classID = 1;
 	public static String className = "SIDClass_";
 
 	public SIDClassExpressionNamer (OWLOntology ont, OWLReasoner reasoner) {
 		this.ontology = ont;
+		this.dataFactory = ont.getOWLOntologyManager().getOWLDataFactory(); 
 		this.reasoner = reasoner;
 		this.classesToAdd = null;
 		this.classesFiltered = new ArrayList<>();
 		this.axiomsToAdd = new HashSet<> ();
+		this.expressionHarvester = null; 
 	}
 	
 	public void applyNaming (boolean refreshReasoner) {
@@ -93,13 +99,17 @@ public class SIDClassExpressionNamer {
 	}
 	
 	private void retrieveClassExpressions () {
-		OWLClassExpressionHarvester axiomVisitor = new OWLClassExpressionHarvester();
+		expressionHarvester = new OWLClassExpressionHarvester();
 		// we apply the reduction in this module to all the
 		// import closure
 		for (OWLAxiom axiom: ontology.getTBoxAxioms(Imports.INCLUDED)) {
-			axiom.accept(axiomVisitor);
+			axiom.accept(expressionHarvester);
 		}
-		classesToAdd = axiomVisitor.getHarvestedClasses();		
+		classesToAdd = expressionHarvester.getHarvestedClasses(this.dataFactory);		
+	}
+	
+	public OWLClassExpressionHarvester getExpressionHarvester() {
+		return expressionHarvester; 
 	}
 	
 	private void applySyntacticSieve() throws NonGatheredClassExpressionsException {

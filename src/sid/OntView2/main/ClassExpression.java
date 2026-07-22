@@ -86,7 +86,7 @@ public class ClassExpression extends Stage {
 
     private VBox selectParentCheckBox() {
         VBox parentListBox = new VBox(5);
-        StackPane parentTitle = createTitlePane("Parent");
+        StackPane parentTitle = createTitlePane("Superclass");
         parentSearchField = new TextField();
         parentSearchField.setPromptText("Search node...");
 
@@ -107,7 +107,7 @@ public class ClassExpression extends Stage {
 
     private VBox selectChildCheckBox() {
         VBox childListBox = new VBox(5);
-        StackPane childTitle = createTitlePane("Child");
+        StackPane childTitle = createTitlePane("Subclass");
         childSearchField = new TextField();
         childSearchField.setPromptText("Search node...");
 
@@ -287,7 +287,6 @@ public class ClassExpression extends Stage {
         }
         if (selectedChild != null && selectedParent != null) {
             parent.artPanel.cleanConnectors();
-            parent.artPanel.isClassExpressionUsed = true;
             parent.artPanel.getVisGraph().rebuildGraphSelectedNodes(selectedParent.getLinkedClassExpression(), selectedChild.getLinkedClassExpression());
             close();
         }
