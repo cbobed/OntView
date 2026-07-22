@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # Script to install the necessary JAR files before launching the application
 
 echo "Installing maven..."
