@@ -930,7 +930,12 @@ public class TopPanel extends Canvas implements ControlPanelInterface {
 
 		if ((x != null) && (!x.isEmpty())) {
 			try {
+
+				long start = System.nanoTime(); 
 				boolean loaded = parent.loadReasoner(x);
+				long stop = System.nanoTime(); 
+				logger.info("Create reasoner and precompute inferences: "+((stop-start)/1_000_000_000.0)+" s.");
+				
 				if(!loaded) {
                     logger.error("Reasoner could not be loaded.");
 					return;

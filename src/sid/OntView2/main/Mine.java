@@ -51,7 +51,7 @@ import sid.OntView2.utils.ExpressionManager;
 import sid.OntView2.utils.ImageMerger;
 
 public class Mine extends Application implements Embedable{
-    private static final Logger logger = LogManager.getLogger(Mine.class);
+    private static final java.util.logging.Logger logger = LogManager.getLogger(Mine.class);
 	private Stage primaryStage;
 	private static final long serialVersionUID = 1L;
 
@@ -197,7 +197,11 @@ public class Mine extends Application implements Embedable{
 			try {
                 set = loaderFuture.get();
 				//set reasoner and ontology before creating
+                long start = System.nanoTime(); 
 				artPanel.createReasonedGraph(set,check);
+				long stop = System.nanoTime(); 
+				logger.info("Create reasoned graph time: "+((stop-start)/1_000_000_000.0)+" s.");
+				
 				artPanel.setCursor(Cursor.DEFAULT);
 				artPanel.cleanConnectors();
 			}
@@ -234,7 +238,12 @@ public class Mine extends Application implements Embedable{
 		Task<Void> task = new Task<>() {
 			@Override
 			protected Void call() {
+				
+				long start = System.nanoTime(); 
 				loadActiveOntology(source);
+				long stop = System.nanoTime(); 
+				logger.info("Loading ontology time: "+((stop-start)/1_000_000_000.0)+" s.");
+				
                 if (isCancelled()) {
                     nTopPanel.getLoadReasonerButton().setDisable(true);
                     nTopPanel.getReasonerCombo().setDisable(true);
@@ -404,7 +413,11 @@ public class Mine extends Application implements Embedable{
 		Task<Void> task = new Task<>() {
 			@Override
 			protected Void call() {
+				long start = System.nanoTime(); 
 				loadActiveOntology(IRI.create(info[0]));
+				long stop = System.nanoTime(); 
+				logger.info("Loading ontology time: "+((stop-start)/1_000_000_000.0)+" s.");
+				
 				nTopPanel.loadReasonerButtonActionActionPerformed(arg0);
 				VisPositionConfig.restoreState(artPanel.getVisGraph());
 				VisLevel.adjustWidthAndPos(artPanel.getVisGraph().getLevelSet());
