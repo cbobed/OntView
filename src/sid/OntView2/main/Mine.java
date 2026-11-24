@@ -51,8 +51,11 @@ import sid.OntView2.utils.ErrorHandler;
 import sid.OntView2.utils.ExpressionManager;
 import sid.OntView2.utils.ImageMerger;
 
+import java.time.Duration;
+import java.time.Instant;
+
 public class Mine extends Application implements Embedable{
-    private static final Logger logger = LogManager.getLogger(Mine.class);
+    private static final java.util.logging.Logger logger = LogManager.getLogger(Mine.class);
 	private Stage primaryStage;
 	private static final long serialVersionUID = 1L;
 
@@ -69,8 +72,7 @@ public class Mine extends Application implements Embedable{
     public static boolean cancelledFlag = false;
     private static final double SCROLL_INCREMENT = 10000;
     private static final double SPEED = 100;
-
-
+    
     /* Code for standalone app initialization */
 
 	public static void main(String[] args) {
@@ -210,7 +212,10 @@ public class Mine extends Application implements Embedable{
 			try {
                 set = loaderFuture.get();
 				//set reasoner and ontology before creating
+                long start = System.nanoTime(); 
 				artPanel.createReasonedGraph(set,check);
+				long stop = System.nanoTime(); 
+				logger.info("Create Reasoned graph: "+((stop-start)/1_000_000_000.0)+" s.");
 				artPanel.setCursor(Cursor.DEFAULT);
 				artPanel.cleanConnectors();
 			}
@@ -247,7 +252,10 @@ public class Mine extends Application implements Embedable{
 		Task<Void> task = new Task<>() {
 			@Override
 			protected Void call() {
+				long start = System.nanoTime(); 
 				loadActiveOntology(source);
+				long stop = System.nanoTime();   
+				logger.info("Load ontology time: "+((stop-start)/1_000_000_000.0)+" s.");
                 if (isCancelled()) {
                     nTopPanel.getLoadReasonerButton().setDisable(true);
                     nTopPanel.getReasonerCombo().setDisable(true);
@@ -338,6 +346,7 @@ public class Mine extends Application implements Embedable{
 			OWLReasonerConfiguration config = new SimpleConfiguration(progressMonitor);
 
 			try {
+				long start = System.nanoTime(); 
 				// Create a reasoner that will reason over our ontology and its imports' closure.  Pass in the configuration.
 				reasoner = getReasonerFactory(reasonerString).createReasoner(activeOntology, config);
 
@@ -348,6 +357,8 @@ public class Mine extends Application implements Embedable{
 				
 				reasoner.precomputeInferences();
 				artPanel.setReasoner(reasoner);
+				long stop = System.nanoTime(); 
+				logger.info("Create reasoner and precomputing inferences: "+((stop-start)/1_000_000_000.0)+" s.");
 				return true;
 			} catch (Exception e) {
 				e.printStackTrace();
